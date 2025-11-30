@@ -1,0 +1,76 @@
+# Fastforge configuration for Klit
+# https://pub.dev/packages/fastforge
+
+app_name: Klit
+description: E621 compatible Flutter app with iOS-style design
+version: 1.0.0
+output: build/dist
+
+android:
+  build_aab: false
+  build_apk: true
+  target_platform: android-arm,android-arm64,android-x64
+  flavor: null
+  build_number: null
+
+ios:
+  build_ipa: true
+  export_options:
+    method: ad-hoc
+    # For App Store distribution, use:
+    # method: app-store
+
+linux:
+  build_appimage: true
+  build_deb: true
+  build_rpm: true
+  maintainer: Klit Developer
+  
+  appimage:
+    include:
+      - libmpv.so.1
+
+  deb:
+    priority: optional
+    section: graphics
+    installed_size: null
+    essential: false
+    maintainer_scripts:
+      postinst: null
+      prerm: null
+
+  rpm:
+    release: 1
+    license: MIT
+    group: Applications/Graphics
+
+macos:
+  build_dmg: true
+  identity:
+    identity_name: null
+    
+  dmg:
+    title: Klit
+    icon: null
+    background: null
+    icon_size: 80
+    contents:
+      - x: 448
+        y: 185
+        type: link
+        path: '/Applications'
+      - x: 192
+        y: 185
+        type: file
+
+windows:
+  build_exe: true
+  
+  exe:
+    icon_path: windows/runner/resources/app_icon.ico
+    install_dir_name: Klit
+    locales:
+      - en-US
+    setup_icon_file: null
+    license_file: null
+

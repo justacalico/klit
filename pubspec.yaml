@@ -21,9 +21,10 @@ dependencies:
   shimmer: ^3.0.0
   connectivity_plus: ^6.0.3
   pull_to_refresh: ^2.0.0
-  uuid: ^4.4.0
+  uuid: ^3.0.5
   video_player: ^2.8.0
   chewie: ^1.8.0
+  fastforge: ^0.6.6
 
 dev_dependencies:
   flutter_test:
