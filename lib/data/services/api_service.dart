@@ -166,26 +166,36 @@ class ApiService {
         limit: limit,
       );
 
+      final queryParams = params.toQueryParams();
+      print('Making request to ${ApiConstants.postsEndpoint} with params: $queryParams');
+
       final response = await _dio.get(
         ApiConstants.postsEndpoint,
-        queryParameters: params.toQueryParams(),
+        queryParameters: queryParams,
       );
+
+      print('Response status: ${response.statusCode}');
 
       if (response.statusCode == 200 && response.data != null) {
         final postsData = response.data['posts'] as List<dynamic>;
+        print('Got ${postsData.length} posts');
         final posts = postsData
             .map((e) => Post.fromJson(e as Map<String, dynamic>))
             .where((p) => p.file.url != null) // Filter out posts without URLs
             .toList();
+        print('After filtering: ${posts.length} posts with URLs');
         return ApiResult.success(posts);
       }
       return ApiResult.failure(ApiException.unknown());
     } on DioException catch (e) {
+      print('API Error: ${e.message}');
+      print('Response: ${e.response?.data}');
       if (e.error is ApiException) {
         return ApiResult.failure(e.error as ApiException);
       }
       return ApiResult.failure(ApiException.unknown(e));
     } catch (e) {
+      print('Exception: $e');
       return ApiResult.failure(ApiException.unknown(e));
     }
   }
@@ -216,10 +226,13 @@ class ApiService {
     int page = 1,
   }) async {
     try {
+      // Popular endpoint uses 'date' parameter with format YYYY-MM-DD
+      // Or we can use the posts endpoint with order:score and date filter
       final response = await _dio.get(
-        '/popular.json',
+        ApiConstants.postsEndpoint,
         queryParameters: {
-          'scale': scale,
+          'tags': 'order:score',
+          'limit': ApiConstants.defaultPageSize,
           'page': page,
         },
       );
@@ -234,11 +247,14 @@ class ApiService {
       }
       return ApiResult.failure(ApiException.unknown());
     } on DioException catch (e) {
+      print('Popular posts error: ${e.message}');
+      print('Response: ${e.response?.data}');
       if (e.error is ApiException) {
         return ApiResult.failure(e.error as ApiException);
       }
       return ApiResult.failure(ApiException.unknown(e));
     } catch (e) {
+      print('Popular posts exception: $e');
       return ApiResult.failure(ApiException.unknown(e));
     }
   }

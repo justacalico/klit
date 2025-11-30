@@ -124,12 +124,14 @@ class PostSearchParams {
     if (rating != null && rating!.isNotEmpty) {
       tagParts.add('rating:$rating');
     }
-    if (order != null && order!.isNotEmpty) {
-      tagParts.add('order:$order');
-    }
 
     if (tagParts.isNotEmpty) {
       params['tags'] = tagParts.join(' ');
+    }
+    
+    // Order is a separate query parameter, not a tag
+    if (order != null && order!.isNotEmpty) {
+      params['tags'] = (params['tags'] ?? '') + ' order:$order';
     }
 
     return params;

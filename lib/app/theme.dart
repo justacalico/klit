@@ -13,34 +13,6 @@ class AppTheme {
       primaryContrastingColor: CupertinoColors.white,
       scaffoldBackgroundColor: AppColors.lightBackground,
       barBackgroundColor: Color(0xF0F9F9F9),
-      textTheme: CupertinoTextThemeData(
-        primaryColor: AppColors.primaryBlue,
-        textStyle: TextStyle(
-          fontSize: 17,
-          color: CupertinoColors.label,
-          fontFamily: '.SF Pro Text',
-          letterSpacing: -0.41,
-        ),
-        navTitleTextStyle: TextStyle(
-          fontSize: 17,
-          fontWeight: FontWeight.w600,
-          color: CupertinoColors.label,
-          fontFamily: '.SF Pro Text',
-          letterSpacing: -0.41,
-        ),
-        navLargeTitleTextStyle: TextStyle(
-          fontSize: 34,
-          fontWeight: FontWeight.w700,
-          color: CupertinoColors.label,
-          fontFamily: '.SF Pro Display',
-          letterSpacing: 0.41,
-        ),
-        tabLabelTextStyle: TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.w500,
-          fontFamily: '.SF Pro Text',
-        ),
-      ),
     );
   }
 
@@ -52,34 +24,6 @@ class AppTheme {
       primaryContrastingColor: CupertinoColors.white,
       scaffoldBackgroundColor: AppColors.darkBackground,
       barBackgroundColor: Color(0xF01C1C1E),
-      textTheme: CupertinoTextThemeData(
-        primaryColor: AppColors.primaryBlue,
-        textStyle: TextStyle(
-          fontSize: 17,
-          color: CupertinoColors.white,
-          fontFamily: '.SF Pro Text',
-          letterSpacing: -0.41,
-        ),
-        navTitleTextStyle: TextStyle(
-          fontSize: 17,
-          fontWeight: FontWeight.w600,
-          color: CupertinoColors.white,
-          fontFamily: '.SF Pro Text',
-          letterSpacing: -0.41,
-        ),
-        navLargeTitleTextStyle: TextStyle(
-          fontSize: 34,
-          fontWeight: FontWeight.w700,
-          color: CupertinoColors.white,
-          fontFamily: '.SF Pro Display',
-          letterSpacing: 0.41,
-        ),
-        tabLabelTextStyle: TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.w500,
-          fontFamily: '.SF Pro Text',
-        ),
-      ),
     );
   }
 

@@ -55,8 +55,21 @@ class Post {
 
   /// Create a Post from JSON
   factory Post.fromJson(Map<String, dynamic> json) {
+    // Helper to safely parse int
+    int? parseInt(dynamic value) {
+      if (value == null) return null;
+      if (value is int) return value;
+      if (value is String) return int.tryParse(value);
+      return null;
+    }
+    
+    // Helper to safely parse required int
+    int parseIntRequired(dynamic value, int defaultValue) {
+      return parseInt(value) ?? defaultValue;
+    }
+
     return Post(
-      id: json['id'] as int,
+      id: parseIntRequired(json['id'], 0),
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       file: PostFile.fromJson(json['file'] as Map<String, dynamic>),
@@ -64,20 +77,24 @@ class Post {
       sample: PostSample.fromJson(json['sample'] as Map<String, dynamic>),
       score: PostScore.fromJson(json['score'] as Map<String, dynamic>),
       tags: PostTags.fromJson(json['tags'] as Map<String, dynamic>),
-      lockedTags: List<int>.from(json['locked_tags'] ?? []),
-      changeSeq: json['change_seq'] as int,
+      lockedTags: (json['locked_tags'] as List<dynamic>?)
+          ?.map((e) => e is int ? e : int.tryParse(e.toString()) ?? 0)
+          .toList() ?? [],
+      changeSeq: parseIntRequired(json['change_seq'], 0),
       flags: PostFlags.fromJson(json['flags'] as Map<String, dynamic>),
-      rating: json['rating'] as String,
-      favCount: json['fav_count'] as int,
+      rating: json['rating'] as String? ?? 's',
+      favCount: parseIntRequired(json['fav_count'], 0),
       sources: List<String>.from(json['sources'] ?? []),
-      pools: List<int>.from(json['pools'] ?? []),
+      pools: (json['pools'] as List<dynamic>?)
+          ?.map((e) => e is int ? e : int.tryParse(e.toString()) ?? 0)
+          .toList() ?? [],
       relationships: PostRelationships.fromJson(
         json['relationships'] as Map<String, dynamic>,
       ),
-      approverId: json['approver_id'] as int?,
-      uploaderId: json['uploader_id'] as int,
+      approverId: parseInt(json['approver_id']),
+      uploaderId: parseIntRequired(json['uploader_id'], 0),
       description: json['description'] as String? ?? '',
-      commentCount: json['comment_count'] as int,
+      commentCount: parseIntRequired(json['comment_count'], 0),
       isFavorited: json['is_favorited'] as bool? ?? false,
       hasNotes: json['has_notes'] as bool? ?? false,
       duration: json['duration'] != null
@@ -147,11 +164,11 @@ class PostFile {
 
   factory PostFile.fromJson(Map<String, dynamic> json) {
     return PostFile(
-      width: json['width'] as int,
-      height: json['height'] as int,
-      ext: json['ext'] as String,
-      size: json['size'] as int,
-      md5: json['md5'] as String,
+      width: (json['width'] as num?)?.toInt() ?? 0,
+      height: (json['height'] as num?)?.toInt() ?? 0,
+      ext: json['ext'] as String? ?? '',
+      size: (json['size'] as num?)?.toInt() ?? 0,
+      md5: json['md5'] as String? ?? '',
       url: json['url'] as String?,
     );
   }
@@ -173,8 +190,8 @@ class PostPreview {
 
   factory PostPreview.fromJson(Map<String, dynamic> json) {
     return PostPreview(
-      width: json['width'] as int,
-      height: json['height'] as int,
+      width: (json['width'] as num?)?.toInt() ?? 0,
+      height: (json['height'] as num?)?.toInt() ?? 0,
       url: json['url'] as String?,
     );
   }
@@ -198,9 +215,9 @@ class PostSample {
 
   factory PostSample.fromJson(Map<String, dynamic> json) {
     return PostSample(
-      has: json['has'] as bool,
-      height: json['height'] as int,
-      width: json['width'] as int,
+      has: json['has'] as bool? ?? false,
+      height: (json['height'] as num?)?.toInt() ?? 0,
+      width: (json['width'] as num?)?.toInt() ?? 0,
       url: json['url'] as String?,
       alternates: json['alternates'] as Map<String, dynamic>?,
     );
@@ -221,9 +238,9 @@ class PostScore {
 
   factory PostScore.fromJson(Map<String, dynamic> json) {
     return PostScore(
-      up: json['up'] as int,
-      down: json['down'] as int,
-      total: json['total'] as int,
+      up: (json['up'] as num?)?.toInt() ?? 0,
+      down: (json['down'] as num?)?.toInt() ?? 0,
+      total: (json['total'] as num?)?.toInt() ?? 0,
     );
   }
 }
@@ -317,12 +334,12 @@ class PostFlags {
 
   factory PostFlags.fromJson(Map<String, dynamic> json) {
     return PostFlags(
-      pending: json['pending'] as bool,
-      flagged: json['flagged'] as bool,
-      noteLocked: json['note_locked'] as bool,
-      statusLocked: json['status_locked'] as bool,
-      ratingLocked: json['rating_locked'] as bool,
-      deleted: json['deleted'] as bool,
+      pending: json['pending'] as bool? ?? false,
+      flagged: json['flagged'] as bool? ?? false,
+      noteLocked: json['note_locked'] as bool? ?? false,
+      statusLocked: json['status_locked'] as bool? ?? false,
+      ratingLocked: json['rating_locked'] as bool? ?? false,
+      deleted: json['deleted'] as bool? ?? false,
     );
   }
 }
@@ -343,10 +360,12 @@ class PostRelationships {
 
   factory PostRelationships.fromJson(Map<String, dynamic> json) {
     return PostRelationships(
-      parentId: json['parent_id'] as int?,
-      hasChildren: json['has_children'] as bool,
-      hasActiveChildren: json['has_active_children'] as bool,
-      children: List<int>.from(json['children'] ?? []),
+      parentId: (json['parent_id'] as num?)?.toInt(),
+      hasChildren: json['has_children'] as bool? ?? false,
+      hasActiveChildren: json['has_active_children'] as bool? ?? false,
+      children: (json['children'] as List<dynamic>?)
+          ?.map((e) => e is int ? e : (e as num).toInt())
+          .toList() ?? [],
     );
   }
 }
