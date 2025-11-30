@@ -123,9 +123,9 @@ class PostCard extends StatelessWidget {
     if (imageUrl == null) {
       return Container(
         color: CupertinoColors.systemGrey5,
-        child: const Center(
+        child: Center(
           child: Icon(
-            CupertinoIcons.photo,
+            post.isVideo ? CupertinoIcons.play_rectangle_fill : CupertinoIcons.photo,
             size: 40,
             color: CupertinoColors.systemGrey,
           ),
@@ -133,20 +133,41 @@ class PostCard extends StatelessWidget {
       );
     }
 
-    return CachedNetworkImage(
-      imageUrl: imageUrl,
-      fit: BoxFit.cover,
-      placeholder: (context, url) => const LoadingShimmer(),
-      errorWidget: (context, url, error) => Container(
-        color: CupertinoColors.systemGrey5,
-        child: const Center(
-          child: Icon(
-            CupertinoIcons.exclamationmark_triangle,
-            size: 30,
-            color: CupertinoColors.systemGrey,
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        CachedNetworkImage(
+          imageUrl: imageUrl,
+          fit: BoxFit.cover,
+          placeholder: (context, url) => const LoadingShimmer(),
+          errorWidget: (context, url, error) => Container(
+            color: CupertinoColors.systemGrey5,
+            child: Center(
+              child: Icon(
+                post.isVideo ? CupertinoIcons.play_rectangle_fill : CupertinoIcons.exclamationmark_triangle,
+                size: 30,
+                color: CupertinoColors.systemGrey,
+              ),
+            ),
           ),
         ),
-      ),
+        // Show play icon overlay for videos
+        if (post.isVideo)
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: CupertinoColors.black.withOpacity(0.5),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                CupertinoIcons.play_fill,
+                color: CupertinoColors.white,
+                size: 24,
+              ),
+            ),
+          ),
+      ],
     );
   }
 

@@ -55,18 +55,32 @@ class _PostDetailPageState extends State<PostDetailPage> {
     );
   }
 
-  void _openFullImage() {
-    if (_post?.file.url == null) return;
-
-    Navigator.of(context).push(
-      CupertinoPageRoute(
-        fullscreenDialog: true,
-        builder: (context) => _FullScreenImageViewer(
-          imageUrl: _post!.file.url!,
-          heroTag: 'post_${_post!.id}',
+  void _openFullMedia() {
+    if (_post == null) return;
+    
+    if (_post!.isVideo) {
+      if (_post!.file.url == null) return;
+      Navigator.of(context).push(
+        CupertinoPageRoute(
+          fullscreenDialog: true,
+          builder: (context) => FullScreenVideoViewer(
+            videoUrl: _post!.file.url!,
+            thumbnailUrl: _post!.preview.url,
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      if (_post?.file.url == null) return;
+      Navigator.of(context).push(
+        CupertinoPageRoute(
+          fullscreenDialog: true,
+          builder: (context) => _FullScreenImageViewer(
+            imageUrl: _post!.file.url!,
+            heroTag: 'post_${_post!.id}',
+          ),
+        ),
+      );
+    }
   }
 
   void _searchTag(String tag) {
@@ -131,6 +145,23 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   Widget _buildImage() {
     final post = _post!;
+    
+    // For videos, show the video player
+    if (post.isVideo && post.file.url != null) {
+      return AspectRatio(
+        aspectRatio: post.file.aspectRatio.clamp(0.5, 2.0),
+        child: VideoPlayerWidget(
+          videoUrl: post.file.url!,
+          thumbnailUrl: post.preview.url,
+          autoPlay: false,
+          looping: true,
+          showControls: true,
+          aspectRatio: post.file.aspectRatio,
+        ),
+      );
+    }
+    
+    // For images
     final imageUrl = post.sample.has ? post.sample.url : post.preview.url;
 
     if (imageUrl == null) {
@@ -150,7 +181,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
 
     return GestureDetector(
-      onTap: _openFullImage,
+      onTap: _openFullMedia,
       child: Hero(
         tag: 'post_${post.id}',
         child: AspectRatio(
@@ -405,9 +436,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.of(context).pop();
-              _openFullImage();
+              _openFullMedia();
             },
-            child: const Text('View Full Resolution'),
+            child: Text(_post?.isVideo == true ? 'View Full Video' : 'View Full Resolution'),
           ),
           CupertinoActionSheetAction(
             onPressed: () {
