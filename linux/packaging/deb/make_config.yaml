@@ -1,0 +1,17 @@
+display_name: Klit
+package_name: klit
+maintainer: Klit Developer <dev@klit.app>
+icon: assets/icon.png
+keywords:
+  - klit
+  - e621
+  - gallery
+  - image
+generic_name: Image Gallery
+categories:
+  - Graphics
+  - Network
+startup_notify: true
+essential: false
+priority: optional
+section: graphics

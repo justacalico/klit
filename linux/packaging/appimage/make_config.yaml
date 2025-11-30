@@ -1,0 +1,13 @@
+display_name: Klit
+icon: assets/icon.png
+keywords:
+  - klit
+  - e621
+  - gallery
+  - image
+generic_name: Image Gallery
+actions: []
+categories:
+  - Graphics
+  - Network
+startup_notify: true

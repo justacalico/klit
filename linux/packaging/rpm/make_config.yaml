@@ -1,0 +1,17 @@
+display_name: Klit
+icon: assets/icon.png
+keywords:
+  - klit
+  - e621
+  - gallery
+  - image
+generic_name: Image Gallery
+categories:
+  - Graphics
+  - Network
+startup_notify: true
+summary: E621 compatible image gallery app
+group: Applications/Graphics
+vendor: Klit Developer
+packager: Klit Developer
+license: MIT

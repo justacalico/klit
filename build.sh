@@ -81,16 +81,23 @@ build_platform() {
             if [[ "$OSTYPE" == "linux-gnu"* ]]; then
                 flutter build linux --release
                 
+                # Use globally installed fastforge
+                FASTFORGE="$HOME/.pub-cache/bin/fastforge"
+                
                 # Build AppImage using fastforge
-                if command -v dart &> /dev/null; then
-                    dart run fastforge package --platform linux --targets appimage || print_warning "AppImage build failed"
+                if [ -x "$FASTFORGE" ]; then
+                    $FASTFORGE package --platform linux --targets appimage || print_warning "AppImage build failed"
+                    $FASTFORGE package --platform linux --targets deb || print_warning "DEB build failed"
+                    $FASTFORGE package --platform linux --targets rpm || print_warning "RPM build failed"
+                else
+                    print_warning "fastforge not found. Run: dart pub global activate fastforge"
                 fi
                 
-                # Build DEB using fastforge
-                dart run fastforge package --platform linux --targets deb || print_warning "DEB build failed"
-                
-                # Build RPM using fastforge
-                dart run fastforge package --platform linux --targets rpm || print_warning "RPM build failed"
+                # Copy linux bundle to dist
+                if [ -d "build/linux/x64/release/bundle" ]; then
+                    cp -r build/linux/x64/release/bundle build/dist/klit-linux
+                    print_status "Linux bundle copied to build/dist/klit-linux"
+                fi
                 
                 print_status "Linux builds completed"
             else
@@ -101,8 +108,15 @@ build_platform() {
             if [[ "$OSTYPE" == "darwin"* ]]; then
                 flutter build macos --release
                 
+                # Use globally installed fastforge
+                FASTFORGE="$HOME/.pub-cache/bin/fastforge"
+                
                 # Build DMG using fastforge
-                dart run fastforge package --platform macos --targets dmg || print_warning "DMG build failed"
+                if [ -x "$FASTFORGE" ]; then
+                    $FASTFORGE package --platform macos --targets dmg || print_warning "DMG build failed"
+                else
+                    print_warning "fastforge not found. Run: dart pub global activate fastforge"
+                fi
                 
                 print_status "macOS DMG built successfully"
             else
@@ -113,8 +127,15 @@ build_platform() {
             if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "cygwin" ]] || [[ "$OSTYPE" == "win32" ]]; then
                 flutter build windows --release
                 
+                # Use globally installed fastforge
+                FASTFORGE="$HOME/.pub-cache/bin/fastforge"
+                
                 # Build EXE installer using fastforge
-                dart run fastforge package --platform windows --targets exe || print_warning "EXE build failed"
+                if [ -x "$FASTFORGE" ]; then
+                    $FASTFORGE package --platform windows --targets exe || print_warning "EXE build failed"
+                else
+                    print_warning "fastforge not found. Run: dart pub global activate fastforge"
+                fi
                 
                 print_status "Windows EXE built successfully"
             else
