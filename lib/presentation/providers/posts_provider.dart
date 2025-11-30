@@ -86,6 +86,7 @@ class PostsProvider extends ChangeNotifier {
     final result = await _apiService.getPosts(
       page: _latestPage,
       limit: ApiConstants.defaultPageSize,
+      tags: 'score:>20',
       order: 'id_desc',
     );
 
