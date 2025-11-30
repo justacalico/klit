@@ -1,0 +1,135 @@
+import 'package:flutter/cupertino.dart';
+import '../../data/models/models.dart';
+import '../../data/services/services.dart';
+
+/// Provider for authentication state
+class AuthProvider extends ChangeNotifier {
+  final AuthService _authService;
+  
+  Account? _currentAccount;
+  List<Account> _accounts = [];
+  bool _isLoading = false;
+  String? _error;
+  bool _isInitialized = false;
+
+  AuthProvider({required AuthService authService})
+      : _authService = authService;
+
+  // Getters
+  Account? get currentAccount => _currentAccount;
+  List<Account> get accounts => _accounts;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
+  bool get isLoggedIn => _currentAccount != null;
+  bool get isInitialized => _isInitialized;
+
+  /// Initialize authentication state
+  Future<void> initialize() async {
+    if (_isInitialized) return;
+    
+    _isLoading = true;
+    // Don't notify during initial load to avoid build-time errors
+
+    try {
+      _currentAccount = await _authService.initializeAuth();
+      _accounts = await _authService.getAccounts();
+      _isInitialized = true;
+    } catch (e) {
+      _error = 'Failed to initialize: $e';
+    } finally {
+      _isLoading = false;
+    }
+  }
+
+  /// Login with credentials
+  Future<bool> login({
+    required String username,
+    required String apiKey,
+    String? host,
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    final result = await _authService.login(
+      username: username,
+      apiKey: apiKey,
+      host: host,
+    );
+
+    return result.when(
+      success: (account) async {
+        _currentAccount = account;
+        _accounts = await _authService.getAccounts();
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      },
+      failure: (error) {
+        _error = error.message;
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      },
+    );
+  }
+
+  /// Switch to a different account
+  Future<bool> switchAccount(String accountId) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    final result = await _authService.switchAccount(accountId);
+
+    return result.when(
+      success: (account) {
+        _currentAccount = account;
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      },
+      failure: (error) {
+        _error = error.message;
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      },
+    );
+  }
+
+  /// Remove an account
+  Future<void> removeAccount(String accountId) async {
+    _isLoading = true;
+    notifyListeners();
+
+    await _authService.removeAccount(accountId);
+    _accounts = await _authService.getAccounts();
+    
+    if (_currentAccount?.id == accountId) {
+      _currentAccount = _accounts.isNotEmpty ? _accounts.first : null;
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  /// Logout
+  Future<void> logout() async {
+    _isLoading = true;
+    notifyListeners();
+
+    await _authService.logout();
+    _accounts = await _authService.getAccounts();
+    _currentAccount = _accounts.isNotEmpty ? _accounts.first : null;
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  /// Clear error
+  void clearError() {
+    _error = null;
+    notifyListeners();
+  }
+}

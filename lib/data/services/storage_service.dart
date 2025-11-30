@@ -1,0 +1,196 @@
+import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
+import '../../core/constants/constants.dart';
+import '../models/models.dart';
+
+/// Service for secure storage operations
+class StorageService {
+  final FlutterSecureStorage _secureStorage;
+  late final SharedPreferences _prefs;
+  bool _initialized = false;
+
+  StorageService({FlutterSecureStorage? secureStorage})
+      : _secureStorage = secureStorage ?? const FlutterSecureStorage();
+
+  /// Initialize the storage service
+  Future<void> init() async {
+    if (_initialized) return;
+    _prefs = await SharedPreferences.getInstance();
+    _initialized = true;
+  }
+
+  // ==================== Account Management ====================
+
+  /// Get all stored accounts
+  Future<List<Account>> getAccounts() async {
+    final accountsJson = await _secureStorage.read(key: AppConstants.accountsKey);
+    if (accountsJson == null) return [];
+
+    final List<dynamic> accountsList = json.decode(accountsJson);
+    return accountsList
+        .map((e) => Account.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Save accounts to secure storage
+  Future<void> saveAccounts(List<Account> accounts) async {
+    final accountsJson = json.encode(accounts.map((e) => e.toJson()).toList());
+    await _secureStorage.write(key: AppConstants.accountsKey, value: accountsJson);
+  }
+
+  /// Add a new account
+  Future<Account> addAccount({
+    required String username,
+    required String apiKey,
+    required String host,
+  }) async {
+    final accounts = await getAccounts();
+    final account = Account(
+      id: const Uuid().v4(),
+      username: username,
+      apiKey: apiKey,
+      host: host,
+      createdAt: DateTime.now(),
+      isActive: accounts.isEmpty,
+    );
+
+    accounts.add(account);
+    await saveAccounts(accounts);
+
+    if (accounts.length == 1) {
+      await setActiveAccountId(account.id);
+    }
+
+    return account;
+  }
+
+  /// Remove an account
+  Future<void> removeAccount(String accountId) async {
+    final accounts = await getAccounts();
+    accounts.removeWhere((a) => a.id == accountId);
+    await saveAccounts(accounts);
+
+    final activeId = await getActiveAccountId();
+    if (activeId == accountId) {
+      await setActiveAccountId(accounts.isNotEmpty ? accounts.first.id : null);
+    }
+  }
+
+  /// Get the active account ID
+  Future<String?> getActiveAccountId() async {
+    return await _secureStorage.read(key: AppConstants.activeAccountKey);
+  }
+
+  /// Set the active account ID
+  Future<void> setActiveAccountId(String? accountId) async {
+    if (accountId == null) {
+      await _secureStorage.delete(key: AppConstants.activeAccountKey);
+    } else {
+      await _secureStorage.write(key: AppConstants.activeAccountKey, value: accountId);
+    }
+  }
+
+  /// Get the active account
+  Future<Account?> getActiveAccount() async {
+    final activeId = await getActiveAccountId();
+    if (activeId == null) return null;
+
+    final accounts = await getAccounts();
+    return accounts.where((a) => a.id == activeId).firstOrNull;
+  }
+
+  // ==================== Preferences ====================
+
+  /// Get the API host
+  String getHost() {
+    return _prefs.getString(AppConstants.hostKey) ?? ApiConstants.defaultHost;
+  }
+
+  /// Set the API host
+  Future<void> setHost(String host) async {
+    await _prefs.setString(AppConstants.hostKey, host);
+  }
+
+  /// Get grid size
+  int getGridSize() {
+    return _prefs.getInt(AppConstants.gridSizeKey) ?? AppConstants.defaultGridColumns;
+  }
+
+  /// Set grid size
+  Future<void> setGridSize(int size) async {
+    await _prefs.setInt(AppConstants.gridSizeKey, size);
+  }
+
+  /// Get safe mode setting
+  bool getSafeMode() {
+    return _prefs.getBool(AppConstants.safeModeKey) ?? false;
+  }
+
+  /// Set safe mode setting
+  Future<void> setSafeMode(bool enabled) async {
+    await _prefs.setBool(AppConstants.safeModeKey, enabled);
+  }
+
+  /// Get theme mode (0 = system, 1 = light, 2 = dark)
+  int getThemeMode() {
+    return _prefs.getInt(AppConstants.themeKey) ?? 0;
+  }
+
+  /// Set theme mode
+  Future<void> setThemeMode(int mode) async {
+    await _prefs.setInt(AppConstants.themeKey, mode);
+  }
+
+  // ==================== Search History ====================
+
+  /// Get search history
+  List<SearchHistoryItem> getSearchHistory() {
+    final historyJson = _prefs.getString(AppConstants.searchHistoryKey);
+    if (historyJson == null) return [];
+
+    final List<dynamic> historyList = json.decode(historyJson);
+    return historyList
+        .map((e) => SearchHistoryItem.fromJson(e as Map<String, dynamic>))
+        .toList()
+      ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+  }
+
+  /// Add to search history
+  Future<void> addToSearchHistory(String query) async {
+    if (query.trim().isEmpty) return;
+
+    var history = getSearchHistory();
+    history.removeWhere((h) => h.query == query);
+    history.insert(
+      0,
+      SearchHistoryItem(query: query, timestamp: DateTime.now()),
+    );
+
+    if (history.length > AppConstants.maxSearchHistoryItems) {
+      history = history.take(AppConstants.maxSearchHistoryItems).toList();
+    }
+
+    final historyJson = json.encode(history.map((e) => e.toJson()).toList());
+    await _prefs.setString(AppConstants.searchHistoryKey, historyJson);
+  }
+
+  /// Clear search history
+  Future<void> clearSearchHistory() async {
+    await _prefs.remove(AppConstants.searchHistoryKey);
+  }
+
+  // ==================== Cache Management ====================
+
+  /// Clear all preferences (not secure storage)
+  Future<void> clearPreferences() async {
+    await _prefs.clear();
+  }
+
+  /// Clear all data including accounts
+  Future<void> clearAll() async {
+    await _prefs.clear();
+    await _secureStorage.deleteAll();
+  }
+}
