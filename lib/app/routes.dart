@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import '../presentation/desktop/responsive_layout.dart';
 import '../presentation/pages/auth/login_page.dart';
-import '../presentation/pages/main_tab_page.dart';
 import '../presentation/pages/post/post_detail_page.dart';
 import '../presentation/pages/search/search_page.dart';
 import '../presentation/pages/settings/account_management_page.dart';
@@ -33,7 +33,7 @@ class AppRouter {
 
       case AppRoutes.main:
         return CupertinoPageRoute(
-          builder: (_) => const MainTabPage(),
+          builder: (_) => const ResponsiveLayout(),
           settings: settings,
         );
 
