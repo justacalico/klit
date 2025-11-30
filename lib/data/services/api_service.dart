@@ -325,4 +325,91 @@ class ApiService {
       return ApiResult.failure(ApiException.unknown(e));
     }
   }
+
+  /// Vote on a post (1 for upvote, -1 for downvote)
+  Future<ApiResult<PostScore>> votePost(int postId, int score) async {
+    try {
+      final response = await _dio.post(
+        '/posts/$postId/votes.json',
+        data: {
+          'score': score,
+          'no_unvote': false,
+        },
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final scoreData = PostScore(
+          up: response.data['up'] as int? ?? 0,
+          down: response.data['down'] as int? ?? 0,
+          total: response.data['score'] as int? ?? 0,
+        );
+        return ApiResult.success(scoreData);
+      }
+      return ApiResult.failure(ApiException.unknown());
+    } on DioException catch (e) {
+      if (e.error is ApiException) {
+        return ApiResult.failure(e.error as ApiException);
+      }
+      return ApiResult.failure(ApiException.unknown(e));
+    } catch (e) {
+      return ApiResult.failure(ApiException.unknown(e));
+    }
+  }
+
+  /// Get comments for a post
+  Future<ApiResult<List<Comment>>> getComments(int postId, {int page = 1}) async {
+    try {
+      final response = await _dio.get(
+        '/comments.json',
+        queryParameters: {
+          'search[post_id]': postId,
+          'group_by': 'comment',
+          'page': page,
+          'limit': 50,
+        },
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final commentsData = response.data as List<dynamic>;
+        final comments = commentsData
+            .map((e) => Comment.fromJson(e as Map<String, dynamic>))
+            .toList();
+        return ApiResult.success(comments);
+      }
+      return ApiResult.failure(ApiException.unknown());
+    } on DioException catch (e) {
+      if (e.error is ApiException) {
+        return ApiResult.failure(e.error as ApiException);
+      }
+      return ApiResult.failure(ApiException.unknown(e));
+    } catch (e) {
+      return ApiResult.failure(ApiException.unknown(e));
+    }
+  }
+
+  /// Post a comment on a post
+  Future<ApiResult<Comment>> postComment(int postId, String body) async {
+    try {
+      final response = await _dio.post(
+        '/comments.json',
+        data: {
+          'comment[post_id]': postId,
+          'comment[body]': body,
+        },
+      );
+
+      if (response.statusCode == 201 && response.data != null) {
+        final comment = Comment.fromJson(response.data as Map<String, dynamic>);
+        return ApiResult.success(comment);
+      }
+      return ApiResult.failure(ApiException.unknown());
+    } on DioException catch (e) {
+      if (e.error is ApiException) {
+        return ApiResult.failure(e.error as ApiException);
+      }
+      return ApiResult.failure(ApiException.unknown(e));
+    } catch (e) {
+      return ApiResult.failure(ApiException.unknown(e));
+    }
+  }
 }
