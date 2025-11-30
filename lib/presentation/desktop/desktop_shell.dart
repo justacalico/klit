@@ -139,9 +139,13 @@ class _DesktopShellState extends State<DesktopShell> {
   }
 
   Widget _buildPostDetailPanel() {
+    // Use a unique key based on postIds and initialIndex to force rebuild when post changes
+    final key = ValueKey('${_postDetailArgs!.postIds.hashCode}_${_postDetailArgs!.initialIndex}');
+    
     return Stack(
       children: [
         PostDetailPage(
+          key: key,
           postIds: _postDetailArgs!.postIds,
           initialIndex: _postDetailArgs!.initialIndex,
         ),
