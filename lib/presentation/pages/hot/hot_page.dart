@@ -5,6 +5,7 @@ import '../../../app/routes.dart';
 import '../../../data/models/models.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
+import '../post/post_detail_page.dart';
 
 /// Hot page with trending posts
 class HotPage extends StatefulWidget {
@@ -42,9 +43,16 @@ class _HotPageState extends State<HotPage> {
   }
 
   void _onPostTap(Post post) {
+    final postsProvider = context.read<PostsProvider>();
+    final posts = postsProvider.hotPosts;
+    final index = posts.indexWhere((p) => p.id == post.id);
+    
     Navigator.of(context).pushNamed(
       AppRoutes.postDetail,
-      arguments: post.id,
+      arguments: PostDetailArguments(
+        postIds: posts.map((p) => p.id).toList(),
+        initialIndex: index >= 0 ? index : 0,
+      ),
     );
   }
 

@@ -5,6 +5,7 @@ import '../../../core/utils/debouncer.dart';
 import '../../../data/models/models.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
+import '../post/post_detail_page.dart';
 
 /// Search page
 class SearchPage extends StatefulWidget {
@@ -75,9 +76,16 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void _onPostTap(Post post) {
+    final postsProvider = context.read<PostsProvider>();
+    final posts = postsProvider.searchResults;
+    final index = posts.indexWhere((p) => p.id == post.id);
+    
     Navigator.of(context).pushNamed(
       AppRoutes.postDetail,
-      arguments: post.id,
+      arguments: PostDetailArguments(
+        postIds: posts.map((p) => p.id).toList(),
+        initialIndex: index >= 0 ? index : 0,
+      ),
     );
   }
 

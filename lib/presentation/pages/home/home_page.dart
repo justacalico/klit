@@ -5,6 +5,7 @@ import '../../../app/routes.dart';
 import '../../../data/models/models.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
+import '../post/post_detail_page.dart';
 
 /// Home page with latest posts
 class HomePage extends StatefulWidget {
@@ -42,9 +43,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onPostTap(Post post) {
+    final postsProvider = context.read<PostsProvider>();
+    final posts = postsProvider.latestPosts;
+    final index = posts.indexWhere((p) => p.id == post.id);
+    
     Navigator.of(context).pushNamed(
       AppRoutes.postDetail,
-      arguments: post.id,
+      arguments: PostDetailArguments(
+        postIds: posts.map((p) => p.id).toList(),
+        initialIndex: index >= 0 ? index : 0,
+      ),
     );
   }
 

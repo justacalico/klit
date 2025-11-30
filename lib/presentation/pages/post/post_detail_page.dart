@@ -9,74 +9,130 @@ import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
 import '../../widgets/widgets.dart';
 
-/// Post detail page
-class PostDetailPage extends StatefulWidget {
-  final int postId;
+/// Arguments for navigating to post detail with swipe support
+class PostDetailArguments {
+  final List<int> postIds;
+  final int initialIndex;
 
-  const PostDetailPage({super.key, required this.postId});
+  const PostDetailArguments({
+    required this.postIds,
+    required this.initialIndex,
+  });
+}
+
+/// Post detail page with swipe navigation
+class PostDetailPage extends StatefulWidget {
+  final List<int> postIds;
+  final int initialIndex;
+
+  const PostDetailPage({
+    super.key,
+    required this.postIds,
+    required this.initialIndex,
+  });
 
   @override
   State<PostDetailPage> createState() => _PostDetailPageState();
 }
 
 class _PostDetailPageState extends State<PostDetailPage> {
-  Post? _post;
-  bool _isLoading = true;
-  String? _error;
+  late PageController _pageController;
+  late int _currentIndex;
+  final Map<int, Post?> _loadedPosts = {};
+  final Map<int, bool> _loadingStates = {};
+  final Map<int, String?> _errorStates = {};
 
   @override
   void initState() {
     super.initState();
-    _loadPost();
+    _currentIndex = widget.initialIndex;
+    _pageController = PageController(initialPage: _currentIndex);
+    _loadPost(_currentIndex);
+    // Preload adjacent posts
+    _preloadAdjacentPosts();
   }
 
-  Future<void> _loadPost() async {
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _preloadAdjacentPosts() {
+    if (_currentIndex > 0) {
+      _loadPost(_currentIndex - 1);
+    }
+    if (_currentIndex < widget.postIds.length - 1) {
+      _loadPost(_currentIndex + 1);
+    }
+  }
+
+  Future<void> _loadPost(int index) async {
+    if (index < 0 || index >= widget.postIds.length) return;
+    if (_loadingStates[index] == true || _loadedPosts.containsKey(index)) return;
+
     setState(() {
-      _isLoading = true;
-      _error = null;
+      _loadingStates[index] = true;
+      _errorStates[index] = null;
     });
 
+    final postId = widget.postIds[index];
     final apiService = context.read<ApiService>();
-    final result = await apiService.getPostById(widget.postId);
+    final result = await apiService.getPostById(postId);
 
     result.when(
       success: (post) {
-        setState(() {
-          _post = post;
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _loadedPosts[index] = post;
+            _loadingStates[index] = false;
+          });
+        }
       },
       failure: (error) {
-        setState(() {
-          _error = error.message;
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _errorStates[index] = error.message;
+            _loadingStates[index] = false;
+          });
+        }
       },
     );
   }
 
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+    _loadPost(index);
+    _preloadAdjacentPosts();
+  }
+
+  int get _currentPostId => widget.postIds[_currentIndex];
+  Post? get _currentPost => _loadedPosts[_currentIndex];
+
   void _openFullMedia() {
-    if (_post == null) return;
+    if (_currentPost == null) return;
     
-    if (_post!.isVideo) {
-      if (_post!.file.url == null) return;
+    if (_currentPost!.isVideo) {
+      if (_currentPost!.file.url == null) return;
       Navigator.of(context).push(
         CupertinoPageRoute(
           fullscreenDialog: true,
           builder: (context) => FullScreenVideoViewer(
-            videoUrl: _post!.file.url!,
-            thumbnailUrl: _post!.preview.url,
+            videoUrl: _currentPost!.file.url!,
+            thumbnailUrl: _currentPost!.preview.url,
           ),
         ),
       );
     } else {
-      if (_post?.file.url == null) return;
+      if (_currentPost?.file.url == null) return;
       Navigator.of(context).push(
         CupertinoPageRoute(
           fullscreenDialog: true,
           builder: (context) => _FullScreenImageViewer(
-            imageUrl: _post!.file.url!,
-            heroTag: 'post_${_post!.id}',
+            imageUrl: _currentPost!.file.url!,
+            heroTag: 'post_${_currentPost!.id}',
           ),
         ),
       );
@@ -92,10 +148,16 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final hasMultiplePosts = widget.postIds.length > 1;
+    
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        middle: Text('Post #${widget.postId}'),
-        trailing: _post != null
+        middle: Text(
+          hasMultiplePosts 
+            ? 'Post #$_currentPostId (${_currentIndex + 1}/${widget.postIds.length})'
+            : 'Post #$_currentPostId',
+        ),
+        trailing: _currentPost != null
             ? CupertinoButton(
                 padding: EdgeInsets.zero,
                 onPressed: () => _showMoreOptions(),
@@ -104,24 +166,35 @@ class _PostDetailPageState extends State<PostDetailPage> {
             : null,
       ),
       child: SafeArea(
-        child: _buildContent(),
+        child: hasMultiplePosts
+            ? PageView.builder(
+                controller: _pageController,
+                itemCount: widget.postIds.length,
+                onPageChanged: _onPageChanged,
+                itemBuilder: (context, index) => _buildPageContent(index),
+              )
+            : _buildPageContent(0),
       ),
     );
   }
 
-  Widget _buildContent() {
-    if (_isLoading) {
+  Widget _buildPageContent(int index) {
+    final post = _loadedPosts[index];
+    final isLoading = _loadingStates[index] == true;
+    final error = _errorStates[index];
+
+    if (isLoading) {
       return const FullPageLoading(message: 'Loading post...');
     }
 
-    if (_error != null) {
+    if (error != null) {
       return ErrorState(
-        message: _error,
-        onRetry: _loadPost,
+        message: error,
+        onRetry: () => _loadPost(index),
       );
     }
 
-    if (_post == null) {
+    if (post == null) {
       return const EmptyState(
         icon: CupertinoIcons.photo,
         title: 'Post not found',
@@ -132,20 +205,18 @@ class _PostDetailPageState extends State<PostDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildImage(),
-          _buildStats(),
-          _buildDescription(),
-          _buildTags(),
-          _buildMetadata(),
+          _buildImage(post),
+          _buildStats(post),
+          _buildDescription(post),
+          _buildTags(post),
+          _buildMetadata(post),
           const SizedBox(height: 32),
         ],
       ),
     );
   }
 
-  Widget _buildImage() {
-    final post = _post!;
-    
+  Widget _buildImage(Post post) {
     // For videos, show the video player
     if (post.isVideo && post.file.url != null) {
       return AspectRatio(
@@ -211,8 +282,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     );
   }
 
-  Widget _buildStats() {
-    final post = _post!;
+  Widget _buildStats(Post post) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
 
@@ -320,8 +390,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     );
   }
 
-  Widget _buildDescription() {
-    final post = _post!;
+  Widget _buildDescription(Post post) {
     if (post.description.isEmpty) return const SizedBox.shrink();
 
     return Padding(
@@ -350,9 +419,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     );
   }
 
-  Widget _buildTags() {
-    final post = _post!;
-
+  Widget _buildTags(Post post) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -375,8 +442,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     );
   }
 
-  Widget _buildMetadata() {
-    final post = _post!;
+  Widget _buildMetadata(Post post) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
 
@@ -438,7 +504,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
               Navigator.of(context).pop();
               _openFullMedia();
             },
-            child: Text(_post?.isVideo == true ? 'View Full Video' : 'View Full Resolution'),
+            child: Text(_currentPost?.isVideo == true ? 'View Full Video' : 'View Full Resolution'),
           ),
           CupertinoActionSheetAction(
             onPressed: () {

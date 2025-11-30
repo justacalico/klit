@@ -38,9 +38,12 @@ class AppRouter {
         );
 
       case AppRoutes.postDetail:
-        final postId = settings.arguments as int;
+        final args = settings.arguments as PostDetailArguments;
         return CupertinoPageRoute(
-          builder: (_) => PostDetailPage(postId: postId),
+          builder: (_) => PostDetailPage(
+            postIds: args.postIds,
+            initialIndex: args.initialIndex,
+          ),
           settings: settings,
         );
 
