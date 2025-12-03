@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:provider/provider.dart';
 import 'app/app.dart';
 import 'data/services/services.dart';
@@ -6,6 +7,9 @@ import 'presentation/providers/providers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize media_kit for desktop video playback
+  MediaKit.ensureInitialized();
 
   // Initialize services
   final storageService = StorageService();

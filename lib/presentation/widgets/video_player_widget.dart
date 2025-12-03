@@ -1,9 +1,20 @@
+import 'dart:io';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:video_player/video_player.dart';
+import 'package:flutter/foundation.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
+import 'package:video_player/video_player.dart' as vp;
 import '../../core/constants/app_constants.dart';
 
-/// A reusable video player widget with Chewie controls
+/// Check if we're on a desktop platform
+bool get isDesktop {
+  if (kIsWeb) return false;
+  return Platform.isLinux || Platform.isWindows || Platform.isMacOS;
+}
+
+/// A reusable video player widget with cross-platform support
+/// Uses media_kit for desktop (Linux, Windows, macOS) and chewie for mobile
 class VideoPlayerWidget extends StatefulWidget {
   final String videoUrl;
   final String? thumbnailUrl;
@@ -27,8 +38,14 @@ class VideoPlayerWidget extends StatefulWidget {
 }
 
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
-  late VideoPlayerController _videoController;
+  // Mobile player (chewie)
+  vp.VideoPlayerController? _videoController;
   ChewieController? _chewieController;
+
+  // Desktop player (media_kit)
+  Player? _player;
+  VideoController? _desktopController;
+
   bool _isInitializing = true;
   String? _error;
 
@@ -39,46 +56,11 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   }
 
   Future<void> _initializePlayer() async {
-    _videoController = VideoPlayerController.networkUrl(
-      Uri.parse(widget.videoUrl),
-    );
-
     try {
-      await _videoController.initialize();
-      
-      _chewieController = ChewieController(
-        videoPlayerController: _videoController,
-        autoPlay: widget.autoPlay,
-        looping: widget.looping,
-        showControls: widget.showControls,
-        aspectRatio: widget.aspectRatio ?? _videoController.value.aspectRatio,
-        placeholder: widget.thumbnailUrl != null
-            ? Image.network(
-                widget.thumbnailUrl!,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) =>
-                    _buildPlaceholder(),
-              )
-            : _buildPlaceholder(),
-        errorBuilder: (context, errorMessage) => _buildErrorWidget(errorMessage),
-        materialProgressColors: ChewieProgressColors(
-          playedColor: AppColors.primaryBlue,
-          handleColor: AppColors.primaryBlue,
-          backgroundColor: CupertinoColors.systemGrey4,
-          bufferedColor: CupertinoColors.systemGrey3,
-        ),
-        cupertinoProgressColors: ChewieProgressColors(
-          playedColor: AppColors.primaryBlue,
-          handleColor: AppColors.primaryBlue,
-          backgroundColor: CupertinoColors.systemGrey4,
-          bufferedColor: CupertinoColors.systemGrey3,
-        ),
-      );
-
-      if (mounted) {
-        setState(() {
-          _isInitializing = false;
-        });
+      if (isDesktop) {
+        await _initializeDesktopPlayer();
+      } else {
+        await _initializeMobilePlayer();
       }
     } catch (e) {
       if (mounted) {
@@ -87,6 +69,67 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           _isInitializing = false;
         });
       }
+    }
+  }
+
+  Future<void> _initializeDesktopPlayer() async {
+    _player = Player();
+    _desktopController = VideoController(_player!);
+
+    // Set up looping
+    if (widget.looping) {
+      _player!.setPlaylistMode(PlaylistMode.single);
+    }
+
+    // Open the video
+    await _player!.open(Media(widget.videoUrl), play: widget.autoPlay);
+
+    if (mounted) {
+      setState(() {
+        _isInitializing = false;
+      });
+    }
+  }
+
+  Future<void> _initializeMobilePlayer() async {
+    _videoController = vp.VideoPlayerController.networkUrl(
+      Uri.parse(widget.videoUrl),
+    );
+
+    await _videoController!.initialize();
+
+    _chewieController = ChewieController(
+      videoPlayerController: _videoController!,
+      autoPlay: widget.autoPlay,
+      looping: widget.looping,
+      showControls: widget.showControls,
+      aspectRatio: widget.aspectRatio ?? _videoController!.value.aspectRatio,
+      placeholder: widget.thumbnailUrl != null
+          ? Image.network(
+              widget.thumbnailUrl!,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+            )
+          : _buildPlaceholder(),
+      errorBuilder: (context, errorMessage) => _buildErrorWidget(errorMessage),
+      materialProgressColors: ChewieProgressColors(
+        playedColor: AppColors.primaryBlue,
+        handleColor: AppColors.primaryBlue,
+        backgroundColor: CupertinoColors.systemGrey4,
+        bufferedColor: CupertinoColors.systemGrey3,
+      ),
+      cupertinoProgressColors: ChewieProgressColors(
+        playedColor: AppColors.primaryBlue,
+        handleColor: AppColors.primaryBlue,
+        backgroundColor: CupertinoColors.systemGrey4,
+        bufferedColor: CupertinoColors.systemGrey3,
+      ),
+    );
+
+    if (mounted) {
+      setState(() {
+        _isInitializing = false;
+      });
     }
   }
 
@@ -116,7 +159,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
               color: CupertinoColors.systemRed,
             ),
             const SizedBox(height: 16),
-            Text(
+            const Text(
               'Video Error',
               style: TextStyle(
                 color: CupertinoColors.white,
@@ -129,7 +172,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Text(
                 errorMessage,
-                style: TextStyle(
+                style: const TextStyle(
                   color: CupertinoColors.systemGrey,
                   fontSize: 14,
                 ),
@@ -144,8 +187,13 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   @override
   void dispose() {
+    // Dispose mobile player
     _chewieController?.dispose();
-    _videoController.dispose();
+    _videoController?.dispose();
+
+    // Dispose desktop player
+    _player?.dispose();
+
     super.dispose();
   }
 
@@ -154,15 +202,15 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     if (_isInitializing) {
       return Container(
         color: CupertinoColors.black,
-        child: Center(
+        child: const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const CupertinoActivityIndicator(
+              CupertinoActivityIndicator(
                 color: CupertinoColors.white,
                 radius: 16,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               Text(
                 'Loading video...',
                 style: TextStyle(
@@ -180,6 +228,25 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       return _buildErrorWidget(_error!);
     }
 
+    if (isDesktop) {
+      return _buildDesktopPlayer();
+    } else {
+      return _buildMobilePlayer();
+    }
+  }
+
+  Widget _buildDesktopPlayer() {
+    if (_desktopController == null) {
+      return _buildErrorWidget('Failed to initialize video player');
+    }
+
+    return Video(
+      controller: _desktopController!,
+      controls: widget.showControls ? AdaptiveVideoControls : NoVideoControls,
+    );
+  }
+
+  Widget _buildMobilePlayer() {
     if (_chewieController == null) {
       return _buildErrorWidget('Failed to initialize video player');
     }
@@ -188,7 +255,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   }
 }
 
-/// Fullscreen video viewer
+/// Fullscreen video viewer with cross-platform support
 class FullScreenVideoViewer extends StatefulWidget {
   final String videoUrl;
   final String? thumbnailUrl;
@@ -204,8 +271,14 @@ class FullScreenVideoViewer extends StatefulWidget {
 }
 
 class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
-  late VideoPlayerController _videoController;
+  // Mobile player (chewie)
+  vp.VideoPlayerController? _videoController;
   ChewieController? _chewieController;
+
+  // Desktop player (media_kit)
+  Player? _player;
+  VideoController? _desktopController;
+
   bool _isInitializing = true;
   String? _error;
 
@@ -216,45 +289,11 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
   }
 
   Future<void> _initializePlayer() async {
-    _videoController = VideoPlayerController.networkUrl(
-      Uri.parse(widget.videoUrl),
-    );
-
     try {
-      await _videoController.initialize();
-      
-      _chewieController = ChewieController(
-        videoPlayerController: _videoController,
-        autoPlay: true,
-        looping: true,
-        showControls: true,
-        fullScreenByDefault: false,
-        allowFullScreen: true,
-        aspectRatio: _videoController.value.aspectRatio,
-        placeholder: widget.thumbnailUrl != null
-            ? Image.network(
-                widget.thumbnailUrl!,
-                fit: BoxFit.cover,
-              )
-            : null,
-        materialProgressColors: ChewieProgressColors(
-          playedColor: AppColors.primaryBlue,
-          handleColor: AppColors.primaryBlue,
-          backgroundColor: CupertinoColors.systemGrey4,
-          bufferedColor: CupertinoColors.systemGrey3,
-        ),
-        cupertinoProgressColors: ChewieProgressColors(
-          playedColor: AppColors.primaryBlue,
-          handleColor: AppColors.primaryBlue,
-          backgroundColor: CupertinoColors.systemGrey4,
-          bufferedColor: CupertinoColors.systemGrey3,
-        ),
-      );
-
-      if (mounted) {
-        setState(() {
-          _isInitializing = false;
-        });
+      if (isDesktop) {
+        await _initializeDesktopPlayer();
+      } else {
+        await _initializeMobilePlayer();
       }
     } catch (e) {
       if (mounted) {
@@ -266,10 +305,74 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
     }
   }
 
+  Future<void> _initializeDesktopPlayer() async {
+    _player = Player();
+    _desktopController = VideoController(_player!);
+
+    // Loop videos by default in fullscreen
+    _player!.setPlaylistMode(PlaylistMode.single);
+
+    // Open the video and autoplay
+    await _player!.open(Media(widget.videoUrl), play: true);
+
+    if (mounted) {
+      setState(() {
+        _isInitializing = false;
+      });
+    }
+  }
+
+  Future<void> _initializeMobilePlayer() async {
+    _videoController = vp.VideoPlayerController.networkUrl(
+      Uri.parse(widget.videoUrl),
+    );
+
+    await _videoController!.initialize();
+
+    _chewieController = ChewieController(
+      videoPlayerController: _videoController!,
+      autoPlay: true,
+      looping: true,
+      showControls: true,
+      fullScreenByDefault: false,
+      allowFullScreen: true,
+      aspectRatio: _videoController!.value.aspectRatio,
+      placeholder: widget.thumbnailUrl != null
+          ? Image.network(
+              widget.thumbnailUrl!,
+              fit: BoxFit.cover,
+            )
+          : null,
+      materialProgressColors: ChewieProgressColors(
+        playedColor: AppColors.primaryBlue,
+        handleColor: AppColors.primaryBlue,
+        backgroundColor: CupertinoColors.systemGrey4,
+        bufferedColor: CupertinoColors.systemGrey3,
+      ),
+      cupertinoProgressColors: ChewieProgressColors(
+        playedColor: AppColors.primaryBlue,
+        handleColor: AppColors.primaryBlue,
+        backgroundColor: CupertinoColors.systemGrey4,
+        bufferedColor: CupertinoColors.systemGrey3,
+      ),
+    );
+
+    if (mounted) {
+      setState(() {
+        _isInitializing = false;
+      });
+    }
+  }
+
   @override
   void dispose() {
+    // Dispose mobile player
     _chewieController?.dispose();
-    _videoController.dispose();
+    _videoController?.dispose();
+
+    // Dispose desktop player
+    _player?.dispose();
+
     super.dispose();
   }
 
@@ -302,14 +405,14 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
 
   Widget _buildContent() {
     if (_isInitializing) {
-      return Column(
+      return const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const CupertinoActivityIndicator(
+          CupertinoActivityIndicator(
             color: CupertinoColors.white,
             radius: 20,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text(
             'Loading video...',
             style: TextStyle(
@@ -331,7 +434,7 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
             color: CupertinoColors.systemRed,
           ),
           const SizedBox(height: 16),
-          Text(
+          const Text(
             'Video Error',
             style: TextStyle(
               color: CupertinoColors.white,
@@ -344,7 +447,7 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
             padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Text(
               _error!,
-              style: TextStyle(
+              style: const TextStyle(
                 color: CupertinoColors.systemGrey,
                 fontSize: 14,
               ),
@@ -367,6 +470,28 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
       );
     }
 
+    if (isDesktop) {
+      return _buildDesktopPlayer();
+    } else {
+      return _buildMobilePlayer();
+    }
+  }
+
+  Widget _buildDesktopPlayer() {
+    if (_desktopController == null) {
+      return const Text(
+        'Failed to initialize video player',
+        style: TextStyle(color: CupertinoColors.white),
+      );
+    }
+
+    return Video(
+      controller: _desktopController!,
+      controls: AdaptiveVideoControls,
+    );
+  }
+
+  Widget _buildMobilePlayer() {
     if (_chewieController == null) {
       return const Text(
         'Failed to initialize video player',

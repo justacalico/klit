@@ -276,7 +276,6 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
                 ),
                 CupertinoButton(
                   padding: EdgeInsets.zero,
-                  minSize: 0,
                   onPressed: () {
                     context.read<SettingsProvider>().clearSearchHistory();
                   },
@@ -286,7 +285,7 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
                       fontSize: 12,
                       color: CupertinoTheme.of(context).primaryColor,
                     ),
-                  ),
+                  ), minimumSize: Size(0, 0),
                 ),
               ],
             ),

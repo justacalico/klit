@@ -25,6 +25,9 @@ dependencies:
   video_player: ^2.8.0
   chewie: ^1.8.0
   fastforge: ^0.6.6
+  media_kit: ^1.2.3
+  media_kit_video: ^2.0.1
+  media_kit_libs_video: ^1.0.7
 
 dev_dependencies:
   flutter_test:
