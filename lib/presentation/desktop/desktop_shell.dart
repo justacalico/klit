@@ -155,7 +155,7 @@ class _DesktopShellState extends State<DesktopShell> {
             child: CupertinoButton(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               color: isDark
-                  ? CupertinoColors.systemGrey.withOpacity(0.3)
+                  ? CupertinoColors.systemGrey.withValues(alpha: 0.3)
                   : CupertinoColors.systemGrey5,
               borderRadius: BorderRadius.circular(8),
               onPressed: _closePostDetail,
