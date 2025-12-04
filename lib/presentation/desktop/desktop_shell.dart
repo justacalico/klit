@@ -4,6 +4,7 @@ import '../pages/post/post_detail_page.dart';
 import 'pages/desktop_home_page.dart';
 import 'pages/desktop_hot_page.dart';
 import 'pages/desktop_popular_page.dart';
+import 'pages/desktop_post_detail_page.dart';
 import 'pages/desktop_search_page.dart';
 import 'pages/desktop_settings_page.dart';
 import 'widgets/desktop_sidebar.dart';
@@ -19,7 +20,7 @@ class DesktopShell extends StatefulWidget {
 class _DesktopShellState extends State<DesktopShell> {
   int _selectedIndex = 0;
   bool _sidebarCollapsed = false;
-  
+
   // For post detail view
   PostDetailArguments? _postDetailArgs;
   String? _searchQuery;
@@ -83,14 +84,11 @@ class _DesktopShellState extends State<DesktopShell> {
                     : AppColors.lightSeparator,
               ),
               // Main content
-              Expanded(
-                child: _buildMainContent(),
-              ),
+              Expanded(child: _buildMainContent()),
             ],
           ),
           // Full-screen post detail overlay
-          if (_postDetailArgs != null)
-            _buildPostDetailOverlay(isDark),
+          if (_postDetailArgs != null) _buildPostDetailOverlay(isDark),
         ],
       ),
     );
@@ -134,58 +132,16 @@ class _DesktopShellState extends State<DesktopShell> {
 
   Widget _buildPostDetailOverlay(bool isDark) {
     // Use a unique key based on postIds and initialIndex to force rebuild when post changes
-    final key = ValueKey('${_postDetailArgs!.postIds.hashCode}_${_postDetailArgs!.initialIndex}');
-    
-    return Container(
-      color: isDark
-          ? CupertinoColors.black.withOpacity(0.85)
-          : CupertinoColors.white.withOpacity(0.95),
-      child: Stack(
-        children: [
-          PostDetailPage(
-            key: key,
-            postIds: _postDetailArgs!.postIds,
-            initialIndex: _postDetailArgs!.initialIndex,
-            onSearchTag: _openSearch,
-          ),
-          // Back button
-          Positioned(
-            top: 12,
-            left: 12,
-            child: CupertinoButton(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              color: isDark
-                  ? CupertinoColors.systemGrey.withValues(alpha: 0.3)
-                  : CupertinoColors.systemGrey5,
-              borderRadius: BorderRadius.circular(8),
-              onPressed: _closePostDetail,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    CupertinoIcons.back,
-                    size: 18,
-                    color: isDark
-                        ? CupertinoColors.white
-                        : CupertinoColors.black,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Back',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      color: isDark
-                          ? CupertinoColors.white
-                          : CupertinoColors.black,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+    final key = ValueKey(
+      '${_postDetailArgs!.postIds.hashCode}_${_postDetailArgs!.initialIndex}',
+    );
+
+    return DesktopPostDetailPage(
+      key: key,
+      postIds: _postDetailArgs!.postIds,
+      initialIndex: _postDetailArgs!.initialIndex,
+      onSearchTag: _openSearch,
+      onClose: _closePostDetail,
     );
   }
 }
