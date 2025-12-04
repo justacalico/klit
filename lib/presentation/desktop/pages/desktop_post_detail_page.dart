@@ -389,24 +389,28 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
 
     // Use sample/preview as placeholder while loading full image
     final placeholderUrl = post.preview.url;
+    final aspectRatio = post.file.aspectRatio;
 
     return GestureDetector(
       onDoubleTap: () => setState(() => _isFullScreen = true),
-      child: CachedNetworkImage(
-        imageUrl: imageUrl,
-        fit: BoxFit.contain,
-        placeholder: (context, url) => placeholderUrl != null
-            ? CachedNetworkImage(
-                imageUrl: placeholderUrl,
-                fit: BoxFit.contain,
-                placeholder: (context, url) =>
-                    const CupertinoActivityIndicator(),
-                errorWidget: (context, url, error) =>
-                    const CupertinoActivityIndicator(),
-              )
-            : const CupertinoActivityIndicator(),
-        errorWidget: (context, url, error) =>
-            const Icon(CupertinoIcons.exclamationmark_triangle, size: 48),
+      child: AspectRatio(
+        aspectRatio: aspectRatio.clamp(0.3, 3.0),
+        child: CachedNetworkImage(
+          imageUrl: imageUrl,
+          fit: BoxFit.contain,
+          placeholder: (context, url) => placeholderUrl != null
+              ? CachedNetworkImage(
+                  imageUrl: placeholderUrl,
+                  fit: BoxFit.contain,
+                  placeholder: (context, url) =>
+                      const CupertinoActivityIndicator(),
+                  errorWidget: (context, url, error) =>
+                      const CupertinoActivityIndicator(),
+                )
+              : const CupertinoActivityIndicator(),
+          errorWidget: (context, url, error) =>
+              const Icon(CupertinoIcons.exclamationmark_triangle, size: 48),
+        ),
       ),
     );
   }
