@@ -278,14 +278,14 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
                   padding: EdgeInsets.zero,
                   onPressed: () {
                     context.read<SettingsProvider>().clearSearchHistory();
-                  },
+                  }, minimumSize: Size(0, 0),
                   child: Text(
                     'Clear',
                     style: TextStyle(
                       fontSize: 12,
                       color: CupertinoTheme.of(context).primaryColor,
                     ),
-                  ), minimumSize: Size(0, 0),
+                  ),
                 ),
               ],
             ),
