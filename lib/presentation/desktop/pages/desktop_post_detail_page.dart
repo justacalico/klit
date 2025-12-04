@@ -381,17 +381,30 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
       );
     }
 
-    final imageUrl = post.sample.has ? post.sample.url : post.preview.url;
+    // Use full resolution image, fallback to sample, then preview
+    final imageUrl = post.file.url ?? post.sample.url ?? post.preview.url;
     if (imageUrl == null) {
       return const Icon(CupertinoIcons.photo, size: 64);
     }
+
+    // Use sample/preview as placeholder while loading full image
+    final placeholderUrl = post.preview.url;
 
     return GestureDetector(
       onDoubleTap: () => setState(() => _isFullScreen = true),
       child: CachedNetworkImage(
         imageUrl: imageUrl,
         fit: BoxFit.contain,
-        placeholder: (context, url) => const CupertinoActivityIndicator(),
+        placeholder: (context, url) => placeholderUrl != null
+            ? CachedNetworkImage(
+                imageUrl: placeholderUrl,
+                fit: BoxFit.contain,
+                placeholder: (context, url) =>
+                    const CupertinoActivityIndicator(),
+                errorWidget: (context, url, error) =>
+                    const CupertinoActivityIndicator(),
+              )
+            : const CupertinoActivityIndicator(),
         errorWidget: (context, url, error) =>
             const Icon(CupertinoIcons.exclamationmark_triangle, size: 48),
       ),
