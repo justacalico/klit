@@ -148,6 +148,7 @@ class _DesktopShellState extends State<DesktopShell> {
           key: key,
           postIds: _postDetailArgs!.postIds,
           initialIndex: _postDetailArgs!.initialIndex,
+          onSearchTag: _openSearch,
         ),
         Positioned(
           top: 8,
