@@ -27,7 +27,6 @@ class _DesktopShellState extends State<DesktopShell> {
   void _onNavItemSelected(int index) {
     setState(() {
       _selectedIndex = index;
-      _postDetailArgs = null;
       _searchQuery = null;
     });
   }
@@ -64,39 +63,34 @@ class _DesktopShellState extends State<DesktopShell> {
     final isDark = brightness == Brightness.dark;
 
     return CupertinoPageScaffold(
-      child: Row(
+      child: Stack(
         children: [
-          // Sidebar
-          DesktopSidebar(
-            selectedIndex: _selectedIndex,
-            onItemSelected: _onNavItemSelected,
-            isCollapsed: _sidebarCollapsed,
-            onToggleCollapse: _toggleSidebar,
+          // Main layout with sidebar
+          Row(
+            children: [
+              // Sidebar
+              DesktopSidebar(
+                selectedIndex: _selectedIndex,
+                onItemSelected: _onNavItemSelected,
+                isCollapsed: _sidebarCollapsed,
+                onToggleCollapse: _toggleSidebar,
+              ),
+              // Separator
+              Container(
+                width: 1,
+                color: isDark
+                    ? AppColors.darkSeparator
+                    : AppColors.lightSeparator,
+              ),
+              // Main content
+              Expanded(
+                child: _buildMainContent(),
+              ),
+            ],
           ),
-          // Separator
-          Container(
-            width: 1,
-            color: isDark
-                ? AppColors.darkSeparator
-                : AppColors.lightSeparator,
-          ),
-          // Main content
-          Expanded(
-            child: _buildMainContent(),
-          ),
-          // Post detail panel (if open)
-          if (_postDetailArgs != null) ...[
-            Container(
-              width: 1,
-              color: isDark
-                  ? AppColors.darkSeparator
-                  : AppColors.lightSeparator,
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.4,
-              child: _buildPostDetailPanel(),
-            ),
-          ],
+          // Full-screen post detail overlay
+          if (_postDetailArgs != null)
+            _buildPostDetailOverlay(isDark),
         ],
       ),
     );
@@ -138,31 +132,60 @@ class _DesktopShellState extends State<DesktopShell> {
     }
   }
 
-  Widget _buildPostDetailPanel() {
+  Widget _buildPostDetailOverlay(bool isDark) {
     // Use a unique key based on postIds and initialIndex to force rebuild when post changes
     final key = ValueKey('${_postDetailArgs!.postIds.hashCode}_${_postDetailArgs!.initialIndex}');
     
-    return Stack(
-      children: [
-        PostDetailPage(
-          key: key,
-          postIds: _postDetailArgs!.postIds,
-          initialIndex: _postDetailArgs!.initialIndex,
-          onSearchTag: _openSearch,
-        ),
-        Positioned(
-          top: 8,
-          right: 8,
-          child: CupertinoButton(
-            padding: const EdgeInsets.all(8),
-            onPressed: _closePostDetail,
-            child: const Icon(
-              CupertinoIcons.xmark_circle_fill,
-              size: 24,
+    return Container(
+      color: isDark
+          ? CupertinoColors.black.withOpacity(0.85)
+          : CupertinoColors.white.withOpacity(0.95),
+      child: Stack(
+        children: [
+          PostDetailPage(
+            key: key,
+            postIds: _postDetailArgs!.postIds,
+            initialIndex: _postDetailArgs!.initialIndex,
+            onSearchTag: _openSearch,
+          ),
+          // Back button
+          Positioned(
+            top: 12,
+            left: 12,
+            child: CupertinoButton(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              color: isDark
+                  ? CupertinoColors.systemGrey.withOpacity(0.3)
+                  : CupertinoColors.systemGrey5,
+              borderRadius: BorderRadius.circular(8),
+              onPressed: _closePostDetail,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    CupertinoIcons.back,
+                    size: 18,
+                    color: isDark
+                        ? CupertinoColors.white
+                        : CupertinoColors.black,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Back',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: isDark
+                          ? CupertinoColors.white
+                          : CupertinoColors.black,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
