@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../core/constants/constants.dart';
 import '../models/models.dart';
 
@@ -167,35 +168,49 @@ class ApiService {
       );
 
       final queryParams = params.toQueryParams();
-      print('Making request to ${ApiConstants.postsEndpoint} with params: $queryParams');
+      if (kDebugMode) {
+        print('Making request to ${ApiConstants.postsEndpoint} with params: $queryParams');
+      }
 
       final response = await _dio.get(
         ApiConstants.postsEndpoint,
         queryParameters: queryParams,
       );
 
-      print('Response status: ${response.statusCode}');
+      if (kDebugMode) {
+        print('Response status: ${response.statusCode}');
+      }
 
       if (response.statusCode == 200 && response.data != null) {
         final postsData = response.data['posts'] as List<dynamic>;
-        print('Got ${postsData.length} posts');
+        if (kDebugMode) {
+          print('Got ${postsData.length} posts');
+        }
         final posts = postsData
             .map((e) => Post.fromJson(e as Map<String, dynamic>))
             .where((p) => p.file.url != null) // Filter out posts without URLs
             .toList();
-        print('After filtering: ${posts.length} posts with URLs');
+        if (kDebugMode) {
+          print('After filtering: ${posts.length} posts with URLs');
+        }
         return ApiResult.success(posts);
       }
       return ApiResult.failure(ApiException.unknown());
     } on DioException catch (e) {
-      print('API Error: ${e.message}');
-      print('Response: ${e.response?.data}');
+      if (kDebugMode) {
+        print('API Error: ${e.message}');
+      }
+      if (kDebugMode) {
+        print('Response: ${e.response?.data}');
+      }
       if (e.error is ApiException) {
         return ApiResult.failure(e.error as ApiException);
       }
       return ApiResult.failure(ApiException.unknown(e));
     } catch (e) {
-      print('Exception: $e');
+      if (kDebugMode) {
+        print('Exception: $e');
+      }
       return ApiResult.failure(ApiException.unknown(e));
     }
   }
@@ -247,14 +262,20 @@ class ApiService {
       }
       return ApiResult.failure(ApiException.unknown());
     } on DioException catch (e) {
-      print('Popular posts error: ${e.message}');
-      print('Response: ${e.response?.data}');
+      if (kDebugMode) {
+        print('Popular posts error: ${e.message}');
+      }
+      if (kDebugMode) {
+        print('Response: ${e.response?.data}');
+      }
       if (e.error is ApiException) {
         return ApiResult.failure(e.error as ApiException);
       }
       return ApiResult.failure(ApiException.unknown(e));
     } catch (e) {
-      print('Popular posts exception: $e');
+      if (kDebugMode) {
+        print('Popular posts exception: $e');
+      }
       return ApiResult.failure(ApiException.unknown(e));
     }
   }
