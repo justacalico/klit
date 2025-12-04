@@ -24,11 +24,14 @@ class PostDetailArguments {
 class PostDetailPage extends StatefulWidget {
   final List<int> postIds;
   final int initialIndex;
+  /// Optional callback for searching tags (used in desktop mode)
+  final void Function(String tag)? onSearchTag;
 
   const PostDetailPage({
     super.key,
     required this.postIds,
     required this.initialIndex,
+    this.onSearchTag,
   });
 
   @override
@@ -241,10 +244,15 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   void _searchTag(String tag) {
-    Navigator.of(context).pushNamed(
-      AppRoutes.search,
-      arguments: tag,
-    );
+    // Use callback if provided (desktop mode), otherwise navigate
+    if (widget.onSearchTag != null) {
+      widget.onSearchTag!(tag);
+    } else {
+      Navigator.of(context).pushNamed(
+        AppRoutes.search,
+        arguments: tag,
+      );
+    }
   }
 
   @override
