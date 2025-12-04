@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -6,26 +8,111 @@ import '../../core/constants/constants.dart';
 import '../models/models.dart';
 
 /// Service for secure storage operations
+/// Falls back to SharedPreferences on Linux if libsecret fails
 class StorageService {
   final FlutterSecureStorage _secureStorage;
   late final SharedPreferences _prefs;
   bool _initialized = false;
+  bool _useSecureStorageFallback = false;
+
+  // Prefix for fallback storage keys to avoid conflicts
+  static const String _fallbackPrefix = 'secure_fallback_';
 
   StorageService({FlutterSecureStorage? secureStorage})
-      : _secureStorage = secureStorage ?? const FlutterSecureStorage();
+    : _secureStorage = secureStorage ?? const FlutterSecureStorage();
 
   /// Initialize the storage service
   Future<void> init() async {
     if (_initialized) return;
     _prefs = await SharedPreferences.getInstance();
+
+    // Test if secure storage works on Linux
+    if (Platform.isLinux) {
+      try {
+        await _secureStorage.read(key: '_test_key_');
+      } on PlatformException {
+        // libsecret failed, use fallback
+        _useSecureStorageFallback = true;
+      }
+    }
+
     _initialized = true;
+  }
+
+  /// Read from secure storage with fallback
+  Future<String?> _secureRead(String key) async {
+    if (_useSecureStorageFallback) {
+      return _prefs.getString('$_fallbackPrefix$key');
+    }
+    try {
+      return await _secureStorage.read(key: key);
+    } on PlatformException {
+      // Fallback for unexpected failures
+      _useSecureStorageFallback = true;
+      return _prefs.getString('$_fallbackPrefix$key');
+    }
+  }
+
+  /// Write to secure storage with fallback
+  Future<void> _secureWrite(String key, String value) async {
+    if (_useSecureStorageFallback) {
+      await _prefs.setString('$_fallbackPrefix$key', value);
+      return;
+    }
+    try {
+      await _secureStorage.write(key: key, value: value);
+    } on PlatformException {
+      // Fallback for unexpected failures
+      _useSecureStorageFallback = true;
+      await _prefs.setString('$_fallbackPrefix$key', value);
+    }
+  }
+
+  /// Delete from secure storage with fallback
+  Future<void> _secureDelete(String key) async {
+    if (_useSecureStorageFallback) {
+      await _prefs.remove('$_fallbackPrefix$key');
+      return;
+    }
+    try {
+      await _secureStorage.delete(key: key);
+    } on PlatformException {
+      _useSecureStorageFallback = true;
+      await _prefs.remove('$_fallbackPrefix$key');
+    }
+  }
+
+  /// Delete all from secure storage with fallback
+  Future<void> _secureDeleteAll() async {
+    if (_useSecureStorageFallback) {
+      final keys = _prefs
+          .getKeys()
+          .where((k) => k.startsWith(_fallbackPrefix))
+          .toList();
+      for (final key in keys) {
+        await _prefs.remove(key);
+      }
+      return;
+    }
+    try {
+      await _secureStorage.deleteAll();
+    } on PlatformException {
+      _useSecureStorageFallback = true;
+      final keys = _prefs
+          .getKeys()
+          .where((k) => k.startsWith(_fallbackPrefix))
+          .toList();
+      for (final key in keys) {
+        await _prefs.remove(key);
+      }
+    }
   }
 
   // ==================== Account Management ====================
 
   /// Get all stored accounts
   Future<List<Account>> getAccounts() async {
-    final accountsJson = await _secureStorage.read(key: AppConstants.accountsKey);
+    final accountsJson = await _secureRead(AppConstants.accountsKey);
     if (accountsJson == null) return [];
 
     final List<dynamic> accountsList = json.decode(accountsJson);
@@ -37,7 +124,7 @@ class StorageService {
   /// Save accounts to secure storage
   Future<void> saveAccounts(List<Account> accounts) async {
     final accountsJson = json.encode(accounts.map((e) => e.toJson()).toList());
-    await _secureStorage.write(key: AppConstants.accountsKey, value: accountsJson);
+    await _secureWrite(AppConstants.accountsKey, accountsJson);
   }
 
   /// Add a new account
@@ -80,15 +167,15 @@ class StorageService {
 
   /// Get the active account ID
   Future<String?> getActiveAccountId() async {
-    return await _secureStorage.read(key: AppConstants.activeAccountKey);
+    return await _secureRead(AppConstants.activeAccountKey);
   }
 
   /// Set the active account ID
   Future<void> setActiveAccountId(String? accountId) async {
     if (accountId == null) {
-      await _secureStorage.delete(key: AppConstants.activeAccountKey);
+      await _secureDelete(AppConstants.activeAccountKey);
     } else {
-      await _secureStorage.write(key: AppConstants.activeAccountKey, value: accountId);
+      await _secureWrite(AppConstants.activeAccountKey, accountId);
     }
   }
 
@@ -115,7 +202,8 @@ class StorageService {
 
   /// Get grid size
   int getGridSize() {
-    return _prefs.getInt(AppConstants.gridSizeKey) ?? AppConstants.defaultGridColumns;
+    return _prefs.getInt(AppConstants.gridSizeKey) ??
+        AppConstants.defaultGridColumns;
   }
 
   /// Set grid size
@@ -191,6 +279,6 @@ class StorageService {
   /// Clear all data including accounts
   Future<void> clearAll() async {
     await _prefs.clear();
-    await _secureStorage.deleteAll();
+    await _secureDeleteAll();
   }
 }
