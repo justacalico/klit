@@ -259,16 +259,14 @@ class _DesktopFavoritesPageState extends State<DesktopFavoritesPage> {
       );
     }
 
-    return SingleChildScrollView(
-      child: PostsGrid(
-        posts: _favorites,
-        columns: _gridColumns,
-        isLoading: _isLoadingMore,
-        hasMore: _hasMore,
-        onPostTap: _onPostTap,
-        onLoadMore: _loadMore,
-        onRetry: () => _loadFavorites(refresh: true),
-      ),
+    return PostsGrid(
+      posts: _favorites,
+      columns: _gridColumns,
+      isLoading: _isLoadingMore,
+      hasMore: _hasMore,
+      onPostTap: _onPostTap,
+      onLoadMore: _loadMore,
+      onRetry: () => _loadFavorites(refresh: true),
     );
   }
 }
