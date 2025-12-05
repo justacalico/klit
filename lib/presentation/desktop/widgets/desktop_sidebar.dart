@@ -78,6 +78,20 @@ class DesktopSidebar extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 16),
+                _SidebarSection(
+                  title: 'Account',
+                  isCollapsed: isCollapsed,
+                  children: [
+                    _SidebarItem(
+                      icon: CupertinoIcons.person_fill,
+                      label: 'Profile',
+                      isSelected: selectedIndex == 5,
+                      isCollapsed: isCollapsed,
+                      onTap: () => onItemSelected(5),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
