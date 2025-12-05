@@ -255,25 +255,28 @@ class ApiService {
     }
   }
 
-  /// Get popular posts
+  /// Get popular posts from /popular.json endpoint
   Future<ApiResult<List<Post>>> getPopularPosts({
     String scale = 'day',
     int page = 1,
   }) async {
     try {
-      // Popular endpoint uses 'date' parameter with format YYYY-MM-DD
-      // Or we can use the posts endpoint with order:score and date filter
+      // The /popular.json endpoint uses 'date' parameter with format YYYY-MM-DD
+      // and 'scale' parameter for day/week/month
+      final now = DateTime.now();
+      final dateStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+      
       final response = await _dio.get(
-        ApiConstants.postsEndpoint,
+        ApiConstants.popularEndpoint,
         queryParameters: {
-          'tags': 'order:score',
-          'limit': ApiConstants.defaultPageSize,
-          'page': page,
+          'date': dateStr,
+          'scale': scale,
         },
       );
 
       if (response.statusCode == 200 && response.data != null) {
-        final postsData = response.data['posts'] as List<dynamic>;
+        // /popular.json returns posts directly as a list, not wrapped in 'posts' key
+        final postsData = response.data['posts'] as List<dynamic>? ?? response.data as List<dynamic>;
         final posts = postsData
             .map((e) => Post.fromJson(e as Map<String, dynamic>))
             .where((p) => p.file.url != null)
