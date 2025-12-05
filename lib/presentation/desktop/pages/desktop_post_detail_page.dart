@@ -62,8 +62,9 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
 
   Future<void> _loadPost(int index) async {
     if (index < 0 || index >= widget.postIds.length) return;
-    if (_loadingStates[index] == true || _loadedPosts.containsKey(index))
+    if (_loadingStates[index] == true || _loadedPosts.containsKey(index)) {
       return;
+    }
 
     setState(() {
       _loadingStates[index] = true;
