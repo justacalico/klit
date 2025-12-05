@@ -70,19 +70,19 @@ class _ProfilePageState extends State<ProfilePage> {
     final isDark = brightness == Brightness.dark;
 
     return CupertinoPageScaffold(
-      backgroundColor:
-          isDark ? AppColors.darkGroupedBackground : AppColors.lightGroupedBackground,
+      backgroundColor: isDark
+          ? AppColors.darkGroupedBackground
+          : AppColors.lightGroupedBackground,
       navigationBar: CupertinoNavigationBar(
         middle: const Text('Profile'),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.accountManagement),
+          onPressed: () =>
+              Navigator.of(context).pushNamed(AppRoutes.accountManagement),
           child: const Icon(CupertinoIcons.gear),
         ),
       ),
-      child: SafeArea(
-        child: _buildContent(isDark),
-      ),
+      child: SafeArea(child: _buildContent(isDark)),
     );
   }
 
@@ -132,10 +132,7 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 16),
             const Text(
               'Not logged in',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             const Text(
@@ -175,7 +172,9 @@ class _ProfilePageState extends State<ProfilePage> {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
+        color: isDark
+            ? AppColors.darkSecondaryBackground
+            : CupertinoColors.white,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -203,10 +202,7 @@ class _ProfilePageState extends State<ProfilePage> {
           // Username
           Text(
             user.name,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           // Level badge
@@ -244,7 +240,9 @@ class _ProfilePageState extends State<ProfilePage> {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
+        color: isDark
+            ? AppColors.darkSecondaryBackground
+            : CupertinoColors.white,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -254,10 +252,7 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: EdgeInsets.only(left: 4, bottom: 12),
             child: Text(
               'Statistics',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
           ),
           Row(
@@ -354,7 +349,9 @@ class _ProfilePageState extends State<ProfilePage> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
+        color: isDark
+            ? AppColors.darkSecondaryBackground
+            : CupertinoColors.white,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -364,10 +361,7 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: EdgeInsets.all(16),
             child: Text(
               'Account Info',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
           ),
           _buildInfoRow('User ID', '#${user.id}', isDark),
@@ -379,14 +373,24 @@ class _ProfilePageState extends State<ProfilePage> {
             isDark,
           ),
           if (user.isBanned)
-            _buildInfoRow('Status', 'Banned', isDark, valueColor: AppColors.explicitColor),
+            _buildInfoRow(
+              'Status',
+              'Banned',
+              isDark,
+              valueColor: AppColors.explicitColor,
+            ),
           const SizedBox(height: 8),
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value, bool isDark, {Color? valueColor}) {
+  Widget _buildInfoRow(
+    String label,
+    String value,
+    bool isDark, {
+    Color? valueColor,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
@@ -416,7 +420,9 @@ class _ProfilePageState extends State<ProfilePage> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
+        color: isDark
+            ? AppColors.darkSecondaryBackground
+            : CupertinoColors.white,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -424,7 +430,8 @@ class _ProfilePageState extends State<ProfilePage> {
           _buildActionTile(
             icon: CupertinoIcons.person_2,
             title: 'Manage Accounts',
-            onTap: () => Navigator.of(context).pushNamed(AppRoutes.accountManagement),
+            onTap: () =>
+                Navigator.of(context).pushNamed(AppRoutes.accountManagement),
           ),
           Container(
             height: 0.5,
@@ -458,7 +465,9 @@ class _ProfilePageState extends State<ProfilePage> {
             Icon(
               icon,
               size: 24,
-              color: isDestructive ? CupertinoColors.destructiveRed : AppColors.primaryBlue,
+              color: isDestructive
+                  ? CupertinoColors.destructiveRed
+                  : AppColors.primaryBlue,
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -499,10 +508,9 @@ class _ProfilePageState extends State<ProfilePage> {
               final authProvider = context.read<AuthProvider>();
               await authProvider.logout();
               if (mounted) {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  AppRoutes.login,
-                  (route) => false,
-                );
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
               }
             },
             child: const Text('Sign Out'),
