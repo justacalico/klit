@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import '../presentation/desktop/responsive_layout.dart';
 import '../presentation/pages/auth/login_page.dart';
 import '../presentation/pages/post/post_detail_page.dart';
+import '../presentation/pages/profile/profile_page.dart';
 import '../presentation/pages/search/search_page.dart';
 import '../presentation/pages/settings/account_management_page.dart';
 import '../presentation/pages/settings/host_settings_page.dart';
@@ -14,6 +15,7 @@ class AppRoutes {
   static const String main = '/main';
   static const String postDetail = '/post';
   static const String search = '/search';
+  static const String profile = '/profile';
   static const String accountManagement = '/settings/accounts';
   static const String hostSettings = '/settings/host';
 }
