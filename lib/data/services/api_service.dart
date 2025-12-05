@@ -255,36 +255,43 @@ class ApiService {
     }
   }
 
-  /// Get popular posts from /popular.json endpoint
+  /// Get popular posts - uses posts endpoint with order:score and date range
   Future<ApiResult<List<Post>>> getPopularPosts({
     String scale = 'day',
     int page = 1,
   }) async {
     try {
-      // The /popular.json endpoint uses 'date' parameter with format YYYY-MM-DD
-      // and 'scale' parameter for day/week/month
+      // Build date range tags based on scale
       final now = DateTime.now();
-      final dateStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+      String dateTags;
+      
+      switch (scale) {
+        case 'week':
+          final weekAgo = now.subtract(const Duration(days: 7));
+          dateTags = 'date:>=${weekAgo.year}-${weekAgo.month.toString().padLeft(2, '0')}-${weekAgo.day.toString().padLeft(2, '0')}';
+          break;
+        case 'month':
+          final monthAgo = now.subtract(const Duration(days: 30));
+          dateTags = 'date:>=${monthAgo.year}-${monthAgo.month.toString().padLeft(2, '0')}-${monthAgo.day.toString().padLeft(2, '0')}';
+          break;
+        case 'day':
+        default:
+          final yesterday = now.subtract(const Duration(days: 1));
+          dateTags = 'date:>=${yesterday.year}-${yesterday.month.toString().padLeft(2, '0')}-${yesterday.day.toString().padLeft(2, '0')}';
+          break;
+      }
       
       final response = await _dio.get(
-        ApiConstants.popularEndpoint,
+        ApiConstants.postsEndpoint,
         queryParameters: {
-          'date': dateStr,
-          'scale': scale,
+          'tags': '$dateTags order:score',
+          'limit': ApiConstants.defaultPageSize,
+          'page': page,
         },
       );
 
       if (response.statusCode == 200 && response.data != null) {
-        // /popular.json returns posts directly as a list
-        List<dynamic> postsData;
-        if (response.data is List) {
-          postsData = response.data as List<dynamic>;
-        } else if (response.data is Map && response.data['posts'] != null) {
-          postsData = response.data['posts'] as List<dynamic>;
-        } else {
-          return ApiResult.failure(ApiException.unknown());
-        }
-        
+        final postsData = response.data['posts'] as List<dynamic>;
         final posts = postsData
             .where((e) => e != null && e is Map<String, dynamic>)
             .map((e) => Post.fromJson(e as Map<String, dynamic>))
