@@ -150,6 +150,26 @@ class ApiService {
     }
   }
 
+  /// Get user profile by username
+  Future<ApiResult<User>> getUserProfile(String username) async {
+    try {
+      final response = await _dio.get('/users/$username.json');
+
+      if (response.statusCode == 200 && response.data != null) {
+        final user = User.fromJson(response.data as Map<String, dynamic>);
+        return ApiResult.success(user);
+      }
+      return ApiResult.failure(ApiException.notFound());
+    } on DioException catch (e) {
+      if (e.error is ApiException) {
+        return ApiResult.failure(e.error as ApiException);
+      }
+      return ApiResult.failure(ApiException.unknown(e));
+    } catch (e) {
+      return ApiResult.failure(ApiException.unknown(e));
+    }
+  }
+
   /// Get posts with optional search parameters
   Future<ApiResult<List<Post>>> getPosts({
     int page = 1,
