@@ -13,6 +13,7 @@ class ApiConstants {
   static const String tagsEndpoint = '/tags.json';
   static const String userEndpoint = '/users';
   static const String favoritesEndpoint = '/favorites.json';
+  static const String popularEndpoint = '/popular.json';
 
   /// Default page size for pagination
   static const int defaultPageSize = 50;
