@@ -428,6 +428,17 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Column(
         children: [
           _buildActionTile(
+            icon: CupertinoIcons.heart_fill,
+            title: 'Favorites',
+            onTap: () =>
+                Navigator.of(context).pushNamed(AppRoutes.favorites),
+          ),
+          Container(
+            height: 0.5,
+            margin: const EdgeInsets.only(left: 56),
+            color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
+          ),
+          _buildActionTile(
             icon: CupertinoIcons.person_2,
             title: 'Manage Accounts',
             onTap: () =>
