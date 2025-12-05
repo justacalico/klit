@@ -493,7 +493,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Icon(
               CupertinoIcons.chevron_right,
               size: 16,
-              color: CupertinoColors.systemGrey.withOpacity(0.5),
+              color: CupertinoColors.systemGrey.withValues(alpha: 0.5),
             ),
           ],
         ),
