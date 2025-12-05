@@ -333,6 +333,41 @@ class ApiService {
     }
   }
 
+  /// Get user's favorite posts
+  Future<ApiResult<List<Post>>> getFavorites({
+    required String username,
+    int page = 1,
+    int limit = 50,
+  }) async {
+    try {
+      final response = await _dio.get(
+        ApiConstants.postsEndpoint,
+        queryParameters: {
+          'tags': 'fav:$username',
+          'page': page,
+          'limit': limit,
+        },
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final postsData = response.data['posts'] as List<dynamic>;
+        final posts = postsData
+            .map((e) => Post.fromJson(e as Map<String, dynamic>))
+            .where((p) => p.file.url != null)
+            .toList();
+        return ApiResult.success(posts);
+      }
+      return ApiResult.failure(ApiException.unknown());
+    } on DioException catch (e) {
+      if (e.error is ApiException) {
+        return ApiResult.failure(e.error as ApiException);
+      }
+      return ApiResult.failure(ApiException.unknown(e));
+    } catch (e) {
+      return ApiResult.failure(ApiException.unknown(e));
+    }
+  }
+
   /// Add a post to favorites
   Future<ApiResult<bool>> addFavorite(int postId) async {
     try {
