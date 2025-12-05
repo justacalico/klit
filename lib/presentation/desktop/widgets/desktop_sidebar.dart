@@ -90,6 +90,13 @@ class DesktopSidebar extends StatelessWidget {
                       isCollapsed: isCollapsed,
                       onTap: () => onItemSelected(5),
                     ),
+                    _SidebarItem(
+                      icon: CupertinoIcons.heart_fill,
+                      label: 'Favorites',
+                      isSelected: selectedIndex == 6,
+                      isCollapsed: isCollapsed,
+                      onTap: () => onItemSelected(6),
+                    ),
                   ],
                 ),
               ],
