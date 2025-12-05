@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'home/home_page.dart';
 import 'hot/hot_page.dart';
 import 'popular/popular_page.dart';
+import 'profile/profile_page.dart';
 import 'settings/settings_page.dart';
 
 /// Main tab navigation page
@@ -29,6 +30,11 @@ class MainTabPage extends StatelessWidget {
             label: 'Popular',
           ),
           BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.person),
+            activeIcon: Icon(CupertinoIcons.person_fill),
+            label: 'Profile',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.settings),
             activeIcon: Icon(CupertinoIcons.settings_solid),
             label: 'Settings',
@@ -44,6 +50,8 @@ class MainTabPage extends StatelessWidget {
           case 2:
             return const PopularPage();
           case 3:
+            return const ProfilePage();
+          case 4:
             return const SettingsPage();
           default:
             return const HomePage();
