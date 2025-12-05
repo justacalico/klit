@@ -1,0 +1,274 @@
+import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
+import '../../../core/constants/constants.dart';
+import '../../../data/models/models.dart';
+import '../../../data/services/services.dart';
+import '../../pages/post/post_detail_page.dart';
+import '../../providers/providers.dart';
+import '../../widgets/widgets.dart';
+
+/// Desktop favorites page with larger grid
+class DesktopFavoritesPage extends StatefulWidget {
+  final Function(PostDetailArguments) onPostTap;
+
+  const DesktopFavoritesPage({
+    super.key,
+    required this.onPostTap,
+  });
+
+  @override
+  State<DesktopFavoritesPage> createState() => _DesktopFavoritesPageState();
+}
+
+class _DesktopFavoritesPageState extends State<DesktopFavoritesPage> {
+  List<Post> _favorites = [];
+  bool _isLoading = true;
+  bool _isLoadingMore = false;
+  String? _error;
+  int _currentPage = 1;
+  bool _hasMore = true;
+  int _gridColumns = 4;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFavorites();
+  }
+
+  Future<void> _loadFavorites({bool refresh = false}) async {
+    final authProvider = context.read<AuthProvider>();
+    final account = authProvider.currentAccount;
+
+    if (account == null) {
+      setState(() {
+        _isLoading = false;
+        _error = 'Not logged in';
+      });
+      return;
+    }
+
+    if (refresh) {
+      setState(() {
+        _currentPage = 1;
+        _hasMore = true;
+        _isLoading = true;
+        _error = null;
+      });
+    }
+
+    final apiService = context.read<ApiService>();
+    final result = await apiService.getFavorites(
+      username: account.username,
+      page: _currentPage,
+    );
+
+    if (mounted) {
+      result.when(
+        success: (posts) {
+          setState(() {
+            if (refresh || _currentPage == 1) {
+              _favorites = posts;
+            } else {
+              _favorites.addAll(posts);
+            }
+            _hasMore = posts.length >= 50;
+            _isLoading = false;
+            _isLoadingMore = false;
+          });
+        },
+        failure: (error) {
+          setState(() {
+            _error = error.message;
+            _isLoading = false;
+            _isLoadingMore = false;
+          });
+        },
+      );
+    }
+  }
+
+  Future<void> _loadMore() async {
+    if (_isLoadingMore || !_hasMore) return;
+
+    setState(() {
+      _isLoadingMore = true;
+      _currentPage++;
+    });
+
+    await _loadFavorites();
+  }
+
+  void _onPostTap(Post post) {
+    final index = _favorites.indexWhere((p) => p.id == post.id);
+    widget.onPostTap(PostDetailArguments(
+      postIds: _favorites.map((p) => p.id).toList(),
+      initialIndex: index >= 0 ? index : 0,
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final brightness = CupertinoTheme.brightnessOf(context);
+    final isDark = brightness == Brightness.dark;
+
+    return Column(
+      children: [
+        _buildToolbar(isDark),
+        Expanded(child: _buildContent(isDark)),
+      ],
+    );
+  }
+
+  Widget _buildToolbar(bool isDark) {
+    return Container(
+      height: 52,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(CupertinoIcons.heart_fill, color: AppColors.explicitColor),
+          const SizedBox(width: 12),
+          const Text(
+            'Favorites',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const Spacer(),
+          // Grid size selector
+          _buildGridSizeSelector(isDark),
+          const SizedBox(width: 12),
+          // Refresh button
+          CupertinoButton(
+            padding: const EdgeInsets.all(8),
+            onPressed: () => _loadFavorites(refresh: true),
+            child: const Icon(CupertinoIcons.refresh, size: 20),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGridSizeSelector(bool isDark) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(
+          CupertinoIcons.square_grid_2x2,
+          size: 16,
+          color: CupertinoColors.secondaryLabel,
+        ),
+        const SizedBox(width: 8),
+        CupertinoSlidingSegmentedControl<int>(
+          groupValue: _gridColumns,
+          children: const {
+            3: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Text('3', style: TextStyle(fontSize: 13)),
+            ),
+            4: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Text('4', style: TextStyle(fontSize: 13)),
+            ),
+            5: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Text('5', style: TextStyle(fontSize: 13)),
+            ),
+            6: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Text('6', style: TextStyle(fontSize: 13)),
+            ),
+          },
+          onValueChanged: (value) {
+            if (value != null) {
+              setState(() => _gridColumns = value);
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContent(bool isDark) {
+    if (_isLoading && _favorites.isEmpty) {
+      return const Center(child: CupertinoActivityIndicator(radius: 16));
+    }
+
+    if (_error != null && _favorites.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              CupertinoIcons.exclamationmark_triangle,
+              size: 48,
+              color: CupertinoColors.systemGrey,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _error!,
+              style: const TextStyle(color: CupertinoColors.systemGrey),
+            ),
+            const SizedBox(height: 16),
+            CupertinoButton.filled(
+              onPressed: () => _loadFavorites(refresh: true),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_favorites.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              CupertinoIcons.heart,
+              size: 64,
+              color: AppColors.explicitColor.withOpacity(0.5),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'No favorites yet',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Posts you favorite will appear here',
+              style: TextStyle(
+                fontSize: 15,
+                color: CupertinoColors.systemGrey,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      child: PostsGrid(
+        posts: _favorites,
+        columns: _gridColumns,
+        isLoading: _isLoadingMore,
+        hasMore: _hasMore,
+        onPostTap: _onPostTap,
+        onLoadMore: _loadMore,
+        onRetry: () => _loadFavorites(refresh: true),
+      ),
+    );
+  }
+}
