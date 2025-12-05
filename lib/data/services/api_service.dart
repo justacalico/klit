@@ -275,8 +275,16 @@ class ApiService {
       );
 
       if (response.statusCode == 200 && response.data != null) {
-        // /popular.json returns posts directly as a list, not wrapped in 'posts' key
-        final postsData = response.data['posts'] as List<dynamic>? ?? response.data as List<dynamic>;
+        // /popular.json returns posts directly as a list
+        List<dynamic> postsData;
+        if (response.data is List) {
+          postsData = response.data as List<dynamic>;
+        } else if (response.data is Map && response.data['posts'] != null) {
+          postsData = response.data['posts'] as List<dynamic>;
+        } else {
+          return ApiResult.failure(ApiException.unknown());
+        }
+        
         final posts = postsData
             .map((e) => Post.fromJson(e as Map<String, dynamic>))
             .where((p) => p.file.url != null)
