@@ -56,6 +56,12 @@ class AppRouter {
           settings: settings,
         );
 
+      case AppRoutes.profile:
+        return CupertinoPageRoute(
+          builder: (_) => const ProfilePage(),
+          settings: settings,
+        );
+
       case AppRoutes.accountManagement:
         return CupertinoPageRoute(
           builder: (_) => const AccountManagementPage(),
