@@ -11,10 +11,7 @@ import '../../providers/providers.dart';
 class DesktopProfilePage extends StatefulWidget {
   final Function(String route)? onNavigate;
 
-  const DesktopProfilePage({
-    super.key,
-    this.onNavigate,
-  });
+  const DesktopProfilePage({super.key, this.onNavigate});
 
   @override
   State<DesktopProfilePage> createState() => _DesktopProfilePageState();
@@ -77,9 +74,7 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
     return Column(
       children: [
         _buildToolbar(isDark),
-        Expanded(
-          child: _buildContent(isDark),
-        ),
+        Expanded(child: _buildContent(isDark)),
       ],
     );
   }
@@ -89,7 +84,9 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
       height: 52,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
+        color: isDark
+            ? AppColors.darkSecondaryBackground
+            : CupertinoColors.white,
         border: Border(
           bottom: BorderSide(
             color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
@@ -101,10 +98,7 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
         children: [
           const Text(
             'Profile',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
           const Spacer(),
           CupertinoButton(
@@ -174,10 +168,7 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
             const SizedBox(height: 16),
             const Text(
               'Not logged in',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             const Text(
@@ -209,7 +200,9 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
                 children: [
                   Expanded(child: _buildStatsCard(_user!, isDark)),
                   const SizedBox(width: 24),
-                  Expanded(child: _buildAccountInfoCard(account, _user!, isDark)),
+                  Expanded(
+                    child: _buildAccountInfoCard(account, _user!, isDark),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -225,7 +218,9 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
+        color: isDark
+            ? AppColors.darkSecondaryBackground
+            : CupertinoColors.white,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -266,7 +261,10 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: _getLevelColor(user.level).withOpacity(0.2),
                         borderRadius: BorderRadius.circular(12),
@@ -293,7 +291,10 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
                 if (user.isBanned) ...[
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.explicitColor.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(12),
@@ -320,7 +321,9 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
+        color: isDark
+            ? AppColors.darkSecondaryBackground
+            : CupertinoColors.white,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -328,10 +331,7 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
         children: [
           const Text(
             'Statistics',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 20),
           _buildStatRow(
@@ -379,12 +379,7 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
           child: Icon(icon, color: color, size: 20),
         ),
         const SizedBox(width: 16),
-        Expanded(
-          child: Text(
-            label,
-            style: const TextStyle(fontSize: 15),
-          ),
-        ),
+        Expanded(child: Text(label, style: const TextStyle(fontSize: 15))),
         Text(
           value,
           style: TextStyle(
@@ -401,7 +396,9 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
+        color: isDark
+            ? AppColors.darkSecondaryBackground
+            : CupertinoColors.white,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -409,10 +406,7 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
         children: [
           const Text(
             'Account Info',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 20),
           _buildInfoRow('User ID', '#${user.id}'),
@@ -451,10 +445,7 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
         ),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
       ],
     );
@@ -463,7 +454,9 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
   Widget _buildActionsCard(BuildContext context, bool isDark) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
+        color: isDark
+            ? AppColors.darkSecondaryBackground
+            : CupertinoColors.white,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -539,10 +532,9 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
               final authProvider = context.read<AuthProvider>();
               await authProvider.logout();
               if (mounted) {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  AppRoutes.login,
-                  (route) => false,
-                );
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
               }
             },
             child: const Text('Sign Out'),
