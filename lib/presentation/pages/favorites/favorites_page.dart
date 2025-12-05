@@ -178,24 +178,14 @@ class _FavoritesPageState extends State<FavoritesPage> {
       );
     }
 
-    return CustomScrollView(
-      slivers: [
-        CupertinoSliverRefreshControl(
-          onRefresh: () => _loadFavorites(refresh: true),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.all(8),
-          sliver: PostsGrid(
-            posts: _favorites,
-            columns: 2,
-            isLoading: _isLoadingMore,
-            hasMore: _hasMore,
-            onPostTap: _onPostTap,
-            onLoadMore: _loadMore,
-            onRetry: () => _loadFavorites(refresh: true),
-          ),
-        ),
-      ],
+    return PostsGrid(
+      posts: _favorites,
+      columns: 2,
+      isLoading: _isLoadingMore,
+      hasMore: _hasMore,
+      onPostTap: _onPostTap,
+      onLoadMore: _loadMore,
+      onRetry: () => _loadFavorites(refresh: true),
     );
   }
 }
