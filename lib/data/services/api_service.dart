@@ -286,6 +286,7 @@ class ApiService {
         }
         
         final posts = postsData
+            .where((e) => e != null && e is Map<String, dynamic>)
             .map((e) => Post.fromJson(e as Map<String, dynamic>))
             .where((p) => p.file.url != null)
             .toList();
