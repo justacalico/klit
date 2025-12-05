@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import '../../core/constants/app_constants.dart';
 import '../pages/post/post_detail_page.dart';
+import 'pages/desktop_favorites_page.dart';
 import 'pages/desktop_home_page.dart';
 import 'pages/desktop_hot_page.dart';
 import 'pages/desktop_popular_page.dart';
@@ -128,6 +129,10 @@ class _DesktopShellState extends State<DesktopShell> {
           onNavigate: (route) {
             Navigator.of(context).pushNamed(route);
           },
+        );
+      case 6:
+        return DesktopFavoritesPage(
+          onPostTap: _openPostDetail,
         );
       default:
         return DesktopHomePage(
