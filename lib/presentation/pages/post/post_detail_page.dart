@@ -448,7 +448,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
         child: VideoPlayerWidget(
           videoUrl: post.file.url!,
           thumbnailUrl: post.preview.url,
-          autoPlay: false,
+          autoPlay: true,
           looping: true,
           showControls: true,
           aspectRatio: post.file.aspectRatio,
