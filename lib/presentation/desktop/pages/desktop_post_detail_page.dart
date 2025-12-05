@@ -374,7 +374,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
       return VideoPlayerWidget(
         videoUrl: post.file.url!,
         thumbnailUrl: post.preview.url,
-        autoPlay: false,
+        autoPlay: true,
         looping: true,
         showControls: true,
         aspectRatio: post.file.aspectRatio,
