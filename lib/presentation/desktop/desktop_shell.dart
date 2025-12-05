@@ -5,6 +5,7 @@ import 'pages/desktop_home_page.dart';
 import 'pages/desktop_hot_page.dart';
 import 'pages/desktop_popular_page.dart';
 import 'pages/desktop_post_detail_page.dart';
+import 'pages/desktop_profile_page.dart';
 import 'pages/desktop_search_page.dart';
 import 'pages/desktop_settings_page.dart';
 import 'widgets/desktop_sidebar.dart';
@@ -121,6 +122,12 @@ class _DesktopShellState extends State<DesktopShell> {
         return DesktopSearchPage(
           initialQuery: _searchQuery,
           onPostTap: _openPostDetail,
+        );
+      case 5:
+        return DesktopProfilePage(
+          onNavigate: (route) {
+            Navigator.of(context).pushNamed(route);
+          },
         );
       default:
         return DesktopHomePage(
