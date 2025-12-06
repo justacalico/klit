@@ -43,5 +43,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-*.png
+
+# Ignore large/temp PNG files but keep essential icons
+# Don't ignore: android/app/src/main/res/mipmap-*/ic_launcher.png
+# Don't ignore: assets/icon.png
+
 /dist
