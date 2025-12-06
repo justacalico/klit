@@ -407,7 +407,7 @@ class ApiService {
     try {
       final response = await _dio.post(
         ApiConstants.favoritesEndpoint,
-        data: {'post_id': postId},
+        data: FormData.fromMap({'post_id': postId}),
       );
 
       return ApiResult.success(response.statusCode == 201);
