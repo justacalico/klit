@@ -48,6 +48,7 @@ class _HomePageState extends State<HomePage> {
 
   void _onPostTap(Post post) {
     final postsProvider = context.read<PostsProvider>();
+    final settingsProvider = context.read<SettingsProvider>();
     final posts = postsProvider.latestPosts;
     final index = posts.indexWhere((p) => p.id == post.id);
     
@@ -56,6 +57,13 @@ class _HomePageState extends State<HomePage> {
       arguments: PostDetailArguments(
         postIds: posts.map((p) => p.id).toList(),
         initialIndex: index >= 0 ? index : 0,
+        hasMore: postsProvider.hasMoreLatest,
+        onLoadMore: () async {
+          await postsProvider.loadLatestPosts(
+            safeMode: settingsProvider.safeMode,
+          );
+          return postsProvider.latestPosts.map((p) => p.id).toList();
+        },
       ),
     );
   }
