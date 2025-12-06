@@ -51,9 +51,11 @@ class _FavoritesPageState extends State<FavoritesPage> {
     }
 
     final apiService = context.read<ApiService>();
+    final settingsProvider = context.read<SettingsProvider>();
     final result = await apiService.getFavorites(
       username: account.username,
       page: _currentPage,
+      safeMode: settingsProvider.safeMode,
     );
 
     if (mounted) {
