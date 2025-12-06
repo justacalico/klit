@@ -261,9 +261,11 @@ class ApiService {
   }
 
   /// Get popular posts - uses posts endpoint with order:score and date range
+  /// If [safeMode] is true, only safe-rated posts will be returned
   Future<ApiResult<List<Post>>> getPopularPosts({
     String scale = 'day',
     int page = 1,
+    bool safeMode = false,
   }) async {
     try {
       // Build date range tags based on scale
@@ -286,10 +288,13 @@ class ApiService {
           break;
       }
       
+      // Add rating:safe tag if safe mode is enabled
+      final tags = safeMode ? '$dateTags order:score rating:safe' : '$dateTags order:score';
+      
       final response = await _dio.get(
         ApiConstants.postsEndpoint,
         queryParameters: {
-          'tags': '$dateTags order:score',
+          'tags': tags,
           'limit': ApiConstants.defaultPageSize,
           'page': page,
         },
