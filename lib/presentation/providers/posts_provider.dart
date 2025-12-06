@@ -167,15 +167,16 @@ class PostsProvider extends ChangeNotifier {
   }
 
   /// Set hot time range and refresh
-  void setHotTimeRange(String range) {
+  void setHotTimeRange(String range, {bool safeMode = false}) {
     if (_hotTimeRange != range) {
       _hotTimeRange = range;
-      loadHotPosts(refresh: true);
+      loadHotPosts(refresh: true, safeMode: safeMode);
     }
   }
 
   /// Load popular posts
-  Future<void> loadPopularPosts({bool refresh = false}) async {
+  /// If [safeMode] is true, only safe-rated posts will be returned
+  Future<void> loadPopularPosts({bool refresh = false, bool safeMode = false}) async {
     if (_isLoadingPopular) return;
     if (!refresh && !_hasMorePopular) return;
 
@@ -191,6 +192,7 @@ class PostsProvider extends ChangeNotifier {
     final result = await _apiService.getPopularPosts(
       scale: _popularTimeRange,
       page: _popularPage,
+      safeMode: safeMode,
     );
 
     result.when(
