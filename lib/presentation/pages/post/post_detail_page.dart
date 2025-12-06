@@ -81,9 +81,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
   }
 
-  Future<void> _loadPost(int index) async {
+  Future<void> _loadPost(int index, {bool forceRefresh = false}) async {
     if (index < 0 || index >= widget.postIds.length) return;
-    if (_loadingStates[index] == true || _loadedPosts.containsKey(index)) return;
+    if (_loadingStates[index] == true) return;
+    if (!forceRefresh && _loadedPosts.containsKey(index)) return;
 
     setState(() {
       _loadingStates[index] = true;
@@ -126,6 +127,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   int get _currentPostId => widget.postIds[_currentIndex];
   Post? get _currentPost => _loadedPosts[_currentIndex];
+
+  Future<void> _refreshCurrentPost() async {
+    await _loadPost(_currentIndex, forceRefresh: true);
+  }
 
   Future<void> _vote(int index, int score) async {
     final post = _loadedPosts[index];
@@ -295,10 +300,25 @@ class _PostDetailPageState extends State<PostDetailPage> {
             : 'Post #$_currentPostId',
         ),
         trailing: _currentPost != null
-            ? CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: () => _showMoreOptions(),
-                child: const Icon(CupertinoIcons.ellipsis),
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: _loadingStates[_currentIndex] == true ? null : _refreshCurrentPost,
+                    child: Icon(
+                      CupertinoIcons.refresh,
+                      color: _loadingStates[_currentIndex] == true 
+                          ? CupertinoColors.systemGrey 
+                          : null,
+                    ),
+                  ),
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () => _showMoreOptions(),
+                    child: const Icon(CupertinoIcons.ellipsis),
+                  ),
+                ],
               )
             : null,
       ),
