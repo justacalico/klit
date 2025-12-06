@@ -59,14 +59,16 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
     final query = _searchController.text.trim();
     if (query.isEmpty) return;
 
+    final settingsProvider = context.read<SettingsProvider>();
     context.read<PostsProvider>().searchPosts(
           query: query,
           refresh: true,
           rating: _selectedRating,
           order: _selectedOrder,
+          safeMode: settingsProvider.safeMode,
         );
 
-    context.read<SettingsProvider>().addToSearchHistory(query);
+    settingsProvider.addToSearchHistory(query);
   }
 
   void _onPostTap(Post post) {
@@ -84,11 +86,13 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
     final query = _searchController.text.trim();
     if (query.isEmpty) return;
 
+    final settingsProvider = context.read<SettingsProvider>();
     context.read<PostsProvider>().searchPosts(
           query: query,
           refresh: false,
           rating: _selectedRating,
           order: _selectedOrder,
+          safeMode: settingsProvider.safeMode,
         );
   }
 
