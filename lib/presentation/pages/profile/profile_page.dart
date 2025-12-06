@@ -1,13 +1,12 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Colors;
 import 'package:provider/provider.dart';
-import '../../../app/routes.dart';
-import '../../../core/constants/constants.dart';
-import '../../../core/extensions/extensions.dart';
-import '../../../data/models/models.dart';
-import '../../../data/services/services.dart';
-import '../../providers/providers.dart';
+import '../../../data/models/user.dart';
+import '../../../data/services/api_service.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/settings_provider.dart';
 
-/// Profile page showing user account information
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
@@ -23,35 +22,27 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _loadProfile();
+    _loadUserStats();
   }
 
-  Future<void> _loadProfile() async {
+  Future<void> _loadUserStats() async {
     final authProvider = context.read<AuthProvider>();
-    final account = authProvider.currentAccount;
-
-    if (account == null) {
+    if (!authProvider.isLoggedIn || authProvider.currentAccount == null) {
       setState(() {
         _isLoading = false;
-        _error = 'Not logged in';
       });
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    final apiService = context.read<ApiService>();
-    final result = await apiService.getUserProfile(account.username);
-
-    if (mounted) {
+    try {
+      final apiService = ApiService();
+      final result = await apiService.getUserProfile(authProvider.currentAccount!.username);
       result.when(
         success: (user) {
           setState(() {
             _user = user;
             _isLoading = false;
+            _error = null;
           });
         },
         failure: (error) {
@@ -61,293 +52,582 @@ class _ProfilePageState extends State<ProfilePage> {
           });
         },
       );
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final brightness = CupertinoTheme.brightnessOf(context);
-    final isDark = brightness == Brightness.dark;
-
     return CupertinoPageScaffold(
-      backgroundColor: isDark
-          ? AppColors.darkGroupedBackground
-          : AppColors.lightGroupedBackground,
-      navigationBar: CupertinoNavigationBar(
-        middle: const Text('Profile'),
-        trailing: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () =>
-              Navigator.of(context).pushNamed(AppRoutes.accountManagement),
-          child: const Icon(CupertinoIcons.gear),
-        ),
-      ),
-      child: SafeArea(child: _buildContent(isDark)),
+      child: _buildContent(context),
     );
   }
 
-  Widget _buildContent(bool isDark) {
+  Widget _buildContent(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final settingsProvider = context.watch<SettingsProvider>();
+    final isDark = settingsProvider.themeMode == 2 ||
+        settingsProvider.themeMode == 3 ||
+        (settingsProvider.themeMode == 0 &&
+            MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+    final isOled = settingsProvider.themeMode == 3;
+
+    if (!authProvider.isLoggedIn) {
+      return _buildNotLoggedIn(context, isDark, isOled);
+    }
+
     if (_isLoading) {
-      return const Center(child: CupertinoActivityIndicator(radius: 16));
+      return const Center(child: CupertinoActivityIndicator());
     }
 
     if (_error != null) {
-      return Center(
+      return _buildError(context, isDark, isOled);
+    }
+
+    return CustomScrollView(
+      slivers: [
+        CupertinoSliverNavigationBar(
+          largeTitle: const Text('Profile'),
+          backgroundColor: isOled
+              ? CupertinoColors.black.withOpacity(0.8)
+              : isDark
+                  ? CupertinoColors.darkBackgroundGray.withOpacity(0.8)
+                  : CupertinoColors.systemBackground.withOpacity(0.8),
+        ),
+        CupertinoSliverRefreshControl(
+          onRefresh: _loadUserStats,
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.all(16),
+          sliver: SliverList(
+            delegate: SliverChildListDelegate([
+              _buildProfileHeader(context, authProvider, isDark, isOled),
+              const SizedBox(height: 20),
+              _buildStatsSection(context, isDark, isOled),
+              const SizedBox(height: 20),
+              _buildAccountInfoSection(context, authProvider, isDark, isOled),
+              const SizedBox(height: 20),
+              _buildActionsSection(context, authProvider, isDark, isOled),
+              const SizedBox(height: 100),
+            ]),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNotLoggedIn(BuildContext context, bool isDark, bool isOled) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              CupertinoIcons.exclamationmark_triangle,
-              size: 48,
-              color: CupertinoColors.systemGrey,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _error!,
-              style: const TextStyle(color: CupertinoColors.systemGrey),
-            ),
-            const SizedBox(height: 16),
-            CupertinoButton.filled(
-              onPressed: _loadProfile,
-              child: const Text('Retry'),
+            _buildLiquidGlassContainer(
+              isDark: isDark,
+              isOled: isOled,
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: isDark
+                              ? [
+                                  CupertinoColors.systemBlue.withOpacity(0.3),
+                                  CupertinoColors.systemBlue.withOpacity(0.1),
+                                ]
+                              : [
+                                  CupertinoColors.systemBlue.withOpacity(0.2),
+                                  CupertinoColors.systemBlue.withOpacity(0.1),
+                                ],
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        CupertinoIcons.person_circle,
+                        size: 64,
+                        color: isDark
+                            ? CupertinoColors.white.withOpacity(0.8)
+                            : CupertinoColors.systemBlue,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Not Logged In',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: isDark
+                            ? CupertinoColors.white
+                            : CupertinoColors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Log in to view your profile, favorites, and more',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: isDark
+                            ? CupertinoColors.white.withOpacity(0.6)
+                            : CupertinoColors.systemGrey,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    CupertinoButton(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 32, vertical: 14),
+                      color: CupertinoColors.systemBlue,
+                      borderRadius: BorderRadius.circular(14),
+                      onPressed: () {
+                        Navigator.of(context).pushNamed('/login');
+                      },
+                      child: const Text(
+                        'Log In',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: CupertinoColors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
-      );
-    }
-
-    final authProvider = context.watch<AuthProvider>();
-    final account = authProvider.currentAccount;
-
-    if (account == null || _user == null) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              CupertinoIcons.person_crop_circle,
-              size: 64,
-              color: CupertinoColors.systemGrey,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Not logged in',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Sign in to view your profile',
-              style: TextStyle(color: CupertinoColors.systemGrey),
-            ),
-            const SizedBox(height: 24),
-            CupertinoButton.filled(
-              onPressed: () => Navigator.of(context).pushNamed(AppRoutes.login),
-              child: const Text('Sign In'),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return RefreshIndicator(
-      onRefresh: _loadProfile,
-      child: Column(
-        children: [
-          const SizedBox(height: 24),
-          _buildProfileHeader(account, _user!, isDark),
-          const SizedBox(height: 24),
-          _buildStatsSection(_user!, isDark),
-          const SizedBox(height: 24),
-          _buildAccountInfoSection(account, _user!, isDark),
-          const SizedBox(height: 24),
-          _buildActionsSection(context, isDark),
-          const SizedBox(height: 40),
-        ],
       ),
     );
   }
 
-  Widget _buildProfileHeader(Account account, User user, bool isDark) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          // Avatar
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: AppColors.primaryBlue.withOpacity(0.2),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryBlue,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          // Info
-          Expanded(
+  Widget _buildError(BuildContext context, bool isDark, bool isOled) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: _buildLiquidGlassContainer(
+          isDark: isDark,
+          isOled: isOled,
+          child: Padding(
+            padding: const EdgeInsets.all(32),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  user.name,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // Level badge
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: _getLevelColor(user.level).withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    user.levelString,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: _getLevelColor(user.level),
+                    gradient: LinearGradient(
+                      colors: [
+                        CupertinoColors.systemRed.withOpacity(0.3),
+                        CupertinoColors.systemRed.withOpacity(0.1),
+                      ],
                     ),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    CupertinoIcons.exclamationmark_triangle,
+                    size: 48,
+                    color: CupertinoColors.systemRed,
                   ),
                 ),
-                const SizedBox(height: 8),
-                // Host
+                const SizedBox(height: 20),
                 Text(
-                  account.host.replaceAll('https://', ''),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: CupertinoColors.systemGrey,
+                  'Error Loading Profile',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color:
+                        isDark ? CupertinoColors.white : CupertinoColors.black,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  _error!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: isDark
+                        ? CupertinoColors.white.withOpacity(0.6)
+                        : CupertinoColors.systemGrey,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                CupertinoButton(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  color: CupertinoColors.systemBlue,
+                  borderRadius: BorderRadius.circular(12),
+                  onPressed: _loadUserStats,
+                  child: const Text(
+                    'Retry',
+                    style: TextStyle(color: CupertinoColors.white),
                   ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildStatsSection(User user, bool isDark) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.only(left: 4, bottom: 12),
-            child: Text(
-              'Statistics',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+  Widget _buildLiquidGlassContainer({
+    required bool isDark,
+    required bool isOled,
+    required Widget child,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isOled
+                  ? [
+                      Colors.white.withOpacity(0.06),
+                      Colors.white.withOpacity(0.02),
+                    ]
+                  : isDark
+                      ? [
+                          Colors.white.withOpacity(0.12),
+                          Colors.white.withOpacity(0.06),
+                        ]
+                      : [
+                          Colors.white.withOpacity(0.8),
+                          Colors.white.withOpacity(0.6),
+                        ],
             ),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatCard(
-                  icon: CupertinoIcons.heart_fill,
-                  value: user.favoriteCount.compact,
-                  label: 'Favorites',
-                  color: AppColors.explicitColor,
-                  isDark: isDark,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildStatCard(
-                  icon: CupertinoIcons.cloud_upload_fill,
-                  value: user.postUploadCount.compact,
-                  label: 'Uploads',
-                  color: AppColors.primaryBlue,
-                  isDark: isDark,
-                ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isOled
+                  ? Colors.white.withOpacity(0.08)
+                  : isDark
+                      ? Colors.white.withOpacity(0.15)
+                      : Colors.white.withOpacity(0.5),
+              width: 0.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(isOled ? 0.4 : 0.1),
+                blurRadius: 20,
+                spreadRadius: -5,
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatCard(
-                  icon: CupertinoIcons.pencil,
-                  value: user.postUpdateCount.compact,
-                  label: 'Edits',
-                  color: AppColors.primaryGreen,
-                  isDark: isDark,
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileHeader(
+      BuildContext context, AuthProvider authProvider, bool isDark, bool isOled) {
+    // e621 doesn't provide avatar URLs directly, so we always show default
+    final username = authProvider.currentAccount?.username ?? 'Unknown';
+
+    return _buildLiquidGlassContainer(
+      isDark: isDark,
+      isOled: isOled,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          children: [
+            // Avatar with glow effect
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: CupertinoColors.systemBlue.withOpacity(0.4),
+                    blurRadius: 20,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        CupertinoColors.systemBlue.withOpacity(0.3),
+                        CupertinoColors.systemPurple.withOpacity(0.3),
+                      ],
+                    ),
+                  ),
+                  child: _buildDefaultAvatar(isDark),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildStatCard(
-                  icon: CupertinoIcons.text_badge_plus,
-                  value: user.noteUpdateCount.compact,
-                  label: 'Notes',
-                  color: AppColors.primaryPurple,
-                  isDark: isDark,
-                ),
+            ),
+            const SizedBox(width: 20),
+            // User info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    username,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: isDark
+                          ? CupertinoColors.white
+                          : CupertinoColors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          CupertinoColors.systemGreen.withOpacity(0.3),
+                          CupertinoColors.systemGreen.withOpacity(0.1),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: CupertinoColors.systemGreen.withOpacity(0.3),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: CupertinoColors.systemGreen,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    CupertinoColors.systemGreen.withOpacity(0.5),
+                                blurRadius: 6,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _user?.levelString ?? 'Member',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: isDark
+                                ? CupertinoColors.systemGreen
+                                : CupertinoColors.systemGreen.darkColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDefaultAvatar(bool isDark) {
+    return Center(
+      child: Icon(
+        CupertinoIcons.person_fill,
+        size: 40,
+        color: isDark
+            ? CupertinoColors.white.withOpacity(0.6)
+            : CupertinoColors.systemGrey,
+      ),
+    );
+  }
+
+  Widget _buildStatsSection(BuildContext context, bool isDark, bool isOled) {
+    return _buildLiquidGlassContainer(
+      isDark: isDark,
+      isOled: isOled,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        CupertinoColors.systemPurple.withOpacity(0.3),
+                        CupertinoColors.systemPurple.withOpacity(0.1),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    CupertinoIcons.chart_bar_fill,
+                    size: 20,
+                    color: isDark
+                        ? CupertinoColors.systemPurple.withOpacity(0.8)
+                        : CupertinoColors.systemPurple,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Statistics',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color:
+                        isDark ? CupertinoColors.white : CupertinoColors.black,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildStatCard(
+                    icon: CupertinoIcons.heart_fill,
+                    label: 'Favorites',
+                    value: _user?.favoriteCount.toString() ?? '0',
+                    color: CupertinoColors.systemPink,
+                    isDark: isDark,
+                    isOled: isOled,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildStatCard(
+                    icon: CupertinoIcons.photo_fill,
+                    label: 'Uploads',
+                    value: _user?.postUploadCount.toString() ?? '0',
+                    color: CupertinoColors.systemBlue,
+                    isDark: isDark,
+                    isOled: isOled,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildStatCard(
+                    icon: CupertinoIcons.tag_fill,
+                    label: 'Tag Edits',
+                    value: _user?.postUpdateCount.toString() ?? '0',
+                    color: CupertinoColors.systemOrange,
+                    isDark: isDark,
+                    isOled: isOled,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildStatCard(
+                    icon: CupertinoIcons.text_bubble_fill,
+                    label: 'Note Edits',
+                    value: _user?.noteUpdateCount.toString() ?? '0',
+                    color: CupertinoColors.systemTeal,
+                    isDark: isDark,
+                    isOled: isOled,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildStatCard({
     required IconData icon,
-    required String value,
     required String label,
+    required String value,
     required Color color,
     required bool isDark,
+    required bool isOled,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkBackground : CupertinoColors.systemGrey6,
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isOled
+              ? [
+                  color.withOpacity(0.15),
+                  color.withOpacity(0.05),
+                ]
+              : isDark
+                  ? [
+                      color.withOpacity(0.2),
+                      color.withOpacity(0.1),
+                    ]
+                  : [
+                      color.withOpacity(0.15),
+                      color.withOpacity(0.05),
+                    ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withOpacity(isDark ? 0.3 : 0.2),
+          width: 0.5,
+        ),
       ),
       child: Column(
         children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.2),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.3),
+                  blurRadius: 12,
+                ),
+              ],
+            ),
+            child: Icon(
+              icon,
+              size: 22,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 12),
           Text(
             value,
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: color,
+              color: isDark ? CupertinoColors.white : CupertinoColors.black,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 12,
-              color: CupertinoColors.systemGrey,
+            style: TextStyle(
+              fontSize: 13,
+              color: isDark
+                  ? CupertinoColors.white.withOpacity(0.6)
+                  : CupertinoColors.systemGrey,
             ),
           ),
         ],
@@ -355,70 +635,128 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildAccountInfoSection(Account account, User user, bool isDark) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: Text(
-              'Account Info',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+  Widget _buildAccountInfoSection(
+      BuildContext context, AuthProvider authProvider, bool isDark, bool isOled) {
+    return _buildLiquidGlassContainer(
+      isDark: isDark,
+      isOled: isOled,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        CupertinoColors.systemBlue.withOpacity(0.3),
+                        CupertinoColors.systemBlue.withOpacity(0.1),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    CupertinoIcons.info_circle_fill,
+                    size: 20,
+                    color: isDark
+                        ? CupertinoColors.systemBlue.withOpacity(0.8)
+                        : CupertinoColors.systemBlue,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Account Info',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color:
+                        isDark ? CupertinoColors.white : CupertinoColors.black,
+                  ),
+                ),
+              ],
             ),
-          ),
-          _buildInfoRow('User ID', '#${user.id}', isDark),
-          _buildInfoRow('Member Since', user.createdAt.relativeTime, isDark),
-          _buildInfoRow('Account Age', user.accountAge, isDark),
-          _buildInfoRow(
-            'Feedback',
-            '+${user.positiveFeedbackCount} / ${user.neutralFeedbackCount} / -${user.negativeFeedbackCount}',
-            isDark,
-          ),
-          if (user.isBanned)
+            const SizedBox(height: 20),
             _buildInfoRow(
-              'Status',
-              'Banned',
-              isDark,
-              valueColor: AppColors.explicitColor,
+              icon: CupertinoIcons.person,
+              label: 'Username',
+              value: authProvider.currentAccount?.username ?? 'Unknown',
+              isDark: isDark,
             ),
-          const SizedBox(height: 8),
-        ],
+            _buildInfoRow(
+              icon: CupertinoIcons.number,
+              label: 'User ID',
+              value: _user?.id.toString() ?? 'N/A',
+              isDark: isDark,
+            ),
+            _buildInfoRow(
+              icon: CupertinoIcons.calendar,
+              label: 'Member Since',
+              value: _formatDateTime(_user?.createdAt),
+              isDark: isDark,
+            ),
+            _buildInfoRow(
+              icon: CupertinoIcons.shield,
+              label: 'Level',
+              value: _user?.levelString ?? 'Member',
+              isDark: isDark,
+              isLast: true,
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildInfoRow(
-    String label,
-    String value,
-    bool isDark, {
-    Color? valueColor,
+  Widget _buildInfoRow({
+    required IconData icon,
+    required String label,
+    required String value,
+    required bool isDark,
+    bool isLast = false,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      decoration: BoxDecoration(
+        border: isLast
+            ? null
+            : Border(
+                bottom: BorderSide(
+                  color: isDark
+                      ? Colors.white.withOpacity(0.1)
+                      : Colors.black.withOpacity(0.05),
+                  width: 0.5,
+                ),
+              ),
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          Icon(
+            icon,
+            size: 20,
+            color: isDark
+                ? CupertinoColors.white.withOpacity(0.5)
+                : CupertinoColors.systemGrey,
+          ),
+          const SizedBox(width: 12),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
-              color: CupertinoColors.systemGrey,
+              color: isDark
+                  ? CupertinoColors.white.withOpacity(0.6)
+                  : CupertinoColors.systemGrey,
             ),
           ),
+          const Spacer(),
           Text(
             value,
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w500,
-              color: valueColor,
+              color: isDark ? CupertinoColors.white : CupertinoColors.black,
             ),
           ),
         ],
@@ -426,44 +764,48 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildActionsSection(BuildContext context, bool isDark) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
+  Widget _buildActionsSection(
+      BuildContext context, AuthProvider authProvider, bool isDark, bool isOled) {
+    return _buildLiquidGlassContainer(
+      isDark: isDark,
+      isOled: isOled,
       child: Column(
         children: [
           _buildActionTile(
             icon: CupertinoIcons.heart_fill,
-            title: 'Favorites',
-            onTap: () =>
-                Navigator.of(context).pushNamed(AppRoutes.favorites),
+            label: 'My Favorites',
+            color: CupertinoColors.systemPink,
+            isDark: isDark,
+            onTap: () => Navigator.of(context).pushNamed('/favorites'),
           ),
           Container(
             height: 0.5,
-            margin: const EdgeInsets.only(left: 56),
-            color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            color: isDark
+                ? Colors.white.withOpacity(0.1)
+                : Colors.black.withOpacity(0.05),
           ),
           _buildActionTile(
-            icon: CupertinoIcons.person_2,
-            title: 'Manage Accounts',
-            onTap: () =>
-                Navigator.of(context).pushNamed(AppRoutes.accountManagement),
+            icon: CupertinoIcons.gear,
+            label: 'Settings',
+            color: CupertinoColors.systemGrey,
+            isDark: isDark,
+            onTap: () => Navigator.of(context).pushNamed('/settings'),
           ),
           Container(
             height: 0.5,
-            margin: const EdgeInsets.only(left: 56),
-            color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            color: isDark
+                ? Colors.white.withOpacity(0.1)
+                : Colors.black.withOpacity(0.05),
           ),
           _buildActionTile(
-            icon: CupertinoIcons.arrow_right_square,
-            title: 'Sign Out',
+            icon: CupertinoIcons.square_arrow_right,
+            label: 'Log Out',
+            color: CupertinoColors.systemRed,
+            isDark: isDark,
             isDestructive: true,
-            onTap: () => _showSignOutConfirmation(context),
+            onTap: () => _showLogoutConfirmation(context, authProvider),
           ),
         ],
       ),
@@ -472,38 +814,57 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildActionTile({
     required IconData icon,
-    required String title,
+    required String label,
+    required Color color,
+    required bool isDark,
     required VoidCallback onTap,
     bool isDestructive = false,
   }) {
     return CupertinoButton(
       padding: EdgeInsets.zero,
       onPressed: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Row(
           children: [
-            Icon(
-              icon,
-              size: 24,
-              color: isDestructive
-                  ? CupertinoColors.destructiveRed
-                  : AppColors.primaryBlue,
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    color.withOpacity(0.3),
+                    color.withOpacity(0.1),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                icon,
+                size: 20,
+                color: color,
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
-                title,
+                label,
                 style: TextStyle(
-                  fontSize: 16,
-                  color: isDestructive ? CupertinoColors.destructiveRed : null,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w500,
+                  color: isDestructive
+                      ? CupertinoColors.systemRed
+                      : isDark
+                          ? CupertinoColors.white
+                          : CupertinoColors.black,
                 ),
               ),
             ),
             Icon(
               CupertinoIcons.chevron_right,
-              size: 16,
-              color: CupertinoColors.systemGrey.withValues(alpha: 0.5),
+              size: 18,
+              color: isDark
+                  ? CupertinoColors.white.withOpacity(0.3)
+                  : CupertinoColors.systemGrey.withOpacity(0.5),
             ),
           ],
         ),
@@ -511,12 +872,13 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _showSignOutConfirmation(BuildContext context) {
+  void _showLogoutConfirmation(
+      BuildContext context, AuthProvider authProvider) {
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
+        title: const Text('Log Out'),
+        content: const Text('Are you sure you want to log out?'),
         actions: [
           CupertinoDialogAction(
             child: const Text('Cancel'),
@@ -524,50 +886,23 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
-            onPressed: () async {
+            child: const Text('Log Out'),
+            onPressed: () {
               Navigator.of(context).pop();
-              final authProvider = context.read<AuthProvider>();
-              await authProvider.logout();
-              if (mounted) {
-                Navigator.of(
-                  context,
-                ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
-              }
+              authProvider.logout();
             },
-            child: const Text('Sign Out'),
           ),
         ],
       ),
     );
   }
 
-  Color _getLevelColor(int level) {
-    if (level >= 34) return AppColors.explicitColor; // Admin
-    if (level >= 32) return AppColors.primaryPurple; // Mod/Janitor
-    if (level >= 30) return AppColors.primaryGreen; // Privileged
-    return AppColors.primaryBlue; // Member
-  }
-}
-
-/// RefreshIndicator wrapper for Cupertino
-class RefreshIndicator extends StatelessWidget {
-  final Widget child;
-  final Future<void> Function() onRefresh;
-
-  const RefreshIndicator({
-    super.key,
-    required this.child,
-    required this.onRefresh,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      slivers: [
-        CupertinoSliverRefreshControl(onRefresh: onRefresh),
-        SliverToBoxAdapter(child: child),
-      ],
-    );
+  String _formatDateTime(DateTime? date) {
+    if (date == null) return 'N/A';
+    final months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 }
