@@ -105,6 +105,11 @@ class _DesktopFavoritesPageState extends State<DesktopFavoritesPage> {
     widget.onPostTap(PostDetailArguments(
       postIds: _favorites.map((p) => p.id).toList(),
       initialIndex: index >= 0 ? index : 0,
+      hasMore: _hasMore,
+      onLoadMore: () async {
+        await _loadMore();
+        return _favorites.map((p) => p.id).toList();
+      },
     ));
   }
 
