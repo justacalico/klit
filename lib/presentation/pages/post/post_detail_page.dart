@@ -272,10 +272,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
               : AppColors.lightSecondaryBackground,
       navigationBar: CupertinoNavigationBar(
         backgroundColor: isOled
-            ? CupertinoColors.black.withOpacity(0.8)
+            ? CupertinoColors.black.withValues(alpha: 0.8)
             : isDark
-                ? CupertinoColors.darkBackgroundGray.withOpacity(0.8)
-                : CupertinoColors.systemBackground.withOpacity(0.8),
+                ? CupertinoColors.darkBackgroundGray.withValues(alpha: 0.8)
+                : CupertinoColors.systemBackground.withValues(alpha: 0.8),
         middle: Text(
           hasMultiplePosts 
             ? 'Post #$_currentPostId (${_currentIndex + 1}/${widget.postIds.length})'
@@ -369,31 +369,31 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 end: Alignment.bottomRight,
                 colors: isOled
                     ? [
-                        Colors.white.withOpacity(0.06),
-                        Colors.white.withOpacity(0.02),
+                        Colors.white.withValues(alpha: 0.06),
+                        Colors.white.withValues(alpha: 0.02),
                       ]
                     : isDark
                         ? [
-                            Colors.white.withOpacity(0.12),
-                            Colors.white.withOpacity(0.06),
+                            Colors.white.withValues(alpha: 0.12),
+                            Colors.white.withValues(alpha: 0.06),
                           ]
                         : [
-                            Colors.white.withOpacity(0.8),
-                            Colors.white.withOpacity(0.6),
+                            Colors.white.withValues(alpha: 0.8),
+                            Colors.white.withValues(alpha: 0.6),
                           ],
               ),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: isOled
-                    ? Colors.white.withOpacity(0.08)
+                    ? Colors.white.withValues(alpha: 0.08)
                     : isDark
-                        ? Colors.white.withOpacity(0.15)
-                        : Colors.white.withOpacity(0.5),
+                        ? Colors.white.withValues(alpha: 0.15)
+                        : Colors.white.withValues(alpha: 0.5),
                 width: 0.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(isOled ? 0.4 : 0.1),
+                  color: Colors.black.withValues(alpha: isOled ? 0.4 : 0.1),
                   blurRadius: 20,
                   spreadRadius: -5,
                 ),
@@ -486,19 +486,19 @@ class _PostDetailPageState extends State<PostDetailPage> {
               gradient: LinearGradient(
                 colors: isActive
                     ? [
-                        color.withOpacity(0.3),
-                        color.withOpacity(0.15),
+                        color.withValues(alpha: 0.3),
+                        color.withValues(alpha: 0.15),
                       ]
                     : [
-                        (isDark ? Colors.white : Colors.black).withOpacity(0.1),
-                        (isDark ? Colors.white : Colors.black).withOpacity(0.05),
+                        (isDark ? Colors.white : Colors.black).withValues(alpha: 0.1),
+                        (isDark ? Colors.white : Colors.black).withValues(alpha: 0.05),
                       ],
               ),
               shape: BoxShape.circle,
               boxShadow: isActive
                   ? [
                       BoxShadow(
-                        color: color.withOpacity(0.4),
+                        color: color.withValues(alpha: 0.4),
                         blurRadius: 12,
                       ),
                     ]
@@ -516,7 +516,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     color: isActive
                         ? color
                         : isDark
-                            ? CupertinoColors.white.withOpacity(0.6)
+                            ? CupertinoColors.white.withValues(alpha: 0.6)
                             : CupertinoColors.systemGrey,
                   ),
           ),
@@ -529,7 +529,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
               color: isActive
                   ? color
                   : isDark
-                      ? CupertinoColors.white.withOpacity(0.6)
+                      ? CupertinoColors.white.withValues(alpha: 0.6)
                       : CupertinoColors.systemGrey,
             ),
           ),
@@ -656,14 +656,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                color.withOpacity(0.25),
-                color.withOpacity(0.1),
+                color.withValues(alpha: 0.25),
+                color.withValues(alpha: 0.1),
               ],
             ),
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.3),
+                color: color.withValues(alpha: 0.3),
                 blurRadius: 10,
               ),
             ],
@@ -685,7 +685,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
           style: TextStyle(
             fontSize: 12,
             color: isDark
-                ? CupertinoColors.white.withOpacity(0.6)
+                ? CupertinoColors.white.withValues(alpha: 0.6)
                 : CupertinoColors.systemGrey,
           ),
         ),
@@ -702,13 +702,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
             gradient: LinearGradient(
               colors: [
                 post.ratingColor,
-                post.ratingColor.withOpacity(0.7),
+                post.ratingColor.withValues(alpha: 0.7),
               ],
             ),
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: post.ratingColor.withOpacity(0.4),
+                color: post.ratingColor.withValues(alpha: 0.4),
                 blurRadius: 10,
               ),
             ],
@@ -728,7 +728,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
           style: TextStyle(
             fontSize: 12,
             color: isDark
-                ? CupertinoColors.white.withOpacity(0.6)
+                ? CupertinoColors.white.withValues(alpha: 0.6)
                 : CupertinoColors.systemGrey,
           ),
         ),
@@ -750,8 +750,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      CupertinoColors.systemIndigo.withOpacity(0.3),
-                      CupertinoColors.systemIndigo.withOpacity(0.1),
+                      CupertinoColors.systemIndigo.withValues(alpha: 0.3),
+                      CupertinoColors.systemIndigo.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(10),
@@ -760,7 +760,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   CupertinoIcons.doc_text_fill,
                   size: 18,
                   color: isDark
-                      ? CupertinoColors.systemIndigo.withOpacity(0.8)
+                      ? CupertinoColors.systemIndigo.withValues(alpha: 0.8)
                       : CupertinoColors.systemIndigo,
                 ),
               ),
@@ -781,7 +781,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
             style: TextStyle(
               fontSize: 15,
               color: isDark
-                  ? CupertinoColors.white.withOpacity(0.8)
+                  ? CupertinoColors.white.withValues(alpha: 0.8)
                   : CupertinoColors.label,
             ),
           ),
@@ -804,8 +804,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      CupertinoColors.systemOrange.withOpacity(0.3),
-                      CupertinoColors.systemOrange.withOpacity(0.1),
+                      CupertinoColors.systemOrange.withValues(alpha: 0.3),
+                      CupertinoColors.systemOrange.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(10),
@@ -814,7 +814,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   CupertinoIcons.tag_fill,
                   size: 18,
                   color: isDark
-                      ? CupertinoColors.systemOrange.withOpacity(0.8)
+                      ? CupertinoColors.systemOrange.withValues(alpha: 0.8)
                       : CupertinoColors.systemOrange,
                 ),
               ),
@@ -853,8 +853,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      CupertinoColors.systemTeal.withOpacity(0.3),
-                      CupertinoColors.systemTeal.withOpacity(0.1),
+                      CupertinoColors.systemTeal.withValues(alpha: 0.3),
+                      CupertinoColors.systemTeal.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(10),
@@ -863,7 +863,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   CupertinoIcons.info_circle_fill,
                   size: 18,
                   color: isDark
-                      ? CupertinoColors.systemTeal.withOpacity(0.8)
+                      ? CupertinoColors.systemTeal.withValues(alpha: 0.8)
                       : CupertinoColors.systemTeal,
                 ),
               ),
@@ -900,8 +900,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
             : Border(
                 bottom: BorderSide(
                   color: isDark
-                      ? Colors.white.withOpacity(0.1)
-                      : Colors.black.withOpacity(0.05),
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.black.withValues(alpha: 0.05),
                   width: 0.5,
                 ),
               ),
@@ -914,7 +914,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
             style: TextStyle(
               fontSize: 14,
               color: isDark
-                  ? CupertinoColors.white.withOpacity(0.6)
+                  ? CupertinoColors.white.withValues(alpha: 0.6)
                   : CupertinoColors.systemGrey,
             ),
           ),
@@ -979,7 +979,7 @@ class _FullScreenImageViewer extends StatelessWidget {
     return CupertinoPageScaffold(
       backgroundColor: CupertinoColors.black,
       navigationBar: CupertinoNavigationBar(
-        backgroundColor: CupertinoColors.black.withOpacity(0.5),
+        backgroundColor: CupertinoColors.black.withValues(alpha: 0.5),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () => Navigator.of(context).pop(),
@@ -1134,16 +1134,16 @@ class _CommentsSheetState extends State<_CommentsSheet> {
               end: Alignment.bottomCenter,
               colors: isOled
                   ? [
-                      Colors.black.withOpacity(0.95),
+                      Colors.black.withValues(alpha: 0.95),
                       Colors.black,
                     ]
                   : isDark
                       ? [
-                          AppColors.darkBackground.withOpacity(0.95),
+                          AppColors.darkBackground.withValues(alpha: 0.95),
                           AppColors.darkBackground,
                         ]
                       : [
-                          CupertinoColors.systemBackground.withOpacity(0.95),
+                          CupertinoColors.systemBackground.withValues(alpha: 0.95),
                           CupertinoColors.systemBackground,
                         ],
             ),
@@ -1151,10 +1151,10 @@ class _CommentsSheetState extends State<_CommentsSheet> {
             border: Border(
               top: BorderSide(
                 color: isOled
-                    ? Colors.white.withOpacity(0.08)
+                    ? Colors.white.withValues(alpha: 0.08)
                     : isDark
-                        ? Colors.white.withOpacity(0.15)
-                        : Colors.white.withOpacity(0.5),
+                        ? Colors.white.withValues(alpha: 0.15)
+                        : Colors.white.withValues(alpha: 0.5),
                 width: 0.5,
               ),
             ),
@@ -1168,7 +1168,7 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                 height: 4,
                 decoration: BoxDecoration(
                   color: isDark
-                      ? Colors.white.withOpacity(0.3)
+                      ? Colors.white.withValues(alpha: 0.3)
                       : CupertinoColors.systemGrey3,
                   borderRadius: BorderRadius.circular(2),
                 ),
@@ -1186,8 +1186,8 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                CupertinoColors.systemBlue.withOpacity(0.3),
-                                CupertinoColors.systemBlue.withOpacity(0.1),
+                                CupertinoColors.systemBlue.withValues(alpha: 0.3),
+                                CupertinoColors.systemBlue.withValues(alpha: 0.1),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(10),
@@ -1196,7 +1196,7 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                             CupertinoIcons.chat_bubble_2_fill,
                             size: 18,
                             color: isDark
-                                ? CupertinoColors.systemBlue.withOpacity(0.8)
+                                ? CupertinoColors.systemBlue.withValues(alpha: 0.8)
                                 : CupertinoColors.systemBlue,
                           ),
                         ),
@@ -1220,15 +1220,15 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? Colors.white.withOpacity(0.1)
-                              : Colors.black.withOpacity(0.05),
+                              ? Colors.white.withValues(alpha: 0.1)
+                              : Colors.black.withValues(alpha: 0.05),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           CupertinoIcons.xmark,
                           size: 18,
                           color: isDark
-                              ? CupertinoColors.white.withOpacity(0.6)
+                              ? CupertinoColors.white.withValues(alpha: 0.6)
                               : CupertinoColors.systemGrey,
                         ),
                       ),
@@ -1240,8 +1240,8 @@ class _CommentsSheetState extends State<_CommentsSheet> {
               Container(
                 height: 0.5,
                 color: isDark
-                    ? Colors.white.withOpacity(0.1)
-                    : Colors.black.withOpacity(0.05),
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.black.withValues(alpha: 0.05),
               ),
               // Comments list
               Expanded(
@@ -1273,24 +1273,24 @@ class _CommentsSheetState extends State<_CommentsSheet> {
               end: Alignment.bottomCenter,
               colors: isOled
                   ? [
-                      Colors.white.withOpacity(0.05),
-                      Colors.white.withOpacity(0.02),
+                      Colors.white.withValues(alpha: 0.05),
+                      Colors.white.withValues(alpha: 0.02),
                     ]
                   : isDark
                       ? [
-                          Colors.white.withOpacity(0.08),
-                          Colors.white.withOpacity(0.04),
+                          Colors.white.withValues(alpha: 0.08),
+                          Colors.white.withValues(alpha: 0.04),
                         ]
                       : [
-                          Colors.white.withOpacity(0.9),
-                          Colors.white.withOpacity(0.8),
+                          Colors.white.withValues(alpha: 0.9),
+                          Colors.white.withValues(alpha: 0.8),
                         ],
             ),
             border: Border(
               top: BorderSide(
                 color: isDark
-                    ? Colors.white.withOpacity(0.1)
-                    : Colors.black.withOpacity(0.05),
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.black.withValues(alpha: 0.05),
               ),
             ),
           ),
@@ -1308,13 +1308,13 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                   ),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? Colors.white.withOpacity(0.08)
-                        : Colors.black.withOpacity(0.05),
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : Colors.black.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: isDark
-                          ? Colors.white.withOpacity(0.1)
-                          : Colors.black.withOpacity(0.08),
+                          ? Colors.white.withValues(alpha: 0.1)
+                          : Colors.black.withValues(alpha: 0.08),
                       width: 0.5,
                     ),
                   ),
@@ -1323,7 +1323,7 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                   ),
                   placeholderStyle: TextStyle(
                     color: isDark
-                        ? CupertinoColors.white.withOpacity(0.4)
+                        ? CupertinoColors.white.withValues(alpha: 0.4)
                         : CupertinoColors.systemGrey,
                   ),
                 ),
@@ -1338,13 +1338,13 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                     gradient: LinearGradient(
                       colors: [
                         CupertinoColors.systemBlue,
-                        CupertinoColors.systemBlue.withOpacity(0.8),
+                        CupertinoColors.systemBlue.withValues(alpha: 0.8),
                       ],
                     ),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: CupertinoColors.systemBlue.withOpacity(0.4),
+                        color: CupertinoColors.systemBlue.withValues(alpha: 0.4),
                         blurRadius: 12,
                       ),
                     ],
@@ -1386,8 +1386,8 @@ class _CommentsSheetState extends State<_CommentsSheet> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    CupertinoColors.systemRed.withOpacity(0.2),
-                    CupertinoColors.systemRed.withOpacity(0.1),
+                    CupertinoColors.systemRed.withValues(alpha: 0.2),
+                    CupertinoColors.systemRed.withValues(alpha: 0.1),
                   ],
                 ),
                 shape: BoxShape.circle,
@@ -1404,7 +1404,7 @@ class _CommentsSheetState extends State<_CommentsSheet> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: isDark
-                    ? CupertinoColors.white.withOpacity(0.6)
+                    ? CupertinoColors.white.withValues(alpha: 0.6)
                     : CupertinoColors.systemGrey,
               ),
             ),
@@ -1428,8 +1428,8 @@ class _CommentsSheetState extends State<_CommentsSheet> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    CupertinoColors.systemBlue.withOpacity(0.2),
-                    CupertinoColors.systemBlue.withOpacity(0.1),
+                    CupertinoColors.systemBlue.withValues(alpha: 0.2),
+                    CupertinoColors.systemBlue.withValues(alpha: 0.1),
                   ],
                 ),
                 shape: BoxShape.circle,
@@ -1438,7 +1438,7 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                 CupertinoIcons.chat_bubble,
                 size: 40,
                 color: isDark
-                    ? CupertinoColors.systemBlue.withOpacity(0.6)
+                    ? CupertinoColors.systemBlue.withValues(alpha: 0.6)
                     : CupertinoColors.systemBlue,
               ),
             ),
@@ -1457,7 +1457,7 @@ class _CommentsSheetState extends State<_CommentsSheet> {
               style: TextStyle(
                 fontSize: 14,
                 color: isDark
-                    ? CupertinoColors.white.withOpacity(0.6)
+                    ? CupertinoColors.white.withValues(alpha: 0.6)
                     : CupertinoColors.systemGrey,
               ),
             ),
@@ -1504,26 +1504,26 @@ class _CommentCard extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: isOled
                   ? [
-                      Colors.white.withOpacity(0.05),
-                      Colors.white.withOpacity(0.02),
+                      Colors.white.withValues(alpha: 0.05),
+                      Colors.white.withValues(alpha: 0.02),
                     ]
                   : isDark
                       ? [
-                          Colors.white.withOpacity(0.1),
-                          Colors.white.withOpacity(0.05),
+                          Colors.white.withValues(alpha: 0.1),
+                          Colors.white.withValues(alpha: 0.05),
                         ]
                       : [
-                          Colors.white.withOpacity(0.8),
-                          Colors.white.withOpacity(0.6),
+                          Colors.white.withValues(alpha: 0.8),
+                          Colors.white.withValues(alpha: 0.6),
                         ],
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isOled
-                  ? Colors.white.withOpacity(0.06)
+                  ? Colors.white.withValues(alpha: 0.06)
                   : isDark
-                      ? Colors.white.withOpacity(0.12)
-                      : Colors.white.withOpacity(0.4),
+                      ? Colors.white.withValues(alpha: 0.12)
+                      : Colors.white.withValues(alpha: 0.4),
               width: 0.5,
             ),
           ),
@@ -1540,8 +1540,8 @@ class _CommentCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              CupertinoColors.systemBlue.withOpacity(0.25),
-                              CupertinoColors.systemBlue.withOpacity(0.1),
+                              CupertinoColors.systemBlue.withValues(alpha: 0.25),
+                              CupertinoColors.systemBlue.withValues(alpha: 0.1),
                             ],
                           ),
                           shape: BoxShape.circle,
@@ -1550,7 +1550,7 @@ class _CommentCard extends StatelessWidget {
                           CupertinoIcons.person_fill,
                           size: 14,
                           color: isDark
-                              ? CupertinoColors.systemBlue.withOpacity(0.8)
+                              ? CupertinoColors.systemBlue.withValues(alpha: 0.8)
                               : CupertinoColors.systemBlue,
                         ),
                       ),
@@ -1576,12 +1576,12 @@ class _CommentCard extends StatelessWidget {
                       gradient: LinearGradient(
                         colors: comment.score >= 0
                             ? [
-                                AppColors.safeColor.withOpacity(0.25),
-                                AppColors.safeColor.withOpacity(0.1),
+                                AppColors.safeColor.withValues(alpha: 0.25),
+                                AppColors.safeColor.withValues(alpha: 0.1),
                               ]
                             : [
-                                AppColors.explicitColor.withOpacity(0.25),
-                                AppColors.explicitColor.withOpacity(0.1),
+                                AppColors.explicitColor.withValues(alpha: 0.25),
+                                AppColors.explicitColor.withValues(alpha: 0.1),
                               ],
                       ),
                       borderRadius: BorderRadius.circular(12),
@@ -1620,7 +1620,7 @@ class _CommentCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   color: isDark
-                      ? CupertinoColors.white.withOpacity(0.85)
+                      ? CupertinoColors.white.withValues(alpha: 0.85)
                       : CupertinoColors.label,
                 ),
               ),
@@ -1630,7 +1630,7 @@ class _CommentCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   color: isDark
-                      ? CupertinoColors.white.withOpacity(0.5)
+                      ? CupertinoColors.white.withValues(alpha: 0.5)
                       : CupertinoColors.secondaryLabel,
                 ),
               ),
