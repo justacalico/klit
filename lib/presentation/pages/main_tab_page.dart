@@ -30,22 +30,25 @@ class _MainTabPageState extends State<MainTabPage> {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
 
-    return CupertinoPageScaffold(
-      child: Stack(
-        children: [
-          // Page content
-          IndexedStack(
-            index: _currentIndex,
-            children: _pages,
-          ),
-          // Liquid Glass navigation bar
-          Positioned(
-            left: 20,
-            right: 20,
-            bottom: MediaQuery.of(context).padding.bottom + 20,
-            child: _buildLiquidGlassNavBar(isDark),
-          ),
-        ],
+    return PopScope(
+      canPop: false,
+      child: CupertinoPageScaffold(
+        child: Stack(
+          children: [
+            // Page content
+            IndexedStack(
+              index: _currentIndex,
+              children: _pages,
+            ),
+            // Liquid Glass navigation bar
+            Positioned(
+              left: 20,
+              right: 20,
+              bottom: MediaQuery.of(context).padding.bottom + 20,
+              child: _buildLiquidGlassNavBar(isDark),
+            ),
+          ],
+        ),
       ),
     );
   }
