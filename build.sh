@@ -47,11 +47,8 @@ if ! command -v flutter &> /dev/null; then
     exit 1
 fi
 
-# Check if fastforge is available
-if ! flutter pub deps | grep -q fastforge; then
-    print_warning "Fastforge not found, running pub get..."
-    flutter pub get
-fi
+# Ensure dependencies are up to date
+flutter pub get 2>/dev/null || true
 
 # Function to build for a specific platform
 build_platform() {
