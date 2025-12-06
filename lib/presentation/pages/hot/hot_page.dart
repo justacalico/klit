@@ -48,6 +48,7 @@ class _HotPageState extends State<HotPage> {
 
   void _onPostTap(Post post) {
     final postsProvider = context.read<PostsProvider>();
+    final settingsProvider = context.read<SettingsProvider>();
     final posts = postsProvider.hotPosts;
     final index = posts.indexWhere((p) => p.id == post.id);
     
@@ -56,6 +57,13 @@ class _HotPageState extends State<HotPage> {
       arguments: PostDetailArguments(
         postIds: posts.map((p) => p.id).toList(),
         initialIndex: index >= 0 ? index : 0,
+        hasMore: postsProvider.hasMoreHot,
+        onLoadMore: () async {
+          await postsProvider.loadHotPosts(
+            safeMode: settingsProvider.safeMode,
+          );
+          return postsProvider.hotPosts.map((p) => p.id).toList();
+        },
       ),
     );
   }
