@@ -27,6 +27,17 @@ class AppTheme {
     );
   }
 
+  /// OLED theme (pure black for AMOLED screens)
+  static CupertinoThemeData get oledTheme {
+    return const CupertinoThemeData(
+      brightness: Brightness.dark,
+      primaryColor: AppColors.primaryBlue,
+      primaryContrastingColor: CupertinoColors.white,
+      scaffoldBackgroundColor: AppColors.oledBackground,
+      barBackgroundColor: Color(0xF0000000),
+    );
+  }
+
   /// Get theme based on brightness
   static CupertinoThemeData getTheme(Brightness brightness) {
     return brightness == Brightness.dark ? darkTheme : lightTheme;
