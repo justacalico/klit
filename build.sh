@@ -98,7 +98,27 @@ build_platform() {
                 if [ -x "$FASTFORGE" ]; then
                     $FASTFORGE package --platform linux --targets appimage || print_warning "AppImage build failed"
                     $FASTFORGE package --platform linux --targets deb || print_warning "DEB build failed"
-                    $FASTFORGE package --platform linux --targets rpm || print_warning "RPM build failed"
+                    
+                    # RPM build with workaround for fastforge bug
+                    # First run fastforge to set up the directory structure (it will fail)
+                    $FASTFORGE package --platform linux --targets rpm 2>/dev/null || true
+                    
+                    # Fix the rpmbuild directory structure - symlink klit to the build subdir
+                    RPM_BUILD_DIR="$DIST_DIR/klit-$VERSION-linux_rpm/rpmbuild/BUILD"
+                    if [ -d "$RPM_BUILD_DIR/klit" ] && [ -d "$RPM_BUILD_DIR/klit-$VERSION-build" ]; then
+                        # Create symlinks in the klit-VERSION-build directory
+                        cd "$RPM_BUILD_DIR/klit-$VERSION-build"
+                        ln -sf ../klit klit
+                        ln -sf ../klit.desktop klit.desktop
+                        ln -sf ../klit.png klit.png
+                        cd - > /dev/null
+                        
+                        # Re-run rpmbuild manually
+                        rpmbuild --define "_topdir $RPM_BUILD_DIR/.." -bb "$RPM_BUILD_DIR/../SPECS/klit.spec" && \
+                            print_status "RPM built successfully" || print_warning "RPM build failed"
+                    else
+                        print_warning "RPM build failed - directory structure not found"
+                    fi
                     
                     # Move fastforge outputs to versioned dist folder
                     for appimage in dist/*.AppImage; do
