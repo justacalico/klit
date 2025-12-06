@@ -47,6 +47,8 @@ class AppRouter {
           builder: (_) => PostDetailPage(
             postIds: args.postIds,
             initialIndex: args.initialIndex,
+            onLoadMore: args.onLoadMore,
+            hasMore: args.hasMore,
           ),
           settings: settings,
         );
