@@ -171,17 +171,22 @@ class ApiService {
   }
 
   /// Get posts with optional search parameters
+  /// If [safeMode] is true, only safe-rated posts will be returned
   Future<ApiResult<List<Post>>> getPosts({
     int page = 1,
     int limit = 50,
     String? tags,
     String? rating,
     String? order,
+    bool safeMode = false,
   }) async {
     try {
+      // If safe mode is enabled, override rating to safe
+      final effectiveRating = safeMode ? 's' : rating;
+      
       final params = PostSearchParams(
         tags: tags,
-        rating: rating,
+        rating: effectiveRating,
         order: order,
         page: page,
         limit: limit,
