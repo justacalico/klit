@@ -17,6 +17,8 @@ class AppConstants {
   static const String themeKey = 'theme_mode';
   static const String gridSizeKey = 'grid_size';
   static const String safeModeKey = 'safe_mode';
+  static const String leftHandedModeKey = 'left_handed_mode';
+  static const String upvoteWhenFavoritedKey = 'upvote_when_favorited';
   static const String searchHistoryKey = 'search_history';
 
   /// Default grid columns
