@@ -248,16 +248,20 @@ class DesktopSettingsPage extends StatelessWidget {
                 groupValue: settings.themeMode,
                 children: const {
                   0: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text('System', style: TextStyle(fontSize: 13)),
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text('Auto', style: TextStyle(fontSize: 12)),
                   ),
                   1: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text('Light', style: TextStyle(fontSize: 13)),
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text('Light', style: TextStyle(fontSize: 12)),
                   ),
                   2: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text('Dark', style: TextStyle(fontSize: 13)),
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text('Dark', style: TextStyle(fontSize: 12)),
+                  ),
+                  3: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text('OLED', style: TextStyle(fontSize: 12)),
                   ),
                 },
                 onValueChanged: (value) {
