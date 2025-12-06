@@ -93,10 +93,10 @@ class _ProfilePageState extends State<ProfilePage> {
         CupertinoSliverNavigationBar(
           largeTitle: const Text('Profile'),
           backgroundColor: isOled
-              ? CupertinoColors.black.withOpacity(0.8)
+              ? CupertinoColors.black.withValues(alpha: 0.8)
               : isDark
-                  ? CupertinoColors.darkBackgroundGray.withOpacity(0.8)
-                  : CupertinoColors.systemBackground.withOpacity(0.8),
+                  ? CupertinoColors.darkBackgroundGray.withValues(alpha: 0.8)
+                  : CupertinoColors.systemBackground.withValues(alpha: 0.8),
         ),
         CupertinoSliverRefreshControl(
           onRefresh: _loadUserStats,
@@ -140,12 +140,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         gradient: LinearGradient(
                           colors: isDark
                               ? [
-                                  CupertinoColors.systemBlue.withOpacity(0.3),
-                                  CupertinoColors.systemBlue.withOpacity(0.1),
+                                  CupertinoColors.systemBlue.withValues(alpha: 0.3),
+                                  CupertinoColors.systemBlue.withValues(alpha: 0.1),
                                 ]
                               : [
-                                  CupertinoColors.systemBlue.withOpacity(0.2),
-                                  CupertinoColors.systemBlue.withOpacity(0.1),
+                                  CupertinoColors.systemBlue.withValues(alpha: 0.2),
+                                  CupertinoColors.systemBlue.withValues(alpha: 0.1),
                                 ],
                         ),
                         shape: BoxShape.circle,
@@ -154,7 +154,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         CupertinoIcons.person_circle,
                         size: 64,
                         color: isDark
-                            ? CupertinoColors.white.withOpacity(0.8)
+                            ? CupertinoColors.white.withValues(alpha: 0.8)
                             : CupertinoColors.systemBlue,
                       ),
                     ),
@@ -176,7 +176,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       style: TextStyle(
                         fontSize: 16,
                         color: isDark
-                            ? CupertinoColors.white.withOpacity(0.6)
+                            ? CupertinoColors.white.withValues(alpha: 0.6)
                             : CupertinoColors.systemGrey,
                       ),
                     ),
@@ -224,8 +224,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        CupertinoColors.systemRed.withOpacity(0.3),
-                        CupertinoColors.systemRed.withOpacity(0.1),
+                        CupertinoColors.systemRed.withValues(alpha: 0.3),
+                        CupertinoColors.systemRed.withValues(alpha: 0.1),
                       ],
                     ),
                     shape: BoxShape.circle,
@@ -252,7 +252,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: isDark
-                        ? CupertinoColors.white.withOpacity(0.6)
+                        ? CupertinoColors.white.withValues(alpha: 0.6)
                         : CupertinoColors.systemGrey,
                   ),
                 ),
@@ -292,31 +292,31 @@ class _ProfilePageState extends State<ProfilePage> {
               end: Alignment.bottomRight,
               colors: isOled
                   ? [
-                      Colors.white.withOpacity(0.06),
-                      Colors.white.withOpacity(0.02),
+                      Colors.white.withValues(alpha: 0.06),
+                      Colors.white.withValues(alpha: 0.02),
                     ]
                   : isDark
                       ? [
-                          Colors.white.withOpacity(0.12),
-                          Colors.white.withOpacity(0.06),
+                          Colors.white.withValues(alpha: 0.12),
+                          Colors.white.withValues(alpha: 0.06),
                         ]
                       : [
-                          Colors.white.withOpacity(0.8),
-                          Colors.white.withOpacity(0.6),
+                          Colors.white.withValues(alpha: 0.8),
+                          Colors.white.withValues(alpha: 0.6),
                         ],
             ),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: isOled
-                  ? Colors.white.withOpacity(0.08)
+                  ? Colors.white.withValues(alpha: 0.08)
                   : isDark
-                      ? Colors.white.withOpacity(0.15)
-                      : Colors.white.withOpacity(0.5),
+                      ? Colors.white.withValues(alpha: 0.15)
+                      : Colors.white.withValues(alpha: 0.5),
               width: 0.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isOled ? 0.4 : 0.1),
+                color: Colors.black.withValues(alpha: isOled ? 0.4 : 0.1),
                 blurRadius: 20,
                 spreadRadius: -5,
               ),
@@ -346,7 +346,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: CupertinoColors.systemBlue.withOpacity(0.4),
+                    color: CupertinoColors.systemBlue.withValues(alpha: 0.4),
                     blurRadius: 20,
                     spreadRadius: 2,
                   ),
@@ -361,8 +361,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        CupertinoColors.systemBlue.withOpacity(0.3),
-                        CupertinoColors.systemPurple.withOpacity(0.3),
+                        CupertinoColors.systemBlue.withValues(alpha: 0.3),
+                        CupertinoColors.systemPurple.withValues(alpha: 0.3),
                       ],
                     ),
                   ),
@@ -393,13 +393,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          CupertinoColors.systemGreen.withOpacity(0.3),
-                          CupertinoColors.systemGreen.withOpacity(0.1),
+                          CupertinoColors.systemGreen.withValues(alpha: 0.3),
+                          CupertinoColors.systemGreen.withValues(alpha: 0.1),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: CupertinoColors.systemGreen.withOpacity(0.3),
+                        color: CupertinoColors.systemGreen.withValues(alpha: 0.3),
                         width: 0.5,
                       ),
                     ),
@@ -415,7 +415,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             boxShadow: [
                               BoxShadow(
                                 color:
-                                    CupertinoColors.systemGreen.withOpacity(0.5),
+                                    CupertinoColors.systemGreen.withValues(alpha: 0.5),
                                 blurRadius: 6,
                               ),
                             ],
@@ -450,7 +450,7 @@ class _ProfilePageState extends State<ProfilePage> {
         CupertinoIcons.person_fill,
         size: 40,
         color: isDark
-            ? CupertinoColors.white.withOpacity(0.6)
+            ? CupertinoColors.white.withValues(alpha: 0.6)
             : CupertinoColors.systemGrey,
       ),
     );
@@ -472,8 +472,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        CupertinoColors.systemPurple.withOpacity(0.3),
-                        CupertinoColors.systemPurple.withOpacity(0.1),
+                        CupertinoColors.systemPurple.withValues(alpha: 0.3),
+                        CupertinoColors.systemPurple.withValues(alpha: 0.1),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(10),
@@ -482,7 +482,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     CupertinoIcons.chart_bar_fill,
                     size: 20,
                     color: isDark
-                        ? CupertinoColors.systemPurple.withOpacity(0.8)
+                        ? CupertinoColors.systemPurple.withValues(alpha: 0.8)
                         : CupertinoColors.systemPurple,
                   ),
                 ),
@@ -572,22 +572,22 @@ class _ProfilePageState extends State<ProfilePage> {
           end: Alignment.bottomRight,
           colors: isOled
               ? [
-                  color.withOpacity(0.15),
-                  color.withOpacity(0.05),
+                  color.withValues(alpha: 0.15),
+                  color.withValues(alpha: 0.05),
                 ]
               : isDark
                   ? [
-                      color.withOpacity(0.2),
-                      color.withOpacity(0.1),
+                      color.withValues(alpha: 0.2),
+                      color.withValues(alpha: 0.1),
                     ]
                   : [
-                      color.withOpacity(0.15),
-                      color.withOpacity(0.05),
+                      color.withValues(alpha: 0.15),
+                      color.withValues(alpha: 0.05),
                     ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: color.withOpacity(isDark ? 0.3 : 0.2),
+          color: color.withValues(alpha: isDark ? 0.3 : 0.2),
           width: 0.5,
         ),
       ),
@@ -596,11 +596,11 @@ class _ProfilePageState extends State<ProfilePage> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.3),
+                  color: color.withValues(alpha: 0.3),
                   blurRadius: 12,
                 ),
               ],
@@ -626,7 +626,7 @@ class _ProfilePageState extends State<ProfilePage> {
             style: TextStyle(
               fontSize: 13,
               color: isDark
-                  ? CupertinoColors.white.withOpacity(0.6)
+                  ? CupertinoColors.white.withValues(alpha: 0.6)
                   : CupertinoColors.systemGrey,
             ),
           ),
@@ -652,8 +652,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        CupertinoColors.systemBlue.withOpacity(0.3),
-                        CupertinoColors.systemBlue.withOpacity(0.1),
+                        CupertinoColors.systemBlue.withValues(alpha: 0.3),
+                        CupertinoColors.systemBlue.withValues(alpha: 0.1),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(10),
@@ -662,7 +662,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     CupertinoIcons.info_circle_fill,
                     size: 20,
                     color: isDark
-                        ? CupertinoColors.systemBlue.withOpacity(0.8)
+                        ? CupertinoColors.systemBlue.withValues(alpha: 0.8)
                         : CupertinoColors.systemBlue,
                   ),
                 ),
@@ -725,8 +725,8 @@ class _ProfilePageState extends State<ProfilePage> {
             : Border(
                 bottom: BorderSide(
                   color: isDark
-                      ? Colors.white.withOpacity(0.1)
-                      : Colors.black.withOpacity(0.05),
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.black.withValues(alpha: 0.05),
                   width: 0.5,
                 ),
               ),
@@ -737,7 +737,7 @@ class _ProfilePageState extends State<ProfilePage> {
             icon,
             size: 20,
             color: isDark
-                ? CupertinoColors.white.withOpacity(0.5)
+                ? CupertinoColors.white.withValues(alpha: 0.5)
                 : CupertinoColors.systemGrey,
           ),
           const SizedBox(width: 12),
@@ -746,7 +746,7 @@ class _ProfilePageState extends State<ProfilePage> {
             style: TextStyle(
               fontSize: 15,
               color: isDark
-                  ? CupertinoColors.white.withOpacity(0.6)
+                  ? CupertinoColors.white.withValues(alpha: 0.6)
                   : CupertinoColors.systemGrey,
             ),
           ),
@@ -782,8 +782,8 @@ class _ProfilePageState extends State<ProfilePage> {
             height: 0.5,
             margin: const EdgeInsets.symmetric(horizontal: 16),
             color: isDark
-                ? Colors.white.withOpacity(0.1)
-                : Colors.black.withOpacity(0.05),
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.black.withValues(alpha: 0.05),
           ),
           _buildActionTile(
             icon: CupertinoIcons.gear,
@@ -796,8 +796,8 @@ class _ProfilePageState extends State<ProfilePage> {
             height: 0.5,
             margin: const EdgeInsets.symmetric(horizontal: 16),
             color: isDark
-                ? Colors.white.withOpacity(0.1)
-                : Colors.black.withOpacity(0.05),
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.black.withValues(alpha: 0.05),
           ),
           _buildActionTile(
             icon: CupertinoIcons.square_arrow_right,
@@ -832,8 +832,8 @@ class _ProfilePageState extends State<ProfilePage> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    color.withOpacity(0.3),
-                    color.withOpacity(0.1),
+                    color.withValues(alpha: 0.3),
+                    color.withValues(alpha: 0.1),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(10),
@@ -863,8 +863,8 @@ class _ProfilePageState extends State<ProfilePage> {
               CupertinoIcons.chevron_right,
               size: 18,
               color: isDark
-                  ? CupertinoColors.white.withOpacity(0.3)
-                  : CupertinoColors.systemGrey.withOpacity(0.5),
+                  ? CupertinoColors.white.withValues(alpha: 0.3)
+                  : CupertinoColors.systemGrey.withValues(alpha: 0.5),
             ),
           ],
         ),
