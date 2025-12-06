@@ -204,15 +204,6 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Clean previous builds
-echo ""
-print_status "Cleaning previous builds..."
-flutter clean
-flutter pub get
-
-# Create output directory
-mkdir -p build/dist
-
 # Build based on arguments
 if [ "$BUILD_ALL" = true ]; then
     build_platform android apk
