@@ -42,7 +42,11 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
 
   Future<void> _loadPosts({bool refresh = false}) async {
     final postsProvider = context.read<PostsProvider>();
-    await postsProvider.loadLatestPosts(refresh: refresh);
+    final settingsProvider = context.read<SettingsProvider>();
+    await postsProvider.loadLatestPosts(
+      refresh: refresh,
+      safeMode: settingsProvider.safeMode,
+    );
 
     if (refresh) {
       _refreshController.refreshCompleted();
