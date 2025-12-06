@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
-import '../../core/constants/constants.dart';
 import 'home/home_page.dart';
 import 'hot/hot_page.dart';
 import 'popular/popular_page.dart';
