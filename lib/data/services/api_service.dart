@@ -502,10 +502,10 @@ class ApiService {
     try {
       final response = await _dio.post(
         '/comments.json',
-        data: {
+        data: FormData.fromMap({
           'comment[post_id]': postId,
           'comment[body]': body,
-        },
+        }),
       );
 
       if (response.statusCode == 201 && response.data != null) {
