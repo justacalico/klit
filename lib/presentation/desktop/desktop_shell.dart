@@ -154,6 +154,8 @@ class _DesktopShellState extends State<DesktopShell> {
       initialIndex: _postDetailArgs!.initialIndex,
       onSearchTag: _openSearch,
       onClose: _closePostDetail,
+      onLoadMore: _postDetailArgs!.onLoadMore,
+      hasMore: _postDetailArgs!.hasMore,
     );
   }
 }
