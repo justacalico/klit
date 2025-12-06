@@ -391,6 +391,15 @@ class _SearchPageState extends State<SearchPage> {
       focusNode: _focusNode,
       placeholder: 'Search tags...',
       onChanged: (value) {
+        // Close suggestions if user typed a space (completed a tag)
+        if (value.endsWith(' ')) {
+          setState(() {
+            _showTagSuggestions = false;
+            _tagSuggestions = [];
+          });
+          return;
+        }
+        
         // Fetch tag suggestions for the current word
         final currentWord = _getCurrentWord();
         _tagDebouncer.run(() {
@@ -407,7 +416,10 @@ class _SearchPageState extends State<SearchPage> {
         });
       },
       onSubmitted: (_) {
-        setState(() => _showTagSuggestions = false);
+        setState(() {
+          _showTagSuggestions = false;
+          _tagSuggestions = [];
+        });
         _performSearch();
       },
     );
