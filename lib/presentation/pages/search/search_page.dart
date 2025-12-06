@@ -1,8 +1,10 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../../app/routes.dart';
 import '../../../core/utils/debouncer.dart';
 import '../../../data/models/models.dart';
+import '../../../data/services/services.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 import '../post/post_detail_page.dart';
@@ -20,10 +22,14 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   final _searchController = TextEditingController();
   final _debouncer = Debouncer(delay: const Duration(milliseconds: 500));
+  final _tagDebouncer = Debouncer(delay: const Duration(milliseconds: 300));
   final _focusNode = FocusNode();
   
   bool _isGridView = true;
   bool _showHistory = true;
+  bool _showTagSuggestions = false;
+  List<Tag> _tagSuggestions = [];
+  bool _isLoadingTags = false;
   String? _selectedRating;
   String _selectedOrder = 'id_desc';
 
@@ -52,8 +58,91 @@ class _SearchPageState extends State<SearchPage> {
   void dispose() {
     _searchController.dispose();
     _debouncer.dispose();
+    _tagDebouncer.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  /// Get the current word being typed (after the last space)
+  String _getCurrentWord() {
+    final text = _searchController.text;
+    final cursorPos = _searchController.selection.baseOffset;
+    if (cursorPos < 0) return text.split(' ').last;
+    
+    final textBeforeCursor = text.substring(0, cursorPos);
+    final words = textBeforeCursor.split(' ');
+    return words.isNotEmpty ? words.last : '';
+  }
+
+  /// Fetch tag suggestions from the API
+  Future<void> _fetchTagSuggestions(String query) async {
+    if (query.isEmpty || query.length < 2) {
+      setState(() {
+        _tagSuggestions = [];
+        _showTagSuggestions = false;
+      });
+      return;
+    }
+
+    setState(() => _isLoadingTags = true);
+
+    final apiService = context.read<ApiService>();
+    final result = await apiService.searchTags(query: query, limit: 10);
+
+    if (mounted) {
+      result.when(
+        success: (tags) {
+          setState(() {
+            _tagSuggestions = tags;
+            _showTagSuggestions = tags.isNotEmpty;
+            _isLoadingTags = false;
+          });
+        },
+        failure: (_) {
+          setState(() {
+            _tagSuggestions = [];
+            _showTagSuggestions = false;
+            _isLoadingTags = false;
+          });
+        },
+      );
+    }
+  }
+
+  /// Insert a tag suggestion into the search field
+  void _insertTagSuggestion(String tagName) {
+    final text = _searchController.text;
+    final cursorPos = _searchController.selection.baseOffset;
+    
+    if (cursorPos < 0) {
+      // Simple case: just append
+      final words = text.split(' ');
+      if (words.isNotEmpty) {
+        words[words.length - 1] = tagName;
+      } else {
+        words.add(tagName);
+      }
+      _searchController.text = '${words.join(' ')} ';
+    } else {
+      // Replace the current word being typed
+      final textBeforeCursor = text.substring(0, cursorPos);
+      final textAfterCursor = text.substring(cursorPos);
+      
+      final lastSpaceIndex = textBeforeCursor.lastIndexOf(' ');
+      final newTextBeforeCursor = lastSpaceIndex >= 0 
+          ? '${textBeforeCursor.substring(0, lastSpaceIndex + 1)}$tagName '
+          : '$tagName ';
+      
+      _searchController.text = newTextBeforeCursor + textAfterCursor;
+      _searchController.selection = TextSelection.collapsed(
+        offset: newTextBeforeCursor.length,
+      );
+    }
+    
+    setState(() {
+      _showTagSuggestions = false;
+      _tagSuggestions = [];
+    });
   }
 
   void _performSearch() {
@@ -110,6 +199,7 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     final gridSize = context.watch<SettingsProvider>().gridSize;
+    final isDark = CupertinoTheme.of(context).brightness == Brightness.dark;
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -121,18 +211,178 @@ class _SearchPageState extends State<SearchPage> {
         ),
       ),
       child: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            _buildFilters(),
+            Column(
+              children: [
+                _buildFilters(),
+                Expanded(
+                  child: _showHistory
+                      ? _buildSearchHistory()
+                      : _buildSearchResults(gridSize),
+                ),
+              ],
+            ),
+            // Tag suggestions overlay
+            if (_showTagSuggestions && _tagSuggestions.isNotEmpty)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: _buildTagSuggestions(),
+              ),
+            // Loading indicator for tags
+            if (_isLoadingTags && !_showTagSuggestions)
+              Positioned(
+                top: 8,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? CupertinoColors.black.withValues(alpha: 0.7)
+                          : CupertinoColors.white.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CupertinoActivityIndicator(),
+                        SizedBox(width: 8),
+                        Text('Loading suggestions...', style: TextStyle(fontSize: 13)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTagSuggestions() {
+    final isDark = CupertinoTheme.of(context).brightness == Brightness.dark;
+    
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      constraints: const BoxConstraints(maxHeight: 300),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: isDark
+                    ? [
+                        CupertinoColors.white.withValues(alpha: 0.14),
+                        CupertinoColors.white.withValues(alpha: 0.08),
+                      ]
+                    : [
+                        CupertinoColors.white.withValues(alpha: 0.9),
+                        CupertinoColors.white.withValues(alpha: 0.8),
+                      ],
+              ),
+              border: Border.all(
+                color: isDark
+                    ? CupertinoColors.white.withValues(alpha: 0.15)
+                    : CupertinoColors.black.withValues(alpha: 0.1),
+                width: 0.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: isDark
+                      ? CupertinoColors.black.withValues(alpha: 0.4)
+                      : CupertinoColors.black.withValues(alpha: 0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ListView.builder(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              itemCount: _tagSuggestions.length,
+              itemBuilder: (context, index) {
+                final tag = _tagSuggestions[index];
+                return _buildTagSuggestionItem(tag, isDark, index == _tagSuggestions.length - 1);
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTagSuggestionItem(Tag tag, bool isDark, bool isLast) {
+    return GestureDetector(
+      onTap: () => _insertTagSuggestion(tag.name),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          border: isLast
+              ? null
+              : Border(
+                  bottom: BorderSide(
+                    color: isDark
+                        ? CupertinoColors.white.withValues(alpha: 0.1)
+                        : CupertinoColors.black.withValues(alpha: 0.05),
+                    width: 0.5,
+                  ),
+                ),
+        ),
+        child: Row(
+          children: [
+            // Tag category indicator
+            Container(
+              width: 4,
+              height: 24,
+              decoration: BoxDecoration(
+                color: tag.color,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(width: 12),
+            // Tag name
             Expanded(
-              child: _showHistory
-                  ? _buildSearchHistory()
-                  : _buildSearchResults(gridSize),
+              child: Text(
+                tag.name.replaceAll('_', ' '),
+                style: TextStyle(
+                  color: tag.color,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            // Post count
+            Text(
+              _formatCount(tag.postCount),
+              style: TextStyle(
+                color: isDark
+                    ? CupertinoColors.white.withValues(alpha: 0.5)
+                    : CupertinoColors.black.withValues(alpha: 0.4),
+                fontSize: 13,
+              ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  String _formatCount(int count) {
+    if (count >= 1000000) {
+      return '${(count / 1000000).toStringAsFixed(1)}m';
+    } else if (count >= 1000) {
+      return '${(count / 1000).toStringAsFixed(1)}k';
+    }
+    return count.toString();
   }
 
   Widget _buildSearchField() {
@@ -141,6 +391,13 @@ class _SearchPageState extends State<SearchPage> {
       focusNode: _focusNode,
       placeholder: 'Search tags...',
       onChanged: (value) {
+        // Fetch tag suggestions for the current word
+        final currentWord = _getCurrentWord();
+        _tagDebouncer.run(() {
+          _fetchTagSuggestions(currentWord);
+        });
+        
+        // Perform search after debounce
         _debouncer.run(() {
           if (value.isNotEmpty) {
             _performSearch();
@@ -149,7 +406,10 @@ class _SearchPageState extends State<SearchPage> {
           }
         });
       },
-      onSubmitted: (_) => _performSearch(),
+      onSubmitted: (_) {
+        setState(() => _showTagSuggestions = false);
+        _performSearch();
+      },
     );
   }
 
