@@ -230,7 +230,7 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
             width: 100,
             height: 100,
             decoration: BoxDecoration(
-              color: AppColors.primaryBlue.withOpacity(0.2),
+              color: AppColors.primaryBlue.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -266,7 +266,7 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: _getLevelColor(user.level).withOpacity(0.2),
+                        color: _getLevelColor(user.level).withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -296,7 +296,7 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.explicitColor.withOpacity(0.2),
+                      color: AppColors.explicitColor.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -373,7 +373,7 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: color.withOpacity(0.15),
+            color: color.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: color, size: 20),
@@ -528,13 +528,12 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
           CupertinoDialogAction(
             isDestructiveAction: true,
             onPressed: () async {
-              Navigator.of(context).pop();
+              final navigator = Navigator.of(context);
+              navigator.pop();
               final authProvider = context.read<AuthProvider>();
               await authProvider.logout();
               if (mounted) {
-                Navigator.of(
-                  context,
-                ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+                navigator.pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
               }
             },
             child: const Text('Sign Out'),
