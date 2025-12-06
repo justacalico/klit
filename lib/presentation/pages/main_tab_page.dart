@@ -42,7 +42,7 @@ class _MainTabPageState extends State<MainTabPage> {
           Positioned(
             left: 20,
             right: 20,
-            bottom: MediaQuery.of(context).padding.bottom + 8,
+            bottom: MediaQuery.of(context).padding.bottom + 20,
             child: _buildLiquidGlassNavBar(isDark),
           ),
         ],
