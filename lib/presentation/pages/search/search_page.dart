@@ -65,14 +65,16 @@ class _SearchPageState extends State<SearchPage> {
 
     setState(() => _showHistory = false);
     
+    final settingsProvider = context.read<SettingsProvider>();
     context.read<PostsProvider>().searchPosts(
       query: query,
       refresh: true,
       rating: _selectedRating,
       order: _selectedOrder,
+      safeMode: settingsProvider.safeMode,
     );
     
-    context.read<SettingsProvider>().addToSearchHistory(query);
+    settingsProvider.addToSearchHistory(query);
   }
 
   void _onPostTap(Post post) {
