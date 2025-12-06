@@ -412,6 +412,57 @@ class _PostDetailPageState extends State<PostDetailPage> {
     final userVote = _userVote[index];
     final isVoting = _isVoting[index] == true;
     final isTogglingFav = _isTogglingFavorite[index] == true;
+    final leftHandedMode = context.watch<SettingsProvider>().leftHandedMode;
+
+    final upvoteButton = _buildGlassActionButton(
+      icon: CupertinoIcons.arrow_up_circle,
+      activeIcon: CupertinoIcons.arrow_up_circle_fill,
+      label: 'Upvote',
+      isActive: userVote == 1,
+      isLoading: isVoting,
+      color: AppColors.safeColor,
+      isDark: isDark,
+      onTap: () => _vote(index, userVote == 1 ? 0 : 1),
+    );
+
+    final downvoteButton = _buildGlassActionButton(
+      icon: CupertinoIcons.arrow_down_circle,
+      activeIcon: CupertinoIcons.arrow_down_circle_fill,
+      label: 'Downvote',
+      isActive: userVote == -1,
+      isLoading: isVoting,
+      color: AppColors.explicitColor,
+      isDark: isDark,
+      onTap: () => _vote(index, userVote == -1 ? 0 : -1),
+    );
+
+    final favoriteButton = _buildGlassActionButton(
+      icon: CupertinoIcons.heart,
+      activeIcon: CupertinoIcons.heart_fill,
+      label: 'Favorite',
+      isActive: isFav,
+      isLoading: isTogglingFav,
+      color: CupertinoColors.systemPink,
+      isDark: isDark,
+      onTap: () => _toggleFavorite(index),
+    );
+
+    final commentButton = _buildGlassActionButton(
+      icon: CupertinoIcons.chat_bubble,
+      activeIcon: CupertinoIcons.chat_bubble_fill,
+      label: '${post.commentCount}',
+      isActive: false,
+      isLoading: false,
+      color: CupertinoColors.systemBlue,
+      isDark: isDark,
+      onTap: () => _showComments(index),
+    );
+
+    // Left-handed mode: Favorite, Upvote, Downvote, Comment
+    // Normal mode: Upvote, Downvote, Favorite, Comment
+    final actions = leftHandedMode
+        ? [favoriteButton, upvoteButton, downvoteButton, commentButton]
+        : [upvoteButton, downvoteButton, favoriteButton, commentButton];
 
     return _buildLiquidGlassContainer(
       isDark: isDark,
@@ -419,48 +470,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildGlassActionButton(
-            icon: CupertinoIcons.arrow_up_circle,
-            activeIcon: CupertinoIcons.arrow_up_circle_fill,
-            label: 'Upvote',
-            isActive: userVote == 1,
-            isLoading: isVoting,
-            color: AppColors.safeColor,
-            isDark: isDark,
-            onTap: () => _vote(index, userVote == 1 ? 0 : 1),
-          ),
-          _buildGlassActionButton(
-            icon: CupertinoIcons.arrow_down_circle,
-            activeIcon: CupertinoIcons.arrow_down_circle_fill,
-            label: 'Downvote',
-            isActive: userVote == -1,
-            isLoading: isVoting,
-            color: AppColors.explicitColor,
-            isDark: isDark,
-            onTap: () => _vote(index, userVote == -1 ? 0 : -1),
-          ),
-          _buildGlassActionButton(
-            icon: CupertinoIcons.heart,
-            activeIcon: CupertinoIcons.heart_fill,
-            label: 'Favorite',
-            isActive: isFav,
-            isLoading: isTogglingFav,
-            color: CupertinoColors.systemPink,
-            isDark: isDark,
-            onTap: () => _toggleFavorite(index),
-          ),
-          _buildGlassActionButton(
-            icon: CupertinoIcons.chat_bubble,
-            activeIcon: CupertinoIcons.chat_bubble_fill,
-            label: '${post.commentCount}',
-            isActive: false,
-            isLoading: false,
-            color: CupertinoColors.systemBlue,
-            isDark: isDark,
-            onTap: () => _showComments(index),
-          ),
-        ],
+        children: actions,
       ),
     );
   }
