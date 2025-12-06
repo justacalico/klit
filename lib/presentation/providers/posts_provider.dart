@@ -215,19 +215,21 @@ class PostsProvider extends ChangeNotifier {
   }
 
   /// Set popular time range and refresh
-  void setPopularTimeRange(String range) {
+  void setPopularTimeRange(String range, {bool safeMode = false}) {
     if (_popularTimeRange != range) {
       _popularTimeRange = range;
-      loadPopularPosts(refresh: true);
+      loadPopularPosts(refresh: true, safeMode: safeMode);
     }
   }
 
   /// Search posts
+  /// If [safeMode] is true, only safe-rated posts will be returned
   Future<void> searchPosts({
     required String query,
     bool refresh = false,
     String? rating,
     String? order,
+    bool safeMode = false,
   }) async {
     if (_isLoadingSearch) return;
     if (!refresh && !_hasMoreSearch) return;
@@ -248,6 +250,7 @@ class PostsProvider extends ChangeNotifier {
       tags: query,
       rating: rating,
       order: order,
+      safeMode: safeMode,
     );
 
     result.when(
