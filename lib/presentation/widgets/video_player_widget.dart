@@ -381,7 +381,7 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
     return CupertinoPageScaffold(
       backgroundColor: CupertinoColors.black,
       navigationBar: CupertinoNavigationBar(
-        backgroundColor: CupertinoColors.black.withOpacity(0.5),
+        backgroundColor: CupertinoColors.black.withValues(alpha: 0.5),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () => Navigator.of(context).pop(),
