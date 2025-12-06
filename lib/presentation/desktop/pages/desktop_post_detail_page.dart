@@ -14,6 +14,10 @@ class DesktopPostDetailPage extends StatefulWidget {
   final int initialIndex;
   final void Function(String tag)? onSearchTag;
   final VoidCallback? onClose;
+  /// Callback to load more posts, returns new post IDs
+  final Future<List<int>> Function()? onLoadMore;
+  /// Whether there are more posts to load
+  final bool hasMore;
 
   const DesktopPostDetailPage({
     super.key,
@@ -21,6 +25,8 @@ class DesktopPostDetailPage extends StatefulWidget {
     required this.initialIndex,
     this.onSearchTag,
     this.onClose,
+    this.onLoadMore,
+    this.hasMore = false,
   });
 
   @override
@@ -29,6 +35,9 @@ class DesktopPostDetailPage extends StatefulWidget {
 
 class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
   late int _currentIndex;
+  late List<int> _postIds;
+  late bool _hasMore;
+  bool _isLoadingMore = false;
   final Map<int, Post?> _loadedPosts = {};
   final Map<int, bool> _loadingStates = {};
   final Map<int, String?> _errorStates = {};
@@ -47,6 +56,8 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
+    _postIds = List.from(widget.postIds);
+    _hasMore = widget.hasMore;
     _loadPost(_currentIndex);
     _preloadAdjacentPosts();
   }
@@ -55,13 +66,51 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
     if (_currentIndex > 0) {
       _loadPost(_currentIndex - 1);
     }
-    if (_currentIndex < widget.postIds.length - 1) {
+    if (_currentIndex < _postIds.length - 1) {
       _loadPost(_currentIndex + 1);
+    }
+    
+    // Load more posts when approaching the end (3 posts before the end)
+    if (_hasMore && 
+        !_isLoadingMore && 
+        widget.onLoadMore != null &&
+        _currentIndex >= _postIds.length - 3) {
+      _loadMorePosts();
+    }
+  }
+
+  Future<void> _loadMorePosts() async {
+    if (_isLoadingMore || !_hasMore || widget.onLoadMore == null) return;
+    
+    setState(() {
+      _isLoadingMore = true;
+    });
+    
+    try {
+      final newPostIds = await widget.onLoadMore!();
+      if (mounted) {
+        setState(() {
+          // Add only new post IDs that aren't already in the list
+          for (final id in newPostIds) {
+            if (!_postIds.contains(id)) {
+              _postIds.add(id);
+            }
+          }
+          _hasMore = newPostIds.isNotEmpty;
+          _isLoadingMore = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingMore = false;
+        });
+      }
     }
   }
 
   Future<void> _loadPost(int index) async {
-    if (index < 0 || index >= widget.postIds.length) return;
+    if (index < 0 || index >= _postIds.length) return;
     if (_loadingStates[index] == true || _loadedPosts.containsKey(index)) {
       return;
     }
@@ -71,7 +120,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
       _errorStates[index] = null;
     });
 
-    final postId = widget.postIds[index];
+    final postId = _postIds[index];
     final apiService = context.read<ApiService>();
     final result = await apiService.getPostById(postId);
 
@@ -99,7 +148,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
 
   void _navigatePost(int delta) {
     final newIndex = _currentIndex + delta;
-    if (newIndex >= 0 && newIndex < widget.postIds.length) {
+    if (newIndex >= 0 && newIndex < _postIds.length) {
       setState(() {
         _currentIndex = newIndex;
       });
@@ -108,7 +157,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
     }
   }
 
-  int get _currentPostId => widget.postIds[_currentIndex];
+  int get _currentPostId => _postIds[_currentIndex];
   Post? get _currentPost => _loadedPosts[_currentIndex];
 
   Future<void> _vote(int score) async {
