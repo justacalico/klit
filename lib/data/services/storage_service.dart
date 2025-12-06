@@ -233,7 +233,7 @@ class StorageService {
 
   /// Get upvote when favorited setting
   bool getUpvoteWhenFavorited() {
-    return _prefs.getBool(AppConstants.upvoteWhenFavoritedKey) ?? false;
+    return _prefs.getBool(AppConstants.upvoteWhenFavoritedKey) ?? true;
   }
 
   /// Set upvote when favorited setting
