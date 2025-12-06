@@ -90,40 +90,35 @@ class SettingsPage extends StatelessWidget {
       children: [
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
+            final themeNames = ['Auto', 'Light', 'Dark', 'OLED'];
             return _buildLiquidGlassTile(
               context,
               isDark: isDark,
               icon: CupertinoIcons.moon_fill,
               iconColor: AppColors.primaryPurple,
               title: 'Theme',
-              trailing: CupertinoSlidingSegmentedControl<int>(
-                groupValue: settings.themeMode,
-                backgroundColor: isDark
-                    ? CupertinoColors.white.withOpacity(0.1)
-                    : CupertinoColors.black.withOpacity(0.06),
-                thumbColor: isDark
-                    ? CupertinoColors.white.withOpacity(0.2)
-                    : CupertinoColors.white,
-                children: const {
-                  0: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text('Auto', style: TextStyle(fontSize: 13)),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    themeNames[settings.themeMode],
+                    style: TextStyle(
+                      color: isDark
+                          ? CupertinoColors.white.withOpacity(0.6)
+                          : CupertinoColors.black.withOpacity(0.5),
+                    ),
                   ),
-                  1: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text('Light', style: TextStyle(fontSize: 13)),
+                  const SizedBox(width: 4),
+                  Icon(
+                    CupertinoIcons.chevron_right,
+                    size: 16,
+                    color: isDark
+                        ? CupertinoColors.white.withOpacity(0.3)
+                        : CupertinoColors.black.withOpacity(0.25),
                   ),
-                  2: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text('Dark', style: TextStyle(fontSize: 13)),
-                  ),
-                },
-                onValueChanged: (value) {
-                  if (value != null) {
-                    settings.setThemeMode(value);
-                  }
-                },
+                ],
               ),
+              onTap: () => _showThemePicker(context, settings, isDark),
             );
           },
         ),
