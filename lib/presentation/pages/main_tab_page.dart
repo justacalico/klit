@@ -62,8 +62,8 @@ class _MainTabPageState extends State<MainTabPage> {
           // Outer glow/shadow
           BoxShadow(
             color: isDark
-                ? CupertinoColors.black.withOpacity(0.4)
-                : CupertinoColors.black.withOpacity(0.08),
+                ? CupertinoColors.black.withValues(alpha: 0.4)
+                : CupertinoColors.black.withValues(alpha: 0.08),
             blurRadius: 24,
             spreadRadius: 0,
             offset: const Offset(0, 8),
@@ -71,8 +71,8 @@ class _MainTabPageState extends State<MainTabPage> {
           // Inner highlight (top)
           BoxShadow(
             color: isDark
-                ? CupertinoColors.white.withOpacity(0.05)
-                : CupertinoColors.white.withOpacity(0.8),
+                ? CupertinoColors.white.withValues(alpha: 0.05)
+                : CupertinoColors.white.withValues(alpha: 0.8),
             blurRadius: 1,
             spreadRadius: 0,
             offset: const Offset(0, -0.5),
@@ -92,19 +92,19 @@ class _MainTabPageState extends State<MainTabPage> {
                 end: Alignment.bottomCenter,
                 colors: isDark
                     ? [
-                        CupertinoColors.white.withOpacity(0.18),
-                        CupertinoColors.white.withOpacity(0.08),
+                        CupertinoColors.white.withValues(alpha: 0.18),
+                        CupertinoColors.white.withValues(alpha: 0.08),
                       ]
                     : [
-                        CupertinoColors.white.withOpacity(0.85),
-                        CupertinoColors.white.withOpacity(0.65),
+                        CupertinoColors.white.withValues(alpha: 0.85),
+                        CupertinoColors.white.withValues(alpha: 0.65),
                       ],
               ),
               // Subtle border for glass edge effect
               border: Border.all(
                 color: isDark
-                    ? CupertinoColors.white.withOpacity(0.2)
-                    : CupertinoColors.white.withOpacity(0.6),
+                    ? CupertinoColors.white.withValues(alpha: 0.2)
+                    : CupertinoColors.white.withValues(alpha: 0.6),
                 width: 1,
               ),
             ),
@@ -168,8 +168,8 @@ class _MainTabPageState extends State<MainTabPage> {
         ? CupertinoColors.white
         : CupertinoColors.black;
     final unselectedColor = isDark
-        ? CupertinoColors.white.withOpacity(0.5)
-        : CupertinoColors.black.withOpacity(0.4);
+        ? CupertinoColors.white.withValues(alpha: 0.5)
+        : CupertinoColors.black.withValues(alpha: 0.4);
 
     return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),
@@ -183,8 +183,8 @@ class _MainTabPageState extends State<MainTabPage> {
             ? BoxDecoration(
                 borderRadius: BorderRadius.circular(24),
                 color: isDark
-                    ? CupertinoColors.white.withOpacity(0.15)
-                    : CupertinoColors.black.withOpacity(0.06),
+                    ? CupertinoColors.white.withValues(alpha: 0.15)
+                    : CupertinoColors.black.withValues(alpha: 0.06),
               )
             : null,
         child: Column(
