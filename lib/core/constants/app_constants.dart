@@ -63,6 +63,12 @@ class AppColors {
   static const Color darkGroupedBackground = Color(0xFF000000);
   static const Color darkSeparator = Color(0xFF38383A);
 
+  // OLED theme backgrounds (pure black for power saving)
+  static const Color oledBackground = Color(0xFF000000);
+  static const Color oledSecondaryBackground = Color(0xFF0A0A0A);
+  static const Color oledGroupedBackground = Color(0xFF000000);
+  static const Color oledSeparator = Color(0xFF1C1C1C);
+
   // Rating colors
   static const Color safeColor = Color(0xFF34C759);
   static const Color questionableColor = Color(0xFFFF9500);
