@@ -363,16 +363,21 @@ class ApiService {
   }
 
   /// Get user's favorite posts
+  /// If [safeMode] is true, only safe-rated posts will be returned
   Future<ApiResult<List<Post>>> getFavorites({
     required String username,
     int page = 1,
     int limit = 50,
+    bool safeMode = false,
   }) async {
     try {
+      // Add rating:safe tag if safe mode is enabled
+      final tags = safeMode ? 'fav:$username rating:safe' : 'fav:$username';
+      
       final response = await _dio.get(
         ApiConstants.postsEndpoint,
         queryParameters: {
-          'tags': 'fav:$username',
+          'tags': tags,
           'page': page,
           'limit': limit,
         },
