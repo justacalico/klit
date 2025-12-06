@@ -349,7 +349,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
             right: 16,
             child: CupertinoButton(
               padding: const EdgeInsets.all(12),
-              color: CupertinoColors.black.withOpacity(0.5),
+              color: CupertinoColors.black.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(8),
               onPressed: () {
                 if (post.isVideo) {
@@ -782,7 +782,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
               left: 16,
               child: CupertinoButton(
                 padding: const EdgeInsets.all(12),
-                color: CupertinoColors.black.withOpacity(0.5),
+                color: CupertinoColors.black.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(8),
                 onPressed: () => setState(() => _isFullScreen = false),
                 child: const Icon(
