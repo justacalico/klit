@@ -151,7 +151,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return RefreshIndicator(
       onRefresh: _loadProfile,
-      child: ListView(
+      child: Column(
         children: [
           const SizedBox(height: 24),
           _buildProfileHeader(account, _user!, isDark),
