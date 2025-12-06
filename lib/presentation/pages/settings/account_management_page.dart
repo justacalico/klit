@@ -96,7 +96,7 @@ class AccountManagementPage extends StatelessWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryBlue.withOpacity(0.2),
+                              color: AppColors.primaryBlue.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Text(
