@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
+import '../../core/utils/helpers.dart';
 import 'home/home_page.dart';
 import 'hot/hot_page.dart';
 import 'popular/popular_page.dart';
@@ -172,7 +173,10 @@ class _MainTabPageState extends State<MainTabPage> {
         : CupertinoColors.black.withValues(alpha: 0.4);
 
     return GestureDetector(
-      onTap: () => setState(() => _currentIndex = index),
+      onTap: () {
+        HapticUtils.selectionClick();
+        setState(() => _currentIndex = index);
+      },
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
