@@ -221,6 +221,26 @@ class StorageService {
     await _prefs.setBool(AppConstants.safeModeKey, enabled);
   }
 
+  /// Get left-handed mode setting
+  bool getLeftHandedMode() {
+    return _prefs.getBool(AppConstants.leftHandedModeKey) ?? false;
+  }
+
+  /// Set left-handed mode setting
+  Future<void> setLeftHandedMode(bool enabled) async {
+    await _prefs.setBool(AppConstants.leftHandedModeKey, enabled);
+  }
+
+  /// Get upvote when favorited setting
+  bool getUpvoteWhenFavorited() {
+    return _prefs.getBool(AppConstants.upvoteWhenFavoritedKey) ?? false;
+  }
+
+  /// Set upvote when favorited setting
+  Future<void> setUpvoteWhenFavorited(bool enabled) async {
+    await _prefs.setBool(AppConstants.upvoteWhenFavoritedKey, enabled);
+  }
+
   /// Get theme mode (0 = system, 1 = light, 2 = dark)
   int getThemeMode() {
     return _prefs.getInt(AppConstants.themeKey) ?? 0;
