@@ -441,7 +441,7 @@ class ApiService {
     try {
       final response = await _dio.post(
         '/posts/$postId/votes.json',
-        data: {
+        queryParameters: {
           'score': score,
           'no_unvote': false,
         },
