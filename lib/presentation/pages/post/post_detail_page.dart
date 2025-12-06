@@ -338,7 +338,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     final isOled = settingsProvider.themeMode == 3;
     final hasMultiplePosts = _postIds.length > 1;
     
-    return CupertinoPageScaffold,
+    return CupertinoPageScaffold(
       backgroundColor: isOled
           ? CupertinoColors.black
           : isDark
