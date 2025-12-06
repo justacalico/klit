@@ -42,7 +42,11 @@ class _DesktopHotPageState extends State<DesktopHotPage> {
 
   Future<void> _loadPosts({bool refresh = false}) async {
     final postsProvider = context.read<PostsProvider>();
-    await postsProvider.loadHotPosts(refresh: refresh);
+    final settingsProvider = context.read<SettingsProvider>();
+    await postsProvider.loadHotPosts(
+      refresh: refresh,
+      safeMode: settingsProvider.safeMode,
+    );
 
     if (refresh) {
       _refreshController.refreshCompleted();
