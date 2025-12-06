@@ -19,10 +19,16 @@ import '../../widgets/widgets.dart';
 class PostDetailArguments {
   final List<int> postIds;
   final int initialIndex;
+  /// Callback to load more posts, returns new post IDs
+  final Future<List<int>> Function()? onLoadMore;
+  /// Whether there are more posts to load
+  final bool hasMore;
 
   const PostDetailArguments({
     required this.postIds,
     required this.initialIndex,
+    this.onLoadMore,
+    this.hasMore = false,
   });
 }
 
@@ -32,12 +38,18 @@ class PostDetailPage extends StatefulWidget {
   final int initialIndex;
   /// Optional callback for searching tags (used in desktop mode)
   final void Function(String tag)? onSearchTag;
+  /// Callback to load more posts, returns new post IDs
+  final Future<List<int>> Function()? onLoadMore;
+  /// Whether there are more posts to load
+  final bool hasMore;
 
   const PostDetailPage({
     super.key,
     required this.postIds,
     required this.initialIndex,
     this.onSearchTag,
+    this.onLoadMore,
+    this.hasMore = false,
   });
 
   @override
@@ -47,6 +59,9 @@ class PostDetailPage extends StatefulWidget {
 class _PostDetailPageState extends State<PostDetailPage> {
   late PageController _pageController;
   late int _currentIndex;
+  late List<int> _postIds;
+  late bool _hasMore;
+  bool _isLoadingMore = false;
   final Map<int, Post?> _loadedPosts = {};
   final Map<int, bool> _loadingStates = {};
   final Map<int, String?> _errorStates = {};
@@ -62,6 +77,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
+    _postIds = List.from(widget.postIds);
+    _hasMore = widget.hasMore;
     _pageController = PageController(initialPage: _currentIndex);
     _loadPost(_currentIndex);
     _preloadAdjacentPosts();
@@ -77,13 +94,51 @@ class _PostDetailPageState extends State<PostDetailPage> {
     if (_currentIndex > 0) {
       _loadPost(_currentIndex - 1);
     }
-    if (_currentIndex < widget.postIds.length - 1) {
+    if (_currentIndex < _postIds.length - 1) {
       _loadPost(_currentIndex + 1);
+    }
+    
+    // Load more posts when approaching the end (3 posts before the end)
+    if (_hasMore && 
+        !_isLoadingMore && 
+        widget.onLoadMore != null &&
+        _currentIndex >= _postIds.length - 3) {
+      _loadMorePosts();
+    }
+  }
+
+  Future<void> _loadMorePosts() async {
+    if (_isLoadingMore || !_hasMore || widget.onLoadMore == null) return;
+    
+    setState(() {
+      _isLoadingMore = true;
+    });
+    
+    try {
+      final newPostIds = await widget.onLoadMore!();
+      if (mounted) {
+        setState(() {
+          // Add only new post IDs that aren't already in the list
+          for (final id in newPostIds) {
+            if (!_postIds.contains(id)) {
+              _postIds.add(id);
+            }
+          }
+          _hasMore = newPostIds.isNotEmpty;
+          _isLoadingMore = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingMore = false;
+        });
+      }
     }
   }
 
   Future<void> _loadPost(int index, {bool forceRefresh = false}) async {
-    if (index < 0 || index >= widget.postIds.length) return;
+    if (index < 0 || index >= _postIds.length) return;
     if (_loadingStates[index] == true) return;
     if (!forceRefresh && _loadedPosts.containsKey(index)) return;
 
@@ -92,7 +147,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
       _errorStates[index] = null;
     });
 
-    final postId = widget.postIds[index];
+    final postId = _postIds[index];
     final apiService = context.read<ApiService>();
     final result = await apiService.getPostById(postId);
 
@@ -126,7 +181,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     _preloadAdjacentPosts();
   }
 
-  int get _currentPostId => widget.postIds[_currentIndex];
+  int get _currentPostId => _postIds[_currentIndex];
   Post? get _currentPost => _loadedPosts[_currentIndex];
 
   Future<void> _refreshCurrentPost() async {
@@ -281,9 +336,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
         (settingsProvider.themeMode == 0 &&
             MediaQuery.platformBrightnessOf(context) == Brightness.dark);
     final isOled = settingsProvider.themeMode == 3;
-    final hasMultiplePosts = widget.postIds.length > 1;
+    final hasMultiplePosts = _postIds.length > 1;
     
-    return CupertinoPageScaffold(
+    return CupertinoPageScaffold,
       backgroundColor: isOled
           ? CupertinoColors.black
           : isDark
@@ -297,7 +352,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 : CupertinoColors.systemBackground.withValues(alpha: 0.8),
         middle: Text(
           hasMultiplePosts 
-            ? 'Post #$_currentPostId (${_currentIndex + 1}/${widget.postIds.length})'
+            ? 'Post #$_currentPostId (${_currentIndex + 1}/${_postIds.length})'
             : 'Post #$_currentPostId',
         ),
         trailing: _currentPost != null
@@ -327,7 +382,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
         child: hasMultiplePosts
             ? PageView.builder(
                 controller: _pageController,
-                itemCount: widget.postIds.length,
+                itemCount: _postIds.length,
                 onPageChanged: _onPageChanged,
                 itemBuilder: (context, index) => _buildPageContent(index, isDark, isOled),
               )
