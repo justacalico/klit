@@ -295,6 +295,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget _buildSearchResults(int gridSize) {
     return Consumer<PostsProvider>(
       builder: (context, postsProvider, _) {
+        final settingsProvider = context.read<SettingsProvider>();
         return _isGridView
             ? PostsGrid(
                 posts: postsProvider.searchResults,
@@ -306,6 +307,7 @@ class _SearchPageState extends State<SearchPage> {
                 onLoadMore: () {
                   postsProvider.searchPosts(
                     query: _searchController.text.trim(),
+                    safeMode: settingsProvider.safeMode,
                   );
                 },
                 onRetry: _performSearch,
@@ -319,6 +321,7 @@ class _SearchPageState extends State<SearchPage> {
                 onLoadMore: () {
                   postsProvider.searchPosts(
                     query: _searchController.text.trim(),
+                    safeMode: settingsProvider.safeMode,
                   );
                 },
                 onRetry: _performSearch,
