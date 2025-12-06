@@ -195,7 +195,7 @@ class SettingsPage extends StatelessWidget {
               subtitle: 'Swap UI elements for left-handed use',
               trailing: CupertinoSwitch(
                 value: settings.leftHandedMode,
-                activeTrackColor: AppColors.primaryPink,
+                activeTrackColor: AppColors.primaryGreen,
                 onChanged: (value) => settings.setLeftHandedMode(value),
               ),
             );
@@ -213,7 +213,7 @@ class SettingsPage extends StatelessWidget {
               subtitle: 'Automatically upvote when adding to favorites',
               trailing: CupertinoSwitch(
                 value: settings.upvoteWhenFavorited,
-                activeTrackColor: AppColors.primaryRed,
+                activeTrackColor: AppColors.primaryGreen,
                 onChanged: (value) => settings.setUpvoteWhenFavorited(value),
               ),
             );
