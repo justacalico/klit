@@ -179,6 +179,18 @@ class _PostDetailPageState extends State<PostDetailPage> {
             _isFavorited[index] = !isFav;
             _isTogglingFavorite[index] = false;
           });
+          
+          // Auto-upvote when favoriting if the setting is enabled
+          if (!isFav) {
+            final settings = context.read<SettingsProvider>();
+            if (settings.upvoteWhenFavorited) {
+              final currentVote = _userVote[index] ?? post.score.ourScore;
+              // Only upvote if not already upvoted
+              if (currentVote != 1) {
+                _vote(index, 1);
+              }
+            }
+          }
         },
         failure: (error) {
           setState(() {
