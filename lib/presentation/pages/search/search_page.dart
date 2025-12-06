@@ -79,6 +79,7 @@ class _SearchPageState extends State<SearchPage> {
 
   void _onPostTap(Post post) {
     final postsProvider = context.read<PostsProvider>();
+    final settingsProvider = context.read<SettingsProvider>();
     final posts = postsProvider.searchResults;
     final index = posts.indexWhere((p) => p.id == post.id);
     
@@ -87,6 +88,16 @@ class _SearchPageState extends State<SearchPage> {
       arguments: PostDetailArguments(
         postIds: posts.map((p) => p.id).toList(),
         initialIndex: index >= 0 ? index : 0,
+        hasMore: postsProvider.hasMoreSearch,
+        onLoadMore: () async {
+          await postsProvider.searchPosts(
+            query: postsProvider.currentSearchQuery,
+            rating: _selectedRating,
+            order: _selectedOrder,
+            safeMode: settingsProvider.safeMode,
+          );
+          return postsProvider.searchResults.map((p) => p.id).toList();
+        },
       ),
     );
   }
