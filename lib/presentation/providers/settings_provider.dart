@@ -10,6 +10,8 @@ class SettingsProvider extends ChangeNotifier {
   int _themeMode = 0; // 0 = system, 1 = light, 2 = dark
   int _gridSize = AppConstants.defaultGridColumns;
   bool _safeMode = false;
+  bool _leftHandedMode = false;
+  bool _upvoteWhenFavorited = false;
   String _host = ApiConstants.defaultHost;
   List<SearchHistoryItem> _searchHistory = [];
 
@@ -20,6 +22,8 @@ class SettingsProvider extends ChangeNotifier {
   int get themeMode => _themeMode;
   int get gridSize => _gridSize;
   bool get safeMode => _safeMode;
+  bool get leftHandedMode => _leftHandedMode;
+  bool get upvoteWhenFavorited => _upvoteWhenFavorited;
   String get host => _host;
   List<SearchHistoryItem> get searchHistory => _searchHistory;
 
@@ -28,6 +32,8 @@ class SettingsProvider extends ChangeNotifier {
     _themeMode = _storageService.getThemeMode();
     _gridSize = _storageService.getGridSize();
     _safeMode = _storageService.getSafeMode();
+    _leftHandedMode = _storageService.getLeftHandedMode();
+    _upvoteWhenFavorited = _storageService.getUpvoteWhenFavorited();
     _host = _storageService.getHost();
     _searchHistory = _storageService.getSearchHistory();
     notifyListeners();
@@ -54,6 +60,20 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> setSafeMode(bool enabled) async {
     _safeMode = enabled;
     await _storageService.setSafeMode(enabled);
+    notifyListeners();
+  }
+
+  /// Toggle left-handed mode
+  Future<void> setLeftHandedMode(bool enabled) async {
+    _leftHandedMode = enabled;
+    await _storageService.setLeftHandedMode(enabled);
+    notifyListeners();
+  }
+
+  /// Toggle upvote when favorited
+  Future<void> setUpvoteWhenFavorited(bool enabled) async {
+    _upvoteWhenFavorited = enabled;
+    await _storageService.setUpvoteWhenFavorited(enabled);
     notifyListeners();
   }
 
