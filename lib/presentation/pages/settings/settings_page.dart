@@ -1,11 +1,11 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Divider;
 import 'package:provider/provider.dart';
 import '../../../app/routes.dart';
 import '../../../core/constants/constants.dart';
 import '../../providers/providers.dart';
 
-/// Settings page
+/// Settings page with iOS 26 liquid glass design
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
@@ -18,20 +18,25 @@ class SettingsPage extends StatelessWidget {
       backgroundColor: isDark
           ? AppColors.darkGroupedBackground
           : AppColors.lightGroupedBackground,
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Settings'),
+      navigationBar: CupertinoNavigationBar(
+        middle: const Text('Settings'),
+        backgroundColor: isDark
+            ? CupertinoColors.black.withOpacity(0.5)
+            : CupertinoColors.white.withOpacity(0.5),
       ),
       child: SafeArea(
+        bottom: false,
         child: ListView(
+          padding: const EdgeInsets.only(bottom: 100),
           children: [
             const SizedBox(height: 20),
-            _buildAccountSection(context),
-            const SizedBox(height: 20),
-            _buildAppearanceSection(context),
-            const SizedBox(height: 20),
-            _buildCacheSection(context),
-            const SizedBox(height: 20),
-            _buildAboutSection(context),
+            _buildAccountSection(context, isDark),
+            const SizedBox(height: 24),
+            _buildAppearanceSection(context, isDark),
+            const SizedBox(height: 24),
+            _buildCacheSection(context, isDark),
+            const SizedBox(height: 24),
+            _buildAboutSection(context, isDark),
             const SizedBox(height: 40),
           ],
         ),
@@ -39,33 +44,36 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAccountSection(BuildContext context) {
-    return _buildSection(
+  Widget _buildAccountSection(BuildContext context, bool isDark) {
+    return _buildLiquidGlassSection(
       context,
+      isDark: isDark,
       title: 'ACCOUNT',
       children: [
         Consumer<AuthProvider>(
           builder: (context, auth, _) {
-            return _buildListTile(
+            return _buildLiquidGlassTile(
               context,
+              isDark: isDark,
               icon: CupertinoIcons.person_circle,
               iconColor: AppColors.primaryBlue,
               title: auth.currentAccount?.username ?? 'Not logged in',
               subtitle: auth.currentAccount?.host ?? '',
-              trailing: const CupertinoListTileChevron(),
+              showChevron: true,
               onTap: () => Navigator.of(context).pushNamed(
                 AppRoutes.accountManagement,
               ),
             );
           },
         ),
-        _buildDivider(),
-        _buildListTile(
+        _buildLiquidGlassDivider(isDark),
+        _buildLiquidGlassTile(
           context,
+          isDark: isDark,
           icon: CupertinoIcons.globe,
           iconColor: AppColors.primaryGreen,
           title: 'Server Configuration',
-          trailing: const CupertinoListTileChevron(),
+          showChevron: true,
           onTap: () => Navigator.of(context).pushNamed(
             AppRoutes.hostSettings,
           ),
@@ -74,20 +82,28 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAppearanceSection(BuildContext context) {
-    return _buildSection(
+  Widget _buildAppearanceSection(BuildContext context, bool isDark) {
+    return _buildLiquidGlassSection(
       context,
+      isDark: isDark,
       title: 'APPEARANCE',
       children: [
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
-            return _buildListTile(
+            return _buildLiquidGlassTile(
               context,
-              icon: CupertinoIcons.moon,
+              isDark: isDark,
+              icon: CupertinoIcons.moon_fill,
               iconColor: AppColors.primaryPurple,
               title: 'Theme',
               trailing: CupertinoSlidingSegmentedControl<int>(
                 groupValue: settings.themeMode,
+                backgroundColor: isDark
+                    ? CupertinoColors.white.withOpacity(0.1)
+                    : CupertinoColors.black.withOpacity(0.06),
+                thumbColor: isDark
+                    ? CupertinoColors.white.withOpacity(0.2)
+                    : CupertinoColors.white,
                 children: const {
                   0: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
@@ -111,54 +127,62 @@ class SettingsPage extends StatelessWidget {
             );
           },
         ),
-        _buildDivider(),
+        _buildLiquidGlassDivider(isDark),
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
-            return _buildListTile(
+            return _buildLiquidGlassTile(
               context,
-              icon: CupertinoIcons.square_grid_2x2,
+              isDark: isDark,
+              icon: CupertinoIcons.square_grid_2x2_fill,
               iconColor: AppColors.primaryOrange,
               title: 'Grid Size',
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: settings.gridSize > AppConstants.minGridColumns
+                  _buildGlassButton(
+                    isDark: isDark,
+                    icon: CupertinoIcons.minus,
+                    onTap: settings.gridSize > AppConstants.minGridColumns
                         ? () => settings.setGridSize(settings.gridSize - 1)
                         : null,
-                    child: const Icon(CupertinoIcons.minus_circle, size: 24),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                  Container(
+                    width: 40,
+                    alignment: Alignment.center,
                     child: Text(
                       '${settings.gridSize}',
-                      style: const TextStyle(fontSize: 17),
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                      ),
                     ),
                   ),
-                  CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: settings.gridSize < AppConstants.maxGridColumns
+                  _buildGlassButton(
+                    isDark: isDark,
+                    icon: CupertinoIcons.plus,
+                    onTap: settings.gridSize < AppConstants.maxGridColumns
                         ? () => settings.setGridSize(settings.gridSize + 1)
                         : null,
-                    child: const Icon(CupertinoIcons.plus_circle, size: 24),
                   ),
                 ],
               ),
             );
           },
         ),
-        _buildDivider(),
+        _buildLiquidGlassDivider(isDark),
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
-            return _buildListTile(
+            return _buildLiquidGlassTile(
               context,
-              icon: CupertinoIcons.shield,
+              isDark: isDark,
+              icon: CupertinoIcons.shield_fill,
               iconColor: AppColors.safeColor,
               title: 'Safe Mode',
               subtitle: 'Only show safe-rated content',
               trailing: CupertinoSwitch(
                 value: settings.safeMode,
+                activeTrackColor: AppColors.safeColor,
                 onChanged: (value) => settings.setSafeMode(value),
               ),
             );
@@ -168,148 +192,286 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCacheSection(BuildContext context) {
-    return _buildSection(
+  Widget _buildCacheSection(BuildContext context, bool isDark) {
+    return _buildLiquidGlassSection(
       context,
+      isDark: isDark,
       title: 'DATA',
       children: [
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
-            return _buildListTile(
+            return _buildLiquidGlassTile(
               context,
-              icon: CupertinoIcons.clock,
+              isDark: isDark,
+              icon: CupertinoIcons.clock_fill,
               iconColor: AppColors.primaryTeal,
               title: 'Search History',
               subtitle: '${settings.searchHistory.length} items',
-              trailing: CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: settings.searchHistory.isEmpty
+              trailing: GestureDetector(
+                onTap: settings.searchHistory.isEmpty
                     ? null
                     : () => _confirmClearHistory(context, settings),
-                child: const Text(
+                child: Text(
                   'Clear',
-                  style: TextStyle(color: CupertinoColors.destructiveRed),
+                  style: TextStyle(
+                    color: settings.searchHistory.isEmpty
+                        ? CupertinoColors.systemGrey
+                        : CupertinoColors.destructiveRed,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             );
           },
         ),
-        _buildDivider(),
-        _buildListTile(
+        _buildLiquidGlassDivider(isDark),
+        _buildLiquidGlassTile(
           context,
-          icon: CupertinoIcons.trash,
+          isDark: isDark,
+          icon: CupertinoIcons.trash_fill,
           iconColor: CupertinoColors.destructiveRed,
           title: 'Clear Image Cache',
+          showChevron: true,
           onTap: () => _confirmClearCache(context),
         ),
       ],
     );
   }
 
-  Widget _buildAboutSection(BuildContext context) {
-    return _buildSection(
+  Widget _buildAboutSection(BuildContext context, bool isDark) {
+    return _buildLiquidGlassSection(
       context,
+      isDark: isDark,
       title: 'ABOUT',
       children: [
-        _buildListTile(
+        _buildLiquidGlassTile(
           context,
-          icon: CupertinoIcons.info_circle,
+          isDark: isDark,
+          icon: CupertinoIcons.info_circle_fill,
           iconColor: AppColors.primaryBlue,
           title: 'Version',
           trailing: Text(
             AppConstants.appVersion,
             style: TextStyle(
-              color: CupertinoColors.secondaryLabel.resolveFrom(context),
+              color: isDark
+                  ? CupertinoColors.white.withOpacity(0.5)
+                  : CupertinoColors.black.withOpacity(0.4),
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
-        _buildDivider(),
-        _buildListTile(
+        _buildLiquidGlassDivider(isDark),
+        _buildLiquidGlassTile(
           context,
-          icon: CupertinoIcons.doc_text,
+          isDark: isDark,
+          icon: CupertinoIcons.doc_text_fill,
           iconColor: AppColors.primaryGreen,
           title: 'Terms of Service',
-          trailing: const CupertinoListTileChevron(),
+          showChevron: true,
           onTap: () {},
         ),
-        _buildDivider(),
-        _buildListTile(
+        _buildLiquidGlassDivider(isDark),
+        _buildLiquidGlassTile(
           context,
-          icon: CupertinoIcons.lock_shield,
+          isDark: isDark,
+          icon: CupertinoIcons.lock_shield_fill,
           iconColor: AppColors.primaryPurple,
           title: 'Privacy Policy',
-          trailing: const CupertinoListTileChevron(),
+          showChevron: true,
           onTap: () {},
         ),
       ],
     );
   }
 
-  Widget _buildSection(
+  Widget _buildLiquidGlassSection(
     BuildContext context, {
+    required bool isDark,
     required String title,
     required List<Widget> children,
   }) {
-    final brightness = CupertinoTheme.brightnessOf(context);
-    final isDark = brightness == Brightness.dark;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 16, bottom: 8),
+          padding: const EdgeInsets.only(left: 20, bottom: 8),
           child: Text(
             title,
             style: TextStyle(
               fontSize: 13,
-              color: CupertinoColors.secondaryLabel.resolveFrom(context),
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+              color: isDark
+                  ? CupertinoColors.white.withOpacity(0.5)
+                  : CupertinoColors.black.withOpacity(0.4),
             ),
           ),
         ),
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: isDark
-                ? AppColors.darkSecondaryBackground
-                : CupertinoColors.white,
-            borderRadius: BorderRadius.circular(10),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: isDark
+                        ? [
+                            CupertinoColors.white.withOpacity(0.14),
+                            CupertinoColors.white.withOpacity(0.08),
+                          ]
+                        : [
+                            CupertinoColors.white.withOpacity(0.8),
+                            CupertinoColors.white.withOpacity(0.6),
+                          ],
+                  ),
+                  border: Border.all(
+                    color: isDark
+                        ? CupertinoColors.white.withOpacity(0.15)
+                        : CupertinoColors.white.withOpacity(0.5),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDark
+                          ? CupertinoColors.black.withOpacity(0.3)
+                          : CupertinoColors.black.withOpacity(0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(children: children),
+              ),
+            ),
           ),
-          child: Column(children: children),
         ),
       ],
     );
   }
 
-  Widget _buildListTile(
+  Widget _buildLiquidGlassTile(
     BuildContext context, {
+    required bool isDark,
     required IconData icon,
     required Color iconColor,
     required String title,
     String? subtitle,
     Widget? trailing,
+    bool showChevron = false,
     VoidCallback? onTap,
   }) {
-    return CupertinoListTile(
-      leading: Container(
-        width: 30,
-        height: 30,
-        decoration: BoxDecoration(
-          color: iconColor,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Icon(icon, size: 18, color: CupertinoColors.white),
-      ),
-      title: Text(title),
-      subtitle: subtitle != null ? Text(subtitle) : null,
-      trailing: trailing,
+    final textColor = isDark ? CupertinoColors.white : CupertinoColors.black;
+    final subtitleColor = isDark
+        ? CupertinoColors.white.withOpacity(0.5)
+        : CupertinoColors.black.withOpacity(0.5);
+
+    return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            // Icon with glass effect
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.9),
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: iconColor.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Icon(icon, size: 18, color: CupertinoColors.white),
+            ),
+            const SizedBox(width: 14),
+            // Title and subtitle
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: textColor,
+                    ),
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: subtitleColor,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            // Trailing widget
+            if (trailing != null) trailing,
+            if (showChevron)
+              Icon(
+                CupertinoIcons.chevron_right,
+                size: 16,
+                color: isDark
+                    ? CupertinoColors.white.withOpacity(0.3)
+                    : CupertinoColors.black.withOpacity(0.25),
+              ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildDivider() {
-    return const Padding(
-      padding: EdgeInsets.only(left: 54),
-      child: Divider(height: 1),
+  Widget _buildLiquidGlassDivider(bool isDark) {
+    return Container(
+      margin: const EdgeInsets.only(left: 62),
+      height: 0.5,
+      color: isDark
+          ? CupertinoColors.white.withOpacity(0.1)
+          : CupertinoColors.black.withOpacity(0.08),
+    );
+  }
+
+  Widget _buildGlassButton({
+    required bool isDark,
+    required IconData icon,
+    VoidCallback? onTap,
+  }) {
+    final isEnabled = onTap != null;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          color: isDark
+              ? CupertinoColors.white.withOpacity(isEnabled ? 0.15 : 0.05)
+              : CupertinoColors.black.withOpacity(isEnabled ? 0.08 : 0.03),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          icon,
+          size: 16,
+          color: isDark
+              ? CupertinoColors.white.withOpacity(isEnabled ? 0.9 : 0.3)
+              : CupertinoColors.black.withOpacity(isEnabled ? 0.8 : 0.25),
+        ),
+      ),
     );
   }
 
