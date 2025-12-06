@@ -70,7 +70,8 @@ class PostsProvider extends ChangeNotifier {
   String get popularTimeRange => _popularTimeRange;
 
   /// Load latest posts
-  Future<void> loadLatestPosts({bool refresh = false}) async {
+  /// If [safeMode] is true, only safe-rated posts will be returned
+  Future<void> loadLatestPosts({bool refresh = false, bool safeMode = false}) async {
     if (_isLoadingLatest) return;
     if (!refresh && !_hasMoreLatest) return;
 
@@ -88,6 +89,7 @@ class PostsProvider extends ChangeNotifier {
       limit: ApiConstants.defaultPageSize,
       tags: 'score:>20',
       order: 'id_desc',
+      safeMode: safeMode,
     );
 
     result.when(
