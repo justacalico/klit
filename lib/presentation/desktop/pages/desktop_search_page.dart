@@ -420,6 +420,15 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
                 borderRadius: BorderRadius.circular(8),
               ),
               onChanged: (value) {
+                // Close suggestions if user typed a space (completed a tag)
+                if (value.endsWith(' ')) {
+                  setState(() {
+                    _showTagSuggestions = false;
+                    _tagSuggestions = [];
+                  });
+                  return;
+                }
+                
                 // Fetch tag suggestions for the current word
                 final currentWord = _getCurrentWord();
                 _tagDebouncer.run(() {
@@ -427,7 +436,10 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
                 });
               },
               onSubmitted: (_) {
-                setState(() => _showTagSuggestions = false);
+                setState(() {
+                  _showTagSuggestions = false;
+                  _tagSuggestions = [];
+                });
                 _performSearch();
               },
             ),
@@ -436,7 +448,10 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
           CupertinoButton(
             padding: const EdgeInsets.all(8),
             onPressed: () {
-              setState(() => _showTagSuggestions = false);
+              setState(() {
+                _showTagSuggestions = false;
+                _tagSuggestions = [];
+              });
               _performSearch();
             },
             child: const Text('Search'),
