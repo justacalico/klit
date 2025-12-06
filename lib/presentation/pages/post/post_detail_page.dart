@@ -1,5 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart'
+    show CachedNetworkImage, CachedNetworkImageProvider;
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Colors;
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import '../../../app/routes.dart';
@@ -7,6 +10,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/extensions/extensions.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
+import '../../providers/settings_provider.dart';
 import '../../widgets/widgets.dart';
 
 /// Arguments for navigating to post detail with swipe support
@@ -58,7 +62,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
     _currentIndex = widget.initialIndex;
     _pageController = PageController(initialPage: _currentIndex);
     _loadPost(_currentIndex);
-    // Preload adjacent posts
     _preloadAdjacentPosts();
   }
 
@@ -123,7 +126,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
   int get _currentPostId => widget.postIds[_currentIndex];
   Post? get _currentPost => _loadedPosts[_currentIndex];
 
-  // Vote on a post
   Future<void> _vote(int index, int score) async {
     final post = _loadedPosts[index];
     if (post == null || _isVoting[index] == true) return;
@@ -154,7 +156,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
   }
 
-  // Toggle favorite status
   Future<void> _toggleFavorite(int index) async {
     final post = _loadedPosts[index];
     if (post == null || _isTogglingFavorite[index] == true) return;
@@ -188,7 +189,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
   }
 
-  // Show comments sheet
   void _showComments(int index) {
     final post = _loadedPosts[index];
     if (post == null) return;
@@ -244,7 +244,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   void _searchTag(String tag) {
-    // Use callback if provided (desktop mode), otherwise navigate
     if (widget.onSearchTag != null) {
       widget.onSearchTag!(tag);
     } else {
@@ -257,10 +256,26 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final settingsProvider = context.watch<SettingsProvider>();
+    final isDark = settingsProvider.themeMode == 2 ||
+        settingsProvider.themeMode == 3 ||
+        (settingsProvider.themeMode == 0 &&
+            MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+    final isOled = settingsProvider.themeMode == 3;
     final hasMultiplePosts = widget.postIds.length > 1;
     
     return CupertinoPageScaffold(
+      backgroundColor: isOled
+          ? CupertinoColors.black
+          : isDark
+              ? AppColors.darkBackground
+              : AppColors.lightSecondaryBackground,
       navigationBar: CupertinoNavigationBar(
+        backgroundColor: isOled
+            ? CupertinoColors.black.withOpacity(0.8)
+            : isDark
+                ? CupertinoColors.darkBackgroundGray.withOpacity(0.8)
+                : CupertinoColors.systemBackground.withOpacity(0.8),
         middle: Text(
           hasMultiplePosts 
             ? 'Post #$_currentPostId (${_currentIndex + 1}/${widget.postIds.length})'
@@ -280,14 +295,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 controller: _pageController,
                 itemCount: widget.postIds.length,
                 onPageChanged: _onPageChanged,
-                itemBuilder: (context, index) => _buildPageContent(index),
+                itemBuilder: (context, index) => _buildPageContent(index, isDark, isOled),
               )
-            : _buildPageContent(0),
+            : _buildPageContent(0, isDark, isOled),
       ),
     );
   }
 
-  Widget _buildPageContent(int index) {
+  Widget _buildPageContent(int index, bool isDark, bool isOled) {
     final post = _loadedPosts[index];
     final isLoading = _loadingStates[index] == true;
     final error = _errorStates[index];
@@ -315,82 +330,133 @@ class _PostDetailPageState extends State<PostDetailPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildImage(post),
-          _buildActionBar(index, post),
-          _buildStats(post, index),
-          _buildDescription(post),
-          _buildTags(post),
-          _buildMetadata(post),
+          const SizedBox(height: 16),
+          _buildActionBar(index, post, isDark, isOled),
+          const SizedBox(height: 16),
+          _buildStats(post, index, isDark, isOled),
+          if (post.description.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            _buildDescription(post, isDark, isOled),
+          ],
+          const SizedBox(height: 16),
+          _buildTags(post, isDark, isOled),
+          const SizedBox(height: 16),
+          _buildMetadata(post, isDark, isOled),
           const SizedBox(height: 32),
         ],
       ),
     );
   }
 
-  Widget _buildActionBar(int index, Post post) {
-    final brightness = CupertinoTheme.brightnessOf(context);
-    final isDark = brightness == Brightness.dark;
+  Widget _buildLiquidGlassContainer({
+    required bool isDark,
+    required bool isOled,
+    required Widget child,
+    EdgeInsets? margin,
+    EdgeInsets? padding,
+  }) {
+    return Container(
+      margin: margin ?? const EdgeInsets.symmetric(horizontal: 16),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+          child: Container(
+            padding: padding ?? const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isOled
+                    ? [
+                        Colors.white.withOpacity(0.06),
+                        Colors.white.withOpacity(0.02),
+                      ]
+                    : isDark
+                        ? [
+                            Colors.white.withOpacity(0.12),
+                            Colors.white.withOpacity(0.06),
+                          ]
+                        : [
+                            Colors.white.withOpacity(0.8),
+                            Colors.white.withOpacity(0.6),
+                          ],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isOled
+                    ? Colors.white.withOpacity(0.08)
+                    : isDark
+                        ? Colors.white.withOpacity(0.15)
+                        : Colors.white.withOpacity(0.5),
+                width: 0.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(isOled ? 0.4 : 0.1),
+                  blurRadius: 20,
+                  spreadRadius: -5,
+                ),
+              ],
+            ),
+            child: child,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionBar(int index, Post post, bool isDark, bool isOled) {
     final isFav = _isFavorited[index] ?? post.isFavorited;
     final userVote = _userVote[index];
     final isVoting = _isVoting[index] == true;
     final isTogglingFav = _isTogglingFavorite[index] == true;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: CupertinoColors.black.withOpacity(isDark ? 0.3 : 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return _buildLiquidGlassContainer(
+      isDark: isDark,
+      isOled: isOled,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          // Upvote button
-          _buildActionButton(
+          _buildGlassActionButton(
             icon: CupertinoIcons.arrow_up_circle,
             activeIcon: CupertinoIcons.arrow_up_circle_fill,
             label: 'Upvote',
             isActive: userVote == 1,
             isLoading: isVoting,
             color: AppColors.safeColor,
+            isDark: isDark,
             onTap: () => _vote(index, userVote == 1 ? 0 : 1),
           ),
-          // Downvote button
-          _buildActionButton(
+          _buildGlassActionButton(
             icon: CupertinoIcons.arrow_down_circle,
             activeIcon: CupertinoIcons.arrow_down_circle_fill,
             label: 'Downvote',
             isActive: userVote == -1,
             isLoading: isVoting,
             color: AppColors.explicitColor,
+            isDark: isDark,
             onTap: () => _vote(index, userVote == -1 ? 0 : -1),
           ),
-          // Favorite button
-          _buildActionButton(
+          _buildGlassActionButton(
             icon: CupertinoIcons.heart,
             activeIcon: CupertinoIcons.heart_fill,
             label: 'Favorite',
             isActive: isFav,
             isLoading: isTogglingFav,
-            color: AppColors.explicitColor,
+            color: CupertinoColors.systemPink,
+            isDark: isDark,
             onTap: () => _toggleFavorite(index),
           ),
-          // Comments button
-          _buildActionButton(
+          _buildGlassActionButton(
             icon: CupertinoIcons.chat_bubble,
             activeIcon: CupertinoIcons.chat_bubble_fill,
             label: '${post.commentCount}',
             isActive: false,
             isLoading: false,
-            color: AppColors.primaryBlue,
+            color: CupertinoColors.systemBlue,
+            isDark: isDark,
             onTap: () => _showComments(index),
           ),
         ],
@@ -398,13 +464,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
     );
   }
 
-  Widget _buildActionButton({
+  Widget _buildGlassActionButton({
     required IconData icon,
     required IconData activeIcon,
     required String label,
     required bool isActive,
     required bool isLoading,
     required Color color,
+    required bool isDark,
     required VoidCallback onTap,
   }) {
     return CupertinoButton(
@@ -413,26 +480,57 @@ class _PostDetailPageState extends State<PostDetailPage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (isLoading)
-            SizedBox(
-              width: 24,
-              height: 24,
-              child: CupertinoActivityIndicator(
-                color: color,
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isActive
+                    ? [
+                        color.withOpacity(0.3),
+                        color.withOpacity(0.15),
+                      ]
+                    : [
+                        (isDark ? Colors.white : Colors.black).withOpacity(0.1),
+                        (isDark ? Colors.white : Colors.black).withOpacity(0.05),
+                      ],
               ),
-            )
-          else
-            Icon(
-              isActive ? activeIcon : icon,
-              size: 24,
-              color: isActive ? color : CupertinoColors.secondaryLabel,
+              shape: BoxShape.circle,
+              boxShadow: isActive
+                  ? [
+                      BoxShadow(
+                        color: color.withOpacity(0.4),
+                        blurRadius: 12,
+                      ),
+                    ]
+                  : null,
             ),
-          const SizedBox(height: 4),
+            child: isLoading
+                ? SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CupertinoActivityIndicator(color: color),
+                  )
+                : Icon(
+                    isActive ? activeIcon : icon,
+                    size: 24,
+                    color: isActive
+                        ? color
+                        : isDark
+                            ? CupertinoColors.white.withOpacity(0.6)
+                            : CupertinoColors.systemGrey,
+                  ),
+          ),
+          const SizedBox(height: 6),
           Text(
             label,
             style: TextStyle(
               fontSize: 11,
-              color: isActive ? color : CupertinoColors.secondaryLabel,
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+              color: isActive
+                  ? color
+                  : isDark
+                      ? CupertinoColors.white.withOpacity(0.6)
+                      : CupertinoColors.systemGrey,
             ),
           ),
         ],
@@ -441,7 +539,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   Widget _buildImage(Post post) {
-    // For videos, show the video player
     if (post.isVideo && post.file.url != null) {
       return AspectRatio(
         aspectRatio: post.file.aspectRatio.clamp(0.5, 2.0),
@@ -456,7 +553,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
       );
     }
     
-    // For images
     final imageUrl = post.sample.has ? post.sample.url : post.preview.url;
 
     if (imageUrl == null) {
@@ -506,98 +602,116 @@ class _PostDetailPageState extends State<PostDetailPage> {
     );
   }
 
-  Widget _buildStats(Post post, int index) {
-    final brightness = CupertinoTheme.brightnessOf(context);
-    final isDark = brightness == Brightness.dark;
+  Widget _buildStats(Post post, int index, bool isDark, bool isOled) {
     final score = _updatedScores[index] ?? post.score;
     final isFav = _isFavorited[index] ?? post.isFavorited;
-    // Adjust fav count based on local favorite state change
     final favCount = isFav != post.isFavorited 
         ? (isFav ? post.favCount + 1 : post.favCount - 1)
         : post.favCount;
 
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: CupertinoColors.black.withOpacity(isDark ? 0.3 : 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return _buildLiquidGlassContainer(
+      isDark: isDark,
+      isOled: isOled,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildStatItem(
+          _buildGlassStatItem(
             icon: CupertinoIcons.arrow_up,
             value: score.total.toString(),
             label: 'Score',
-            color: score.total >= 0
-                ? AppColors.safeColor
-                : AppColors.explicitColor,
+            color: score.total >= 0 ? AppColors.safeColor : AppColors.explicitColor,
+            isDark: isDark,
           ),
-          _buildStatItem(
+          _buildGlassStatItem(
             icon: CupertinoIcons.heart_fill,
             value: favCount.compact,
             label: 'Favorites',
-            color: AppColors.explicitColor,
+            color: CupertinoColors.systemPink,
+            isDark: isDark,
           ),
-          _buildStatItem(
+          _buildGlassStatItem(
             icon: CupertinoIcons.chat_bubble_fill,
             value: post.commentCount.toString(),
             label: 'Comments',
-            color: AppColors.primaryBlue,
+            color: CupertinoColors.systemBlue,
+            isDark: isDark,
           ),
-          _buildRatingBadge(post),
+          _buildRatingBadge(post, isDark),
         ],
       ),
     );
   }
 
-  Widget _buildStatItem({
+  Widget _buildGlassStatItem({
     required IconData icon,
     required String value,
     required String label,
     required Color color,
+    required bool isDark,
   }) {
     return Column(
       children: [
-        Icon(icon, size: 24, color: color),
-        const SizedBox(height: 4),
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                color.withOpacity(0.25),
+                color.withOpacity(0.1),
+              ],
+            ),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.3),
+                blurRadius: 10,
+              ),
+            ],
+          ),
+          child: Icon(icon, size: 20, color: color),
+        ),
+        const SizedBox(height: 8),
         Text(
           value,
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: color,
+            color: isDark ? CupertinoColors.white : CupertinoColors.black,
           ),
         ),
+        const SizedBox(height: 2),
         Text(
           label,
           style: TextStyle(
             fontSize: 12,
-            color: CupertinoColors.secondaryLabel.resolveFrom(context),
+            color: isDark
+                ? CupertinoColors.white.withOpacity(0.6)
+                : CupertinoColors.systemGrey,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildRatingBadge(Post post) {
+  Widget _buildRatingBadge(Post post, bool isDark) {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: post.ratingColor,
-            borderRadius: BorderRadius.circular(8),
+            gradient: LinearGradient(
+              colors: [
+                post.ratingColor,
+                post.ratingColor.withOpacity(0.7),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: post.ratingColor.withOpacity(0.4),
+                blurRadius: 10,
+              ),
+            ],
           ),
           child: Text(
             post.rating.toUpperCase(),
@@ -608,59 +722,112 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ),
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 8),
         Text(
           post.ratingLabel,
           style: TextStyle(
             fontSize: 12,
-            color: CupertinoColors.secondaryLabel.resolveFrom(context),
+            color: isDark
+                ? CupertinoColors.white.withOpacity(0.6)
+                : CupertinoColors.systemGrey,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildDescription(Post post) {
-    if (post.description.isEmpty) return const SizedBox.shrink();
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+  Widget _buildDescription(Post post, bool isDark, bool isOled) {
+    return _buildLiquidGlassContainer(
+      isDark: isDark,
+      isOled: isOled,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Description',
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w600,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      CupertinoColors.systemIndigo.withOpacity(0.3),
+                      CupertinoColors.systemIndigo.withOpacity(0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  CupertinoIcons.doc_text_fill,
+                  size: 18,
+                  color: isDark
+                      ? CupertinoColors.systemIndigo.withOpacity(0.8)
+                      : CupertinoColors.systemIndigo,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Description',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Text(
             post.description,
             style: TextStyle(
               fontSize: 15,
-              color: CupertinoColors.label.resolveFrom(context),
+              color: isDark
+                  ? CupertinoColors.white.withOpacity(0.8)
+                  : CupertinoColors.label,
             ),
           ),
-          const SizedBox(height: 16),
         ],
       ),
     );
   }
 
-  Widget _buildTags(Post post) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
+  Widget _buildTags(Post post, bool isDark, bool isOled) {
+    return _buildLiquidGlassContainer(
+      isDark: isDark,
+      isOled: isOled,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Tags',
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w600,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      CupertinoColors.systemOrange.withOpacity(0.3),
+                      CupertinoColors.systemOrange.withOpacity(0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  CupertinoIcons.tag_fill,
+                  size: 18,
+                  color: isDark
+                      ? CupertinoColors.systemOrange.withOpacity(0.8)
+                      : CupertinoColors.systemOrange,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Tags',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 12),
           CategorizedTagList(
@@ -672,36 +839,73 @@ class _PostDetailPageState extends State<PostDetailPage> {
     );
   }
 
-  Widget _buildMetadata(Post post) {
-    final brightness = CupertinoTheme.brightnessOf(context);
-    final isDark = brightness == Brightness.dark;
-
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
+  Widget _buildMetadata(Post post, bool isDark, bool isOled) {
+    return _buildLiquidGlassContainer(
+      isDark: isDark,
+      isOled: isOled,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildMetadataRow('ID', '#${post.id}'),
-          _buildMetadataRow('Posted', post.createdAt.relativeTime),
-          _buildMetadataRow('Resolution', '${post.file.width}x${post.file.height}'),
-          _buildMetadataRow('File Size', post.file.size.fileSize),
-          _buildMetadataRow('Type', post.file.ext.toUpperCase()),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      CupertinoColors.systemTeal.withOpacity(0.3),
+                      CupertinoColors.systemTeal.withOpacity(0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  CupertinoIcons.info_circle_fill,
+                  size: 18,
+                  color: isDark
+                      ? CupertinoColors.systemTeal.withOpacity(0.8)
+                      : CupertinoColors.systemTeal,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Details',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildMetadataRow('ID', '#${post.id}', isDark),
+          _buildMetadataRow('Posted', post.createdAt.relativeTime, isDark),
+          _buildMetadataRow('Resolution', '${post.file.width}x${post.file.height}', isDark),
+          _buildMetadataRow('File Size', post.file.size.fileSize, isDark),
+          _buildMetadataRow('Type', post.file.ext.toUpperCase(), isDark),
           if (post.sources.isNotEmpty)
-            _buildMetadataRow('Sources', '${post.sources.length} source(s)'),
+            _buildMetadataRow('Sources', '${post.sources.length} source(s)', isDark, isLast: true),
         ],
       ),
     );
   }
 
-  Widget _buildMetadataRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+  Widget _buildMetadataRow(String label, String value, bool isDark, {bool isLast = false}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        border: isLast
+            ? null
+            : Border(
+                bottom: BorderSide(
+                  color: isDark
+                      ? Colors.white.withOpacity(0.1)
+                      : Colors.black.withOpacity(0.05),
+                  width: 0.5,
+                ),
+              ),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -709,14 +913,17 @@ class _PostDetailPageState extends State<PostDetailPage> {
             label,
             style: TextStyle(
               fontSize: 14,
-              color: CupertinoColors.secondaryLabel.resolveFrom(context),
+              color: isDark
+                  ? CupertinoColors.white.withOpacity(0.6)
+                  : CupertinoColors.systemGrey,
             ),
           ),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
+              color: isDark ? CupertinoColors.white : CupertinoColors.black,
             ),
           ),
         ],
@@ -739,14 +946,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.of(context).pop();
-              // Could implement share functionality
             },
             child: const Text('Share'),
           ),
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.of(context).pop();
-              // Could implement download functionality
             },
             child: const Text('Download'),
           ),
@@ -809,7 +1014,7 @@ class _FullScreenImageViewer extends StatelessWidget {
   }
 }
 
-/// Comments sheet for displaying and posting comments
+/// Comments sheet with liquid glass design
 class _CommentsSheet extends StatefulWidget {
   final int postId;
 
@@ -909,121 +1114,266 @@ class _CommentsSheetState extends State<_CommentsSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = CupertinoTheme.brightnessOf(context);
-    final isDark = brightness == Brightness.dark;
+    final settingsProvider = context.watch<SettingsProvider>();
+    final isDark = settingsProvider.themeMode == 2 ||
+        settingsProvider.themeMode == 3 ||
+        (settingsProvider.themeMode == 0 &&
+            MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+    final isOled = settingsProvider.themeMode == 3;
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.75,
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkBackground
-            : CupertinoColors.systemBackground,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      child: Column(
-        children: [
-          // Handle bar
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 12),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: CupertinoColors.systemGrey3,
-              borderRadius: BorderRadius.circular(2),
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.75,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: isOled
+                  ? [
+                      Colors.black.withOpacity(0.95),
+                      Colors.black,
+                    ]
+                  : isDark
+                      ? [
+                          AppColors.darkBackground.withOpacity(0.95),
+                          AppColors.darkBackground,
+                        ]
+                      : [
+                          CupertinoColors.systemBackground.withOpacity(0.95),
+                          CupertinoColors.systemBackground,
+                        ],
             ),
-          ),
-          // Header
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Comments',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Icon(CupertinoIcons.xmark_circle_fill),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            height: 1,
-            color: CupertinoColors.separator.resolveFrom(context),
-          ),
-          // Comments list
-          Expanded(
-            child: _buildCommentsList(),
-          ),
-          // Comment input
-          Container(
-            padding: EdgeInsets.only(
-              left: 16,
-              right: 16,
-              top: 8,
-              bottom: 8 + bottomPadding,
-            ),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.darkSecondaryBackground
-                  : CupertinoColors.white,
-              border: Border(
-                top: BorderSide(
-                  color: CupertinoColors.separator.resolveFrom(context),
-                ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            border: Border(
+              top: BorderSide(
+                color: isOled
+                    ? Colors.white.withOpacity(0.08)
+                    : isDark
+                        ? Colors.white.withOpacity(0.15)
+                        : Colors.white.withOpacity(0.5),
+                width: 0.5,
               ),
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: CupertinoTextField(
-                    controller: _commentController,
-                    placeholder: 'Write a comment...',
-                    maxLines: 3,
-                    minLines: 1,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? AppColors.darkBackground
-                          : CupertinoColors.systemGrey6,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: _isPosting ? null : _postComment,
-                  child: _isPosting
-                      ? const CupertinoActivityIndicator()
-                      : Icon(
-                          CupertinoIcons.paperplane_fill,
-                          color: CupertinoTheme.of(context).primaryColor,
-                        ),
-                ),
-              ],
-            ),
           ),
-        ],
+          child: Column(
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 12),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.white.withOpacity(0.3)
+                      : CupertinoColors.systemGrey3,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              // Header
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                CupertinoColors.systemBlue.withOpacity(0.3),
+                                CupertinoColors.systemBlue.withOpacity(0.1),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            CupertinoIcons.chat_bubble_2_fill,
+                            size: 18,
+                            color: isDark
+                                ? CupertinoColors.systemBlue.withOpacity(0.8)
+                                : CupertinoColors.systemBlue,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Comments',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: isDark
+                                ? CupertinoColors.white
+                                : CupertinoColors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                    CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? Colors.white.withOpacity(0.1)
+                              : Colors.black.withOpacity(0.05),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          CupertinoIcons.xmark,
+                          size: 18,
+                          color: isDark
+                              ? CupertinoColors.white.withOpacity(0.6)
+                              : CupertinoColors.systemGrey,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                height: 0.5,
+                color: isDark
+                    ? Colors.white.withOpacity(0.1)
+                    : Colors.black.withOpacity(0.05),
+              ),
+              // Comments list
+              Expanded(
+                child: _buildCommentsList(isDark, isOled),
+              ),
+              // Comment input
+              _buildCommentInput(isDark, isOled, bottomPadding),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildCommentsList() {
+  Widget _buildCommentInput(bool isDark, bool isOled, double bottomPadding) {
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 12,
+            bottom: 12 + bottomPadding,
+          ),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: isOled
+                  ? [
+                      Colors.white.withOpacity(0.05),
+                      Colors.white.withOpacity(0.02),
+                    ]
+                  : isDark
+                      ? [
+                          Colors.white.withOpacity(0.08),
+                          Colors.white.withOpacity(0.04),
+                        ]
+                      : [
+                          Colors.white.withOpacity(0.9),
+                          Colors.white.withOpacity(0.8),
+                        ],
+            ),
+            border: Border(
+              top: BorderSide(
+                color: isDark
+                    ? Colors.white.withOpacity(0.1)
+                    : Colors.black.withOpacity(0.05),
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: CupertinoTextField(
+                  controller: _commentController,
+                  placeholder: 'Write a comment...',
+                  maxLines: 3,
+                  minLines: 1,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Colors.white.withOpacity(0.08)
+                        : Colors.black.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isDark
+                          ? Colors.white.withOpacity(0.1)
+                          : Colors.black.withOpacity(0.08),
+                      width: 0.5,
+                    ),
+                  ),
+                  style: TextStyle(
+                    color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                  ),
+                  placeholderStyle: TextStyle(
+                    color: isDark
+                        ? CupertinoColors.white.withOpacity(0.4)
+                        : CupertinoColors.systemGrey,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: _isPosting ? null : _postComment,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        CupertinoColors.systemBlue,
+                        CupertinoColors.systemBlue.withOpacity(0.8),
+                      ],
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: CupertinoColors.systemBlue.withOpacity(0.4),
+                        blurRadius: 12,
+                      ),
+                    ],
+                  ),
+                  child: _isPosting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CupertinoActivityIndicator(
+                            color: CupertinoColors.white,
+                          ),
+                        )
+                      : const Icon(
+                          CupertinoIcons.paperplane_fill,
+                          size: 20,
+                          color: CupertinoColors.white,
+                        ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCommentsList(bool isDark, bool isOled) {
     if (_isLoading) {
-      return const Center(
-        child: CupertinoActivityIndicator(),
-      );
+      return const Center(child: CupertinoActivityIndicator());
     }
 
     if (_error != null) {
@@ -1031,16 +1381,32 @@ class _CommentsSheetState extends State<_CommentsSheet> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              CupertinoIcons.exclamationmark_triangle,
-              size: 48,
-              color: CupertinoColors.systemGrey,
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    CupertinoColors.systemRed.withOpacity(0.2),
+                    CupertinoColors.systemRed.withOpacity(0.1),
+                  ],
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                CupertinoIcons.exclamationmark_triangle,
+                size: 32,
+                color: CupertinoColors.systemRed,
+              ),
             ),
             const SizedBox(height: 16),
             Text(
               _error!,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: CupertinoColors.systemGrey),
+              style: TextStyle(
+                color: isDark
+                    ? CupertinoColors.white.withOpacity(0.6)
+                    : CupertinoColors.systemGrey,
+              ),
             ),
             const SizedBox(height: 16),
             CupertinoButton(
@@ -1053,26 +1419,46 @@ class _CommentsSheetState extends State<_CommentsSheet> {
     }
 
     if (_comments.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              CupertinoIcons.chat_bubble,
-              size: 48,
-              color: CupertinoColors.systemGrey,
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    CupertinoColors.systemBlue.withOpacity(0.2),
+                    CupertinoColors.systemBlue.withOpacity(0.1),
+                  ],
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                CupertinoIcons.chat_bubble,
+                size: 40,
+                color: isDark
+                    ? CupertinoColors.systemBlue.withOpacity(0.6)
+                    : CupertinoColors.systemBlue,
+              ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               'No comments yet',
-              style: TextStyle(color: CupertinoColors.systemGrey),
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
+                color: isDark ? CupertinoColors.white : CupertinoColors.black,
+              ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Be the first to comment!',
               style: TextStyle(
-                color: CupertinoColors.systemGrey,
                 fontSize: 14,
+                color: isDark
+                    ? CupertinoColors.white.withOpacity(0.6)
+                    : CupertinoColors.systemGrey,
               ),
             ),
           ],
@@ -1083,96 +1469,174 @@ class _CommentsSheetState extends State<_CommentsSheet> {
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemCount: _comments.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 16),
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final comment = _comments[index];
-        return _CommentCard(comment: comment);
+        return _CommentCard(comment: comment, isDark: isDark, isOled: isOled);
       },
     );
   }
 }
 
-/// Individual comment card
+/// Individual comment card with liquid glass design
 class _CommentCard extends StatelessWidget {
   final Comment comment;
+  final bool isDark;
+  final bool isOled;
 
-  const _CommentCard({required this.comment});
+  const _CommentCard({
+    required this.comment,
+    required this.isDark,
+    required this.isOled,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final brightness = CupertinoTheme.brightnessOf(context);
-    final isDark = brightness == Brightness.dark;
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: CupertinoColors.black.withOpacity(isDark ? 0.2 : 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isOled
+                  ? [
+                      Colors.white.withOpacity(0.05),
+                      Colors.white.withOpacity(0.02),
+                    ]
+                  : isDark
+                      ? [
+                          Colors.white.withOpacity(0.1),
+                          Colors.white.withOpacity(0.05),
+                        ]
+                      : [
+                          Colors.white.withOpacity(0.8),
+                          Colors.white.withOpacity(0.6),
+                        ],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isOled
+                  ? Colors.white.withOpacity(0.06)
+                  : isDark
+                      ? Colors.white.withOpacity(0.12)
+                      : Colors.white.withOpacity(0.4),
+              width: 0.5,
+            ),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                comment.creatorName,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(
-                    comment.score >= 0
-                        ? CupertinoIcons.arrow_up
-                        : CupertinoIcons.arrow_down,
-                    size: 14,
-                    color: comment.score >= 0
-                        ? AppColors.safeColor
-                        : AppColors.explicitColor,
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              CupertinoColors.systemBlue.withOpacity(0.25),
+                              CupertinoColors.systemBlue.withOpacity(0.1),
+                            ],
+                          ),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          CupertinoIcons.person_fill,
+                          size: 14,
+                          color: isDark
+                              ? CupertinoColors.systemBlue.withOpacity(0.8)
+                              : CupertinoColors.systemBlue,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        comment.creatorName,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: isDark
+                              ? CupertinoColors.white
+                              : CupertinoColors.black,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    comment.score.abs().toString(),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: comment.score >= 0
-                          ? AppColors.safeColor
-                          : AppColors.explicitColor,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: comment.score >= 0
+                            ? [
+                                AppColors.safeColor.withOpacity(0.25),
+                                AppColors.safeColor.withOpacity(0.1),
+                              ]
+                            : [
+                                AppColors.explicitColor.withOpacity(0.25),
+                                AppColors.explicitColor.withOpacity(0.1),
+                              ],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          comment.score >= 0
+                              ? CupertinoIcons.arrow_up
+                              : CupertinoIcons.arrow_down,
+                          size: 12,
+                          color: comment.score >= 0
+                              ? AppColors.safeColor
+                              : AppColors.explicitColor,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          comment.score.abs().toString(),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: comment.score >= 0
+                                ? AppColors.safeColor
+                                : AppColors.explicitColor,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
+              const SizedBox(height: 10),
+              Text(
+                comment.body,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark
+                      ? CupertinoColors.white.withOpacity(0.85)
+                      : CupertinoColors.label,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                comment.createdAt.relativeTime,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark
+                      ? CupertinoColors.white.withOpacity(0.5)
+                      : CupertinoColors.secondaryLabel,
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            comment.body,
-            style: TextStyle(
-              fontSize: 14,
-              color: CupertinoColors.label.resolveFrom(context),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            comment.createdAt.relativeTime,
-            style: TextStyle(
-              fontSize: 12,
-              color: CupertinoColors.secondaryLabel.resolveFrom(context),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
