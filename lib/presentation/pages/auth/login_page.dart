@@ -37,7 +37,10 @@ class _LoginPageState extends State<LoginPage> {
     await authProvider.initialize();
     
     if (authProvider.isLoggedIn && mounted) {
-      Navigator.of(context).pushReplacementNamed(AppRoutes.main);
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.main,
+        (route) => false,
+      );
     }
   }
 
@@ -84,7 +87,10 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     if (success && mounted) {
-      Navigator.of(context).pushReplacementNamed(AppRoutes.main);
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.main,
+        (route) => false,
+      );
     } else if (authProvider.error != null && mounted) {
       _showError(authProvider.error!);
     }
