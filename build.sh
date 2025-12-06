@@ -28,6 +28,19 @@ print_error() {
     echo -e "${RED}[✗]${NC} $1"
 }
 
+# Read version from pubspec.yaml
+VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | tr -d '[:space:]')
+if [ -z "$VERSION" ]; then
+    print_error "Could not read version from pubspec.yaml"
+    exit 1
+fi
+
+print_status "Building Klit version: $VERSION"
+
+# Create output directory with version
+DIST_DIR="dist/$VERSION"
+mkdir -p "$DIST_DIR"
+
 # Check if flutter is installed
 if ! command -v flutter &> /dev/null; then
     print_error "Flutter is not installed or not in PATH"
@@ -39,9 +52,6 @@ if ! flutter pub deps | grep -q fastforge; then
     print_warning "Fastforge not found, running pub get..."
     flutter pub get
 fi
-
-# Create output directory
-mkdir -p build/dist
 
 # Function to build for a specific platform
 build_platform() {
@@ -57,10 +67,9 @@ build_platform() {
         android)
             if [[ "$OSTYPE" == "linux-gnu"* ]] || [[ "$OSTYPE" == "darwin"* ]] || [[ "$OSTYPE" == "msys" ]]; then
                 flutter build apk --release
-                mkdir -p build/dist
                 if [ -f "build/app/outputs/flutter-apk/app-release.apk" ]; then
-                    cp build/app/outputs/flutter-apk/app-release.apk build/dist/klit.apk
-                    print_status "APK built successfully: build/dist/klit.apk"
+                    cp build/app/outputs/flutter-apk/app-release.apk "$DIST_DIR/klit-android-$VERSION.apk"
+                    print_status "APK built successfully: $DIST_DIR/klit-android-$VERSION.apk"
                 fi
             fi
             ;;
@@ -68,8 +77,12 @@ build_platform() {
             if [[ "$OSTYPE" == "darwin"* ]]; then
                 flutter build ipa --release --no-codesign || flutter build ios --release --no-codesign
                 if [ -d "build/ios/ipa" ]; then
-                    cp build/ios/ipa/*.ipa build/dist/ 2>/dev/null || true
-                    print_status "IPA built successfully"
+                    for ipa in build/ios/ipa/*.ipa; do
+                        if [ -f "$ipa" ]; then
+                            cp "$ipa" "$DIST_DIR/klit-ios-$VERSION.ipa"
+                            print_status "IPA built successfully: $DIST_DIR/klit-ios-$VERSION.ipa"
+                        fi
+                    done
                 else
                     print_warning "IPA build completed (may need manual export from Xcode)"
                 fi
@@ -84,19 +97,35 @@ build_platform() {
                 # Use globally installed fastforge
                 FASTFORGE="$HOME/.pub-cache/bin/fastforge"
                 
-                # Build AppImage using fastforge
+                # Build packages using fastforge
                 if [ -x "$FASTFORGE" ]; then
                     $FASTFORGE package --platform linux --targets appimage || print_warning "AppImage build failed"
                     $FASTFORGE package --platform linux --targets deb || print_warning "DEB build failed"
                     $FASTFORGE package --platform linux --targets rpm || print_warning "RPM build failed"
+                    
+                    # Move fastforge outputs to versioned dist folder
+                    for appimage in dist/*.AppImage; do
+                        if [ -f "$appimage" ]; then
+                            mv "$appimage" "$DIST_DIR/klit-linux-$VERSION.AppImage"
+                            print_status "AppImage: $DIST_DIR/klit-linux-$VERSION.AppImage"
+                        fi
+                    done
+                    
+                    for deb in dist/*.deb; do
+                        if [ -f "$deb" ]; then
+                            mv "$deb" "$DIST_DIR/klit-linux-$VERSION.deb"
+                            print_status "DEB: $DIST_DIR/klit-linux-$VERSION.deb"
+                        fi
+                    done
+                    
+                    for rpm in dist/*.rpm; do
+                        if [ -f "$rpm" ]; then
+                            mv "$rpm" "$DIST_DIR/klit-linux-$VERSION.rpm"
+                            print_status "RPM: $DIST_DIR/klit-linux-$VERSION.rpm"
+                        fi
+                    done
                 else
                     print_warning "fastforge not found. Run: dart pub global activate fastforge"
-                fi
-                
-                # Copy linux bundle to dist
-                if [ -d "build/linux/x64/release/bundle" ]; then
-                    cp -r build/linux/x64/release/bundle build/dist/klit-linux
-                    print_status "Linux bundle copied to build/dist/klit-linux"
                 fi
                 
                 print_status "Linux builds completed"
@@ -114,6 +143,14 @@ build_platform() {
                 # Build DMG using fastforge
                 if [ -x "$FASTFORGE" ]; then
                     $FASTFORGE package --platform macos --targets dmg || print_warning "DMG build failed"
+                    
+                    # Move fastforge outputs to versioned dist folder
+                    for dmg in dist/*.dmg; do
+                        if [ -f "$dmg" ]; then
+                            mv "$dmg" "$DIST_DIR/klit-macos-$VERSION.dmg"
+                            print_status "DMG: $DIST_DIR/klit-macos-$VERSION.dmg"
+                        fi
+                    done
                 else
                     print_warning "fastforge not found. Run: dart pub global activate fastforge"
                 fi
@@ -133,6 +170,14 @@ build_platform() {
                 # Build EXE installer using fastforge
                 if [ -x "$FASTFORGE" ]; then
                     $FASTFORGE package --platform windows --targets exe || print_warning "EXE build failed"
+                    
+                    # Move fastforge outputs to versioned dist folder
+                    for exe in dist/*.exe; do
+                        if [ -f "$exe" ]; then
+                            mv "$exe" "$DIST_DIR/klit-windows-$VERSION.exe"
+                            print_status "EXE: $DIST_DIR/klit-windows-$VERSION.exe"
+                        fi
+                    done
                 else
                     print_warning "fastforge not found. Run: dart pub global activate fastforge"
                 fi
