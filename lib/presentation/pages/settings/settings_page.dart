@@ -21,8 +21,8 @@ class SettingsPage extends StatelessWidget {
       navigationBar: CupertinoNavigationBar(
         middle: const Text('Settings'),
         backgroundColor: isDark
-            ? CupertinoColors.black.withOpacity(0.5)
-            : CupertinoColors.white.withOpacity(0.5),
+            ? CupertinoColors.black.withValues(alpha: 0.5)
+            : CupertinoColors.white.withValues(alpha: 0.5),
       ),
       child: SafeArea(
         bottom: false,
@@ -104,8 +104,8 @@ class SettingsPage extends StatelessWidget {
                     themeNames[settings.themeMode],
                     style: TextStyle(
                       color: isDark
-                          ? CupertinoColors.white.withOpacity(0.6)
-                          : CupertinoColors.black.withOpacity(0.5),
+                          ? CupertinoColors.white.withValues(alpha: 0.6)
+                          : CupertinoColors.black.withValues(alpha: 0.5),
                     ),
                   ),
                   const SizedBox(width: 4),
@@ -113,8 +113,8 @@ class SettingsPage extends StatelessWidget {
                     CupertinoIcons.chevron_right,
                     size: 16,
                     color: isDark
-                        ? CupertinoColors.white.withOpacity(0.3)
-                        : CupertinoColors.black.withOpacity(0.25),
+                        ? CupertinoColors.white.withValues(alpha: 0.3)
+                        : CupertinoColors.black.withValues(alpha: 0.25),
                   ),
                 ],
               ),
@@ -249,8 +249,8 @@ class SettingsPage extends StatelessWidget {
             AppConstants.appVersion,
             style: TextStyle(
               color: isDark
-                  ? CupertinoColors.white.withOpacity(0.5)
-                  : CupertinoColors.black.withOpacity(0.4),
+                  ? CupertinoColors.white.withValues(alpha: 0.5)
+                  : CupertinoColors.black.withValues(alpha: 0.4),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -297,8 +297,8 @@ class SettingsPage extends StatelessWidget {
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
               color: isDark
-                  ? CupertinoColors.white.withOpacity(0.5)
-                  : CupertinoColors.black.withOpacity(0.4),
+                  ? CupertinoColors.white.withValues(alpha: 0.5)
+                  : CupertinoColors.black.withValues(alpha: 0.4),
             ),
           ),
         ),
@@ -316,25 +316,25 @@ class SettingsPage extends StatelessWidget {
                     end: Alignment.bottomCenter,
                     colors: isDark
                         ? [
-                            CupertinoColors.white.withOpacity(0.14),
-                            CupertinoColors.white.withOpacity(0.08),
+                            CupertinoColors.white.withValues(alpha: 0.14),
+                            CupertinoColors.white.withValues(alpha: 0.08),
                           ]
                         : [
-                            CupertinoColors.white.withOpacity(0.8),
-                            CupertinoColors.white.withOpacity(0.6),
+                            CupertinoColors.white.withValues(alpha: 0.8),
+                            CupertinoColors.white.withValues(alpha: 0.6),
                           ],
                   ),
                   border: Border.all(
                     color: isDark
-                        ? CupertinoColors.white.withOpacity(0.15)
-                        : CupertinoColors.white.withOpacity(0.5),
+                        ? CupertinoColors.white.withValues(alpha: 0.15)
+                        : CupertinoColors.white.withValues(alpha: 0.5),
                     width: 1,
                   ),
                   boxShadow: [
                     BoxShadow(
                       color: isDark
-                          ? CupertinoColors.black.withOpacity(0.3)
-                          : CupertinoColors.black.withOpacity(0.05),
+                          ? CupertinoColors.black.withValues(alpha: 0.3)
+                          : CupertinoColors.black.withValues(alpha: 0.05),
                       blurRadius: 20,
                       offset: const Offset(0, 4),
                     ),
@@ -362,8 +362,8 @@ class SettingsPage extends StatelessWidget {
   }) {
     final textColor = isDark ? CupertinoColors.white : CupertinoColors.black;
     final subtitleColor = isDark
-        ? CupertinoColors.white.withOpacity(0.5)
-        : CupertinoColors.black.withOpacity(0.5);
+        ? CupertinoColors.white.withValues(alpha: 0.5)
+        : CupertinoColors.black.withValues(alpha: 0.5);
 
     return GestureDetector(
       onTap: onTap,
@@ -377,11 +377,11 @@ class SettingsPage extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.9),
+                color: iconColor.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
-                    color: iconColor.withOpacity(0.3),
+                    color: iconColor.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -423,8 +423,8 @@ class SettingsPage extends StatelessWidget {
                 CupertinoIcons.chevron_right,
                 size: 16,
                 color: isDark
-                    ? CupertinoColors.white.withOpacity(0.3)
-                    : CupertinoColors.black.withOpacity(0.25),
+                    ? CupertinoColors.white.withValues(alpha: 0.3)
+                    : CupertinoColors.black.withValues(alpha: 0.25),
               ),
           ],
         ),
@@ -437,8 +437,8 @@ class SettingsPage extends StatelessWidget {
       margin: const EdgeInsets.only(left: 62),
       height: 0.5,
       color: isDark
-          ? CupertinoColors.white.withOpacity(0.1)
-          : CupertinoColors.black.withOpacity(0.08),
+          ? CupertinoColors.white.withValues(alpha: 0.1)
+          : CupertinoColors.black.withValues(alpha: 0.08),
     );
   }
 
@@ -455,16 +455,16 @@ class SettingsPage extends StatelessWidget {
         height: 32,
         decoration: BoxDecoration(
           color: isDark
-              ? CupertinoColors.white.withOpacity(isEnabled ? 0.15 : 0.05)
-              : CupertinoColors.black.withOpacity(isEnabled ? 0.08 : 0.03),
+              ? CupertinoColors.white.withValues(alpha: isEnabled ? 0.15 : 0.05)
+              : CupertinoColors.black.withValues(alpha: isEnabled ? 0.08 : 0.03),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
           icon,
           size: 16,
           color: isDark
-              ? CupertinoColors.white.withOpacity(isEnabled ? 0.9 : 0.3)
-              : CupertinoColors.black.withOpacity(isEnabled ? 0.8 : 0.25),
+              ? CupertinoColors.white.withValues(alpha: isEnabled ? 0.9 : 0.3)
+              : CupertinoColors.black.withValues(alpha: isEnabled ? 0.8 : 0.25),
         ),
       ),
     );
@@ -542,19 +542,19 @@ class SettingsPage extends StatelessWidget {
                 end: Alignment.bottomCenter,
                 colors: isDark
                     ? [
-                        CupertinoColors.white.withOpacity(0.16),
-                        CupertinoColors.white.withOpacity(0.10),
+                        CupertinoColors.white.withValues(alpha: 0.16),
+                        CupertinoColors.white.withValues(alpha: 0.10),
                       ]
                     : [
-                        CupertinoColors.white.withOpacity(0.9),
-                        CupertinoColors.white.withOpacity(0.75),
+                        CupertinoColors.white.withValues(alpha: 0.9),
+                        CupertinoColors.white.withValues(alpha: 0.75),
                       ],
               ),
               border: Border(
                 top: BorderSide(
                   color: isDark
-                      ? CupertinoColors.white.withOpacity(0.2)
-                      : CupertinoColors.white.withOpacity(0.6),
+                      ? CupertinoColors.white.withValues(alpha: 0.2)
+                      : CupertinoColors.white.withValues(alpha: 0.6),
                   width: 0.5,
                 ),
               ),
@@ -571,8 +571,8 @@ class SettingsPage extends StatelessWidget {
                     height: 5,
                     decoration: BoxDecoration(
                       color: isDark
-                          ? CupertinoColors.white.withOpacity(0.3)
-                          : CupertinoColors.black.withOpacity(0.2),
+                          ? CupertinoColors.white.withValues(alpha: 0.3)
+                          : CupertinoColors.black.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(2.5),
                     ),
                   ),
@@ -604,15 +604,15 @@ class SettingsPage extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: isSelected
                               ? (isDark
-                                  ? AppColors.primaryBlue.withOpacity(0.3)
-                                  : AppColors.primaryBlue.withOpacity(0.15))
+                                  ? AppColors.primaryBlue.withValues(alpha: 0.3)
+                                  : AppColors.primaryBlue.withValues(alpha: 0.15))
                               : (isDark
-                                  ? CupertinoColors.white.withOpacity(0.08)
-                                  : CupertinoColors.black.withOpacity(0.04)),
+                                  ? CupertinoColors.white.withValues(alpha: 0.08)
+                                  : CupertinoColors.black.withValues(alpha: 0.04)),
                           borderRadius: BorderRadius.circular(12),
                           border: isSelected
                               ? Border.all(
-                                  color: AppColors.primaryBlue.withOpacity(0.5),
+                                  color: AppColors.primaryBlue.withValues(alpha: 0.5),
                                   width: 1.5,
                                 )
                               : null,
@@ -625,8 +625,8 @@ class SettingsPage extends StatelessWidget {
                               color: isSelected
                                   ? AppColors.primaryBlue
                                   : (isDark
-                                      ? CupertinoColors.white.withOpacity(0.7)
-                                      : CupertinoColors.black.withOpacity(0.6)),
+                                      ? CupertinoColors.white.withValues(alpha: 0.7)
+                                      : CupertinoColors.black.withValues(alpha: 0.6)),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
@@ -651,8 +651,8 @@ class SettingsPage extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: isDark
-                                          ? CupertinoColors.white.withOpacity(0.5)
-                                          : CupertinoColors.black.withOpacity(0.5),
+                                          ? CupertinoColors.white.withValues(alpha: 0.5)
+                                          : CupertinoColors.black.withValues(alpha: 0.5),
                                     ),
                                   ),
                                 ],
