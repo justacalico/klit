@@ -517,4 +517,165 @@ class SettingsPage extends StatelessWidget {
       ),
     );
   }
+
+  void _showThemePicker(BuildContext context, SettingsProvider settings, bool isDark) {
+    final themes = [
+      ('Auto', 'Follow system settings', CupertinoIcons.device_phone_portrait),
+      ('Light', 'Always use light theme', CupertinoIcons.sun_max_fill),
+      ('Dark', 'Standard dark theme', CupertinoIcons.moon_fill),
+      ('OLED', 'Pure black for AMOLED screens', CupertinoIcons.moon_stars_fill),
+    ];
+
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+          child: Container(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).padding.bottom,
+            ),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: isDark
+                    ? [
+                        CupertinoColors.white.withOpacity(0.16),
+                        CupertinoColors.white.withOpacity(0.10),
+                      ]
+                    : [
+                        CupertinoColors.white.withOpacity(0.9),
+                        CupertinoColors.white.withOpacity(0.75),
+                      ],
+              ),
+              border: Border(
+                top: BorderSide(
+                  color: isDark
+                      ? CupertinoColors.white.withOpacity(0.2)
+                      : CupertinoColors.white.withOpacity(0.6),
+                  width: 0.5,
+                ),
+              ),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Handle bar
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 12),
+                    width: 36,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? CupertinoColors.white.withOpacity(0.3)
+                          : CupertinoColors.black.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(2.5),
+                    ),
+                  ),
+                  // Title
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Text(
+                      'Choose Theme',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                      ),
+                    ),
+                  ),
+                  // Theme options
+                  ...List.generate(themes.length, (index) {
+                    final (name, description, icon) = themes[index];
+                    final isSelected = settings.themeMode == index;
+                    return GestureDetector(
+                      onTap: () {
+                        settings.setThemeMode(index);
+                        Navigator.of(context).pop();
+                      },
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? (isDark
+                                  ? AppColors.primaryBlue.withOpacity(0.3)
+                                  : AppColors.primaryBlue.withOpacity(0.15))
+                              : (isDark
+                                  ? CupertinoColors.white.withOpacity(0.08)
+                                  : CupertinoColors.black.withOpacity(0.04)),
+                          borderRadius: BorderRadius.circular(12),
+                          border: isSelected
+                              ? Border.all(
+                                  color: AppColors.primaryBlue.withOpacity(0.5),
+                                  width: 1.5,
+                                )
+                              : null,
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              icon,
+                              size: 24,
+                              color: isSelected
+                                  ? AppColors.primaryBlue
+                                  : (isDark
+                                      ? CupertinoColors.white.withOpacity(0.7)
+                                      : CupertinoColors.black.withOpacity(0.6)),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    name,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: isSelected
+                                          ? AppColors.primaryBlue
+                                          : (isDark
+                                              ? CupertinoColors.white
+                                              : CupertinoColors.black),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    description,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: isDark
+                                          ? CupertinoColors.white.withOpacity(0.5)
+                                          : CupertinoColors.black.withOpacity(0.5),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (isSelected)
+                              Icon(
+                                CupertinoIcons.checkmark_circle_fill,
+                                size: 24,
+                                color: AppColors.primaryBlue,
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
