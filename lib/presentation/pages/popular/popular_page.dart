@@ -48,6 +48,7 @@ class _PopularPageState extends State<PopularPage> {
 
   void _onPostTap(Post post) {
     final postsProvider = context.read<PostsProvider>();
+    final settingsProvider = context.read<SettingsProvider>();
     final posts = postsProvider.popularPosts;
     final index = posts.indexWhere((p) => p.id == post.id);
     
@@ -56,6 +57,13 @@ class _PopularPageState extends State<PopularPage> {
       arguments: PostDetailArguments(
         postIds: posts.map((p) => p.id).toList(),
         initialIndex: index >= 0 ? index : 0,
+        hasMore: postsProvider.hasMorePopular,
+        onLoadMore: () async {
+          await postsProvider.loadPopularPosts(
+            safeMode: settingsProvider.safeMode,
+          );
+          return postsProvider.popularPosts.map((p) => p.id).toList();
+        },
       ),
     );
   }
