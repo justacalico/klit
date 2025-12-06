@@ -16,7 +16,7 @@ class KlitApp extends StatelessWidget {
         return CupertinoApp(
           title: 'Klit',
           debugShowCheckedModeBanner: false,
-          theme: _getTheme(settings.themeMode),
+          theme: _getTheme(settings.themeMode, null),
           onGenerateRoute: AppRouter.generateRoute,
           initialRoute: AppRoutes.login,
           localizationsDelegates: const [
@@ -27,19 +27,36 @@ class KlitApp extends StatelessWidget {
           supportedLocales: const [
             Locale('en', 'US'),
           ],
+          builder: (context, child) {
+            // For system theme, we need to rebuild with actual brightness
+            if (settings.themeMode == 0) {
+              final brightness = MediaQuery.platformBrightnessOf(context);
+              return CupertinoTheme(
+                data: brightness == Brightness.dark
+                    ? AppTheme.darkTheme
+                    : AppTheme.lightTheme,
+                child: child!,
+              );
+            }
+            return child!;
+          },
         );
       },
     );
   }
 
-  CupertinoThemeData _getTheme(int themeMode) {
+  CupertinoThemeData _getTheme(int themeMode, Brightness? platformBrightness) {
     switch (themeMode) {
       case 1:
         return AppTheme.lightTheme;
       case 2:
         return AppTheme.darkTheme;
+      case 0:
       default:
-        // System theme - use light as default, actual will be determined by MediaQuery
+        // System theme - determined by platform brightness
+        if (platformBrightness == Brightness.dark) {
+          return AppTheme.darkTheme;
+        }
         return AppTheme.lightTheme;
     }
   }
