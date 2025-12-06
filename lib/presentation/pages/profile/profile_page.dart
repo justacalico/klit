@@ -177,7 +177,7 @@ class _ProfilePageState extends State<ProfilePage> {
             : CupertinoColors.white,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Column(
+      child: Row(
         children: [
           // Avatar
           Container(
@@ -198,36 +198,46 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
-          // Username
-          Text(
-            user.name,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
-          // Level badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: _getLevelColor(user.level).withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              user.levelString,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: _getLevelColor(user.level),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          // Host
-          Text(
-            account.host.replaceAll('https://', ''),
-            style: const TextStyle(
-              fontSize: 14,
-              color: CupertinoColors.systemGrey,
+          const SizedBox(width: 16),
+          // Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  user.name,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                // Level badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: _getLevelColor(user.level).withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    user.levelString,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: _getLevelColor(user.level),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                // Host
+                Text(
+                  account.host.replaceAll('https://', ''),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: CupertinoColors.systemGrey,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
