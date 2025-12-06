@@ -257,7 +257,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
   }
 
   Widget _buildTopBar(bool isDark) {
-    final hasMultiple = widget.postIds.length > 1;
+    final hasMultiple = _postIds.length > 1;
 
     return Container(
       height: 56,
@@ -302,7 +302,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
           // Post title
           Text(
             hasMultiple
-                ? 'Post #$_currentPostId (${_currentIndex + 1}/${widget.postIds.length})'
+                ? 'Post #$_currentPostId (${_currentIndex + 1}/${_postIds.length})'
                 : 'Post #$_currentPostId',
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
@@ -321,12 +321,12 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
             ),
             CupertinoButton(
               padding: const EdgeInsets.all(8),
-              onPressed: _currentIndex < widget.postIds.length - 1
+              onPressed: _currentIndex < _postIds.length - 1
                   ? () => _navigatePost(1)
                   : null,
               child: Icon(
                 CupertinoIcons.chevron_right,
-                color: _currentIndex < widget.postIds.length - 1
+                color: _currentIndex < _postIds.length - 1
                     ? (isDark ? CupertinoColors.white : CupertinoColors.black)
                     : CupertinoColors.systemGrey,
               ),
