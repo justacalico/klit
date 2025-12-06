@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart'
     show CachedNetworkImage, CachedNetworkImageProvider;
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart' show Colors, Theme, ThemeData, Brightness;
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:photo_view/photo_view.dart';
@@ -519,7 +520,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }) {
     return CupertinoButton(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      onPressed: isLoading ? null : onTap,
+      onPressed: isLoading ? null : () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
