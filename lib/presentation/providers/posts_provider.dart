@@ -112,7 +112,8 @@ class PostsProvider extends ChangeNotifier {
   }
 
   /// Load hot posts (high score recent posts)
-  Future<void> loadHotPosts({bool refresh = false}) async {
+  /// If [safeMode] is true, only safe-rated posts will be returned
+  Future<void> loadHotPosts({bool refresh = false, bool safeMode = false}) async {
     if (_isLoadingHot) return;
     if (!refresh && !_hasMoreHot) return;
 
@@ -143,6 +144,7 @@ class PostsProvider extends ChangeNotifier {
       limit: ApiConstants.defaultPageSize,
       tags: timeTag,
       order: 'score',
+      safeMode: safeMode,
     );
 
     result.when(
