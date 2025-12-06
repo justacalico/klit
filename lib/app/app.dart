@@ -51,6 +51,8 @@ class KlitApp extends StatelessWidget {
         return AppTheme.lightTheme;
       case 2:
         return AppTheme.darkTheme;
+      case 3:
+        return AppTheme.oledTheme;
       case 0:
       default:
         // System theme - determined by platform brightness
