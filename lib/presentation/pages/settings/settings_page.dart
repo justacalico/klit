@@ -183,6 +183,42 @@ class SettingsPage extends StatelessWidget {
             );
           },
         ),
+        _buildLiquidGlassDivider(isDark),
+        Consumer<SettingsProvider>(
+          builder: (context, settings, _) {
+            return _buildLiquidGlassTile(
+              context,
+              isDark: isDark,
+              icon: CupertinoIcons.hand_draw_fill,
+              iconColor: AppColors.primaryPink,
+              title: 'Left Handed Mode',
+              subtitle: 'Swap UI elements for left-handed use',
+              trailing: CupertinoSwitch(
+                value: settings.leftHandedMode,
+                activeTrackColor: AppColors.primaryPink,
+                onChanged: (value) => settings.setLeftHandedMode(value),
+              ),
+            );
+          },
+        ),
+        _buildLiquidGlassDivider(isDark),
+        Consumer<SettingsProvider>(
+          builder: (context, settings, _) {
+            return _buildLiquidGlassTile(
+              context,
+              isDark: isDark,
+              icon: CupertinoIcons.heart_fill,
+              iconColor: AppColors.primaryRed,
+              title: 'Upvote When Favorited',
+              subtitle: 'Automatically upvote when adding to favorites',
+              trailing: CupertinoSwitch(
+                value: settings.upvoteWhenFavorited,
+                activeTrackColor: AppColors.primaryRed,
+                onChanged: (value) => settings.setUpvoteWhenFavorited(value),
+              ),
+            );
+          },
+        ),
       ],
     );
   }
