@@ -187,7 +187,7 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: isDark
-            ? AppColors.darkSecondaryBackground.withOpacity(0.5)
+            ? AppColors.darkSecondaryBackground.withValues(alpha: 0.5)
             : CupertinoColors.systemGrey6,
         border: Border(
           bottom: BorderSide(
