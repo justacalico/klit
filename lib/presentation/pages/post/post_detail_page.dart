@@ -1469,7 +1469,7 @@ class _CommentsSheetState extends State<_CommentsSheet> {
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemCount: _comments.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final comment = _comments[index];
         return _CommentCard(comment: comment, isDark: isDark, isOled: isOled);
