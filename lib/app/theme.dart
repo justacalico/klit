@@ -119,7 +119,7 @@ class AppDecorations {
     borderRadius: BorderRadius.circular(12),
     boxShadow: [
       BoxShadow(
-        color: CupertinoColors.black.withOpacity(0.08),
+        color: CupertinoColors.black.withValues(alpha: 0.08),
         blurRadius: 8,
         offset: const Offset(0, 2),
       ),
@@ -132,7 +132,7 @@ class AppDecorations {
     borderRadius: BorderRadius.circular(12),
     boxShadow: [
       BoxShadow(
-        color: CupertinoColors.black.withOpacity(0.3),
+        color: CupertinoColors.black.withValues(alpha: 0.3),
         blurRadius: 8,
         offset: const Offset(0, 2),
       ),
@@ -148,13 +148,13 @@ class AppDecorations {
   static BoxDecoration glassmorphism(Brightness brightness) {
     return BoxDecoration(
       color: brightness == Brightness.dark
-          ? CupertinoColors.black.withOpacity(0.5)
-          : CupertinoColors.white.withOpacity(0.7),
+          ? CupertinoColors.black.withValues(alpha: 0.5)
+          : CupertinoColors.white.withValues(alpha: 0.7),
       borderRadius: BorderRadius.circular(16),
       border: Border.all(
         color: brightness == Brightness.dark
-            ? CupertinoColors.white.withOpacity(0.1)
-            : CupertinoColors.black.withOpacity(0.1),
+            ? CupertinoColors.white.withValues(alpha: 0.1)
+            : CupertinoColors.black.withValues(alpha: 0.1),
       ),
     );
   }
