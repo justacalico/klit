@@ -238,7 +238,7 @@ class _DesktopFavoritesPageState extends State<DesktopFavoritesPage> {
             Icon(
               CupertinoIcons.heart,
               size: 64,
-              color: AppColors.explicitColor.withOpacity(0.5),
+              color: AppColors.explicitColor.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             const Text(
