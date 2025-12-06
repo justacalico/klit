@@ -35,7 +35,11 @@ class _PopularPageState extends State<PopularPage> {
 
   Future<void> _loadPosts({bool refresh = false}) async {
     final postsProvider = context.read<PostsProvider>();
-    await postsProvider.loadPopularPosts(refresh: refresh);
+    final settingsProvider = context.read<SettingsProvider>();
+    await postsProvider.loadPopularPosts(
+      refresh: refresh,
+      safeMode: settingsProvider.safeMode,
+    );
     
     if (refresh) {
       _refreshController.refreshCompleted();
