@@ -2,7 +2,8 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart'
     show CachedNetworkImage, CachedNetworkImageProvider;
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Colors;
+import 'package:flutter/material.dart' show Colors, Theme, ThemeData, Brightness;
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import '../../../app/routes.dart';
@@ -776,13 +777,73 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            post.description,
-            style: TextStyle(
-              fontSize: 15,
-              color: isDark
-                  ? CupertinoColors.white.withValues(alpha: 0.8)
-                  : CupertinoColors.label,
+          Theme(
+            data: ThemeData(
+              brightness: isDark ? Brightness.dark : Brightness.light,
+            ),
+            child: MarkdownBody(
+              data: post.description,
+              selectable: true,
+              shrinkWrap: true,
+              styleSheet: MarkdownStyleSheet(
+                p: TextStyle(
+                  fontSize: 15,
+                  color: isDark
+                      ? CupertinoColors.white.withValues(alpha: 0.8)
+                      : CupertinoColors.label,
+                ),
+                a: TextStyle(
+                  color: CupertinoColors.systemBlue,
+                  decoration: TextDecoration.underline,
+                ),
+                code: TextStyle(
+                  fontSize: 13,
+                  backgroundColor: isDark
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.black.withValues(alpha: 0.05),
+                  color: isDark
+                      ? CupertinoColors.white.withValues(alpha: 0.9)
+                      : CupertinoColors.black,
+                ),
+                codeblockDecoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : Colors.black.withValues(alpha: 0.04),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                blockquoteDecoration: BoxDecoration(
+                  border: Border(
+                    left: BorderSide(
+                      color: CupertinoColors.systemBlue.withValues(alpha: 0.5),
+                      width: 3,
+                    ),
+                  ),
+                ),
+                blockquotePadding: const EdgeInsets.only(left: 12),
+                h1: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                ),
+                h2: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                ),
+                h3: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                ),
+                listBullet: TextStyle(
+                  color: isDark
+                      ? CupertinoColors.white.withValues(alpha: 0.8)
+                      : CupertinoColors.label,
+                ),
+              ),
+              onTapLink: (text, href, title) {
+                // Handle link taps - could open in browser
+              },
             ),
           ),
         ],
@@ -1615,13 +1676,53 @@ class _CommentCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              Text(
-                comment.body,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark
-                      ? CupertinoColors.white.withValues(alpha: 0.85)
-                      : CupertinoColors.label,
+              Theme(
+                data: ThemeData(
+                  brightness: isDark ? Brightness.dark : Brightness.light,
+                ),
+                child: MarkdownBody(
+                  data: comment.body,
+                  selectable: true,
+                  shrinkWrap: true,
+                  styleSheet: MarkdownStyleSheet(
+                    p: TextStyle(
+                      fontSize: 14,
+                      color: isDark
+                          ? CupertinoColors.white.withValues(alpha: 0.85)
+                          : CupertinoColors.label,
+                    ),
+                    a: TextStyle(
+                      color: CupertinoColors.systemBlue,
+                      decoration: TextDecoration.underline,
+                    ),
+                    code: TextStyle(
+                      fontSize: 12,
+                      backgroundColor: isDark
+                          ? Colors.white.withValues(alpha: 0.1)
+                          : Colors.black.withValues(alpha: 0.05),
+                      color: isDark
+                          ? CupertinoColors.white.withValues(alpha: 0.9)
+                          : CupertinoColors.black,
+                    ),
+                    codeblockDecoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : Colors.black.withValues(alpha: 0.04),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    blockquoteDecoration: BoxDecoration(
+                      border: Border(
+                        left: BorderSide(
+                          color: CupertinoColors.systemBlue.withValues(alpha: 0.5),
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                    blockquotePadding: const EdgeInsets.only(left: 10),
+                  ),
+                  onTapLink: (text, href, title) {
+                    // Handle link taps
+                  },
                 ),
               ),
               const SizedBox(height: 10),
