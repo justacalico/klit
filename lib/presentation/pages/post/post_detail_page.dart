@@ -184,7 +184,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
           if (!isFav) {
             final settings = context.read<SettingsProvider>();
             if (settings.upvoteWhenFavorited) {
-              final currentVote = _userVote[index] ?? post.score.ourScore;
+              final currentVote = _userVote[index];
               // Only upvote if not already upvoted
               if (currentVote != 1) {
                 _vote(index, 1);
