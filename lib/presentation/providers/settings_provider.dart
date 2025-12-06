@@ -11,7 +11,7 @@ class SettingsProvider extends ChangeNotifier {
   int _gridSize = AppConstants.defaultGridColumns;
   bool _safeMode = false;
   bool _leftHandedMode = false;
-  bool _upvoteWhenFavorited = false;
+  bool _upvoteWhenFavorited = true;
   String _host = ApiConstants.defaultHost;
   List<SearchHistoryItem> _searchHistory = [];
 
