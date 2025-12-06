@@ -1,6 +1,8 @@
 display_name: Klit
 package_name: klit
-maintainer: Klit Developer <dev@klit.app>
+maintainer:
+  name: Klit Developer
+  email: dev@klit.app
 icon: assets/icon.png
 keywords:
   - klit
@@ -14,4 +16,4 @@ categories:
 startup_notify: true
 essential: false
 priority: optional
-section: graphics
+section: x11
