@@ -45,7 +45,7 @@ class PostCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: CupertinoColors.black.withOpacity(isDark ? 0.3 : 0.08),
+              color: CupertinoColors.black.withValues(alpha: isDark ? 0.3 : 0.08),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -76,7 +76,7 @@ class PostCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: CupertinoColors.black.withOpacity(isDark ? 0.3 : 0.08),
+              color: CupertinoColors.black.withValues(alpha: isDark ? 0.3 : 0.08),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -157,7 +157,7 @@ class PostCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: CupertinoColors.black.withOpacity(0.5),
+                color: CupertinoColors.black.withValues(alpha: 0.5),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -183,8 +183,8 @@ class PostCard extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              CupertinoColors.black.withOpacity(0),
-              CupertinoColors.black.withOpacity(0.7),
+              CupertinoColors.black.withValues(alpha: 0),
+              CupertinoColors.black.withValues(alpha: 0.7),
             ],
           ),
         ),
@@ -225,7 +225,7 @@ class PostCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: CupertinoColors.black.withOpacity(0.5),
+        color: CupertinoColors.black.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(4),
       ),
       child: const Icon(
@@ -243,7 +243,7 @@ class PostCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: CupertinoColors.black.withOpacity(0.5),
+        color: CupertinoColors.black.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(
