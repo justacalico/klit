@@ -11,10 +11,7 @@ import '../../widgets/widgets.dart';
 class DesktopFavoritesPage extends StatefulWidget {
   final Function(PostDetailArguments) onPostTap;
 
-  const DesktopFavoritesPage({
-    super.key,
-    required this.onPostTap,
-  });
+  const DesktopFavoritesPage({super.key, required this.onPostTap});
 
   @override
   State<DesktopFavoritesPage> createState() => _DesktopFavoritesPageState();
@@ -111,15 +108,17 @@ class _DesktopFavoritesPageState extends State<DesktopFavoritesPage> {
 
   void _onPostTap(Post post) {
     final index = _favorites.indexWhere((p) => p.id == post.id);
-    widget.onPostTap(PostDetailArguments(
-      postIds: _favorites.map((p) => p.id).toList(),
-      initialIndex: index >= 0 ? index : 0,
-      hasMore: _hasMore,
-      onLoadMore: () async {
-        await _loadMore();
-        return _favorites.map((p) => p.id).toList();
-      },
-    ));
+    widget.onPostTap(
+      PostDetailArguments(
+        postIds: _favorites.map((p) => p.id).toList(),
+        initialIndex: index >= 0 ? index : 0,
+        hasMore: _hasMore,
+        onLoadMore: () async {
+          await _loadMore();
+          return _favorites.map((p) => p.id).toList();
+        },
+      ),
+    );
   }
 
   @override
@@ -140,7 +139,9 @@ class _DesktopFavoritesPageState extends State<DesktopFavoritesPage> {
       height: 52,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
+        color: isDark
+            ? AppColors.darkSecondaryBackground
+            : CupertinoColors.white,
         border: Border(
           bottom: BorderSide(
             color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
@@ -154,10 +155,7 @@ class _DesktopFavoritesPageState extends State<DesktopFavoritesPage> {
           const SizedBox(width: 12),
           const Text(
             'Favorites',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
           const Spacer(),
           // Grid size selector
@@ -257,18 +255,12 @@ class _DesktopFavoritesPageState extends State<DesktopFavoritesPage> {
             const SizedBox(height: 16),
             const Text(
               'No favorites yet',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             const Text(
               'Posts you favorite will appear here',
-              style: TextStyle(
-                fontSize: 15,
-                color: CupertinoColors.systemGrey,
-              ),
+              style: TextStyle(fontSize: 15, color: CupertinoColors.systemGrey),
             ),
           ],
         ),
