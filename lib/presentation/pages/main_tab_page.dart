@@ -1,6 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
+import '../../app/routes.dart';
 import '../../core/utils/helpers.dart';
+import '../providers/providers.dart';
 import 'home/home_page.dart';
 import 'hot/hot_page.dart';
 import 'popular/popular_page.dart';
@@ -26,27 +29,54 @@ class _MainTabPageState extends State<MainTabPage> {
     SettingsPage(),
   ];
 
+  void _handleLogout(BuildContext context) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('Sign Out'),
+        content: const Text('Are you sure you want to sign out of guest mode?'),
+        actions: [
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.of(context).pop();
+              final authProvider = context.read<AuthProvider>();
+              authProvider.logout();
+              Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+            },
+            child: const Text('Sign Out'),
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isGuest = context.watch<AuthProvider>().isGuest;
 
     return PopScope(
       canPop: false,
       child: CupertinoPageScaffold(
         child: Stack(
           children: [
-            // Page content
-            IndexedStack(
-              index: _currentIndex,
-              children: _pages,
-            ),
+            // Page content - in guest mode, don't show settings (index 4)
+            IndexedStack(index: _currentIndex, children: _pages),
             // Liquid Glass navigation bar
             Positioned(
               left: 20,
               right: 20,
               bottom: MediaQuery.of(context).padding.bottom + 20,
-              child: _buildLiquidGlassNavBar(isDark),
+              child: _buildLiquidGlassNavBar(isDark, isGuest),
             ),
           ],
         ),
@@ -54,7 +84,7 @@ class _MainTabPageState extends State<MainTabPage> {
     );
   }
 
-  Widget _buildLiquidGlassNavBar(bool isDark) {
+  Widget _buildLiquidGlassNavBar(bool isDark, bool isGuest) {
     return Container(
       height: 64,
       decoration: BoxDecoration(
@@ -140,16 +170,54 @@ class _MainTabPageState extends State<MainTabPage> {
                   label: 'Profile',
                   isDark: isDark,
                 ),
-                _buildLiquidGlassNavItem(
-                  index: 4,
-                  icon: CupertinoIcons.settings,
-                  activeIcon: CupertinoIcons.settings_solid,
-                  label: 'Settings',
-                  isDark: isDark,
-                ),
+                // In guest mode, show Sign Out instead of Settings
+                if (isGuest)
+                  _buildLogoutNavItem(isDark)
+                else
+                  _buildLiquidGlassNavItem(
+                    index: 4,
+                    icon: CupertinoIcons.settings,
+                    activeIcon: CupertinoIcons.settings_solid,
+                    label: 'Settings',
+                    isDark: isDark,
+                  ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogoutNavItem(bool isDark) {
+    final color = isDark
+        ? CupertinoColors.white.withValues(alpha: 0.5)
+        : CupertinoColors.black.withValues(alpha: 0.4);
+
+    return GestureDetector(
+      onTap: () {
+        HapticUtils.selectionClick();
+        _handleLogout(context);
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: 56,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(CupertinoIcons.square_arrow_right, color: color, size: 24),
+            const SizedBox(height: 2),
+            Text(
+              'Sign Out',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: color,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -163,7 +231,7 @@ class _MainTabPageState extends State<MainTabPage> {
     required bool isDark,
   }) {
     final isSelected = _currentIndex == index;
-    
+
     // Colors matching iOS 26 liquid glass style
     final selectedColor = isDark
         ? CupertinoColors.white
