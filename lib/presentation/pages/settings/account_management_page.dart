@@ -229,19 +229,28 @@ class AccountManagementPage extends StatelessWidget {
   void _confirmRemoveAccount(BuildContext context, String accountId) {
     showCupertinoDialog(
       context: context,
-      builder: (context) => CupertinoAlertDialog(
+      builder: (dialogContext) => CupertinoAlertDialog(
         title: const Text('Remove Account'),
         content: const Text('Are you sure you want to remove this account?'),
         actions: [
           CupertinoDialogAction(
             child: const Text('Cancel'),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
-            onPressed: () {
-              Navigator.of(context).pop();
-              context.read<AuthProvider>().removeAccount(accountId);
+            onPressed: () async {
+              Navigator.of(dialogContext).pop();
+              final auth = context.read<AuthProvider>();
+              final noAccountsLeft = await auth.removeAccount(accountId);
+              
+              if (noAccountsLeft && context.mounted) {
+                // No accounts left, go to login page
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  AppRoutes.login,
+                  (route) => false,
+                );
+              }
             },
             child: const Text('Remove'),
           ),
