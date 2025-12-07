@@ -66,10 +66,9 @@ class SettingsPage extends StatelessWidget {
                 showChevron: true,
                 onTap: () {
                   auth.logout(); // Clear guest state
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    AppRoutes.login,
-                    (route) => false,
-                  );
+                  Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
                 },
               ),
             ],
@@ -101,7 +100,8 @@ class SettingsPage extends StatelessWidget {
               iconColor: AppColors.primaryGreen,
               title: 'Server Configuration',
               showChevron: true,
-              onTap: () => Navigator.of(context).pushNamed(AppRoutes.hostSettings),
+              onTap: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.hostSettings),
             ),
           ],
         );
