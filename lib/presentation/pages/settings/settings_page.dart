@@ -21,6 +21,7 @@ class SettingsPage extends StatelessWidget {
           ? AppColors.darkGroupedBackground
           : AppColors.lightGroupedBackground,
       navigationBar: CupertinoNavigationBar(
+        heroTag: 'settings_nav',
         middle: const Text('Settings'),
         backgroundColor: isDark
             ? CupertinoColors.black.withValues(alpha: 0.5)
