@@ -12,6 +12,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/extensions/extensions.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../widgets/widgets.dart';
 
@@ -496,11 +497,38 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   Widget _buildActionBar(int index, Post post, bool isDark, bool isOled) {
+    final authProvider = context.watch<AuthProvider>();
+    final isGuest = authProvider.isGuest;
     final isFav = _isFavorited[index] ?? post.isFavorited;
     final userVote = _userVote[index];
     final isVoting = _isVoting[index] == true;
     final isTogglingFav = _isTogglingFavorite[index] == true;
     final leftHandedMode = context.watch<SettingsProvider>().leftHandedMode;
+
+    // Comment button is always available
+    final commentButton = _buildGlassActionButton(
+      icon: CupertinoIcons.chat_bubble,
+      activeIcon: CupertinoIcons.chat_bubble_fill,
+      label: '${post.commentCount}',
+      isActive: false,
+      isLoading: false,
+      color: CupertinoColors.systemBlue,
+      isDark: isDark,
+      onTap: () => _showComments(index),
+    );
+
+    // Guest users only see comment button
+    if (isGuest) {
+      return _buildLiquidGlassContainer(
+        isDark: isDark,
+        isOled: isOled,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [commentButton],
+        ),
+      );
+    }
 
     final upvoteButton = _buildGlassActionButton(
       icon: CupertinoIcons.arrow_up_circle,
@@ -533,17 +561,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
       color: CupertinoColors.systemPink,
       isDark: isDark,
       onTap: () => _toggleFavorite(index),
-    );
-
-    final commentButton = _buildGlassActionButton(
-      icon: CupertinoIcons.chat_bubble,
-      activeIcon: CupertinoIcons.chat_bubble_fill,
-      label: '${post.commentCount}',
-      isActive: false,
-      isLoading: false,
-      color: CupertinoColors.systemBlue,
-      isDark: isDark,
-      onTap: () => _showComments(index),
     );
 
     // Left-handed mode: Favorite, Upvote, Downvote, Comment
