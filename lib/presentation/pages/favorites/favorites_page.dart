@@ -125,14 +125,11 @@ class _FavoritesPageState extends State<FavoritesPage> {
     final isDark = brightness == Brightness.dark;
 
     return CupertinoPageScaffold(
-      backgroundColor:
-          isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Favorites'),
-      ),
-      child: SafeArea(
-        child: _buildContent(isDark),
-      ),
+      backgroundColor: isDark
+          ? AppColors.darkBackground
+          : AppColors.lightBackground,
+      navigationBar: const CupertinoNavigationBar(middle: Text('Favorites')),
+      child: SafeArea(child: _buildContent(isDark)),
     );
   }
 
@@ -179,10 +176,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
             const SizedBox(height: 16),
             const Text(
               'No favorites yet',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             const Text(
