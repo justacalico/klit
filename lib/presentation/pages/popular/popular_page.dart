@@ -40,7 +40,7 @@ class _PopularPageState extends State<PopularPage> {
       refresh: refresh,
       safeMode: settingsProvider.safeMode,
     );
-    
+
     if (refresh) {
       _refreshController.refreshCompleted();
     }
@@ -51,7 +51,7 @@ class _PopularPageState extends State<PopularPage> {
     final settingsProvider = context.read<SettingsProvider>();
     final posts = postsProvider.popularPosts;
     final index = posts.indexWhere((p) => p.id == post.id);
-    
+
     Navigator.of(context).pushNamed(
       AppRoutes.postDetail,
       arguments: PostDetailArguments(
@@ -78,6 +78,7 @@ class _PopularPageState extends State<PopularPage> {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
+        heroTag: 'popular_nav',
         middle: const Text('Popular'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
