@@ -133,10 +133,36 @@ class _LoginPageState extends State<LoginPage> {
               _buildForm(),
               const SizedBox(height: 32),
               _buildLoginButton(),
+              const SizedBox(height: 16),
+              _buildGuestButton(),
               const SizedBox(height: 24),
               _buildHelpText(),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  void _continueAsGuest() {
+    final authProvider = context.read<AuthProvider>();
+    authProvider.continueAsGuest();
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.main,
+      (route) => false,
+    );
+  }
+
+  Widget _buildGuestButton() {
+    return CupertinoButton(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      onPressed: _continueAsGuest,
+      child: Text(
+        'Continue as Guest',
+        style: TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w500,
+          color: CupertinoColors.secondaryLabel.resolveFrom(context),
         ),
       ),
     );
