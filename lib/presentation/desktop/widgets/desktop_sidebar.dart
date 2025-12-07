@@ -32,10 +32,9 @@ class DesktopSidebar extends StatelessWidget {
               Navigator.of(dialogContext).pop();
               final authProvider = context.read<AuthProvider>();
               authProvider.logout();
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                AppRoutes.login,
-                (route) => false,
-              );
+              Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
             },
             child: const Text('Sign Out'),
           ),
