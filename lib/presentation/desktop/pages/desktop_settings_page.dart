@@ -8,10 +8,7 @@ import '../../providers/providers.dart';
 class DesktopSettingsPage extends StatelessWidget {
   final Function(String) onNavigate;
 
-  const DesktopSettingsPage({
-    super.key,
-    required this.onNavigate,
-  });
+  const DesktopSettingsPage({super.key, required this.onNavigate});
 
   @override
   Widget build(BuildContext context) {
@@ -34,18 +31,14 @@ class DesktopSettingsPage extends StatelessWidget {
                       context,
                       title: 'Account',
                       icon: CupertinoIcons.person_circle,
-                      children: [
-                        _buildAccountCard(context, isDark),
-                      ],
+                      children: [_buildAccountCard(context, isDark)],
                     ),
                     const SizedBox(height: 24),
                     _buildSection(
                       context,
                       title: 'Appearance',
                       icon: CupertinoIcons.paintbrush,
-                      children: [
-                        _buildThemeSelector(context, isDark),
-                      ],
+                      children: [_buildThemeSelector(context, isDark)],
                     ),
                     const SizedBox(height: 24),
                     _buildSection(
@@ -63,18 +56,14 @@ class DesktopSettingsPage extends StatelessWidget {
                       context,
                       title: 'Connection',
                       icon: CupertinoIcons.globe,
-                      children: [
-                        _buildHostSetting(context, isDark),
-                      ],
+                      children: [_buildHostSetting(context, isDark)],
                     ),
                     const SizedBox(height: 24),
                     _buildSection(
                       context,
                       title: 'About',
                       icon: CupertinoIcons.info_circle,
-                      children: [
-                        _buildAboutCard(context, isDark),
-                      ],
+                      children: [_buildAboutCard(context, isDark)],
                     ),
                   ],
                 ),
@@ -107,10 +96,7 @@ class DesktopSettingsPage extends StatelessWidget {
           SizedBox(width: 8),
           Text(
             'Settings',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -132,10 +118,7 @@ class DesktopSettingsPage extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -145,7 +128,11 @@ class DesktopSettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCard(BuildContext context, bool isDark, {required Widget child}) {
+  Widget _buildCard(
+    BuildContext context,
+    bool isDark, {
+    required Widget child,
+  }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -206,15 +193,19 @@ class DesktopSettingsPage extends StatelessWidget {
                         'Sign in to access all features',
                         style: TextStyle(
                           fontSize: 13,
-                          color: CupertinoColors.secondaryLabel
-                              .resolveFrom(context),
+                          color: CupertinoColors.secondaryLabel.resolveFrom(
+                            context,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
                 CupertinoButton(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   onPressed: () {
                     authProvider.logout();
                     Navigator.of(context).pushNamedAndRemoveUntil(
@@ -243,9 +234,7 @@ class DesktopSettingsPage extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    account != null
-                        ? account.username[0].toUpperCase()
-                        : '?',
+                    account != null ? account.username[0].toUpperCase() : '?',
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -271,15 +260,19 @@ class DesktopSettingsPage extends StatelessWidget {
                         account.host,
                         style: TextStyle(
                           fontSize: 13,
-                          color: CupertinoColors.secondaryLabel
-                              .resolveFrom(context),
+                          color: CupertinoColors.secondaryLabel.resolveFrom(
+                            context,
+                          ),
                         ),
                       ),
                   ],
                 ),
               ),
               CupertinoButton(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 onPressed: () => onNavigate(AppRoutes.accountManagement),
                 child: const Text('Manage'),
               ),
@@ -301,10 +294,7 @@ class DesktopSettingsPage extends StatelessWidget {
               const Icon(CupertinoIcons.moon_stars, size: 20),
               const SizedBox(width: 12),
               const Expanded(
-                child: Text(
-                  'Theme',
-                  style: TextStyle(fontSize: 15),
-                ),
+                child: Text('Theme', style: TextStyle(fontSize: 15)),
               ),
               CupertinoSlidingSegmentedControl<int>(
                 groupValue: settings.themeMode,
@@ -398,10 +388,7 @@ class DesktopSettingsPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Safe Mode',
-                      style: TextStyle(fontSize: 15),
-                    ),
+                    Text('Safe Mode', style: TextStyle(fontSize: 15)),
                     Text(
                       'Only show safe-rated content',
                       style: TextStyle(
@@ -437,10 +424,7 @@ class DesktopSettingsPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'API Host',
-                      style: TextStyle(fontSize: 15),
-                    ),
+                    const Text('API Host', style: TextStyle(fontSize: 15)),
                     Text(
                       settings.host,
                       style: const TextStyle(
@@ -452,7 +436,10 @@ class DesktopSettingsPage extends StatelessWidget {
                 ),
               ),
               CupertinoButton(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 onPressed: () => onNavigate(AppRoutes.hostSettings),
                 child: const Text('Configure'),
               ),
