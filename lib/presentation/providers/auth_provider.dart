@@ -5,7 +5,7 @@ import '../../data/services/services.dart';
 /// Provider for authentication state
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService;
-  
+
   Account? _currentAccount;
   List<Account> _accounts = [];
   bool _isLoading = false;
@@ -13,8 +13,7 @@ class AuthProvider extends ChangeNotifier {
   bool _isInitialized = false;
   bool _isGuest = false;
 
-  AuthProvider({required AuthService authService})
-      : _authService = authService;
+  AuthProvider({required AuthService authService}) : _authService = authService;
 
   // Getters
   Account? get currentAccount => _currentAccount;
@@ -28,7 +27,7 @@ class AuthProvider extends ChangeNotifier {
   /// Initialize authentication state
   Future<void> initialize() async {
     if (_isInitialized) return;
-    
+
     _isLoading = true;
     // Don't notify during initial load to avoid build-time errors
 
@@ -107,7 +106,7 @@ class AuthProvider extends ChangeNotifier {
 
     await _authService.removeAccount(accountId);
     _accounts = await _authService.getAccounts();
-    
+
     if (_currentAccount?.id == accountId) {
       _currentAccount = _accounts.isNotEmpty ? _accounts.first : null;
     }
