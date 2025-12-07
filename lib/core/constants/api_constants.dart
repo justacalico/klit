@@ -25,7 +25,8 @@ class ApiConstants {
   static const double requestsPerSecond = 2.0;
 
   /// User agent header (required by e926 API TOS)
-  static const String userAgent = 'Klit/1.0.0 (Flutter App)';
+  /// Must include app name, version, and a way to contact the developer
+  static const String userAgent = 'Klit/2.0.0 (by OpenLyst on e926; https://openlyst.onrender.com)';
 
   /// API headers
   static Map<String, String> get defaultHeaders => {
