@@ -333,6 +333,185 @@ class SettingsPage extends StatelessWidget {
     }
   }
 
+  void _showTermsOfService(BuildContext context, bool isDark) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => _buildPolicyDialog(
+        context,
+        isDark: isDark,
+        title: 'Terms of Service',
+        content: '''
+Klit - Terms of Service
+
+Last Updated: January 2025
+
+1. LICENSE
+Klit is free and open source software licensed under the GNU General Public License (GPL). You are free to use, modify, and distribute this software in accordance with the GPL license terms.
+
+2. NO WARRANTY
+This software is provided "as is" without warranty of any kind, express or implied. The developers make no guarantees regarding the reliability, accuracy, or fitness for any particular purpose.
+
+3. USER RESPONSIBILITY
+You are solely responsible for:
+• The content you access through this application
+• Compliance with applicable laws in your jurisdiction
+• Any actions taken while using this software
+
+4. THIRD-PARTY CONTENT
+Klit provides access to third-party content and services. We do not control, endorse, or assume responsibility for any third-party content accessed through this application.
+
+5. MODIFICATIONS
+We reserve the right to modify these terms at any time. Continued use of the application constitutes acceptance of any changes.
+
+6. OPEN SOURCE
+The source code is publicly available. You can review, contribute to, or fork this project in accordance with the GPL license.
+''',
+      ),
+    );
+  }
+
+  void _showPrivacyPolicy(BuildContext context, bool isDark) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => _buildPolicyDialog(
+        context,
+        isDark: isDark,
+        title: 'Privacy Policy',
+        content: '''
+Klit - Privacy Policy
+
+Last Updated: January 2025
+
+1. DATA COLLECTION
+We do not collect any personal data. Klit is designed with privacy as a core principle.
+
+2. LOCAL STORAGE
+All your data is stored locally on your device:
+• Favorites and bookmarks
+• Viewing history
+• App preferences and settings
+
+No data is transmitted to external servers owned by us.
+
+3. NO TRACKING
+We do not:
+• Track your usage or behavior
+• Collect analytics or telemetry
+• Use cookies or tracking technologies
+• Share any information with third parties
+
+4. NO ACCOUNTS
+Klit does not require user accounts or registration. There is no sign-up process and no personal information is ever requested.
+
+5. THIRD-PARTY SERVICES
+When you access content through Klit, you may interact with third-party websites or services. Those services have their own privacy policies which we do not control.
+
+6. OPEN SOURCE
+Klit is open source under the GPL license. You can verify our privacy practices by reviewing the source code yourself.
+
+7. CONTACT
+For any privacy concerns or questions about this policy, please visit our website or open an issue on our public repository.
+
+Your Privacy is Protected - Everything Stays on Your Device.
+''',
+      ),
+    );
+  }
+
+  Widget _buildPolicyDialog(
+    BuildContext context, {
+    required bool isDark,
+    required String title,
+    required String content,
+  }) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.85,
+      decoration: BoxDecoration(
+        color: isDark
+            ? CupertinoColors.black.withValues(alpha: 0.9)
+            : CupertinoColors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+          child: Column(
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.only(top: 8),
+                width: 36,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? CupertinoColors.white.withValues(alpha: 0.3)
+                      : CupertinoColors.black.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(2.5),
+                ),
+              ),
+              // Header
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const SizedBox(width: 60),
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? CupertinoColors.white
+                            : CupertinoColors.black,
+                      ),
+                    ),
+                    CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      child: Text(
+                        'Done',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryBlue,
+                        ),
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+              ),
+              // Divider
+              Container(
+                height: 0.5,
+                color: isDark
+                    ? CupertinoColors.white.withValues(alpha: 0.1)
+                    : CupertinoColors.black.withValues(alpha: 0.1),
+              ),
+              // Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Text(
+                    content,
+                    style: TextStyle(
+                      fontSize: 15,
+                      height: 1.5,
+                      color: isDark
+                          ? CupertinoColors.white.withValues(alpha: 0.85)
+                          : CupertinoColors.black.withValues(alpha: 0.85),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildLiquidGlassSection(
     BuildContext context, {
     required bool isDark,
