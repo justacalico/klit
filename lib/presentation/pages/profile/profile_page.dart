@@ -76,6 +76,11 @@ class _ProfilePageState extends State<ProfilePage> {
             MediaQuery.platformBrightnessOf(context) == Brightness.dark);
     final isOled = settingsProvider.themeMode == 3;
 
+    // Show guest profile if in guest mode
+    if (authProvider.isGuest) {
+      return _buildGuestProfile(context, isDark, isOled);
+    }
+
     if (!authProvider.isLoggedIn) {
       return _buildNotLoggedIn(context, isDark, isOled);
     }
@@ -191,6 +196,97 @@ class _ProfilePageState extends State<ProfilePage> {
                       },
                       child: const Text(
                         'Log In',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: CupertinoColors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGuestProfile(BuildContext context, bool isDark, bool isOled) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildLiquidGlassContainer(
+              isDark: isDark,
+              isOled: isOled,
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: isDark
+                              ? [
+                                  CupertinoColors.systemGrey.withValues(alpha: 0.3),
+                                  CupertinoColors.systemGrey.withValues(alpha: 0.1),
+                                ]
+                              : [
+                                  CupertinoColors.systemGrey.withValues(alpha: 0.2),
+                                  CupertinoColors.systemGrey.withValues(alpha: 0.1),
+                                ],
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        CupertinoIcons.person_circle,
+                        size: 64,
+                        color: isDark
+                            ? CupertinoColors.white.withValues(alpha: 0.8)
+                            : CupertinoColors.systemGrey,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Guest Mode',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: isDark
+                            ? CupertinoColors.white
+                            : CupertinoColors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'You\'re browsing as a guest.\nSign in to save favorites, vote, and more.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: isDark
+                            ? CupertinoColors.white.withValues(alpha: 0.6)
+                            : CupertinoColors.systemGrey,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    CupertinoButton(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 32, vertical: 14),
+                      color: CupertinoColors.systemBlue,
+                      borderRadius: BorderRadius.circular(14),
+                      onPressed: () {
+                        context.read<AuthProvider>().logout();
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          '/login',
+                          (route) => false,
+                        );
+                      },
+                      child: const Text(
+                        'Sign In',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           color: CupertinoColors.white,
