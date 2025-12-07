@@ -107,7 +107,8 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Remove an account
-  Future<void> removeAccount(String accountId) async {
+  /// Returns true if there are no more accounts (should navigate to login)
+  Future<bool> removeAccount(String accountId) async {
     _isLoading = true;
     notifyListeners();
 
@@ -120,9 +121,12 @@ class AuthProvider extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+    
+    // Return true if no accounts left
+    return _accounts.isEmpty && _currentAccount == null;
   }
 
-  /// Logout
+  /// Logout current account only (keeps other accounts)
   Future<void> logout() async {
     _isLoading = true;
     notifyListeners();
@@ -135,6 +139,9 @@ class AuthProvider extends ChangeNotifier {
     _isLoading = false;
     notifyListeners();
   }
+
+  /// Check if there are any accounts
+  bool get hasAccounts => _accounts.isNotEmpty;
 
   /// Continue as guest (no account required)
   /// Guest mode uses e621.net with forced safe mode
