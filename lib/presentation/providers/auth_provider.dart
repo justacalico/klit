@@ -11,6 +11,7 @@ class AuthProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
   bool _isInitialized = false;
+  bool _isGuest = false;
 
   AuthProvider({required AuthService authService})
       : _authService = authService;
@@ -20,7 +21,8 @@ class AuthProvider extends ChangeNotifier {
   List<Account> get accounts => _accounts;
   bool get isLoading => _isLoading;
   String? get error => _error;
-  bool get isLoggedIn => _currentAccount != null;
+  bool get isLoggedIn => _currentAccount != null || _isGuest;
+  bool get isGuest => _isGuest;
   bool get isInitialized => _isInitialized;
 
   /// Initialize authentication state
@@ -122,8 +124,16 @@ class AuthProvider extends ChangeNotifier {
     await _authService.logout();
     _accounts = await _authService.getAccounts();
     _currentAccount = _accounts.isNotEmpty ? _accounts.first : null;
+    _isGuest = false;
 
     _isLoading = false;
+    notifyListeners();
+  }
+
+  /// Continue as guest (no account required)
+  void continueAsGuest() {
+    _isGuest = true;
+    _isInitialized = true;
     notifyListeners();
   }
 
