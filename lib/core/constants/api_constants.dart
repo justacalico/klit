@@ -26,12 +26,14 @@ class ApiConstants {
 
   /// User agent header (required by e926 API TOS)
   /// Must include app name, version, and a way to contact the developer
-  static const String userAgent = 'Klit/2.0.0 (by OpenLyst on e926; https://openlyst.onrender.com)';
+  /// Format: AppName/Version (contact info)
+  static const String userAgent = 'Klit/2.0.0 (by Openlyst on GitLab; gitlab.com/Openlyst/klit)';
 
   /// API headers
   static Map<String, String> get defaultHeaders => {
         'User-Agent': userAgent,
         'Accept': 'application/json',
+        'Content-Type': 'application/json',
       };
 
   /// Popular time ranges
