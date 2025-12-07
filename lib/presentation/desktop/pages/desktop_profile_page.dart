@@ -150,10 +150,9 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
             CupertinoButton.filled(
               onPressed: () {
                 authProvider.logout();
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  AppRoutes.login,
-                  (route) => false,
-                );
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
               },
               child: const Text('Sign In'),
             ),
@@ -304,7 +303,9 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: _getLevelColor(user.level).withValues(alpha: 0.2),
+                        color: _getLevelColor(
+                          user.level,
+                        ).withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -571,7 +572,10 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
               final authProvider = context.read<AuthProvider>();
               await authProvider.logout();
               if (mounted) {
-                navigator.pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+                navigator.pushNamedAndRemoveUntil(
+                  AppRoutes.login,
+                  (route) => false,
+                );
               }
             },
             child: const Text('Sign Out'),
