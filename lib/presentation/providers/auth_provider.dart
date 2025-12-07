@@ -121,7 +121,7 @@ class AuthProvider extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
-    
+
     // Return true if no accounts left
     return _accounts.isEmpty && _currentAccount == null;
   }
