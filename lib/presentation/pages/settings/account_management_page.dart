@@ -47,10 +47,7 @@ class AccountManagementPage extends StatelessWidget {
                         : CupertinoColors.white,
                     borderRadius: BorderRadius.circular(12),
                     border: isActive
-                        ? Border.all(
-                            color: AppColors.primaryBlue,
-                            width: 2,
-                          )
+                        ? Border.all(color: AppColors.primaryBlue, width: 2)
                         : null,
                   ),
                   child: CupertinoListTile(
@@ -77,14 +74,18 @@ class AccountManagementPage extends StatelessWidget {
                     title: Text(
                       account.username,
                       style: TextStyle(
-                        fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isActive
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                     ),
                     subtitle: Text(
                       Uri.parse(account.host).host,
                       style: TextStyle(
                         fontSize: 12,
-                        color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                        color: CupertinoColors.secondaryLabel.resolveFrom(
+                          context,
+                        ),
                       ),
                     ),
                     trailing: Row(
@@ -97,7 +98,9 @@ class AccountManagementPage extends StatelessWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryBlue.withValues(alpha: 0.2),
+                              color: AppColors.primaryBlue.withValues(
+                                alpha: 0.2,
+                              ),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Text(
@@ -126,7 +129,9 @@ class AccountManagementPage extends StatelessWidget {
                     onTap: isActive
                         ? null
                         : () async {
-                            final success = await auth.switchAccount(account.id);
+                            final success = await auth.switchAccount(
+                              account.id,
+                            );
                             if (success && context.mounted) {
                               // Navigate to main and clear stack to refresh the app
                               Navigator.of(context).pushNamedAndRemoveUntil(
@@ -158,10 +163,7 @@ class AccountManagementPage extends StatelessWidget {
           const SizedBox(height: 16),
           const Text(
             'No Accounts',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
           Text(
@@ -188,7 +190,11 @@ class AccountManagementPage extends StatelessWidget {
     );
   }
 
-  void _showAccountOptions(BuildContext context, String accountId, bool isActive) {
+  void _showAccountOptions(
+    BuildContext context,
+    String accountId,
+    bool isActive,
+  ) {
     showCupertinoModalPopup(
       context: context,
       builder: (context) => CupertinoActionSheet(
@@ -201,10 +207,9 @@ class AccountManagementPage extends StatelessWidget {
                 final success = await auth.switchAccount(accountId);
                 if (success && context.mounted) {
                   // Navigate to main and clear stack to refresh the app
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    AppRoutes.main,
-                    (route) => false,
-                  );
+                  Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil(AppRoutes.main, (route) => false);
                 }
               },
               child: const Text('Switch to this account'),
@@ -243,13 +248,12 @@ class AccountManagementPage extends StatelessWidget {
               Navigator.of(dialogContext).pop();
               final auth = context.read<AuthProvider>();
               final noAccountsLeft = await auth.removeAccount(accountId);
-              
+
               if (noAccountsLeft && context.mounted) {
                 // No accounts left, go to login page
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  AppRoutes.login,
-                  (route) => false,
-                );
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
               }
             },
             child: const Text('Remove'),
@@ -352,10 +356,7 @@ class _AddAccountSheetState extends State<_AddAccountSheet> {
                   const Spacer(),
                   const Text(
                     'Add Account',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
                   ),
                   const Spacer(),
                   CupertinoButton(
@@ -408,7 +409,8 @@ class _AddAccountSheetState extends State<_AddAccountSheet> {
                 children: [
                   CupertinoSwitch(
                     value: _useCustomHost,
-                    onChanged: (value) => setState(() => _useCustomHost = value),
+                    onChanged: (value) =>
+                        setState(() => _useCustomHost = value),
                   ),
                   const SizedBox(width: 12),
                   const Text('Use custom host'),
