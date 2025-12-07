@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
       refresh: refresh,
       safeMode: settingsProvider.safeMode,
     );
-    
+
     if (refresh) {
       _refreshController.refreshCompleted();
     }
@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
     final settingsProvider = context.read<SettingsProvider>();
     final posts = postsProvider.latestPosts;
     final index = posts.indexWhere((p) => p.id == post.id);
-    
+
     Navigator.of(context).pushNamed(
       AppRoutes.postDetail,
       arguments: PostDetailArguments(
@@ -78,6 +78,7 @@ class _HomePageState extends State<HomePage> {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
+        heroTag: 'home_nav',
         middle: const Text('Home'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
