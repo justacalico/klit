@@ -39,6 +39,15 @@ class _DesktopFavoritesPageState extends State<DesktopFavoritesPage> {
     final authProvider = context.read<AuthProvider>();
     final account = authProvider.currentAccount;
 
+    // Guest users can't have favorites
+    if (authProvider.isGuest) {
+      setState(() {
+        _isLoading = false;
+        _error = 'Sign in to save and view your favorites';
+      });
+      return;
+    }
+
     if (account == null) {
       setState(() {
         _isLoading = false;
