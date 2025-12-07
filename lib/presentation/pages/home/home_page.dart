@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        heroTag: 'home_nav',
+        transitionBetweenRoutes: false,
         middle: const Text('Home'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

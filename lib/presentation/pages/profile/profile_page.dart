@@ -97,7 +97,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return CustomScrollView(
       slivers: [
         CupertinoSliverNavigationBar(
-          heroTag: 'profile_nav',
+          transitionBetweenRoutes: false,
           largeTitle: const Text('Profile'),
           backgroundColor: isOled
               ? CupertinoColors.black.withValues(alpha: 0.8)

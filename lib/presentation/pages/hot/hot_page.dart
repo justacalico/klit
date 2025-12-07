@@ -76,7 +76,7 @@ class _HotPageState extends State<HotPage> {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        heroTag: 'hot_nav',
+        transitionBetweenRoutes: false,
         middle: const Text('Hot'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

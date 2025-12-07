@@ -78,7 +78,7 @@ class _PopularPageState extends State<PopularPage> {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        heroTag: 'popular_nav',
+        transitionBetweenRoutes: false,
         middle: const Text('Popular'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
