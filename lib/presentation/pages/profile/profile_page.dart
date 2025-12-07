@@ -36,7 +36,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
     try {
       final apiService = ApiService();
-      final result = await apiService.getUserProfile(authProvider.currentAccount!.username);
+      final result = await apiService.getUserProfile(
+        authProvider.currentAccount!.username,
+      );
       result.when(
         success: (user) {
           setState(() {
@@ -62,15 +64,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      child: _buildContent(context),
-    );
+    return CupertinoPageScaffold(child: _buildContent(context));
   }
 
   Widget _buildContent(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     final settingsProvider = context.watch<SettingsProvider>();
-    final isDark = settingsProvider.themeMode == 2 ||
+    final isDark =
+        settingsProvider.themeMode == 2 ||
         settingsProvider.themeMode == 3 ||
         (settingsProvider.themeMode == 0 &&
             MediaQuery.platformBrightnessOf(context) == Brightness.dark);
@@ -100,12 +101,10 @@ class _ProfilePageState extends State<ProfilePage> {
           backgroundColor: isOled
               ? CupertinoColors.black.withValues(alpha: 0.8)
               : isDark
-                  ? CupertinoColors.darkBackgroundGray.withValues(alpha: 0.8)
-                  : CupertinoColors.systemBackground.withValues(alpha: 0.8),
+              ? CupertinoColors.darkBackgroundGray.withValues(alpha: 0.8)
+              : CupertinoColors.systemBackground.withValues(alpha: 0.8),
         ),
-        CupertinoSliverRefreshControl(
-          onRefresh: _loadUserStats,
-        ),
+        CupertinoSliverRefreshControl(onRefresh: _loadUserStats),
         SliverPadding(
           padding: const EdgeInsets.all(16),
           sliver: SliverList(
@@ -145,12 +144,20 @@ class _ProfilePageState extends State<ProfilePage> {
                         gradient: LinearGradient(
                           colors: isDark
                               ? [
-                                  CupertinoColors.systemBlue.withValues(alpha: 0.3),
-                                  CupertinoColors.systemBlue.withValues(alpha: 0.1),
+                                  CupertinoColors.systemBlue.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                  CupertinoColors.systemBlue.withValues(
+                                    alpha: 0.1,
+                                  ),
                                 ]
                               : [
-                                  CupertinoColors.systemBlue.withValues(alpha: 0.2),
-                                  CupertinoColors.systemBlue.withValues(alpha: 0.1),
+                                  CupertinoColors.systemBlue.withValues(
+                                    alpha: 0.2,
+                                  ),
+                                  CupertinoColors.systemBlue.withValues(
+                                    alpha: 0.1,
+                                  ),
                                 ],
                         ),
                         shape: BoxShape.circle,
@@ -188,7 +195,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     const SizedBox(height: 24),
                     CupertinoButton(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 32, vertical: 14),
+                        horizontal: 32,
+                        vertical: 14,
+                      ),
                       color: CupertinoColors.systemBlue,
                       borderRadius: BorderRadius.circular(14),
                       onPressed: () {
@@ -232,12 +241,20 @@ class _ProfilePageState extends State<ProfilePage> {
                         gradient: LinearGradient(
                           colors: isDark
                               ? [
-                                  CupertinoColors.systemGrey.withValues(alpha: 0.3),
-                                  CupertinoColors.systemGrey.withValues(alpha: 0.1),
+                                  CupertinoColors.systemGrey.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                  CupertinoColors.systemGrey.withValues(
+                                    alpha: 0.1,
+                                  ),
                                 ]
                               : [
-                                  CupertinoColors.systemGrey.withValues(alpha: 0.2),
-                                  CupertinoColors.systemGrey.withValues(alpha: 0.1),
+                                  CupertinoColors.systemGrey.withValues(
+                                    alpha: 0.2,
+                                  ),
+                                  CupertinoColors.systemGrey.withValues(
+                                    alpha: 0.1,
+                                  ),
                                 ],
                         ),
                         shape: BoxShape.circle,
@@ -275,15 +292,16 @@ class _ProfilePageState extends State<ProfilePage> {
                     const SizedBox(height: 24),
                     CupertinoButton(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 32, vertical: 14),
+                        horizontal: 32,
+                        vertical: 14,
+                      ),
                       color: CupertinoColors.systemBlue,
                       borderRadius: BorderRadius.circular(14),
                       onPressed: () {
                         context.read<AuthProvider>().logout();
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          '/login',
-                          (route) => false,
-                        );
+                        Navigator.of(
+                          context,
+                        ).pushNamedAndRemoveUntil('/login', (route) => false);
                       },
                       child: const Text(
                         'Sign In',
@@ -338,8 +356,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color:
-                        isDark ? CupertinoColors.white : CupertinoColors.black,
+                    color: isDark
+                        ? CupertinoColors.white
+                        : CupertinoColors.black,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -354,8 +373,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 const SizedBox(height: 24),
                 CupertinoButton(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
                   color: CupertinoColors.systemBlue,
                   borderRadius: BorderRadius.circular(12),
                   onPressed: _loadUserStats,
@@ -392,22 +413,22 @@ class _ProfilePageState extends State<ProfilePage> {
                       Colors.white.withValues(alpha: 0.02),
                     ]
                   : isDark
-                      ? [
-                          Colors.white.withValues(alpha: 0.12),
-                          Colors.white.withValues(alpha: 0.06),
-                        ]
-                      : [
-                          Colors.white.withValues(alpha: 0.8),
-                          Colors.white.withValues(alpha: 0.6),
-                        ],
+                  ? [
+                      Colors.white.withValues(alpha: 0.12),
+                      Colors.white.withValues(alpha: 0.06),
+                    ]
+                  : [
+                      Colors.white.withValues(alpha: 0.8),
+                      Colors.white.withValues(alpha: 0.6),
+                    ],
             ),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: isOled
                   ? Colors.white.withValues(alpha: 0.08)
                   : isDark
-                      ? Colors.white.withValues(alpha: 0.15)
-                      : Colors.white.withValues(alpha: 0.5),
+                  ? Colors.white.withValues(alpha: 0.15)
+                  : Colors.white.withValues(alpha: 0.5),
               width: 0.5,
             ),
             boxShadow: [
@@ -425,7 +446,11 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildProfileHeader(
-      BuildContext context, AuthProvider authProvider, bool isDark, bool isOled) {
+    BuildContext context,
+    AuthProvider authProvider,
+    bool isDark,
+    bool isOled,
+  ) {
     // e926 doesn't provide avatar URLs directly, so we always show default
     final username = authProvider.currentAccount?.username ?? 'Unknown';
 
@@ -484,8 +509,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
@@ -495,7 +522,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: CupertinoColors.systemGreen.withValues(alpha: 0.3),
+                        color: CupertinoColors.systemGreen.withValues(
+                          alpha: 0.3,
+                        ),
                         width: 0.5,
                       ),
                     ),
@@ -510,8 +539,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color:
-                                    CupertinoColors.systemGreen.withValues(alpha: 0.5),
+                                color: CupertinoColors.systemGreen.withValues(
+                                  alpha: 0.5,
+                                ),
                                 blurRadius: 6,
                               ),
                             ],
@@ -588,8 +618,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color:
-                        isDark ? CupertinoColors.white : CupertinoColors.black,
+                    color: isDark
+                        ? CupertinoColors.white
+                        : CupertinoColors.black,
                   ),
                 ),
               ],
@@ -667,19 +698,10 @@ class _ProfilePageState extends State<ProfilePage> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isOled
-              ? [
-                  color.withValues(alpha: 0.15),
-                  color.withValues(alpha: 0.05),
-                ]
+              ? [color.withValues(alpha: 0.15), color.withValues(alpha: 0.05)]
               : isDark
-                  ? [
-                      color.withValues(alpha: 0.2),
-                      color.withValues(alpha: 0.1),
-                    ]
-                  : [
-                      color.withValues(alpha: 0.15),
-                      color.withValues(alpha: 0.05),
-                    ],
+              ? [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)]
+              : [color.withValues(alpha: 0.15), color.withValues(alpha: 0.05)],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
@@ -695,17 +717,10 @@ class _ProfilePageState extends State<ProfilePage> {
               color: color.withValues(alpha: 0.2),
               shape: BoxShape.circle,
               boxShadow: [
-                BoxShadow(
-                  color: color.withValues(alpha: 0.3),
-                  blurRadius: 12,
-                ),
+                BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 12),
               ],
             ),
-            child: Icon(
-              icon,
-              size: 22,
-              color: color,
-            ),
+            child: Icon(icon, size: 22, color: color),
           ),
           const SizedBox(height: 12),
           Text(
@@ -732,7 +747,11 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildAccountInfoSection(
-      BuildContext context, AuthProvider authProvider, bool isDark, bool isOled) {
+    BuildContext context,
+    AuthProvider authProvider,
+    bool isDark,
+    bool isOled,
+  ) {
     return _buildLiquidGlassContainer(
       isDark: isDark,
       isOled: isOled,
@@ -768,8 +787,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color:
-                        isDark ? CupertinoColors.white : CupertinoColors.black,
+                    color: isDark
+                        ? CupertinoColors.white
+                        : CupertinoColors.black,
                   ),
                 ),
               ],
@@ -861,7 +881,11 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildActionsSection(
-      BuildContext context, AuthProvider authProvider, bool isDark, bool isOled) {
+    BuildContext context,
+    AuthProvider authProvider,
+    bool isDark,
+    bool isOled,
+  ) {
     return _buildLiquidGlassContainer(
       isDark: isDark,
       isOled: isOled,
@@ -934,11 +958,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(
-                icon,
-                size: 20,
-                color: color,
-              ),
+              child: Icon(icon, size: 20, color: color),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -950,8 +970,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   color: isDestructive
                       ? CupertinoColors.systemRed
                       : isDark
-                          ? CupertinoColors.white
-                          : CupertinoColors.black,
+                      ? CupertinoColors.white
+                      : CupertinoColors.black,
                 ),
               ),
             ),
@@ -969,7 +989,9 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _showLogoutConfirmation(
-      BuildContext context, AuthProvider authProvider) {
+    BuildContext context,
+    AuthProvider authProvider,
+  ) {
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
@@ -996,8 +1018,18 @@ class _ProfilePageState extends State<ProfilePage> {
   String _formatDateTime(DateTime? date) {
     if (date == null) return 'N/A';
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
