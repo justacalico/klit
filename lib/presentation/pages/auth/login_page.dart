@@ -17,7 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   final _usernameController = TextEditingController();
   final _apiKeyController = TextEditingController();
   final _hostController = TextEditingController();
-  
+
   bool _useCustomHost = false;
   bool _obscureApiKey = true;
 
@@ -35,12 +35,11 @@ class _LoginPageState extends State<LoginPage> {
     if (!mounted) return;
     final authProvider = context.read<AuthProvider>();
     await authProvider.initialize();
-    
+
     if (authProvider.isLoggedIn && mounted) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRoutes.main,
-        (route) => false,
-      );
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.main, (route) => false);
     }
   }
 
@@ -60,12 +59,12 @@ class _LoginPageState extends State<LoginPage> {
     // Validate inputs
     final usernameError = Validators.username(username);
     final apiKeyError = Validators.apiKey(apiKey);
-    
+
     if (usernameError != null) {
       _showError(usernameError);
       return;
     }
-    
+
     if (apiKeyError != null) {
       _showError(apiKeyError);
       return;
@@ -87,10 +86,9 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     if (success && mounted) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRoutes.main,
-        (route) => false,
-      );
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.main, (route) => false);
     } else if (authProvider.error != null && mounted) {
       _showError(authProvider.error!);
     }
@@ -147,10 +145,9 @@ class _LoginPageState extends State<LoginPage> {
   void _continueAsGuest() {
     final authProvider = context.read<AuthProvider>();
     authProvider.continueAsGuest();
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      AppRoutes.main,
-      (route) => false,
-    );
+    Navigator.of(
+      context,
+    ).pushNamedAndRemoveUntil(AppRoutes.main, (route) => false);
   }
 
   Widget _buildGuestButton() {
@@ -199,10 +196,7 @@ class _LoginPageState extends State<LoginPage> {
         const SizedBox(height: 24),
         const Text(
           'Welcome to Klit',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         Text(
@@ -255,9 +249,7 @@ class _LoginPageState extends State<LoginPage> {
               padding: EdgeInsets.zero,
               onPressed: () => setState(() => _obscureApiKey = !_obscureApiKey),
               child: Icon(
-                _obscureApiKey
-                    ? CupertinoIcons.eye
-                    : CupertinoIcons.eye_slash,
+                _obscureApiKey ? CupertinoIcons.eye : CupertinoIcons.eye_slash,
                 size: 20,
                 color: CupertinoColors.secondaryLabel,
               ),
@@ -297,17 +289,10 @@ class _LoginPageState extends State<LoginPage> {
       padding: const EdgeInsets.all(16),
       prefix: Padding(
         padding: const EdgeInsets.only(left: 12),
-        child: Icon(
-          icon,
-          size: 20,
-          color: CupertinoColors.secondaryLabel,
-        ),
+        child: Icon(icon, size: 20, color: CupertinoColors.secondaryLabel),
       ),
       suffix: suffix != null
-          ? Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: suffix,
-            )
+          ? Padding(padding: const EdgeInsets.only(right: 8), child: suffix)
           : null,
       decoration: BoxDecoration(
         color: CupertinoColors.systemGrey6.resolveFrom(context),
@@ -330,10 +315,7 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               const Text(
                 'Use custom host',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
               ),
               Text(
                 'Connect to a different e926-compatible server',
@@ -360,10 +342,7 @@ class _LoginPageState extends State<LoginPage> {
               ? const CupertinoActivityIndicator(color: CupertinoColors.white)
               : const Text(
                   'Sign In',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
                 ),
         );
       },
