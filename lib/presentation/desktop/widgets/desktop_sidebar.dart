@@ -22,25 +22,26 @@ class DesktopSidebar extends StatelessWidget {
   void _handleLogout(BuildContext context) {
     showCupertinoDialog(
       context: context,
-      builder: (ctx) => CupertinoAlertDialog(
+      builder: (dialogContext) => CupertinoAlertDialog(
         title: const Text('Sign Out'),
         content: const Text('Are you sure you want to sign out of guest mode?'),
         actions: [
           CupertinoDialogAction(
             isDestructiveAction: true,
             onPressed: () {
-              Navigator.of(ctx).pop();
+              Navigator.of(dialogContext).pop();
               final authProvider = context.read<AuthProvider>();
               authProvider.logout();
-              Navigator.of(
-                context,
-              ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                AppRoutes.login,
+                (route) => false,
+              );
             },
             child: const Text('Sign Out'),
           ),
           CupertinoDialogAction(
             isDefaultAction: true,
-            onPressed: () => Navigator.of(ctx).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Cancel'),
           ),
         ],
