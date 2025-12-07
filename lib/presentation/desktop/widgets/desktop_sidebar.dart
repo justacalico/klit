@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
+import '../../../app/routes.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../providers/providers.dart';
 
 /// macOS-style sidebar for desktop navigation
 class DesktopSidebar extends StatelessWidget {
@@ -16,10 +19,40 @@ class DesktopSidebar extends StatelessWidget {
     required this.onToggleCollapse,
   });
 
+  void _handleLogout(BuildContext context) {
+    showCupertinoDialog(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        title: const Text('Sign Out'),
+        content: const Text('Are you sure you want to sign out of guest mode?'),
+        actions: [
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              final authProvider = context.read<AuthProvider>();
+              authProvider.logout();
+              Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+            },
+            child: const Text('Sign Out'),
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isGuest = context.watch<AuthProvider>().isGuest;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -102,16 +135,24 @@ class DesktopSidebar extends StatelessWidget {
               ],
             ),
           ),
-          // Settings at bottom
+          // Settings or Sign Out at bottom (depending on guest mode)
           Padding(
             padding: const EdgeInsets.all(8),
-            child: _SidebarItem(
-              icon: CupertinoIcons.settings,
-              label: 'Settings',
-              isSelected: selectedIndex == 3,
-              isCollapsed: isCollapsed,
-              onTap: () => onItemSelected(3),
-            ),
+            child: isGuest
+                ? _SidebarItem(
+                    icon: CupertinoIcons.square_arrow_right,
+                    label: 'Sign Out',
+                    isSelected: false,
+                    isCollapsed: isCollapsed,
+                    onTap: () => _handleLogout(context),
+                  )
+                : _SidebarItem(
+                    icon: CupertinoIcons.settings,
+                    label: 'Settings',
+                    isSelected: selectedIndex == 3,
+                    isCollapsed: isCollapsed,
+                    onTap: () => onItemSelected(3),
+                  ),
           ),
           // Collapse toggle
           Padding(
@@ -149,9 +190,7 @@ class DesktopSidebar extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: isDark
-                ? AppColors.darkSeparator
-                : AppColors.lightSeparator,
+            color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
             width: 0.5,
           ),
         ),
@@ -184,10 +223,7 @@ class DesktopSidebar extends StatelessWidget {
             const SizedBox(width: 10),
             const Text(
               'Klit',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ],
         ],
@@ -275,13 +311,13 @@ class _SidebarItemState extends State<_SidebarItem> {
           decoration: BoxDecoration(
             color: widget.isSelected
                 ? (isDark
-                    ? CupertinoColors.systemGrey4.darkColor
-                    : CupertinoColors.systemGrey4)
+                      ? CupertinoColors.systemGrey4.darkColor
+                      : CupertinoColors.systemGrey4)
                 : _isHovered
-                    ? (isDark
-                        ? CupertinoColors.systemGrey5.darkColor
-                        : CupertinoColors.systemGrey5)
-                    : CupertinoColors.transparent,
+                ? (isDark
+                      ? CupertinoColors.systemGrey5.darkColor
+                      : CupertinoColors.systemGrey5)
+                : CupertinoColors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
           child: widget.isCollapsed
@@ -309,8 +345,9 @@ class _SidebarItemState extends State<_SidebarItem> {
                         widget.label,
                         style: TextStyle(
                           fontSize: 13,
-                          fontWeight:
-                              widget.isSelected ? FontWeight.w600 : FontWeight.w500,
+                          fontWeight: widget.isSelected
+                              ? FontWeight.w600
+                              : FontWeight.w500,
                           color: widget.isSelected
                               ? AppColors.primaryBlue
                               : CupertinoColors.label.resolveFrom(context),
