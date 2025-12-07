@@ -15,7 +15,7 @@ class ApiService {
   static const _minRequestInterval = Duration(milliseconds: 500);
 
   ApiService({String? baseUrl})
-      : _baseUrl = baseUrl ?? ApiConstants.defaultHost {
+    : _baseUrl = baseUrl ?? ApiConstants.defaultHost {
     _dio = Dio(
       BaseOptions(
         baseUrl: _baseUrl,
@@ -33,6 +33,25 @@ class ApiService {
             options.headers['Authorization'] = _authHeader;
           }
           handler.next(options);
+        },
+        onResponse: (response, handler) {
+          // Check for Cloudflare challenge in response
+          if (response.data is String &&
+              (response.data as String).contains('Just a moment')) {
+            handler.reject(
+              DioException(
+                requestOptions: response.requestOptions,
+                error: const ApiException(
+                  message:
+                      'Service temporarily unavailable. Please try again or sign in.',
+                  statusCode: 503,
+                ),
+                type: DioExceptionType.badResponse,
+              ),
+            );
+            return;
+          }
+          handler.next(response);
         },
         onError: (error, handler) {
           handler.next(_handleDioError(error));
@@ -56,15 +75,41 @@ class ApiService {
   DioException _handleDioError(DioException error) {
     ApiException apiError;
 
+    // Check for Cloudflare challenge in error response
+    final responseData = error.response?.data;
+    if (responseData is String && responseData.contains('Just a moment')) {
+      apiError = const ApiException(
+        message:
+            'Service temporarily unavailable. Please try again or sign in.',
+        statusCode: 503,
+      );
+      return DioException(
+        requestOptions: error.requestOptions,
+        error: apiError,
+        response: error.response,
+        type: error.type,
+      );
+    }
+
     switch (error.response?.statusCode) {
       case 401:
         apiError = ApiException.unauthorized();
         break;
       case 403:
-        apiError = const ApiException(
-          message: 'Access forbidden. Check your permissions.',
-          statusCode: 403,
-        );
+        // Check if it's actually a Cloudflare block
+        if (responseData is String &&
+            responseData.contains('<!DOCTYPE html>')) {
+          apiError = const ApiException(
+            message:
+                'Service temporarily unavailable. Please try again or sign in.',
+            statusCode: 503,
+          );
+        } else {
+          apiError = const ApiException(
+            message: 'Access forbidden. Please sign in to continue.',
+            statusCode: 403,
+          );
+        }
         break;
       case 404:
         apiError = ApiException.notFound();
@@ -183,7 +228,7 @@ class ApiService {
     try {
       // If safe mode is enabled, override rating to safe
       final effectiveRating = safeMode ? 's' : rating;
-      
+
       final params = PostSearchParams(
         tags: tags,
         rating: effectiveRating,
@@ -194,7 +239,9 @@ class ApiService {
 
       final queryParams = params.toQueryParams();
       if (kDebugMode) {
-        print('Making request to ${ApiConstants.postsEndpoint} with params: $queryParams');
+        print(
+          'Making request to ${ApiConstants.postsEndpoint} with params: $queryParams',
+        );
       }
 
       final response = await _dio.get(
@@ -246,7 +293,9 @@ class ApiService {
       final response = await _dio.get('/posts/$id.json');
 
       if (response.statusCode == 200 && response.data != null) {
-        final post = Post.fromJson(response.data['post'] as Map<String, dynamic>);
+        final post = Post.fromJson(
+          response.data['post'] as Map<String, dynamic>,
+        );
         return ApiResult.success(post);
       }
       return ApiResult.failure(ApiException.notFound('Post'));
@@ -271,26 +320,31 @@ class ApiService {
       // Build date range tags based on scale
       final now = DateTime.now();
       String dateTags;
-      
+
       switch (scale) {
         case 'week':
           final weekAgo = now.subtract(const Duration(days: 7));
-          dateTags = 'date:>=${weekAgo.year}-${weekAgo.month.toString().padLeft(2, '0')}-${weekAgo.day.toString().padLeft(2, '0')}';
+          dateTags =
+              'date:>=${weekAgo.year}-${weekAgo.month.toString().padLeft(2, '0')}-${weekAgo.day.toString().padLeft(2, '0')}';
           break;
         case 'month':
           final monthAgo = now.subtract(const Duration(days: 30));
-          dateTags = 'date:>=${monthAgo.year}-${monthAgo.month.toString().padLeft(2, '0')}-${monthAgo.day.toString().padLeft(2, '0')}';
+          dateTags =
+              'date:>=${monthAgo.year}-${monthAgo.month.toString().padLeft(2, '0')}-${monthAgo.day.toString().padLeft(2, '0')}';
           break;
         case 'day':
         default:
           final yesterday = now.subtract(const Duration(days: 1));
-          dateTags = 'date:>=${yesterday.year}-${yesterday.month.toString().padLeft(2, '0')}-${yesterday.day.toString().padLeft(2, '0')}';
+          dateTags =
+              'date:>=${yesterday.year}-${yesterday.month.toString().padLeft(2, '0')}-${yesterday.day.toString().padLeft(2, '0')}';
           break;
       }
-      
+
       // Add rating:safe tag if safe mode is enabled
-      final tags = safeMode ? '$dateTags order:score rating:safe' : '$dateTags order:score';
-      
+      final tags = safeMode
+          ? '$dateTags order:score rating:safe'
+          : '$dateTags order:score';
+
       final response = await _dio.get(
         ApiConstants.postsEndpoint,
         queryParameters: {
@@ -373,14 +427,10 @@ class ApiService {
     try {
       // Add rating:safe tag if safe mode is enabled
       final tags = safeMode ? 'fav:$username rating:safe' : 'fav:$username';
-      
+
       final response = await _dio.get(
         ApiConstants.postsEndpoint,
-        queryParameters: {
-          'tags': tags,
-          'page': page,
-          'limit': limit,
-        },
+        queryParameters: {'tags': tags, 'page': page, 'limit': limit},
       );
 
       if (response.statusCode == 200 && response.data != null) {
@@ -441,10 +491,7 @@ class ApiService {
     try {
       final response = await _dio.post(
         '/posts/$postId/votes.json',
-        queryParameters: {
-          'score': score,
-          'no_unvote': false,
-        },
+        queryParameters: {'score': score, 'no_unvote': false},
       );
 
       if (response.statusCode == 200 && response.data != null) {
@@ -467,7 +514,10 @@ class ApiService {
   }
 
   /// Get comments for a post
-  Future<ApiResult<List<Comment>>> getComments(int postId, {int page = 1}) async {
+  Future<ApiResult<List<Comment>>> getComments(
+    int postId, {
+    int page = 1,
+  }) async {
     try {
       final response = await _dio.get(
         '/comments.json',
