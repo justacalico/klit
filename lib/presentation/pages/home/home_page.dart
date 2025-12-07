@@ -19,6 +19,13 @@ class _HomePageState extends State<HomePage> {
   final RefreshController _refreshController = RefreshController();
   bool _isGridView = true;
 
+  /// Check if safe mode should be enforced (guest mode OR safe mode setting)
+  bool _shouldEnforceSafeMode(BuildContext context) {
+    final authProvider = context.read<AuthProvider>();
+    final settingsProvider = context.read<SettingsProvider>();
+    return authProvider.isGuest || settingsProvider.safeMode;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -35,10 +42,9 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadPosts({bool refresh = false}) async {
     final postsProvider = context.read<PostsProvider>();
-    final settingsProvider = context.read<SettingsProvider>();
     await postsProvider.loadLatestPosts(
       refresh: refresh,
-      safeMode: settingsProvider.safeMode,
+      safeMode: _shouldEnforceSafeMode(context),
     );
 
     if (refresh) {
@@ -48,9 +54,9 @@ class _HomePageState extends State<HomePage> {
 
   void _onPostTap(Post post) {
     final postsProvider = context.read<PostsProvider>();
-    final settingsProvider = context.read<SettingsProvider>();
     final posts = postsProvider.latestPosts;
     final index = posts.indexWhere((p) => p.id == post.id);
+    final safeMode = _shouldEnforceSafeMode(context);
 
     Navigator.of(context).pushNamed(
       AppRoutes.postDetail,
@@ -59,9 +65,7 @@ class _HomePageState extends State<HomePage> {
         initialIndex: index >= 0 ? index : 0,
         hasMore: postsProvider.hasMoreLatest,
         onLoadMore: () async {
-          await postsProvider.loadLatestPosts(
-            safeMode: settingsProvider.safeMode,
-          );
+          await postsProvider.loadLatestPosts(safeMode: safeMode);
           return postsProvider.latestPosts.map((p) => p.id).toList();
         },
       ),

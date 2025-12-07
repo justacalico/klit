@@ -24,7 +24,7 @@ class _SearchPageState extends State<SearchPage> {
   final _debouncer = Debouncer(delay: const Duration(milliseconds: 500));
   final _tagDebouncer = Debouncer(delay: const Duration(milliseconds: 300));
   final _focusNode = FocusNode();
-  
+
   bool _isGridView = true;
   bool _showHistory = true;
   bool _showTagSuggestions = false;
@@ -68,7 +68,7 @@ class _SearchPageState extends State<SearchPage> {
     final text = _searchController.text;
     final cursorPos = _searchController.selection.baseOffset;
     if (cursorPos < 0) return text.split(' ').last;
-    
+
     final textBeforeCursor = text.substring(0, cursorPos);
     final words = textBeforeCursor.split(' ');
     return words.isNotEmpty ? words.last : '';
@@ -113,7 +113,7 @@ class _SearchPageState extends State<SearchPage> {
   void _insertTagSuggestion(String tagName) {
     final text = _searchController.text;
     final cursorPos = _searchController.selection.baseOffset;
-    
+
     if (cursorPos < 0) {
       // Simple case: just append
       final words = text.split(' ');
@@ -127,22 +127,29 @@ class _SearchPageState extends State<SearchPage> {
       // Replace the current word being typed
       final textBeforeCursor = text.substring(0, cursorPos);
       final textAfterCursor = text.substring(cursorPos);
-      
+
       final lastSpaceIndex = textBeforeCursor.lastIndexOf(' ');
-      final newTextBeforeCursor = lastSpaceIndex >= 0 
+      final newTextBeforeCursor = lastSpaceIndex >= 0
           ? '${textBeforeCursor.substring(0, lastSpaceIndex + 1)}$tagName '
           : '$tagName ';
-      
+
       _searchController.text = newTextBeforeCursor + textAfterCursor;
       _searchController.selection = TextSelection.collapsed(
         offset: newTextBeforeCursor.length,
       );
     }
-    
+
     setState(() {
       _showTagSuggestions = false;
       _tagSuggestions = [];
     });
+  }
+
+  /// Check if safe mode should be enforced (guest mode OR safe mode setting)
+  bool _shouldEnforceSafeMode(BuildContext context) {
+    final authProvider = context.read<AuthProvider>();
+    final settingsProvider = context.read<SettingsProvider>();
+    return authProvider.isGuest || settingsProvider.safeMode;
   }
 
   void _performSearch() {
@@ -153,25 +160,26 @@ class _SearchPageState extends State<SearchPage> {
     }
 
     setState(() => _showHistory = false);
-    
+
     final settingsProvider = context.read<SettingsProvider>();
+    final safeMode = _shouldEnforceSafeMode(context);
     context.read<PostsProvider>().searchPosts(
       query: query,
       refresh: true,
       rating: _selectedRating,
       order: _selectedOrder,
-      safeMode: settingsProvider.safeMode,
+      safeMode: safeMode,
     );
-    
+
     settingsProvider.addToSearchHistory(query);
   }
 
   void _onPostTap(Post post) {
     final postsProvider = context.read<PostsProvider>();
-    final settingsProvider = context.read<SettingsProvider>();
     final posts = postsProvider.searchResults;
     final index = posts.indexWhere((p) => p.id == post.id);
-    
+    final safeMode = _shouldEnforceSafeMode(context);
+
     Navigator.of(context).pushNamed(
       AppRoutes.postDetail,
       arguments: PostDetailArguments(
@@ -183,7 +191,7 @@ class _SearchPageState extends State<SearchPage> {
             query: postsProvider.currentSearchQuery,
             rating: _selectedRating,
             order: _selectedOrder,
-            safeMode: settingsProvider.safeMode,
+            safeMode: safeMode,
           );
           return postsProvider.searchResults.map((p) => p.id).toList();
         },
@@ -239,7 +247,10 @@ class _SearchPageState extends State<SearchPage> {
                 right: 0,
                 child: Center(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: isDark
                           ? CupertinoColors.black.withValues(alpha: 0.7)
@@ -251,7 +262,10 @@ class _SearchPageState extends State<SearchPage> {
                       children: [
                         CupertinoActivityIndicator(),
                         SizedBox(width: 8),
-                        Text('Loading suggestions...', style: TextStyle(fontSize: 13)),
+                        Text(
+                          'Loading suggestions...',
+                          style: TextStyle(fontSize: 13),
+                        ),
                       ],
                     ),
                   ),
@@ -265,7 +279,7 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget _buildTagSuggestions() {
     final isDark = CupertinoTheme.of(context).brightness == Brightness.dark;
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       constraints: const BoxConstraints(maxHeight: 300),
@@ -311,7 +325,11 @@ class _SearchPageState extends State<SearchPage> {
               itemCount: _tagSuggestions.length,
               itemBuilder: (context, index) {
                 final tag = _tagSuggestions[index];
-                return _buildTagSuggestionItem(tag, isDark, index == _tagSuggestions.length - 1);
+                return _buildTagSuggestionItem(
+                  tag,
+                  isDark,
+                  index == _tagSuggestions.length - 1,
+                );
               },
             ),
           ),
@@ -399,13 +417,13 @@ class _SearchPageState extends State<SearchPage> {
           });
           return;
         }
-        
+
         // Fetch tag suggestions for the current word
         final currentWord = _getCurrentWord();
         _tagDebouncer.run(() {
           _fetchTagSuggestions(currentWord);
         });
-        
+
         // Perform search after debounce
         _debouncer.run(() {
           if (value.isNotEmpty) {
@@ -426,14 +444,18 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildFilters() {
+    final isGuest = context.read<AuthProvider>().isGuest;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
           Expanded(
             child: _buildFilterChip(
-              'Rating: ${_selectedRating ?? 'Any'}',
-              () => _showRatingPicker(),
+              // In guest mode, always show 'Safe' and disable the picker
+              isGuest ? 'Rating: Safe' : 'Rating: ${_selectedRating ?? 'Any'}',
+              isGuest ? null : () => _showRatingPicker(),
+              disabled: isGuest,
             ),
           ),
           const SizedBox(width: 8),
@@ -453,13 +475,19 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildFilterChip(String label, VoidCallback onTap) {
+  Widget _buildFilterChip(
+    String label,
+    VoidCallback? onTap, {
+    bool disabled = false,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: CupertinoColors.systemGrey5.resolveFrom(context),
+          color: disabled
+              ? CupertinoColors.systemGrey4.resolveFrom(context)
+              : CupertinoColors.systemGrey5.resolveFrom(context),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -468,7 +496,12 @@ class _SearchPageState extends State<SearchPage> {
             Flexible(
               child: Text(
                 label,
-                style: const TextStyle(fontSize: 13),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: disabled
+                      ? CupertinoColors.systemGrey.resolveFrom(context)
+                      : null,
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -489,10 +522,10 @@ class _SearchPageState extends State<SearchPage> {
           final label = rating == 'Any'
               ? 'Any'
               : rating == 's'
-                  ? 'Safe'
-                  : rating == 'q'
-                      ? 'Questionable'
-                      : 'Explicit';
+              ? 'Safe'
+              : rating == 'q'
+              ? 'Questionable'
+              : 'Explicit';
           return CupertinoActionSheetAction(
             onPressed: () {
               Navigator.of(context).pop();

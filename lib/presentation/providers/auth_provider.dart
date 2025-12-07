@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
+import '../../core/constants/constants.dart';
 import '../../data/models/models.dart';
 import '../../data/services/services.dart';
 
 /// Provider for authentication state
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService;
+  ApiService? _apiService;
 
   Account? _currentAccount;
   List<Account> _accounts = [];
@@ -14,6 +16,11 @@ class AuthProvider extends ChangeNotifier {
   bool _isGuest = false;
 
   AuthProvider({required AuthService authService}) : _authService = authService;
+
+  /// Set the API service reference (call after creation)
+  void setApiService(ApiService apiService) {
+    _apiService = apiService;
+  }
 
   // Getters
   Account? get currentAccount => _currentAccount;
@@ -130,9 +137,12 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Continue as guest (no account required)
+  /// Guest mode uses e621.net with forced safe mode
   void continueAsGuest() {
     _isGuest = true;
     _isInitialized = true;
+    // Set API to use e621.net for guest mode (e926 has Cloudflare issues)
+    _apiService?.setBaseUrl(ApiConstants.nsfwHost);
     notifyListeners();
   }
 

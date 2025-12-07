@@ -19,6 +19,13 @@ class _PopularPageState extends State<PopularPage> {
   final RefreshController _refreshController = RefreshController();
   bool _isGridView = true;
 
+  /// Check if safe mode should be enforced (guest mode OR safe mode setting)
+  bool _shouldEnforceSafeMode(BuildContext context) {
+    final authProvider = context.read<AuthProvider>();
+    final settingsProvider = context.read<SettingsProvider>();
+    return authProvider.isGuest || settingsProvider.safeMode;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -35,10 +42,9 @@ class _PopularPageState extends State<PopularPage> {
 
   Future<void> _loadPosts({bool refresh = false}) async {
     final postsProvider = context.read<PostsProvider>();
-    final settingsProvider = context.read<SettingsProvider>();
     await postsProvider.loadPopularPosts(
       refresh: refresh,
-      safeMode: settingsProvider.safeMode,
+      safeMode: _shouldEnforceSafeMode(context),
     );
 
     if (refresh) {
@@ -48,9 +54,9 @@ class _PopularPageState extends State<PopularPage> {
 
   void _onPostTap(Post post) {
     final postsProvider = context.read<PostsProvider>();
-    final settingsProvider = context.read<SettingsProvider>();
     final posts = postsProvider.popularPosts;
     final index = posts.indexWhere((p) => p.id == post.id);
+    final safeMode = _shouldEnforceSafeMode(context);
 
     Navigator.of(context).pushNamed(
       AppRoutes.postDetail,
@@ -59,9 +65,7 @@ class _PopularPageState extends State<PopularPage> {
         initialIndex: index >= 0 ? index : 0,
         hasMore: postsProvider.hasMorePopular,
         onLoadMore: () async {
-          await postsProvider.loadPopularPosts(
-            safeMode: settingsProvider.safeMode,
-          );
+          await postsProvider.loadPopularPosts(safeMode: safeMode);
           return postsProvider.popularPosts.map((p) => p.id).toList();
         },
       ),
