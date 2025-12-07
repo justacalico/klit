@@ -296,6 +296,16 @@ class SettingsPage extends StatelessWidget {
         _buildLiquidGlassTile(
           context,
           isDark: isDark,
+          icon: CupertinoIcons.globe,
+          iconColor: AppColors.primaryOrange,
+          title: 'Website',
+          showChevron: true,
+          onTap: () => _openWebsite(),
+        ),
+        _buildLiquidGlassDivider(isDark),
+        _buildLiquidGlassTile(
+          context,
+          isDark: isDark,
           icon: CupertinoIcons.doc_text_fill,
           iconColor: AppColors.primaryGreen,
           title: 'Terms of Service',
@@ -314,6 +324,13 @@ class SettingsPage extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _openWebsite() async {
+    final uri = Uri.parse('https://openlyst.onrender.com/');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 
   Widget _buildLiquidGlassSection(
