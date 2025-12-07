@@ -40,7 +40,7 @@ class _HotPageState extends State<HotPage> {
       refresh: refresh,
       safeMode: settingsProvider.safeMode,
     );
-    
+
     if (refresh) {
       _refreshController.refreshCompleted();
     }
@@ -51,7 +51,7 @@ class _HotPageState extends State<HotPage> {
     final settingsProvider = context.read<SettingsProvider>();
     final posts = postsProvider.hotPosts;
     final index = posts.indexWhere((p) => p.id == post.id);
-    
+
     Navigator.of(context).pushNamed(
       AppRoutes.postDetail,
       arguments: PostDetailArguments(
@@ -59,9 +59,7 @@ class _HotPageState extends State<HotPage> {
         initialIndex: index >= 0 ? index : 0,
         hasMore: postsProvider.hasMoreHot,
         onLoadMore: () async {
-          await postsProvider.loadHotPosts(
-            safeMode: settingsProvider.safeMode,
-          );
+          await postsProvider.loadHotPosts(safeMode: settingsProvider.safeMode);
           return postsProvider.hotPosts.map((p) => p.id).toList();
         },
       ),
@@ -78,6 +76,7 @@ class _HotPageState extends State<HotPage> {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
+        heroTag: 'hot_nav',
         middle: const Text('Hot'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
