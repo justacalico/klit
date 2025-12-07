@@ -1,4 +1,4 @@
-package com.example.klit
+package gitlab.openlyst.klit
 
 import io.flutter.embedding.android.FlutterActivity
 
