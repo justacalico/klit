@@ -310,7 +310,7 @@ class SettingsPage extends StatelessWidget {
           iconColor: AppColors.primaryGreen,
           title: 'Terms of Service',
           showChevron: true,
-          onTap: () {},
+          onTap: () => _showTermsOfService(context, isDark),
         ),
         _buildLiquidGlassDivider(isDark),
         _buildLiquidGlassTile(
@@ -320,7 +320,7 @@ class SettingsPage extends StatelessWidget {
           iconColor: AppColors.primaryPurple,
           title: 'Privacy Policy',
           showChevron: true,
-          onTap: () {},
+          onTap: () => _showPrivacyPolicy(context, isDark),
         ),
       ],
     );
