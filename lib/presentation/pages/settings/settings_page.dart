@@ -47,14 +47,42 @@ class SettingsPage extends StatelessWidget {
   }
 
   Widget _buildAccountSection(BuildContext context, bool isDark) {
-    return _buildLiquidGlassSection(
-      context,
-      isDark: isDark,
-      title: 'ACCOUNT',
-      children: [
-        Consumer<AuthProvider>(
-          builder: (context, auth, _) {
-            return _buildLiquidGlassTile(
+    return Consumer<AuthProvider>(
+      builder: (context, auth, _) {
+        // Guest mode - show login prompt
+        if (auth.isGuest) {
+          return _buildLiquidGlassSection(
+            context,
+            isDark: isDark,
+            title: 'ACCOUNT',
+            children: [
+              _buildLiquidGlassTile(
+                context,
+                isDark: isDark,
+                icon: CupertinoIcons.person_badge_plus,
+                iconColor: AppColors.primaryBlue,
+                title: 'Sign In',
+                subtitle: 'Sign in to access all features',
+                showChevron: true,
+                onTap: () {
+                  auth.logout(); // Clear guest state
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    AppRoutes.login,
+                    (route) => false,
+                  );
+                },
+              ),
+            ],
+          );
+        }
+
+        // Logged in - show account management
+        return _buildLiquidGlassSection(
+          context,
+          isDark: isDark,
+          title: 'ACCOUNT',
+          children: [
+            _buildLiquidGlassTile(
               context,
               isDark: isDark,
               icon: CupertinoIcons.person_circle,
@@ -64,20 +92,20 @@ class SettingsPage extends StatelessWidget {
               showChevron: true,
               onTap: () =>
                   Navigator.of(context).pushNamed(AppRoutes.accountManagement),
-            );
-          },
-        ),
-        _buildLiquidGlassDivider(isDark),
-        _buildLiquidGlassTile(
-          context,
-          isDark: isDark,
-          icon: CupertinoIcons.globe,
-          iconColor: AppColors.primaryGreen,
-          title: 'Server Configuration',
-          showChevron: true,
-          onTap: () => Navigator.of(context).pushNamed(AppRoutes.hostSettings),
-        ),
-      ],
+            ),
+            _buildLiquidGlassDivider(isDark),
+            _buildLiquidGlassTile(
+              context,
+              isDark: isDark,
+              icon: CupertinoIcons.globe,
+              iconColor: AppColors.primaryGreen,
+              title: 'Server Configuration',
+              showChevron: true,
+              onTap: () => Navigator.of(context).pushNamed(AppRoutes.hostSettings),
+            ),
+          ],
+        );
+      },
     );
   }
 
