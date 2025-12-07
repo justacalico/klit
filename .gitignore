@@ -49,3 +49,4 @@ app.*.map.json
 # Don't ignore: assets/icon.png
 
 /dist
+flutter_*.png
