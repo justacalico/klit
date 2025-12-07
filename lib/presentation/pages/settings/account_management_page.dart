@@ -195,9 +195,17 @@ class AccountManagementPage extends StatelessWidget {
         actions: [
           if (!isActive)
             CupertinoActionSheetAction(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
-                context.read<AuthProvider>().switchAccount(accountId);
+                final auth = context.read<AuthProvider>();
+                final success = await auth.switchAccount(accountId);
+                if (success && context.mounted) {
+                  // Navigate to main and clear stack to refresh the app
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    AppRoutes.main,
+                    (route) => false,
+                  );
+                }
               },
               child: const Text('Switch to this account'),
             ),
