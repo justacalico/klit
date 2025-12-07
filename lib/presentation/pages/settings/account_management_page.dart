@@ -125,7 +125,16 @@ class AccountManagementPage extends StatelessWidget {
                     ),
                     onTap: isActive
                         ? null
-                        : () => auth.switchAccount(account.id),
+                        : () async {
+                            final success = await auth.switchAccount(account.id);
+                            if (success && context.mounted) {
+                              // Navigate to main and clear stack to refresh the app
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                AppRoutes.main,
+                                (route) => false,
+                              );
+                            }
+                          },
                   ),
                 );
               },
