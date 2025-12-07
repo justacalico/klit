@@ -3,7 +3,8 @@ import 'package:cached_network_image/cached_network_image.dart'
     show CachedNetworkImage, CachedNetworkImageProvider;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/material.dart' show Colors, Theme, ThemeData, Brightness;
+import 'package:flutter/material.dart'
+    show Colors, Theme, ThemeData, Brightness;
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
@@ -20,8 +21,10 @@ import '../../widgets/widgets.dart';
 class PostDetailArguments {
   final List<int> postIds;
   final int initialIndex;
+
   /// Callback to load more posts, returns new post IDs
   final Future<List<int>> Function()? onLoadMore;
+
   /// Whether there are more posts to load
   final bool hasMore;
 
@@ -37,10 +40,13 @@ class PostDetailArguments {
 class PostDetailPage extends StatefulWidget {
   final List<int> postIds;
   final int initialIndex;
+
   /// Optional callback for searching tags (used in desktop mode)
   final void Function(String tag)? onSearchTag;
+
   /// Callback to load more posts, returns new post IDs
   final Future<List<int>> Function()? onLoadMore;
+
   /// Whether there are more posts to load
   final bool hasMore;
 
@@ -66,10 +72,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
   final Map<int, Post?> _loadedPosts = {};
   final Map<int, bool> _loadingStates = {};
   final Map<int, String?> _errorStates = {};
-  
+
   // Action states per post index
   final Map<int, bool> _isFavorited = {};
-  final Map<int, int?> _userVote = {}; // 1 = upvoted, -1 = downvoted, null = no vote
+  final Map<int, int?> _userVote =
+      {}; // 1 = upvoted, -1 = downvoted, null = no vote
   final Map<int, PostScore?> _updatedScores = {};
   final Map<int, bool> _isVoting = {};
   final Map<int, bool> _isTogglingFavorite = {};
@@ -98,10 +105,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
     if (_currentIndex < _postIds.length - 1) {
       _loadPost(_currentIndex + 1);
     }
-    
+
     // Load more posts when approaching the end (3 posts before the end)
-    if (_hasMore && 
-        !_isLoadingMore && 
+    if (_hasMore &&
+        !_isLoadingMore &&
         widget.onLoadMore != null &&
         _currentIndex >= _postIds.length - 3) {
       _loadMorePosts();
@@ -110,11 +117,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   Future<void> _loadMorePosts() async {
     if (_isLoadingMore || !_hasMore || widget.onLoadMore == null) return;
-    
+
     setState(() {
       _isLoadingMore = true;
     });
-    
+
     try {
       final newPostIds = await widget.onLoadMore!();
       if (mounted) {
@@ -241,7 +248,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
             _isFavorited[index] = !isFav;
             _isTogglingFavorite[index] = false;
           });
-          
+
           // Auto-upvote when favoriting if the setting is enabled
           if (!isFav) {
             final settings = context.read<SettingsProvider>();
@@ -292,7 +299,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   void _openFullMedia() {
     if (_currentPost == null) return;
-    
+
     if (_currentPost!.isVideo) {
       if (_currentPost!.file.url == null) return;
       Navigator.of(context).push(
@@ -322,39 +329,37 @@ class _PostDetailPageState extends State<PostDetailPage> {
     if (widget.onSearchTag != null) {
       widget.onSearchTag!(tag);
     } else {
-      Navigator.of(context).pushNamed(
-        AppRoutes.search,
-        arguments: tag,
-      );
+      Navigator.of(context).pushNamed(AppRoutes.search, arguments: tag);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final settingsProvider = context.watch<SettingsProvider>();
-    final isDark = settingsProvider.themeMode == 2 ||
+    final isDark =
+        settingsProvider.themeMode == 2 ||
         settingsProvider.themeMode == 3 ||
         (settingsProvider.themeMode == 0 &&
             MediaQuery.platformBrightnessOf(context) == Brightness.dark);
     final isOled = settingsProvider.themeMode == 3;
     final hasMultiplePosts = _postIds.length > 1;
-    
+
     return CupertinoPageScaffold(
       backgroundColor: isOled
           ? CupertinoColors.black
           : isDark
-              ? AppColors.darkBackground
-              : AppColors.lightSecondaryBackground,
+          ? AppColors.darkBackground
+          : AppColors.lightSecondaryBackground,
       navigationBar: CupertinoNavigationBar(
         backgroundColor: isOled
             ? CupertinoColors.black.withValues(alpha: 0.8)
             : isDark
-                ? CupertinoColors.darkBackgroundGray.withValues(alpha: 0.8)
-                : CupertinoColors.systemBackground.withValues(alpha: 0.8),
+            ? CupertinoColors.darkBackgroundGray.withValues(alpha: 0.8)
+            : CupertinoColors.systemBackground.withValues(alpha: 0.8),
         middle: Text(
-          hasMultiplePosts 
-            ? 'Post #$_currentPostId (${_currentIndex + 1}/${_postIds.length})'
-            : 'Post #$_currentPostId',
+          hasMultiplePosts
+              ? 'Post #$_currentPostId (${_currentIndex + 1}/${_postIds.length})'
+              : 'Post #$_currentPostId',
         ),
         trailing: _currentPost != null
             ? Row(
@@ -362,11 +367,13 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 children: [
                   CupertinoButton(
                     padding: EdgeInsets.zero,
-                    onPressed: _loadingStates[_currentIndex] == true ? null : _refreshCurrentPost,
+                    onPressed: _loadingStates[_currentIndex] == true
+                        ? null
+                        : _refreshCurrentPost,
                     child: Icon(
                       CupertinoIcons.refresh,
-                      color: _loadingStates[_currentIndex] == true 
-                          ? CupertinoColors.systemGrey 
+                      color: _loadingStates[_currentIndex] == true
+                          ? CupertinoColors.systemGrey
                           : null,
                     ),
                   ),
@@ -385,7 +392,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 controller: _pageController,
                 itemCount: _postIds.length,
                 onPageChanged: _onPageChanged,
-                itemBuilder: (context, index) => _buildPageContent(index, isDark, isOled),
+                itemBuilder: (context, index) =>
+                    _buildPageContent(index, isDark, isOled),
               )
             : _buildPageContent(0, isDark, isOled),
       ),
@@ -402,10 +410,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
 
     if (error != null) {
-      return ErrorState(
-        message: error,
-        onRetry: () => _loadPost(index),
-      );
+      return ErrorState(message: error, onRetry: () => _loadPost(index));
     }
 
     if (post == null) {
@@ -463,22 +468,22 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         Colors.white.withValues(alpha: 0.02),
                       ]
                     : isDark
-                        ? [
-                            Colors.white.withValues(alpha: 0.12),
-                            Colors.white.withValues(alpha: 0.06),
-                          ]
-                        : [
-                            Colors.white.withValues(alpha: 0.8),
-                            Colors.white.withValues(alpha: 0.6),
-                          ],
+                    ? [
+                        Colors.white.withValues(alpha: 0.12),
+                        Colors.white.withValues(alpha: 0.06),
+                      ]
+                    : [
+                        Colors.white.withValues(alpha: 0.8),
+                        Colors.white.withValues(alpha: 0.6),
+                      ],
               ),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: isOled
                     ? Colors.white.withValues(alpha: 0.08)
                     : isDark
-                        ? Colors.white.withValues(alpha: 0.15)
-                        : Colors.white.withValues(alpha: 0.5),
+                    ? Colors.white.withValues(alpha: 0.15)
+                    : Colors.white.withValues(alpha: 0.5),
                 width: 0.5,
               ),
               boxShadow: [
@@ -592,10 +597,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }) {
     return CupertinoButton(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      onPressed: isLoading ? null : () {
-        HapticFeedback.lightImpact();
-        onTap();
-      },
+      onPressed: isLoading
+          ? null
+          : () {
+              HapticFeedback.lightImpact();
+              onTap();
+            },
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -609,8 +616,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         color.withValues(alpha: 0.15),
                       ]
                     : [
-                        (isDark ? Colors.white : Colors.black).withValues(alpha: 0.1),
-                        (isDark ? Colors.white : Colors.black).withValues(alpha: 0.05),
+                        (isDark ? Colors.white : Colors.black).withValues(
+                          alpha: 0.1,
+                        ),
+                        (isDark ? Colors.white : Colors.black).withValues(
+                          alpha: 0.05,
+                        ),
                       ],
               ),
               shape: BoxShape.circle,
@@ -635,8 +646,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     color: isActive
                         ? color
                         : isDark
-                            ? CupertinoColors.white.withValues(alpha: 0.6)
-                            : CupertinoColors.systemGrey,
+                        ? CupertinoColors.white.withValues(alpha: 0.6)
+                        : CupertinoColors.systemGrey,
                   ),
           ),
           const SizedBox(height: 6),
@@ -648,8 +659,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
               color: isActive
                   ? color
                   : isDark
-                      ? CupertinoColors.white.withValues(alpha: 0.6)
-                      : CupertinoColors.systemGrey,
+                  ? CupertinoColors.white.withValues(alpha: 0.6)
+                  : CupertinoColors.systemGrey,
             ),
           ),
         ],
@@ -671,7 +682,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
         ),
       );
     }
-    
+
     final imageUrl = post.sample.has ? post.sample.url : post.preview.url;
 
     if (imageUrl == null) {
@@ -701,9 +712,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
             fit: BoxFit.contain,
             placeholder: (context, url) => Container(
               color: CupertinoColors.systemGrey5,
-              child: const Center(
-                child: CupertinoActivityIndicator(),
-              ),
+              child: const Center(child: CupertinoActivityIndicator()),
             ),
             errorWidget: (context, url, error) => Container(
               color: CupertinoColors.systemGrey5,
@@ -724,7 +733,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   Widget _buildStats(Post post, int index, bool isDark, bool isOled) {
     final score = _updatedScores[index] ?? post.score;
     final isFav = _isFavorited[index] ?? post.isFavorited;
-    final favCount = isFav != post.isFavorited 
+    final favCount = isFav != post.isFavorited
         ? (isFav ? post.favCount + 1 : post.favCount - 1)
         : post.favCount;
 
@@ -738,7 +747,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
             icon: CupertinoIcons.arrow_up,
             value: score.total.toString(),
             label: 'Score',
-            color: score.total >= 0 ? AppColors.safeColor : AppColors.explicitColor,
+            color: score.total >= 0
+                ? AppColors.safeColor
+                : AppColors.explicitColor,
             isDark: isDark,
           ),
           _buildGlassStatItem(
@@ -781,10 +792,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ),
             shape: BoxShape.circle,
             boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.3),
-                blurRadius: 10,
-              ),
+              BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 10),
             ],
           ),
           child: Icon(icon, size: 20, color: color),
@@ -1009,10 +1017,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ],
           ),
           const SizedBox(height: 12),
-          CategorizedTagList(
-            tags: post.tags,
-            onTagTap: _searchTag,
-          ),
+          CategorizedTagList(tags: post.tags, onTagTap: _searchTag),
         ],
       ),
     );
@@ -1060,17 +1065,31 @@ class _PostDetailPageState extends State<PostDetailPage> {
           const SizedBox(height: 16),
           _buildMetadataRow('ID', '#${post.id}', isDark),
           _buildMetadataRow('Posted', post.createdAt.relativeTime, isDark),
-          _buildMetadataRow('Resolution', '${post.file.width}x${post.file.height}', isDark),
+          _buildMetadataRow(
+            'Resolution',
+            '${post.file.width}x${post.file.height}',
+            isDark,
+          ),
           _buildMetadataRow('File Size', post.file.size.fileSize, isDark),
           _buildMetadataRow('Type', post.file.ext.toUpperCase(), isDark),
           if (post.sources.isNotEmpty)
-            _buildMetadataRow('Sources', '${post.sources.length} source(s)', isDark, isLast: true),
+            _buildMetadataRow(
+              'Sources',
+              '${post.sources.length} source(s)',
+              isDark,
+              isLast: true,
+            ),
         ],
       ),
     );
   }
 
-  Widget _buildMetadataRow(String label, String value, bool isDark, {bool isLast = false}) {
+  Widget _buildMetadataRow(
+    String label,
+    String value,
+    bool isDark, {
+    bool isLast = false,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
@@ -1120,7 +1139,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
               Navigator.of(context).pop();
               _openFullMedia();
             },
-            child: Text(_currentPost?.isVideo == true ? 'View Full Video' : 'View Full Resolution'),
+            child: Text(
+              _currentPost?.isVideo == true
+                  ? 'View Full Video'
+                  : 'View Full Resolution',
+            ),
           ),
           CupertinoActionSheetAction(
             onPressed: () {
@@ -1148,10 +1171,7 @@ class _FullScreenImageViewer extends StatelessWidget {
   final String imageUrl;
   final String heroTag;
 
-  const _FullScreenImageViewer({
-    required this.imageUrl,
-    required this.heroTag,
-  });
+  const _FullScreenImageViewer({required this.imageUrl, required this.heroTag});
 
   @override
   Widget build(BuildContext context) {
@@ -1162,10 +1182,7 @@ class _FullScreenImageViewer extends StatelessWidget {
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Icon(
-            CupertinoIcons.xmark,
-            color: CupertinoColors.white,
-          ),
+          child: const Icon(CupertinoIcons.xmark, color: CupertinoColors.white),
         ),
       ),
       child: Hero(
@@ -1294,7 +1311,8 @@ class _CommentsSheetState extends State<_CommentsSheet> {
   @override
   Widget build(BuildContext context) {
     final settingsProvider = context.watch<SettingsProvider>();
-    final isDark = settingsProvider.themeMode == 2 ||
+    final isDark =
+        settingsProvider.themeMode == 2 ||
         settingsProvider.themeMode == 3 ||
         (settingsProvider.themeMode == 0 &&
             MediaQuery.platformBrightnessOf(context) == Brightness.dark);
@@ -1312,19 +1330,16 @@ class _CommentsSheetState extends State<_CommentsSheet> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: isOled
-                  ? [
-                      Colors.black.withValues(alpha: 0.95),
-                      Colors.black,
-                    ]
+                  ? [Colors.black.withValues(alpha: 0.95), Colors.black]
                   : isDark
-                      ? [
-                          AppColors.darkBackground.withValues(alpha: 0.95),
-                          AppColors.darkBackground,
-                        ]
-                      : [
-                          CupertinoColors.systemBackground.withValues(alpha: 0.95),
-                          CupertinoColors.systemBackground,
-                        ],
+                  ? [
+                      AppColors.darkBackground.withValues(alpha: 0.95),
+                      AppColors.darkBackground,
+                    ]
+                  : [
+                      CupertinoColors.systemBackground.withValues(alpha: 0.95),
+                      CupertinoColors.systemBackground,
+                    ],
             ),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             border: Border(
@@ -1332,8 +1347,8 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                 color: isOled
                     ? Colors.white.withValues(alpha: 0.08)
                     : isDark
-                        ? Colors.white.withValues(alpha: 0.15)
-                        : Colors.white.withValues(alpha: 0.5),
+                    ? Colors.white.withValues(alpha: 0.15)
+                    : Colors.white.withValues(alpha: 0.5),
                 width: 0.5,
               ),
             ),
@@ -1365,8 +1380,12 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                CupertinoColors.systemBlue.withValues(alpha: 0.3),
-                                CupertinoColors.systemBlue.withValues(alpha: 0.1),
+                                CupertinoColors.systemBlue.withValues(
+                                  alpha: 0.3,
+                                ),
+                                CupertinoColors.systemBlue.withValues(
+                                  alpha: 0.1,
+                                ),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(10),
@@ -1375,7 +1394,9 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                             CupertinoIcons.chat_bubble_2_fill,
                             size: 18,
                             color: isDark
-                                ? CupertinoColors.systemBlue.withValues(alpha: 0.8)
+                                ? CupertinoColors.systemBlue.withValues(
+                                    alpha: 0.8,
+                                  )
                                 : CupertinoColors.systemBlue,
                           ),
                         ),
@@ -1423,9 +1444,7 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                     : Colors.black.withValues(alpha: 0.05),
               ),
               // Comments list
-              Expanded(
-                child: _buildCommentsList(isDark, isOled),
-              ),
+              Expanded(child: _buildCommentsList(isDark, isOled)),
               // Comment input
               _buildCommentInput(isDark, isOled, bottomPadding),
             ],
@@ -1456,14 +1475,14 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                       Colors.white.withValues(alpha: 0.02),
                     ]
                   : isDark
-                      ? [
-                          Colors.white.withValues(alpha: 0.08),
-                          Colors.white.withValues(alpha: 0.04),
-                        ]
-                      : [
-                          Colors.white.withValues(alpha: 0.9),
-                          Colors.white.withValues(alpha: 0.8),
-                        ],
+                  ? [
+                      Colors.white.withValues(alpha: 0.08),
+                      Colors.white.withValues(alpha: 0.04),
+                    ]
+                  : [
+                      Colors.white.withValues(alpha: 0.9),
+                      Colors.white.withValues(alpha: 0.8),
+                    ],
             ),
             border: Border(
               top: BorderSide(
@@ -1498,7 +1517,9 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                     ),
                   ),
                   style: TextStyle(
-                    color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                    color: isDark
+                        ? CupertinoColors.white
+                        : CupertinoColors.black,
                   ),
                   placeholderStyle: TextStyle(
                     color: isDark
@@ -1523,7 +1544,9 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: CupertinoColors.systemBlue.withValues(alpha: 0.4),
+                        color: CupertinoColors.systemBlue.withValues(
+                          alpha: 0.4,
+                        ),
                         blurRadius: 12,
                       ),
                     ],
@@ -1687,22 +1710,22 @@ class _CommentCard extends StatelessWidget {
                       Colors.white.withValues(alpha: 0.02),
                     ]
                   : isDark
-                      ? [
-                          Colors.white.withValues(alpha: 0.1),
-                          Colors.white.withValues(alpha: 0.05),
-                        ]
-                      : [
-                          Colors.white.withValues(alpha: 0.8),
-                          Colors.white.withValues(alpha: 0.6),
-                        ],
+                  ? [
+                      Colors.white.withValues(alpha: 0.1),
+                      Colors.white.withValues(alpha: 0.05),
+                    ]
+                  : [
+                      Colors.white.withValues(alpha: 0.8),
+                      Colors.white.withValues(alpha: 0.6),
+                    ],
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isOled
                   ? Colors.white.withValues(alpha: 0.06)
                   : isDark
-                      ? Colors.white.withValues(alpha: 0.12)
-                      : Colors.white.withValues(alpha: 0.4),
+                  ? Colors.white.withValues(alpha: 0.12)
+                  : Colors.white.withValues(alpha: 0.4),
               width: 0.5,
             ),
           ),
@@ -1719,7 +1742,9 @@ class _CommentCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              CupertinoColors.systemBlue.withValues(alpha: 0.25),
+                              CupertinoColors.systemBlue.withValues(
+                                alpha: 0.25,
+                              ),
                               CupertinoColors.systemBlue.withValues(alpha: 0.1),
                             ],
                           ),
@@ -1729,7 +1754,9 @@ class _CommentCard extends StatelessWidget {
                           CupertinoIcons.person_fill,
                           size: 14,
                           color: isDark
-                              ? CupertinoColors.systemBlue.withValues(alpha: 0.8)
+                              ? CupertinoColors.systemBlue.withValues(
+                                  alpha: 0.8,
+                                )
                               : CupertinoColors.systemBlue,
                         ),
                       ),
@@ -1831,7 +1858,9 @@ class _CommentCard extends StatelessWidget {
                     blockquoteDecoration: BoxDecoration(
                       border: Border(
                         left: BorderSide(
-                          color: CupertinoColors.systemBlue.withValues(alpha: 0.5),
+                          color: CupertinoColors.systemBlue.withValues(
+                            alpha: 0.5,
+                          ),
                           width: 2,
                         ),
                       ),
