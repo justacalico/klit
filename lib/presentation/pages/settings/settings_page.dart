@@ -61,9 +61,8 @@ class SettingsPage extends StatelessWidget {
               title: auth.currentAccount?.username ?? 'Not logged in',
               subtitle: auth.currentAccount?.host ?? '',
               showChevron: true,
-              onTap: () => Navigator.of(context).pushNamed(
-                AppRoutes.accountManagement,
-              ),
+              onTap: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.accountManagement),
             );
           },
         ),
@@ -75,9 +74,7 @@ class SettingsPage extends StatelessWidget {
           iconColor: AppColors.primaryGreen,
           title: 'Server Configuration',
           showChevron: true,
-          onTap: () => Navigator.of(context).pushNamed(
-            AppRoutes.hostSettings,
-          ),
+          onTap: () => Navigator.of(context).pushNamed(AppRoutes.hostSettings),
         ),
       ],
     );
@@ -150,7 +147,9 @@ class SettingsPage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                        color: isDark
+                            ? CupertinoColors.white
+                            : CupertinoColors.black,
                       ),
                     ),
                   ),
@@ -640,10 +639,7 @@ Your Privacy is Protected - Everything Stays on Your Device.
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: subtitleColor,
-                      ),
+                      style: TextStyle(fontSize: 13, color: subtitleColor),
                     ),
                   ],
                 ],
@@ -689,7 +685,9 @@ Your Privacy is Protected - Everything Stays on Your Device.
         decoration: BoxDecoration(
           color: isDark
               ? CupertinoColors.white.withValues(alpha: isEnabled ? 0.15 : 0.05)
-              : CupertinoColors.black.withValues(alpha: isEnabled ? 0.08 : 0.03),
+              : CupertinoColors.black.withValues(
+                  alpha: isEnabled ? 0.08 : 0.03,
+                ),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
@@ -708,7 +706,9 @@ Your Privacy is Protected - Everything Stays on Your Device.
       context: context,
       builder: (context) => CupertinoAlertDialog(
         title: const Text('Clear Search History'),
-        content: const Text('Are you sure you want to clear your search history?'),
+        content: const Text(
+          'Are you sure you want to clear your search history?',
+        ),
         actions: [
           CupertinoDialogAction(
             child: const Text('Cancel'),
@@ -751,7 +751,11 @@ Your Privacy is Protected - Everything Stays on Your Device.
     );
   }
 
-  void _showThemePicker(BuildContext context, SettingsProvider settings, bool isDark) {
+  void _showThemePicker(
+    BuildContext context,
+    SettingsProvider settings,
+    bool isDark,
+  ) {
     final themes = [
       ('Auto', 'Follow system settings', CupertinoIcons.device_phone_portrait),
       ('Light', 'Always use light theme', CupertinoIcons.sun_max_fill),
@@ -817,7 +821,9 @@ Your Privacy is Protected - Everything Stays on Your Device.
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                        color: isDark
+                            ? CupertinoColors.white
+                            : CupertinoColors.black,
                       ),
                     ),
                   ),
@@ -832,20 +838,36 @@ Your Privacy is Protected - Everything Stays on Your Device.
                       },
                       behavior: HitTestBehavior.opaque,
                       child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? (isDark
-                                  ? AppColors.primaryBlue.withValues(alpha: 0.3)
-                                  : AppColors.primaryBlue.withValues(alpha: 0.15))
+                                    ? AppColors.primaryBlue.withValues(
+                                        alpha: 0.3,
+                                      )
+                                    : AppColors.primaryBlue.withValues(
+                                        alpha: 0.15,
+                                      ))
                               : (isDark
-                                  ? CupertinoColors.white.withValues(alpha: 0.08)
-                                  : CupertinoColors.black.withValues(alpha: 0.04)),
+                                    ? CupertinoColors.white.withValues(
+                                        alpha: 0.08,
+                                      )
+                                    : CupertinoColors.black.withValues(
+                                        alpha: 0.04,
+                                      )),
                           borderRadius: BorderRadius.circular(12),
                           border: isSelected
                               ? Border.all(
-                                  color: AppColors.primaryBlue.withValues(alpha: 0.5),
+                                  color: AppColors.primaryBlue.withValues(
+                                    alpha: 0.5,
+                                  ),
                                   width: 1.5,
                                 )
                               : null,
@@ -858,8 +880,12 @@ Your Privacy is Protected - Everything Stays on Your Device.
                               color: isSelected
                                   ? AppColors.primaryBlue
                                   : (isDark
-                                      ? CupertinoColors.white.withValues(alpha: 0.7)
-                                      : CupertinoColors.black.withValues(alpha: 0.6)),
+                                        ? CupertinoColors.white.withValues(
+                                            alpha: 0.7,
+                                          )
+                                        : CupertinoColors.black.withValues(
+                                            alpha: 0.6,
+                                          )),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
@@ -874,8 +900,8 @@ Your Privacy is Protected - Everything Stays on Your Device.
                                       color: isSelected
                                           ? AppColors.primaryBlue
                                           : (isDark
-                                              ? CupertinoColors.white
-                                              : CupertinoColors.black),
+                                                ? CupertinoColors.white
+                                                : CupertinoColors.black),
                                     ),
                                   ),
                                   const SizedBox(height: 2),
@@ -884,8 +910,12 @@ Your Privacy is Protected - Everything Stays on Your Device.
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: isDark
-                                          ? CupertinoColors.white.withValues(alpha: 0.5)
-                                          : CupertinoColors.black.withValues(alpha: 0.5),
+                                          ? CupertinoColors.white.withValues(
+                                              alpha: 0.5,
+                                            )
+                                          : CupertinoColors.black.withValues(
+                                              alpha: 0.5,
+                                            ),
                                     ),
                                   ),
                                 ],
