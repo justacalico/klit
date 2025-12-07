@@ -1,4 +1,4 @@
-/// Model representing a user profile from the e621 API
+/// Model representing a user profile from the e926 API
 class User {
   final int id;
   final String name;

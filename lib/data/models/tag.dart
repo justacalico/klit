@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import '../../core/constants/app_constants.dart';
 
-/// Model representing a tag from e621 API
+/// Model representing a tag from e926 API
 class Tag {
   final int id;
   final String name;

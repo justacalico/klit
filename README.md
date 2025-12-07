@@ -1,6 +1,6 @@
 # Klit
 
-An E621 compatible Flutter app with iOS-style design.
+An E926 compatible Flutter app with iOS-style design.
 
 ## Building
 

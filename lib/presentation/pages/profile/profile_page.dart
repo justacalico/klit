@@ -330,7 +330,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildProfileHeader(
       BuildContext context, AuthProvider authProvider, bool isDark, bool isOled) {
-    // e621 doesn't provide avatar URLs directly, so we always show default
+    // e926 doesn't provide avatar URLs directly, so we always show default
     final username = authProvider.currentAccount?.username ?? 'Unknown';
 
     return _buildLiquidGlassContainer(

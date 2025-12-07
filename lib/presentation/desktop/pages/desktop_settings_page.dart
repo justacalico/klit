@@ -457,7 +457,7 @@ class DesktopSettingsPage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'A beautiful e621-compatible client built with Flutter.',
+            'A beautiful e926-compatible client built with Flutter.',
             style: TextStyle(
               fontSize: 13,
               color: CupertinoColors.secondaryLabel.resolveFrom(context),

@@ -1,12 +1,12 @@
-/// API constants for e621 and compatible sites
+/// API constants for e926 and compatible sites
 class ApiConstants {
   ApiConstants._();
 
-  /// Default e621 API endpoint
-  static const String defaultHost = 'https://e621.net';
+  /// Default e926 API endpoint
+  static const String defaultHost = 'https://e926.net';
 
-  /// Safe for work alternative
-  static const String sfwHost = 'https://e926.net';
+  /// NSFW alternative
+  static const String nsfwHost = 'https://e621.net';
 
   /// API endpoints
   static const String postsEndpoint = '/posts.json';
@@ -24,7 +24,7 @@ class ApiConstants {
   /// Rate limiting - requests per second
   static const double requestsPerSecond = 2.0;
 
-  /// User agent header (required by e621 API TOS)
+  /// User agent header (required by e926 API TOS)
   static const String userAgent = 'Klit/1.0.0 (Flutter App)';
 
   /// API headers

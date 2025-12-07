@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import '../../core/constants/app_constants.dart';
 
-/// Model representing a post from e621 API
+/// Model representing a post from e926 API
 class Post {
   final int id;
   final DateTime createdAt;

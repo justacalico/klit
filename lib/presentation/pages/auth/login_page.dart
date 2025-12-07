@@ -180,7 +180,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Sign in with your e621 account',
+          'Sign in with your e926 account',
           style: TextStyle(
             fontSize: 16,
             color: CupertinoColors.secondaryLabel.resolveFrom(context),
@@ -310,7 +310,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               Text(
-                'Connect to a different e621-compatible server',
+                'Connect to a different e926-compatible server',
                 style: TextStyle(
                   fontSize: 12,
                   color: CupertinoColors.secondaryLabel.resolveFrom(context),
@@ -358,7 +358,7 @@ class _LoginPageState extends State<LoginPage> {
         CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () {
-            // Could open a URL to e621 API key page
+            // Could open a URL to e926 API key page
             _showApiKeyHelp();
           },
           child: const Text(
@@ -376,7 +376,7 @@ class _LoginPageState extends State<LoginPage> {
       builder: (context) => CupertinoActionSheet(
         title: const Text('Getting an API Key'),
         message: const Text(
-          '1. Log in to e621.net\n'
+          '1. Log in to e926.net\n'
           '2. Go to Account → Manage API Access\n'
           '3. Create a new API key\n'
           '4. Copy the key and use it here',

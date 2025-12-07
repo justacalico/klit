@@ -19,14 +19,14 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
 
   final List<Map<String, String>> _presetHosts = [
     {
-      'name': 'e621 (Default)',
-      'url': 'https://e621.net',
-      'description': 'Main e621 instance',
+      'name': 'e926 (Default)',
+      'url': 'https://e926.net',
+      'description': 'Main e926 instance (SFW)',
     },
     {
-      'name': 'e926 (SFW)',
-      'url': 'https://e926.net',
-      'description': 'Safe for work alternative',
+      'name': 'e621 (NSFW)',
+      'url': 'https://e621.net',
+      'description': 'NSFW alternative',
     },
   ];
 
@@ -272,7 +272,7 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Custom hosts must be compatible with the e621 API. Changing the host will affect all new requests.',
+              'Custom hosts must be compatible with the e926 API. Changing the host will affect all new requests.',
               style: TextStyle(
                 fontSize: 13,
                 color: CupertinoColors.label.resolveFrom(context),

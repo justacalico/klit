@@ -2,7 +2,7 @@
 # https://pub.dev/packages/fastforge
 
 app_name: Klit
-description: E621 compatible Flutter app with iOS-style design
+description: E926 compatible Flutter app with iOS-style design
 version: 1.0.0
 output: build/dist
 

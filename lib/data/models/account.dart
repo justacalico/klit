@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-/// Model representing a user account for e621 API
+/// Model representing a user account for e926 API
 class Account {
   final String id;
   final String username;

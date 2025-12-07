@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import '../../core/constants/constants.dart';
 import '../models/models.dart';
 
-/// Service for e621 API communication
+/// Service for e926 API communication
 class ApiService {
   late final Dio _dio;
   String _baseUrl;

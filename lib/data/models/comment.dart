@@ -1,4 +1,4 @@
-/// Model representing a comment from e621 API
+/// Model representing a comment from e926 API
 class Comment {
   final int id;
   final int postId;

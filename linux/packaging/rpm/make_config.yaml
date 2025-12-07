@@ -2,7 +2,7 @@ display_name: Klit
 icon: assets/icon.png
 keywords:
   - klit
-  - e621
+  - e926
   - gallery
   - image
 generic_name: Image Gallery
@@ -10,7 +10,7 @@ categories:
   - Graphics
   - Network
 startup_notify: true
-summary: E621 compatible image gallery app
+summary: E926 compatible image gallery app
 group: Application/Graphics
 vendor: Klit Developer
 packager: Klit Developer
