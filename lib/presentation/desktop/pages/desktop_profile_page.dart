@@ -123,6 +123,45 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
   }
 
   Widget _buildContent(bool isDark) {
+    final authProvider = context.watch<AuthProvider>();
+
+    // Show guest mode UI
+    if (authProvider.isGuest) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              CupertinoIcons.person_crop_circle,
+              size: 64,
+              color: CupertinoColors.systemGrey,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Guest Mode',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Sign in to save favorites, vote, and view your profile',
+              style: TextStyle(color: CupertinoColors.systemGrey),
+            ),
+            const SizedBox(height: 24),
+            CupertinoButton.filled(
+              onPressed: () {
+                authProvider.logout();
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  AppRoutes.login,
+                  (route) => false,
+                );
+              },
+              child: const Text('Sign In'),
+            ),
+          ],
+        ),
+      );
+    }
+
     if (_isLoading) {
       return const Center(child: CupertinoActivityIndicator(radius: 16));
     }
@@ -152,7 +191,6 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
       );
     }
 
-    final authProvider = context.watch<AuthProvider>();
     final account = authProvider.currentAccount;
 
     if (account == null || _user == null) {
