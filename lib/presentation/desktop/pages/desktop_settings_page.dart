@@ -166,6 +166,68 @@ class DesktopSettingsPage extends StatelessWidget {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, _) {
         final account = authProvider.currentAccount;
+        final isGuest = authProvider.isGuest;
+
+        // Guest mode - show sign in prompt
+        if (isGuest) {
+          return _buildCard(
+            context,
+            isDark,
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: CupertinoColors.systemGrey.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      CupertinoIcons.person_badge_plus,
+                      size: 24,
+                      color: CupertinoColors.systemGrey,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Guest Mode',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        'Sign in to access all features',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: CupertinoColors.secondaryLabel
+                              .resolveFrom(context),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                CupertinoButton(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  onPressed: () {
+                    authProvider.logout();
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      AppRoutes.login,
+                      (route) => false,
+                    );
+                  },
+                  child: const Text('Sign In'),
+                ),
+              ],
+            ),
+          );
+        }
 
         return _buildCard(
           context,
