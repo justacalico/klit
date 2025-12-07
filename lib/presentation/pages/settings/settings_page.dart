@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../app/routes.dart';
@@ -275,21 +276,27 @@ class SettingsPage extends StatelessWidget {
       isDark: isDark,
       title: 'ABOUT',
       children: [
-        _buildLiquidGlassTile(
-          context,
-          isDark: isDark,
-          icon: CupertinoIcons.info_circle_fill,
-          iconColor: AppColors.primaryBlue,
-          title: 'Version',
-          trailing: Text(
-            AppConstants.appVersion,
-            style: TextStyle(
-              color: isDark
-                  ? CupertinoColors.white.withValues(alpha: 0.5)
-                  : CupertinoColors.black.withValues(alpha: 0.4),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+        FutureBuilder<PackageInfo>(
+          future: PackageInfo.fromPlatform(),
+          builder: (context, snapshot) {
+            final version = snapshot.data?.version ?? '...';
+            return _buildLiquidGlassTile(
+              context,
+              isDark: isDark,
+              icon: CupertinoIcons.info_circle_fill,
+              iconColor: AppColors.primaryBlue,
+              title: 'Version',
+              trailing: Text(
+                version,
+                style: TextStyle(
+                  color: isDark
+                      ? CupertinoColors.white.withValues(alpha: 0.5)
+                      : CupertinoColors.black.withValues(alpha: 0.4),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            );
+          },
         ),
         _buildLiquidGlassDivider(isDark),
         _buildLiquidGlassTile(
