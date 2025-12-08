@@ -44,6 +44,12 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Android signing keys - NEVER commit these!
+android/key.properties
+android/keystore/
+*.jks
+*.keystore
+
 # Ignore large/temp PNG files but keep essential icons
 # Don't ignore: android/app/src/main/res/mipmap-*/ic_launcher.png
 # Don't ignore: assets/icon.png
