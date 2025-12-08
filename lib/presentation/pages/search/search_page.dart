@@ -53,9 +53,20 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
       _showHistory = false;
       _performSearch();
     }
+    // Listen for focus changes to close tag suggestions
+    _focusNode.addListener(_onFocusChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
+  }
+
+  void _onFocusChanged() {
+    if (!_focusNode.hasFocus && _showTagSuggestions) {
+      setState(() {
+        _showTagSuggestions = false;
+        _tagSuggestions = [];
+      });
+    }
   }
 
   @override
@@ -71,6 +82,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
   @override
   void dispose() {
     routeObserver.unsubscribe(this);
+    _focusNode.removeListener(_onFocusChanged);
     _searchController.dispose();
     _debouncer.dispose();
     _tagDebouncer.dispose();
