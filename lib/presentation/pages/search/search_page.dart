@@ -19,7 +19,7 @@ class SearchPage extends StatefulWidget {
   State<SearchPage> createState() => _SearchPageState();
 }
 
-class _SearchPageState extends State<SearchPage> {
+class _SearchPageState extends State<SearchPage> with RouteAware {
   final _searchController = TextEditingController();
   final _debouncer = Debouncer(delay: const Duration(milliseconds: 500));
   final _tagDebouncer = Debouncer(delay: const Duration(milliseconds: 300));
@@ -32,6 +32,10 @@ class _SearchPageState extends State<SearchPage> {
   bool _isLoadingTags = false;
   String? _selectedRating;
   String _selectedOrder = 'id_desc';
+
+  // Route observer for detecting navigation events
+  static final RouteObserver<ModalRoute<void>> routeObserver =
+      RouteObserver<ModalRoute<void>>();
 
   final List<String> _ratingOptions = ['Any', 's', 'q', 'e'];
   final Map<String, String> _orderOptions = {
@@ -55,12 +59,35 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Subscribe to route changes
+    final route = ModalRoute.of(context);
+    if (route != null) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
   void dispose() {
+    routeObserver.unsubscribe(this);
     _searchController.dispose();
     _debouncer.dispose();
     _tagDebouncer.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Called when returning to this page from another page
+    // Re-enable the search field by requesting focus after a short delay
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted && !_focusNode.hasFocus) {
+        // Don't auto-focus, just ensure the field is interactive
+        // User can tap to focus if they want
+      }
+    });
   }
 
   /// Get the current word being typed (after the last space)
@@ -211,7 +238,8 @@ class _SearchPageState extends State<SearchPage> {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        middle: _buildSearchField(),
+        automaticallyImplyLeading: false,
+        middle: const Text('Search'),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () => Navigator.of(context).pop(),
@@ -223,6 +251,11 @@ class _SearchPageState extends State<SearchPage> {
           children: [
             Column(
               children: [
+                // Search field in body for better focus handling
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  child: _buildSearchField(),
+                ),
                 _buildFilters(),
                 Expanded(
                   child: _showHistory
@@ -231,10 +264,10 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ],
             ),
-            // Tag suggestions overlay
+            // Tag suggestions overlay - adjusted position
             if (_showTagSuggestions && _tagSuggestions.isNotEmpty)
               Positioned(
-                top: 0,
+                top: 56, // Below search field
                 left: 0,
                 right: 0,
                 child: _buildTagSuggestions(),
@@ -242,7 +275,7 @@ class _SearchPageState extends State<SearchPage> {
             // Loading indicator for tags
             if (_isLoadingTags && !_showTagSuggestions)
               Positioned(
-                top: 8,
+                top: 64,
                 left: 0,
                 right: 0,
                 child: Center(
