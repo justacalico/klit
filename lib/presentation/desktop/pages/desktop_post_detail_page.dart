@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/app_constants.dart';
@@ -51,6 +52,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
 
   // For full screen image view
   bool _isFullScreen = false;
+  late FocusNode _focusNode;
 
   @override
   void initState() {
@@ -58,8 +60,18 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
     _currentIndex = widget.initialIndex;
     _postIds = List.from(widget.postIds);
     _hasMore = widget.hasMore;
+    _focusNode = FocusNode();
     _loadPost(_currentIndex);
     _preloadAdjacentPosts();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _focusNode.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
   }
 
   void _preloadAdjacentPosts() {
@@ -245,13 +257,46 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
       return _buildFullScreenView(isDark);
     }
 
-    return Container(
-      color: isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      child: Column(
-        children: [
-          _buildTopBar(isDark),
-          Expanded(child: _buildContent(isDark)),
-        ],
+    return RawKeyboardListener(
+      focusNode: _focusNode,
+      autofocus: true,
+      onKey: (event) {
+        if (event is RawKeyDownEvent) {
+          final key = event.logicalKey.keyLabel.toLowerCase();
+          // Navigation
+          if (key == 'd') {
+            _navigatePost(1);
+            return;
+          }
+          if (key == 'a') {
+            _navigatePost(-1);
+            return;
+          }
+          // Actions
+          if (key == 'f') {
+            _toggleFavorite();
+            return;
+          }
+          if (key == 'w') {
+            final currentVote = _userVote[_currentIndex];
+            _vote(currentVote == 1 ? 0 : 1);
+            return;
+          }
+          if (key == 's') {
+            final currentVote = _userVote[_currentIndex];
+            _vote(currentVote == -1 ? 0 : -1);
+            return;
+          }
+        }
+      },
+      child: Container(
+        color: isDark ? AppColors.darkBackground : AppColors.lightBackground,
+        child: Column(
+          children: [
+            _buildTopBar(isDark),
+            Expanded(child: _buildContent(isDark)),
+          ],
+        ),
       ),
     );
   }
