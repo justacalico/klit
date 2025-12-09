@@ -26,9 +26,9 @@ void main() async {
   await settingsProvider.initialize();
 
   final authProvider = AuthProvider(authService: authService);
-  authProvider.setApiService(
-    apiService,
-  ); // Allow auth provider to control API service
+  // Allow auth provider to control API service and initialize authentication
+  authProvider.setApiService(apiService);
+  await authProvider.initialize();
   final postsProvider = PostsProvider(apiService: apiService);
 
   runApp(
