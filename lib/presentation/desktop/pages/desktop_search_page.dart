@@ -389,103 +389,141 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
   }
 
   Widget _buildToolbar(BuildContext context, bool isDark) {
-    return Container(
-      height: 52,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
-        border: Border(
-          bottom: BorderSide(
-            color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
-            width: 0.5,
-          ),
-        ),
-      ),
-      child: Row(
-        children: [
-          const Icon(CupertinoIcons.search),
-          const SizedBox(width: 12),
-          Expanded(
-            child: CupertinoTextField(
-              controller: _searchController,
-              focusNode: _focusNode,
-              placeholder: 'Search tags...',
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        child: Container(
+          height: 52,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: isDark
+                  ? [
+                      const Color(0xFF2C2C2E).withValues(alpha: 0.8),
+                      const Color(0xFF1C1C1E).withValues(alpha: 0.9),
+                    ]
+                  : [
+                      const Color(0xFFFFFFFF).withValues(alpha: 0.8),
+                      const Color(0xFFF8F8FA).withValues(alpha: 0.9),
+                    ],
+            ),
+            border: Border(
+              bottom: BorderSide(
                 color: isDark
-                    ? AppColors.darkBackground
-                    : CupertinoColors.systemGrey6,
-                borderRadius: BorderRadius.circular(8),
+                    ? const Color(0xFF3A3A3C).withValues(alpha: 0.3)
+                    : const Color(0xFFD1D1D6).withValues(alpha: 0.5),
+                width: 0.5,
               ),
-              onChanged: (value) {
-                // Close suggestions if user typed a space (completed a tag)
-                if (value.endsWith(' ')) {
+            ),
+          ),
+          child: Row(
+            children: [
+              const Icon(CupertinoIcons.search),
+              const SizedBox(width: 12),
+              Expanded(
+                child: CupertinoTextField(
+                  controller: _searchController,
+                  focusNode: _focusNode,
+                  placeholder: 'Search tags...',
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF1C1C1E).withValues(alpha: 0.6)
+                        : const Color(0xFFF2F2F7).withValues(alpha: 0.8),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: isDark
+                          ? const Color(0xFF3A3A3C).withValues(alpha: 0.3)
+                          : const Color(0xFFD1D1D6).withValues(alpha: 0.4),
+                      width: 0.5,
+                    ),
+                  ),
+                  onChanged: (value) {
+                    // Close suggestions if user typed a space (completed a tag)
+                    if (value.endsWith(' ')) {
+                      setState(() {
+                        _showTagSuggestions = false;
+                        _tagSuggestions = [];
+                      });
+                      return;
+                    }
+                    
+                    // Fetch tag suggestions for the current word
+                    final currentWord = _getCurrentWord();
+                    _tagDebouncer.run(() {
+                      _fetchTagSuggestions(currentWord);
+                    });
+                  },
+                  onSubmitted: (_) {
+                    setState(() {
+                      _showTagSuggestions = false;
+                      _tagSuggestions = [];
+                    });
+                    _performSearch();
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              CupertinoButton(
+                padding: const EdgeInsets.all(8),
+                onPressed: () {
                   setState(() {
                     _showTagSuggestions = false;
                     _tagSuggestions = [];
                   });
-                  return;
-                }
-                
-                // Fetch tag suggestions for the current word
-                final currentWord = _getCurrentWord();
-                _tagDebouncer.run(() {
-                  _fetchTagSuggestions(currentWord);
-                });
-              },
-              onSubmitted: (_) {
-                setState(() {
-                  _showTagSuggestions = false;
-                  _tagSuggestions = [];
-                });
-                _performSearch();
-              },
-            ),
+                  _performSearch();
+                },
+                child: const Text('Search'),
+              ),
+              CupertinoButton(
+                padding: const EdgeInsets.all(8),
+                onPressed: () => setState(() => _showFilters = !_showFilters),
+                child: Icon(
+                  _showFilters
+                      ? CupertinoIcons.slider_horizontal_below_rectangle
+                      : CupertinoIcons.slider_horizontal_3,
+                  size: 20,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 12),
-          CupertinoButton(
-            padding: const EdgeInsets.all(8),
-            onPressed: () {
-              setState(() {
-                _showTagSuggestions = false;
-                _tagSuggestions = [];
-              });
-              _performSearch();
-            },
-            child: const Text('Search'),
-          ),
-          CupertinoButton(
-            padding: const EdgeInsets.all(8),
-            onPressed: () => setState(() => _showFilters = !_showFilters),
-            child: Icon(
-              _showFilters
-                  ? CupertinoIcons.slider_horizontal_below_rectangle
-                  : CupertinoIcons.slider_horizontal_3,
-              size: 20,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildFilters(BuildContext context, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground.withValues(alpha: 0.5)
-            : CupertinoColors.systemGrey6,
-        border: Border(
-          bottom: BorderSide(
-            color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
-            width: 0.5,
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: isDark
+                  ? [
+                      const Color(0xFF2C2C2E).withValues(alpha: 0.6),
+                      const Color(0xFF1C1C1E).withValues(alpha: 0.7),
+                    ]
+                  : [
+                      const Color(0xFFF8F8FA).withValues(alpha: 0.7),
+                      const Color(0xFFF2F2F7).withValues(alpha: 0.8),
+                    ],
+            ),
+            border: Border(
+              bottom: BorderSide(
+                color: isDark
+                    ? const Color(0xFF3A3A3C).withValues(alpha: 0.3)
+                    : const Color(0xFFD1D1D6).withValues(alpha: 0.5),
+                width: 0.5,
+              ),
+            ),
           ),
-        ),
-      ),
-      child: Row(
+          child: Row(
         children: [
           // Rating filter
           const Text('Rating:', style: TextStyle(fontSize: 13)),
@@ -542,7 +580,9 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
           const Spacer(),
           // Grid size
           _buildGridSizeSelector(isDark),
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }
