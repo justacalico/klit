@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -126,28 +127,43 @@ class _DesktopHotPageState extends State<DesktopHotPage> {
   }
 
   Widget _buildToolbar(BuildContext context, bool isDark) {
-    return Container(
-      height: 52,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
-        border: Border(
-          bottom: BorderSide(
-            color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
-            width: 0.5,
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        child: Container(
+          height: 52,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: isDark
+                  ? [
+                      const Color(0xFF2C2C2E).withValues(alpha: 0.8),
+                      const Color(0xFF1C1C1E).withValues(alpha: 0.9),
+                    ]
+                  : [
+                      const Color(0xFFFFFFFF).withValues(alpha: 0.8),
+                      const Color(0xFFF8F8FA).withValues(alpha: 0.9),
+                    ],
+            ),
+            border: Border(
+              bottom: BorderSide(
+                color: isDark
+                    ? const Color(0xFF3A3A3C).withValues(alpha: 0.3)
+                    : const Color(0xFFD1D1D6).withValues(alpha: 0.5),
+                width: 0.5,
+              ),
+            ),
           ),
-        ),
-      ),
-      child: Row(
-        children: [
-          const Icon(CupertinoIcons.flame_fill, color: AppColors.primaryOrange),
-          const SizedBox(width: 8),
-          const Text(
-            'Hot Posts',
-            style: TextStyle(
-              fontSize: 18,
+          child: Row(
+            children: [
+              const Icon(CupertinoIcons.flame_fill, color: AppColors.primaryOrange),
+              const SizedBox(width: 8),
+              const Text(
+                'Hot Posts',
+                style: TextStyle(
+                  fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -164,7 +180,9 @@ class _DesktopHotPageState extends State<DesktopHotPage> {
             onPressed: () => _loadPosts(refresh: true),
             child: const Icon(CupertinoIcons.refresh, size: 20),
           ),
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }
