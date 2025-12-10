@@ -532,29 +532,29 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
   Widget _buildFilters(BuildContext context, bool isDark) {
     return ClipRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
               colors: isDark
                   ? [
-                      const Color(0xFF2C2C2E).withValues(alpha: 0.6),
-                      const Color(0xFF1C1C1E).withValues(alpha: 0.7),
+                      const Color(0xFF18181B).withValues(alpha: 0.75),
+                      const Color(0xFF1F1F23).withValues(alpha: 0.8),
                     ]
                   : [
-                      const Color(0xFFF8F8FA).withValues(alpha: 0.7),
-                      const Color(0xFFF2F2F7).withValues(alpha: 0.8),
+                      const Color(0xFFFAFAFC).withValues(alpha: 0.8),
+                      const Color(0xFFF4F4F5).withValues(alpha: 0.85),
                     ],
             ),
             border: Border(
               bottom: BorderSide(
                 color: isDark
-                    ? const Color(0xFF3A3A3C).withValues(alpha: 0.3)
-                    : const Color(0xFFD1D1D6).withValues(alpha: 0.5),
-                width: 0.5,
+                    ? DesktopToolbarColors.primaryPurple.withValues(alpha: 0.1)
+                    : DesktopToolbarColors.primaryPurple.withValues(alpha: 0.08),
+                width: 1,
               ),
             ),
           ),
