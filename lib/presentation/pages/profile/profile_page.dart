@@ -104,12 +104,51 @@ class _ProfilePageState extends State<ProfilePage> {
       slivers: [
         CupertinoSliverNavigationBar(
           transitionBetweenRoutes: false,
-          largeTitle: const Text('Profile'),
           backgroundColor: isOled
               ? CupertinoColors.black.withValues(alpha: 0.8)
               : isDark
-              ? CupertinoColors.darkBackgroundGray.withValues(alpha: 0.8)
-              : CupertinoColors.systemBackground.withValues(alpha: 0.8),
+              ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
+              : CupertinoColors.white.withValues(alpha: 0.85),
+          border: Border(
+            bottom: BorderSide(
+              color: isDark
+                  ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
+                  : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+              width: 0.5,
+            ),
+          ),
+          largeTitle: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      _ThemeColors.primaryIndigo,
+                      _ThemeColors.primaryPurple,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: _ThemeColors.primaryPurple.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  CupertinoIcons.person_fill,
+                  size: 16,
+                  color: CupertinoColors.white,
+                ),
+              ),
+              const SizedBox(width: 10),
+              const Text('Profile'),
+            ],
+          ),
         ),
         CupertinoSliverRefreshControl(onRefresh: _loadUserStats),
         SliverPadding(
