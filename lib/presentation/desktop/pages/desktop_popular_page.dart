@@ -1,12 +1,11 @@
-import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../data/models/models.dart';
 import '../../pages/post/post_detail_page.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
+import '../widgets/desktop_toolbar.dart';
 
 /// Desktop popular page with most favorited posts
 class DesktopPopularPage extends StatefulWidget {
@@ -75,12 +74,28 @@ class _DesktopPopularPageState extends State<DesktopPopularPage> {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = CupertinoTheme.brightnessOf(context);
-    final isDark = brightness == Brightness.dark;
-
     return Column(
       children: [
-        _buildToolbar(context, isDark),
+        DesktopToolbar(
+          title: 'Popular Posts',
+          icon: CupertinoIcons.star_fill,
+          actions: [
+            DesktopGridSizeSelector(
+              value: _gridColumns,
+              onChanged: (val) => setState(() => _gridColumns = val),
+            ),
+            const SizedBox(width: 16),
+            DesktopToolbarButton(
+              icon: CupertinoIcons.search,
+              onPressed: () => widget.onSearchTap(),
+            ),
+            const SizedBox(width: 8),
+            DesktopToolbarButton(
+              icon: CupertinoIcons.refresh,
+              onPressed: () => _loadPosts(refresh: true),
+            ),
+          ],
+        ),
         Expanded(
           child: Consumer<PostsProvider>(
             builder: (context, postsProvider, _) {
@@ -121,111 +136,6 @@ class _DesktopPopularPageState extends State<DesktopPopularPage> {
               );
             },
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildToolbar(BuildContext context, bool isDark) {
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-        child: Container(
-          height: 52,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: isDark
-                  ? [
-                      const Color(0xFF2C2C2E).withValues(alpha: 0.8),
-                      const Color(0xFF1C1C1E).withValues(alpha: 0.9),
-                    ]
-                  : [
-                      const Color(0xFFFFFFFF).withValues(alpha: 0.8),
-                      const Color(0xFFF8F8FA).withValues(alpha: 0.9),
-                    ],
-            ),
-            border: Border(
-              bottom: BorderSide(
-                color: isDark
-                    ? const Color(0xFF3A3A3C).withValues(alpha: 0.3)
-                    : const Color(0xFFD1D1D6).withValues(alpha: 0.5),
-                width: 0.5,
-              ),
-            ),
-          ),
-          child: Row(
-            children: [
-              const Icon(CupertinoIcons.star_fill, color: AppColors.primaryYellow),
-              const SizedBox(width: 8),
-              const Text(
-                'Popular Posts',
-                style: TextStyle(
-                  fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const Spacer(),
-          _buildGridSizeSelector(isDark),
-          const SizedBox(width: 12),
-          CupertinoButton(
-            padding: const EdgeInsets.all(8),
-            onPressed: () => widget.onSearchTap(),
-            child: const Icon(CupertinoIcons.search, size: 20),
-          ),
-          CupertinoButton(
-            padding: const EdgeInsets.all(8),
-            onPressed: () => _loadPosts(refresh: true),
-            child: const Icon(CupertinoIcons.refresh, size: 20),
-          ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGridSizeSelector(bool isDark) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Icon(
-          CupertinoIcons.square_grid_2x2,
-          size: 16,
-          color: CupertinoColors.secondaryLabel,
-        ),
-        const SizedBox(width: 8),
-        CupertinoSlidingSegmentedControl<int>(
-          groupValue: _gridColumns,
-          children: const {
-            2: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text('2', style: TextStyle(fontSize: 13)),
-            ),
-            3: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text('3', style: TextStyle(fontSize: 13)),
-            ),
-            4: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text('4', style: TextStyle(fontSize: 13)),
-            ),
-            5: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text('5', style: TextStyle(fontSize: 13)),
-            ),
-            6: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text('6', style: TextStyle(fontSize: 13)),
-            ),
-          },
-          onValueChanged: (value) {
-            if (value != null) {
-              setState(() => _gridColumns = value);
-            }
-          },
         ),
       ],
     );
