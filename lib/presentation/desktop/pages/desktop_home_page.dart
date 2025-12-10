@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -110,20 +111,35 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
   }
 
   Widget _buildToolbar(BuildContext context, bool isDark) {
-    return Container(
-      height: 52,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
-        border: Border(
-          bottom: BorderSide(
-            color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
-            width: 0.5,
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        child: Container(
+          height: 52,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: isDark
+                  ? [
+                      const Color(0xFF2C2C2E).withValues(alpha: 0.8),
+                      const Color(0xFF1C1C1E).withValues(alpha: 0.9),
+                    ]
+                  : [
+                      const Color(0xFFFFFFFF).withValues(alpha: 0.8),
+                      const Color(0xFFF8F8FA).withValues(alpha: 0.9),
+                    ],
+            ),
+            border: Border(
+              bottom: BorderSide(
+                color: isDark
+                    ? const Color(0xFF3A3A3C).withValues(alpha: 0.3)
+                    : const Color(0xFFD1D1D6).withValues(alpha: 0.5),
+                width: 0.5,
+              ),
+            ),
           ),
-        ),
-      ),
       child: Row(
         children: [
           const Text(
@@ -143,13 +159,13 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
             onPressed: () => widget.onSearchTap(),
             child: const Icon(CupertinoIcons.search, size: 20),
           ),
-          // Refresh button
-          CupertinoButton(
+          child: CupertinoButton(
             padding: const EdgeInsets.all(8),
             onPressed: () => _loadPosts(refresh: true),
             child: const Icon(CupertinoIcons.refresh, size: 20),
           ),
         ],
+        ),
       ),
     );
   }
