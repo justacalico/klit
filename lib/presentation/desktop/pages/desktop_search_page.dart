@@ -392,57 +392,94 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
   Widget _buildToolbar(BuildContext context, bool isDark) {
     return ClipRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        filter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
         child: Container(
-          height: 52,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          height: 60,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
               colors: isDark
                   ? [
-                      const Color(0xFF2C2C2E).withValues(alpha: 0.8),
-                      const Color(0xFF1C1C1E).withValues(alpha: 0.9),
+                      const Color(0xFF18181B).withValues(alpha: 0.85),
+                      const Color(0xFF1F1F23).withValues(alpha: 0.9),
                     ]
                   : [
-                      const Color(0xFFFFFFFF).withValues(alpha: 0.8),
-                      const Color(0xFFF8F8FA).withValues(alpha: 0.9),
+                      const Color(0xFFFFFFFF).withValues(alpha: 0.85),
+                      const Color(0xFFFAFAFC).withValues(alpha: 0.9),
                     ],
             ),
             border: Border(
               bottom: BorderSide(
                 color: isDark
-                    ? const Color(0xFF3A3A3C).withValues(alpha: 0.3)
-                    : const Color(0xFFD1D1D6).withValues(alpha: 0.5),
-                width: 0.5,
+                    ? DesktopToolbarColors.primaryPurple.withValues(alpha: 0.15)
+                    : DesktopToolbarColors.primaryPurple.withValues(alpha: 0.1),
+                width: 1,
               ),
             ),
           ),
           child: Row(
             children: [
-              const Icon(CupertinoIcons.search),
-              const SizedBox(width: 12),
+              // Search icon with gradient
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      DesktopToolbarColors.primaryIndigo,
+                      DesktopToolbarColors.primaryPurple,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: DesktopToolbarColors.primaryPurple.withValues(
+                        alpha: 0.3,
+                      ),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  CupertinoIcons.search,
+                  size: 16,
+                  color: CupertinoColors.white,
+                ),
+              ),
+              const SizedBox(width: 14),
               Expanded(
                 child: CupertinoTextField(
                   controller: _searchController,
                   focusNode: _focusNode,
                   placeholder: 'Search tags...',
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+                  ),
+                  placeholderStyle: TextStyle(
+                    fontSize: 15,
+                    color: isDark 
+                        ? CupertinoColors.systemGrey 
+                        : CupertinoColors.systemGrey2,
+                  ),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF1C1C1E).withValues(alpha: 0.6)
-                        : const Color(0xFFF2F2F7).withValues(alpha: 0.8),
-                    borderRadius: BorderRadius.circular(8),
+                        ? const Color(0xFF27272A).withValues(alpha: 0.6)
+                        : const Color(0xFFF4F4F5).withValues(alpha: 0.8),
+                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isDark
-                          ? const Color(0xFF3A3A3C).withValues(alpha: 0.3)
-                          : const Color(0xFFD1D1D6).withValues(alpha: 0.4),
-                      width: 0.5,
+                          ? DesktopToolbarColors.primaryPurple.withValues(alpha: 0.2)
+                          : DesktopToolbarColors.primaryPurple.withValues(alpha: 0.15),
+                      width: 1,
                     ),
                   ),
                   onChanged: (value) {
-                    // Close suggestions if user typed a space (completed a tag)
                     if (value.endsWith(' ')) {
                       setState(() {
                         _showTagSuggestions = false;
@@ -451,7 +488,6 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
                       return;
                     }
                     
-                    // Fetch tag suggestions for the current word
                     final currentWord = _getCurrentWord();
                     _tagDebouncer.run(() {
                       _fetchTagSuggestions(currentWord);
@@ -467,8 +503,9 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
                 ),
               ),
               const SizedBox(width: 12),
-              CupertinoButton(
-                padding: const EdgeInsets.all(8),
+              DesktopToolbarButton(
+                icon: CupertinoIcons.search,
+                tooltip: 'Search',
                 onPressed: () {
                   setState(() {
                     _showTagSuggestions = false;
@@ -476,17 +513,14 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
                   });
                   _performSearch();
                 },
-                child: const Text('Search'),
               ),
-              CupertinoButton(
-                padding: const EdgeInsets.all(8),
+              const SizedBox(width: 8),
+              DesktopToolbarButton(
+                icon: _showFilters
+                    ? CupertinoIcons.slider_horizontal_below_rectangle
+                    : CupertinoIcons.slider_horizontal_3,
+                tooltip: 'Toggle Filters',
                 onPressed: () => setState(() => _showFilters = !_showFilters),
-                child: Icon(
-                  _showFilters
-                      ? CupertinoIcons.slider_horizontal_below_rectangle
-                      : CupertinoIcons.slider_horizontal_3,
-                  size: 20,
-                ),
               ),
             ],
           ),
