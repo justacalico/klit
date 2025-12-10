@@ -15,7 +15,7 @@ import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/settings_provider.dart';
-import '../../widgets/widgets.dart';
+import '../../widgets/widgets.dart' hide Colors;
 
 /// Arguments for navigating to post detail with swipe support
 class PostDetailArguments {
