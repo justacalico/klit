@@ -125,18 +125,3 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
     );
   }
 }
-            6: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text('6', style: TextStyle(fontSize: 13)),
-            ),
-          },
-          onValueChanged: (value) {
-            if (value != null) {
-              setState(() => _gridColumns = value);
-            }
-          },
-        ),
-      ],
-    );
-  }
-}
