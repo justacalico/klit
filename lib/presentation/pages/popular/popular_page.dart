@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -6,6 +7,12 @@ import '../../../data/models/models.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 import '../post/post_detail_page.dart';
+
+/// Design constants for the purple/indigo mobile theme
+class _ThemeColors {
+  static const Color primaryIndigo = Color(0xFF6366F1);
+  static const Color primaryPurple = Color(0xFF8B5CF6);
+}
 
 /// Popular page with most favorited posts
 class PopularPage extends StatefulWidget {
@@ -78,67 +85,157 @@ class _PopularPageState extends State<PopularPage> {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = CupertinoTheme.brightnessOf(context);
+    final isDark = brightness == Brightness.dark;
     final gridSize = context.watch<SettingsProvider>().gridSize;
 
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        transitionBetweenRoutes: false,
-        middle: const Text('Popular'),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ViewToggleButton(
-              isGrid: _isGridView,
-              onToggle: () => setState(() => _isGridView = !_isGridView),
-            ),
-            AppBarSearchButton(onTap: _openSearch),
-          ],
-        ),
-      ),
-      child: SafeArea(
-        child: Consumer<PostsProvider>(
-          builder: (context, postsProvider, _) {
-            return Column(
-              children: [
-                TimeRangeSelector(
+      child: CustomScrollView(
+        slivers: [
+          _buildNavigationBar(isDark),
+          SliverToBoxAdapter(
+            child: Consumer<PostsProvider>(
+              builder: (context, postsProvider, _) {
+                return TimeRangeSelector(
                   selected: postsProvider.popularTimeRange,
                   options: const ['day', 'week', 'month'],
                   onChanged: (range) {
                     postsProvider.setPopularTimeRange(range);
                   },
-                ),
-                Expanded(
-                  child: SmartRefresher(
-                    controller: _refreshController,
-                    enablePullDown: true,
-                    enablePullUp: postsProvider.hasMorePopular,
-                    onRefresh: () => _loadPosts(refresh: true),
-                    onLoading: () => _loadPosts(),
-                    child: _isGridView
-                        ? PostsGrid(
-                            posts: postsProvider.popularPosts,
-                            columns: gridSize,
-                            isLoading: postsProvider.isLoadingPopular,
-                            hasMore: postsProvider.hasMorePopular,
-                            error: postsProvider.popularError,
-                            onPostTap: _onPostTap,
-                            onLoadMore: () => _loadPosts(),
-                            onRetry: () => _loadPosts(refresh: true),
-                          )
-                        : PostsList(
-                            posts: postsProvider.popularPosts,
-                            isLoading: postsProvider.isLoadingPopular,
-                            hasMore: postsProvider.hasMorePopular,
-                            error: postsProvider.popularError,
-                            onPostTap: _onPostTap,
-                            onLoadMore: () => _loadPosts(),
-                            onRetry: () => _loadPosts(refresh: true),
-                          ),
-                  ),
+                );
+              },
+            ),
+          ),
+          SliverFillRemaining(
+            child: Consumer<PostsProvider>(
+              builder: (context, postsProvider, _) {
+                return SmartRefresher(
+                  controller: _refreshController,
+                  enablePullDown: true,
+                  enablePullUp: postsProvider.hasMorePopular,
+                  onRefresh: () => _loadPosts(refresh: true),
+                  onLoading: () => _loadPosts(),
+                  child: _isGridView
+                      ? PostsGrid(
+                          posts: postsProvider.popularPosts,
+                          columns: gridSize,
+                          isLoading: postsProvider.isLoadingPopular,
+                          hasMore: postsProvider.hasMorePopular,
+                          error: postsProvider.popularError,
+                          onPostTap: _onPostTap,
+                          onLoadMore: () => _loadPosts(),
+                          onRetry: () => _loadPosts(refresh: true),
+                        )
+                      : PostsList(
+                          posts: postsProvider.popularPosts,
+                          isLoading: postsProvider.isLoadingPopular,
+                          hasMore: postsProvider.hasMorePopular,
+                          error: postsProvider.popularError,
+                          onPostTap: _onPostTap,
+                          onLoadMore: () => _loadPosts(),
+                          onRetry: () => _loadPosts(refresh: true),
+                        ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavigationBar(bool isDark) {
+    return CupertinoSliverNavigationBar(
+      transitionBetweenRoutes: false,
+      backgroundColor: isDark
+          ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
+          : CupertinoColors.white.withValues(alpha: 0.85),
+      border: Border(
+        bottom: BorderSide(
+          color: isDark
+              ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
+              : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+          width: 0.5,
+        ),
+      ),
+      largeTitle: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  _ThemeColors.primaryIndigo,
+                  _ThemeColors.primaryPurple,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: _ThemeColors.primaryPurple.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
               ],
-            );
-          },
+            ),
+            child: const Icon(
+              CupertinoIcons.star_fill,
+              size: 16,
+              color: CupertinoColors.white,
+            ),
+          ),
+          const SizedBox(width: 10),
+          const Text('Popular'),
+        ],
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildToolbarButton(
+            icon: _isGridView ? CupertinoIcons.list_bullet : CupertinoIcons.square_grid_2x2,
+            isDark: isDark,
+            onTap: () => setState(() => _isGridView = !_isGridView),
+          ),
+          const SizedBox(width: 8),
+          _buildToolbarButton(
+            icon: CupertinoIcons.search,
+            isDark: isDark,
+            onTap: _openSearch,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToolbarButton({
+    required IconData icon,
+    required bool isDark,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: isDark
+              ? const Color(0xFF2C2C2E).withValues(alpha: 0.6)
+              : const Color(0xFFF3F4F6).withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isDark
+                ? _ThemeColors.primaryPurple.withValues(alpha: 0.2)
+                : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+            width: 1,
+          ),
+        ),
+        child: Icon(
+          icon,
+          size: 20,
+          color: isDark
+              ? CupertinoColors.white.withValues(alpha: 0.8)
+              : const Color(0xFF374151),
         ),
       ),
     );
