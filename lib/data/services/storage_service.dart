@@ -55,8 +55,8 @@ class StorageService {
     }
     try {
       return await _secureStorage.read(key: key);
-    } on PlatformException {
-      // Fallback for unexpected failures
+    } catch (e) {
+      // Fallback for unexpected failures (PlatformException, etc.)
       _useSecureStorageFallback = true;
       return _prefs.getString('$_fallbackPrefix$key');
     }
@@ -70,8 +70,8 @@ class StorageService {
     }
     try {
       await _secureStorage.write(key: key, value: value);
-    } on PlatformException {
-      // Fallback for unexpected failures
+    } catch (e) {
+      // Fallback for unexpected failures (PlatformException, etc.)
       _useSecureStorageFallback = true;
       await _prefs.setString('$_fallbackPrefix$key', value);
     }
@@ -85,7 +85,8 @@ class StorageService {
     }
     try {
       await _secureStorage.delete(key: key);
-    } on PlatformException {
+    } catch (e) {
+      // Fallback for unexpected failures (PlatformException, etc.)
       _useSecureStorageFallback = true;
       await _prefs.remove('$_fallbackPrefix$key');
     }
@@ -105,7 +106,8 @@ class StorageService {
     }
     try {
       await _secureStorage.deleteAll();
-    } on PlatformException {
+    } catch (e) {
+      // Fallback for unexpected failures (PlatformException, etc.)
       _useSecureStorageFallback = true;
       final keys = _prefs
           .getKeys()
