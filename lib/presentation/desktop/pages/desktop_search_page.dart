@@ -8,6 +8,7 @@ import '../../../data/services/services.dart';
 import '../../pages/post/post_detail_page.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
+import '../widgets/desktop_toolbar.dart';
 
 /// Desktop search page with advanced filters
 class DesktopSearchPage extends StatefulWidget {
