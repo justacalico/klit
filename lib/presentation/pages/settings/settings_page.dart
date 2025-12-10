@@ -7,6 +7,12 @@ import '../../../app/routes.dart';
 import '../../../core/constants/constants.dart';
 import '../../providers/providers.dart';
 
+/// Design constants for the purple/indigo mobile theme
+class _ThemeColors {
+  static const Color primaryIndigo = Color(0xFF6366F1);
+  static const Color primaryPurple = Color(0xFF8B5CF6);
+}
+
 /// Settings page with iOS 26 liquid glass design
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -20,29 +26,71 @@ class SettingsPage extends StatelessWidget {
       backgroundColor: isDark
           ? AppColors.darkGroupedBackground
           : AppColors.lightGroupedBackground,
-      navigationBar: CupertinoNavigationBar(
-        transitionBetweenRoutes: false,
-        middle: const Text('Settings'),
-        backgroundColor: isDark
-            ? CupertinoColors.black.withValues(alpha: 0.5)
-            : CupertinoColors.white.withValues(alpha: 0.5),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: 100),
-          children: [
-            const SizedBox(height: 20),
-            _buildAccountSection(context, isDark),
-            const SizedBox(height: 24),
-            _buildAppearanceSection(context, isDark),
-            const SizedBox(height: 24),
-            _buildCacheSection(context, isDark),
-            const SizedBox(height: 24),
-            _buildAboutSection(context, isDark),
-            const SizedBox(height: 40),
-          ],
-        ),
+      child: CustomScrollView(
+        slivers: [
+          CupertinoSliverNavigationBar(
+            transitionBetweenRoutes: false,
+            backgroundColor: isDark
+                ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
+                : CupertinoColors.white.withValues(alpha: 0.85),
+            border: Border(
+              bottom: BorderSide(
+                color: isDark
+                    ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
+                    : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+                width: 0.5,
+              ),
+            ),
+            largeTitle: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        _ThemeColors.primaryIndigo,
+                        _ThemeColors.primaryPurple,
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _ThemeColors.primaryPurple.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    CupertinoIcons.gear_solid,
+                    size: 16,
+                    color: CupertinoColors.white,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                const Text('Settings'),
+              ],
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.only(bottom: 100),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                const SizedBox(height: 20),
+                _buildAccountSection(context, isDark),
+                const SizedBox(height: 24),
+                _buildAppearanceSection(context, isDark),
+                const SizedBox(height: 24),
+                _buildCacheSection(context, isDark),
+                const SizedBox(height: 24),
+                _buildAboutSection(context, isDark),
+                const SizedBox(height: 40),
+              ]),
+            ),
+          ),
+        ],
       ),
     );
   }
