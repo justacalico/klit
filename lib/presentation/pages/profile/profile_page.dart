@@ -330,13 +330,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    CupertinoButton(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 14,
-                      ),
-                      color: CupertinoColors.systemBlue,
-                      borderRadius: BorderRadius.circular(14),
+                    _buildGradientButton(
                       onPressed: () {
                         context.read<AuthProvider>().logout();
                         Navigator.of(
@@ -412,13 +406,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                CupertinoButton(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  color: CupertinoColors.systemBlue,
-                  borderRadius: BorderRadius.circular(12),
+                _buildGradientButton(
                   onPressed: _loadUserStats,
                   child: const Text(
                     'Retry',
@@ -429,6 +417,40 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildGradientButton({
+    required VoidCallback onPressed,
+    required Widget child,
+  }) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 32,
+          vertical: 14,
+        ),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              _ThemeColors.primaryIndigo,
+              _ThemeColors.primaryPurple,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: _ThemeColors.primaryPurple.withValues(alpha: 0.4),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: child,
       ),
     );
   }
