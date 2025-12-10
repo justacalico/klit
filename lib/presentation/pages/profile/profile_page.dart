@@ -239,13 +239,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    CupertinoButton(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 14,
-                      ),
-                      color: CupertinoColors.systemBlue,
-                      borderRadius: BorderRadius.circular(14),
+                    _buildGradientButton(
                       onPressed: () {
                         Navigator.of(context).pushNamed('/login');
                       },
