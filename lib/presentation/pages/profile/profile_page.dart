@@ -7,6 +7,12 @@ import '../../../data/services/api_service.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/settings_provider.dart';
 
+/// Design constants for the purple/indigo mobile theme
+class _ThemeColors {
+  static const Color primaryIndigo = Color(0xFF6366F1);
+  static const Color primaryPurple = Color(0xFF8B5CF6);
+}
+
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
