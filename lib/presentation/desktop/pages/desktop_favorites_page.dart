@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/constants.dart';
@@ -135,39 +136,56 @@ class _DesktopFavoritesPageState extends State<DesktopFavoritesPage> {
   }
 
   Widget _buildToolbar(bool isDark) {
-    return Container(
-      height: 52,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
-        border: Border(
-          bottom: BorderSide(
-            color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
-            width: 0.5,
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        child: Container(
+          height: 52,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [
+                      const Color(0xFF2C2C2E).withValues(alpha: 0.8),
+                      const Color(0xFF1C1C1E).withValues(alpha: 0.9),
+                    ]
+                  : [
+                      const Color(0xFFFFFFFF).withValues(alpha: 0.8),
+                      const Color(0xFFF8F8FA).withValues(alpha: 0.9),
+                    ],
+            ),
+            border: Border(
+              bottom: BorderSide(
+                color: isDark
+                    ? const Color(0xFF3D3D3F).withValues(alpha: 0.5)
+                    : const Color(0xFFE5E5E7).withValues(alpha: 0.8),
+                width: 0.5,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              const Icon(CupertinoIcons.heart_fill, color: AppColors.explicitColor),
+              const SizedBox(width: 12),
+              const Text(
+                'Favorites',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              ),
+              const Spacer(),
+              // Grid size selector
+              _buildGridSizeSelector(isDark),
+              const SizedBox(width: 12),
+              // Refresh button
+              CupertinoButton(
+                padding: const EdgeInsets.all(8),
+                onPressed: () => _loadFavorites(refresh: true),
+                child: const Icon(CupertinoIcons.refresh, size: 20),
+              ),
+            ],
           ),
         ),
-      ),
-      child: Row(
-        children: [
-          const Icon(CupertinoIcons.heart_fill, color: AppColors.explicitColor),
-          const SizedBox(width: 12),
-          const Text(
-            'Favorites',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-          ),
-          const Spacer(),
-          // Grid size selector
-          _buildGridSizeSelector(isDark),
-          const SizedBox(width: 12),
-          // Refresh button
-          CupertinoButton(
-            padding: const EdgeInsets.all(8),
-            onPressed: () => _loadFavorites(refresh: true),
-            child: const Icon(CupertinoIcons.refresh, size: 20),
-          ),
-        ],
       ),
     );
   }
