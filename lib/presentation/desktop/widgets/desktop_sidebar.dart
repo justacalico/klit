@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../../app/routes.dart';
@@ -57,10 +58,37 @@ class DesktopSidebar extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       width: isCollapsed ? 72 : 220,
-      color: isDark
-          ? AppColors.darkSecondaryBackground
-          : AppColors.lightSecondaryBackground,
-      child: Column(
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? [
+                        const Color(0xFF1C1C1E).withValues(alpha: 0.75),
+                        const Color(0xFF2C2C2E).withValues(alpha: 0.85),
+                        const Color(0xFF1C1C1E).withValues(alpha: 0.9),
+                      ]
+                    : [
+                        const Color(0xFFFFFFFF).withValues(alpha: 0.7),
+                        const Color(0xFFF8F8FA).withValues(alpha: 0.8),
+                        const Color(0xFFF2F2F7).withValues(alpha: 0.85),
+                      ],
+                stops: const [0.0, 0.5, 1.0],
+              ),
+              border: Border(
+                right: BorderSide(
+                  color: isDark
+                      ? const Color(0xFF3A3A3C).withValues(alpha: 0.4)
+                      : const Color(0xFFD1D1D6).withValues(alpha: 0.5),
+                  width: 0.5,
+                ),
+              ),
+            ),
+            child: Column(
         children: [
           // App header
           _buildHeader(context, isDark),
@@ -154,31 +182,18 @@ class DesktopSidebar extends StatelessWidget {
                     onTap: () => onItemSelected(3),
                   ),
           ),
-          // Collapse toggle
+          // Collapse toggle with glass effect
           Padding(
             padding: const EdgeInsets.all(8),
-            child: CupertinoButton(
-              padding: EdgeInsets.zero,
-              onPressed: onToggleCollapse,
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                  color: isDark
-                      ? CupertinoColors.systemGrey5.darkColor
-                      : CupertinoColors.systemGrey5,
-                ),
-                child: Icon(
-                  isCollapsed
-                      ? CupertinoIcons.sidebar_right
-                      : CupertinoIcons.sidebar_left,
-                  size: 18,
-                  color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                ),
-              ),
+            child: _GlassCollapseButton(
+              isCollapsed: isCollapsed,
+              onTap: onToggleCollapse,
             ),
           ),
         ],
+      ),
+          ),
+        ),
       ),
     );
   }
@@ -190,23 +205,36 @@ class DesktopSidebar extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
+            color: isDark
+                ? const Color(0xFF3A3A3C).withValues(alpha: 0.3)
+                : const Color(0xFFD1D1D6).withValues(alpha: 0.4),
             width: 0.5,
           ),
         ),
       ),
       child: Row(
         children: [
+          // App icon with liquid glass glow effect
           Container(
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppColors.primaryBlue, AppColors.primaryPurple],
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primaryBlue.withValues(alpha: 0.9),
+                  AppColors.primaryPurple.withValues(alpha: 0.9),
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(7),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryBlue.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: const Center(
               child: Text(
@@ -288,8 +316,29 @@ class _SidebarItem extends StatefulWidget {
   State<_SidebarItem> createState() => _SidebarItemState();
 }
 
-class _SidebarItemState extends State<_SidebarItem> {
+class _SidebarItemState extends State<_SidebarItem>
+    with SingleTickerProviderStateMixin {
   bool _isHovered = false;
+  late AnimationController _controller;
+  late Animation<double> _glowAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _glowAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -297,29 +346,70 @@ class _SidebarItemState extends State<_SidebarItem> {
     final isDark = brightness == Brightness.dark;
 
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
+      onEnter: (_) {
+        setState(() => _isHovered = true);
+        _controller.forward();
+      },
+      onExit: (_) {
+        setState(() => _isHovered = false);
+        _controller.reverse();
+      },
       child: GestureDetector(
         onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          margin: const EdgeInsets.symmetric(vertical: 2),
-          padding: EdgeInsets.symmetric(
-            horizontal: widget.isCollapsed ? 0 : 12,
-            vertical: 8,
-          ),
-          decoration: BoxDecoration(
-            color: widget.isSelected
-                ? (isDark
-                      ? CupertinoColors.systemGrey4.darkColor
-                      : CupertinoColors.systemGrey4)
-                : _isHovered
-                ? (isDark
-                      ? CupertinoColors.systemGrey5.darkColor
-                      : CupertinoColors.systemGrey5)
-                : CupertinoColors.transparent,
-            borderRadius: BorderRadius.circular(8),
-          ),
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            final isActive = widget.isSelected || _isHovered;
+
+            return Container(
+              margin: const EdgeInsets.symmetric(vertical: 2),
+              padding: EdgeInsets.symmetric(
+                horizontal: widget.isCollapsed ? 0 : 12,
+                vertical: 8,
+              ),
+              decoration: BoxDecoration(
+                gradient: isActive
+                    ? LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: widget.isSelected
+                            ? [
+                                AppColors.primaryBlue.withValues(
+                                  alpha: isDark ? 0.3 : 0.2,
+                                ),
+                                AppColors.primaryBlue.withValues(
+                                  alpha: isDark ? 0.2 : 0.15,
+                                ),
+                              ]
+                            : [
+                                (isDark
+                                        ? const Color(0xFF3A3A3C)
+                                        : const Color(0xFFE5E5EA))
+                                    .withValues(alpha: 0.5 * _glowAnimation.value),
+                                (isDark
+                                        ? const Color(0xFF2C2C2E)
+                                        : const Color(0xFFF2F2F7))
+                                    .withValues(alpha: 0.3 * _glowAnimation.value),
+                              ],
+                      )
+                    : null,
+                borderRadius: BorderRadius.circular(8),
+                border: widget.isSelected
+                    ? Border.all(
+                        color: AppColors.primaryBlue.withValues(alpha: 0.3),
+                        width: 0.5,
+                      )
+                    : null,
+                boxShadow: widget.isSelected
+                    ? [
+                        BoxShadow(
+                          color: AppColors.primaryBlue.withValues(alpha: 0.15),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ]
+                    : null,
+              ),
           child: widget.isCollapsed
               ? Center(
                   child: Icon(
@@ -356,6 +446,85 @@ class _SidebarItemState extends State<_SidebarItem> {
                     ),
                   ],
                 ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+/// Glass-styled collapse toggle button
+class _GlassCollapseButton extends StatefulWidget {
+  final bool isCollapsed;
+  final VoidCallback onTap;
+
+  const _GlassCollapseButton({
+    required this.isCollapsed,
+    required this.onTap,
+  });
+
+  @override
+  State<_GlassCollapseButton> createState() => _GlassCollapseButtonState();
+}
+
+class _GlassCollapseButtonState extends State<_GlassCollapseButton> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final brightness = CupertinoTheme.brightnessOf(context);
+    final isDark = brightness == Brightness.dark;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: _isHovered
+                  ? [
+                      (isDark
+                              ? const Color(0xFF3A3A3C)
+                              : const Color(0xFFE5E5EA))
+                          .withValues(alpha: 0.6),
+                      (isDark
+                              ? const Color(0xFF2C2C2E)
+                              : const Color(0xFFF2F2F7))
+                          .withValues(alpha: 0.4),
+                    ]
+                  : [
+                      (isDark
+                              ? const Color(0xFF2C2C2E)
+                              : const Color(0xFFF2F2F7))
+                          .withValues(alpha: 0.4),
+                      (isDark
+                              ? const Color(0xFF1C1C1E)
+                              : const Color(0xFFFFFFFF))
+                          .withValues(alpha: 0.3),
+                    ],
+            ),
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(
+              color: isDark
+                  ? const Color(0xFF3A3A3C).withValues(alpha: 0.3)
+                  : const Color(0xFFD1D1D6).withValues(alpha: 0.4),
+              width: 0.5,
+            ),
+          ),
+          child: Icon(
+            widget.isCollapsed
+                ? CupertinoIcons.sidebar_right
+                : CupertinoIcons.sidebar_left,
+            size: 18,
+            color: CupertinoColors.secondaryLabel.resolveFrom(context),
+          ),
         ),
       ),
     );
