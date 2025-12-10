@@ -812,76 +812,148 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
   }
 
   Widget _buildDescriptionCard(Post post, bool isDark) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkBackground : CupertinoColors.systemGrey6,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Description',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [
+                      const Color(0xFF1C1C1E).withValues(alpha: 0.6),
+                      const Color(0xFF0C0C0E).withValues(alpha: 0.7),
+                    ]
+                  : [
+                      const Color(0xFFF0F0F2).withValues(alpha: 0.6),
+                      const Color(0xFFE8E8EA).withValues(alpha: 0.7),
+                    ],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDark
+                  ? const Color(0xFF3D3D3F).withValues(alpha: 0.3)
+                  : const Color(0xFFE5E5E7).withValues(alpha: 0.5),
+              width: 0.5,
+            ),
           ),
-          const SizedBox(height: 8),
-          Text(post.description, style: const TextStyle(fontSize: 14)),
-        ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Description',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 8),
+              Text(post.description, style: const TextStyle(fontSize: 14)),
+            ],
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildTagsCard(Post post, bool isDark) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkBackground : CupertinoColors.systemGrey6,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Tags',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [
+                      const Color(0xFF1C1C1E).withValues(alpha: 0.6),
+                      const Color(0xFF0C0C0E).withValues(alpha: 0.7),
+                    ]
+                  : [
+                      const Color(0xFFF0F0F2).withValues(alpha: 0.6),
+                      const Color(0xFFE8E8EA).withValues(alpha: 0.7),
+                    ],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDark
+                  ? const Color(0xFF3D3D3F).withValues(alpha: 0.3)
+                  : const Color(0xFFE5E5E7).withValues(alpha: 0.5),
+              width: 0.5,
+            ),
           ),
-          const SizedBox(height: 12),
-          CategorizedTagList(tags: post.tags, onTagTap: _searchTag),
-        ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Tags',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 12),
+              CategorizedTagList(tags: post.tags, onTagTap: _searchTag),
+            ],
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildMetadataCard(Post post, bool isDark) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkBackground : CupertinoColors.systemGrey6,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Details',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [
+                      const Color(0xFF1C1C1E).withValues(alpha: 0.6),
+                      const Color(0xFF0C0C0E).withValues(alpha: 0.7),
+                    ]
+                  : [
+                      const Color(0xFFF0F0F2).withValues(alpha: 0.6),
+                      const Color(0xFFE8E8EA).withValues(alpha: 0.7),
+                    ],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDark
+                  ? const Color(0xFF3D3D3F).withValues(alpha: 0.3)
+                  : const Color(0xFFE5E5E7).withValues(alpha: 0.5),
+              width: 0.5,
+            ),
           ),
-          const SizedBox(height: 12),
-          _buildMetadataRow('ID', '#${post.id}'),
-          _buildMetadataRow('Posted', post.createdAt.relativeTime),
-          _buildMetadataRow(
-            'Resolution',
-            '${post.file.width}×${post.file.height}',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Details',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 12),
+              _buildMetadataRow('ID', '#${post.id}'),
+              _buildMetadataRow('Posted', post.createdAt.relativeTime),
+              _buildMetadataRow(
+                'Resolution',
+                '${post.file.width}×${post.file.height}',
+              ),
+              _buildMetadataRow('File Size', post.file.size.fileSize),
+              _buildMetadataRow('Type', post.file.ext.toUpperCase()),
+              if (post.sources.isNotEmpty)
+                _buildMetadataRow('Sources', '${post.sources.length} source(s)'),
+            ],
           ),
-          _buildMetadataRow('File Size', post.file.size.fileSize),
-          _buildMetadataRow('Type', post.file.ext.toUpperCase()),
-          if (post.sources.isNotEmpty)
-            _buildMetadataRow('Sources', '${post.sources.length} source(s)'),
-        ],
+        ),
       ),
     );
   }
