@@ -501,7 +501,6 @@ class _SidebarItemState extends State<_SidebarItem>
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
-    final isActive = widget.isSelected || _isHovered;
 
     return MouseRegion(
       onEnter: (_) {
