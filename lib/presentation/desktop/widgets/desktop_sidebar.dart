@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../../app/routes.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../providers/providers.dart';
 
 /// Design constants for the new purple/indigo theme
@@ -11,8 +10,6 @@ class _DesignColors {
   static const Color primaryIndigo = Color(0xFF6366F1);
   static const Color primaryPurple = Color(0xFF8B5CF6);
   static const Color primaryViolet = Color(0xFFA855F7);
-
-  static List<Color> get gradientColors => [primaryIndigo, primaryPurple, primaryViolet];
 }
 
 /// macOS-style sidebar for desktop navigation with modern glassmorphism
