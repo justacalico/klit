@@ -116,13 +116,13 @@ class DesktopToolbar extends StatelessWidget {
 /// Styled toolbar button with hover effect
 class DesktopToolbarButton extends StatefulWidget {
   final IconData icon;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final String? tooltip;
 
   const DesktopToolbarButton({
     super.key,
     required this.icon,
-    required this.onPressed,
+    this.onPressed,
     this.tooltip,
   });
 
@@ -137,17 +137,18 @@ class _DesktopToolbarButtonState extends State<DesktopToolbarButton> {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isDisabled = widget.onPressed == null;
 
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
+      onEnter: isDisabled ? null : (_) => setState(() => _isHovered = true),
+      onExit: isDisabled ? null : (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: widget.onPressed,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            gradient: _isHovered
+            gradient: _isHovered && !isDisabled
                 ? LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -157,14 +158,14 @@ class _DesktopToolbarButtonState extends State<DesktopToolbarButton> {
                     ],
                   )
                 : null,
-            color: _isHovered
+            color: _isHovered && !isDisabled
                 ? null
                 : isDark
-                    ? const Color(0xFF2C2C2E).withValues(alpha: 0.6)
-                    : const Color(0xFFF3F4F6).withValues(alpha: 0.8),
+                    ? const Color(0xFF2C2C2E).withValues(alpha: isDisabled ? 0.3 : 0.6)
+                    : const Color(0xFFF3F4F6).withValues(alpha: isDisabled ? 0.5 : 0.8),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: _isHovered
+              color: _isHovered && !isDisabled
                   ? DesktopToolbarColors.primaryPurple.withValues(alpha: 0.3)
                   : isDark
                       ? const Color(0xFF3A3A3C).withValues(alpha: 0.3)
@@ -175,11 +176,13 @@ class _DesktopToolbarButtonState extends State<DesktopToolbarButton> {
           child: Icon(
             widget.icon,
             size: 18,
-            color: _isHovered
-                ? DesktopToolbarColors.primaryPurple
-                : isDark
-                    ? CupertinoColors.white
-                    : const Color(0xFF374151),
+            color: isDisabled
+                ? CupertinoColors.systemGrey
+                : _isHovered
+                    ? DesktopToolbarColors.primaryPurple
+                    : isDark
+                        ? CupertinoColors.white
+                        : const Color(0xFF374151),
           ),
         ),
       ),
