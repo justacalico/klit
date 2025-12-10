@@ -41,7 +41,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     try {
-      final apiService = ApiService();
+      final apiService = context.read<ApiService>();
       final result = await apiService.getUserProfile(
         authProvider.currentAccount!.username,
       );
