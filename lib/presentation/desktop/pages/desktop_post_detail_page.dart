@@ -9,6 +9,7 @@ import '../../../core/extensions/extensions.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
 import '../../widgets/widgets.dart';
+import '../widgets/desktop_toolbar.dart';
 
 /// Desktop-optimized post detail page with side-by-side layout
 class DesktopPostDetailPage extends StatefulWidget {
