@@ -308,90 +308,110 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
 
     return ClipRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        filter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
         child: Container(
-          height: 56,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          height: 60,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
                   ? [
-                      const Color(0xFF2C2C2E).withValues(alpha: 0.8),
-                      const Color(0xFF1C1C1E).withValues(alpha: 0.9),
+                      const Color(0xFF18181B).withValues(alpha: 0.85),
+                      const Color(0xFF1F1F23).withValues(alpha: 0.9),
                     ]
                   : [
-                      const Color(0xFFFFFFFF).withValues(alpha: 0.8),
-                      const Color(0xFFF8F8FA).withValues(alpha: 0.9),
+                      const Color(0xFFFFFFFF).withValues(alpha: 0.85),
+                      const Color(0xFFFAFAFC).withValues(alpha: 0.9),
                     ],
             ),
             border: Border(
               bottom: BorderSide(
                 color: isDark
-                    ? const Color(0xFF3D3D3F).withValues(alpha: 0.5)
-                    : const Color(0xFFE5E5E7).withValues(alpha: 0.8),
+                    ? DesktopToolbarColors.primaryPurple.withValues(alpha: 0.15)
+                    : DesktopToolbarColors.primaryPurple.withValues(alpha: 0.1),
+                width: 1,
               ),
             ),
           ),
           child: Row(
             children: [
-              // Back button
-              CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: widget.onClose,
-                child: Row(
-                  children: [
-                    Icon(
-                      CupertinoIcons.back,
-                      size: 20,
-                      color: isDark ? CupertinoColors.white : CupertinoColors.black,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Back',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: isDark
-                            ? CupertinoColors.white
-                            : CupertinoColors.black,
-                      ),
-                    ),
-                  ],
+              // Back button with gradient styling
+              DesktopToolbarButton(
+                icon: CupertinoIcons.back,
+                tooltip: 'Back',
+                onPressed: widget.onClose ?? () {},
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Back',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: isDark
+                      ? CupertinoColors.white
+                      : const Color(0xFF1F2937),
                 ),
               ),
               const Spacer(),
-              // Post title
+              // Post title with gradient icon
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      DesktopToolbarColors.primaryIndigo,
+                      DesktopToolbarColors.primaryPurple,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: DesktopToolbarColors.primaryPurple.withValues(
+                        alpha: 0.3,
+                      ),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  CupertinoIcons.photo,
+                  size: 14,
+                  color: CupertinoColors.white,
+                ),
+              ),
+              const SizedBox(width: 10),
               Text(
                 hasMultiple
                     ? 'Post #$_currentPostId (${_currentIndex + 1}/${_postIds.length})'
                     : 'Post #$_currentPostId',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? CupertinoColors.white
+                      : const Color(0xFF1F2937),
+                ),
               ),
               const Spacer(),
               // Navigation buttons (if multiple posts)
               if (hasMultiple) ...[
-                CupertinoButton(
-                  padding: const EdgeInsets.all(8),
+                DesktopToolbarButton(
+                  icon: CupertinoIcons.chevron_left,
+                  tooltip: 'Previous',
                   onPressed: _currentIndex > 0 ? () => _navigatePost(-1) : null,
-                  child: Icon(
-                    CupertinoIcons.chevron_left,
-                    color: _currentIndex > 0
-                        ? (isDark ? CupertinoColors.white : CupertinoColors.black)
-                        : CupertinoColors.systemGrey,
-                  ),
                 ),
-                CupertinoButton(
-                  padding: const EdgeInsets.all(8),
+                const SizedBox(width: 8),
+                DesktopToolbarButton(
+                  icon: CupertinoIcons.chevron_right,
+                  tooltip: 'Next',
                   onPressed: _currentIndex < _postIds.length - 1
                       ? () => _navigatePost(1)
                       : null,
-                  child: Icon(
-                    CupertinoIcons.chevron_right,
-                    color: _currentIndex < _postIds.length - 1
-                        ? (isDark ? CupertinoColors.white : CupertinoColors.black)
-                        : CupertinoColors.systemGrey,
-                  ),
                 ),
               ],
             ],
