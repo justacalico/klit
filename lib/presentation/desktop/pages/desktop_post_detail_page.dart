@@ -259,11 +259,11 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
       return _buildFullScreenView(isDark);
     }
 
-    return RawKeyboardListener(
+    return KeyboardListener(
       focusNode: _focusNode,
       autofocus: true,
-      onKey: (event) {
-        if (event is RawKeyDownEvent) {
+      onKeyEvent: (event) {
+        if (event is KeyDownEvent) {
           final key = event.logicalKey.keyLabel.toLowerCase();
           // Navigation
           if (key == 'd') {
