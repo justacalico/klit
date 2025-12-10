@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -304,80 +305,97 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
   Widget _buildTopBar(bool isDark) {
     final hasMultiple = _postIds.length > 1;
 
-    return Container(
-      height: 56,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
-        border: Border(
-          bottom: BorderSide(
-            color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        child: Container(
+          height: 56,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [
+                      const Color(0xFF2C2C2E).withValues(alpha: 0.8),
+                      const Color(0xFF1C1C1E).withValues(alpha: 0.9),
+                    ]
+                  : [
+                      const Color(0xFFFFFFFF).withValues(alpha: 0.8),
+                      const Color(0xFFF8F8FA).withValues(alpha: 0.9),
+                    ],
+            ),
+            border: Border(
+              bottom: BorderSide(
+                color: isDark
+                    ? const Color(0xFF3D3D3F).withValues(alpha: 0.5)
+                    : const Color(0xFFE5E5E7).withValues(alpha: 0.8),
+              ),
+            ),
           ),
-        ),
-      ),
-      child: Row(
-        children: [
-          // Back button
-          CupertinoButton(
-            padding: EdgeInsets.zero,
-            onPressed: widget.onClose,
-            child: Row(
-              children: [
-                Icon(
-                  CupertinoIcons.back,
-                  size: 20,
-                  color: isDark ? CupertinoColors.white : CupertinoColors.black,
+          child: Row(
+            children: [
+              // Back button
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: widget.onClose,
+                child: Row(
+                  children: [
+                    Icon(
+                      CupertinoIcons.back,
+                      size: 20,
+                      color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Back',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: isDark
+                            ? CupertinoColors.white
+                            : CupertinoColors.black,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 4),
-                Text(
-                  'Back',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: isDark
-                        ? CupertinoColors.white
-                        : CupertinoColors.black,
+              ),
+              const Spacer(),
+              // Post title
+              Text(
+                hasMultiple
+                    ? 'Post #$_currentPostId (${_currentIndex + 1}/${_postIds.length})'
+                    : 'Post #$_currentPostId',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              const Spacer(),
+              // Navigation buttons (if multiple posts)
+              if (hasMultiple) ...[
+                CupertinoButton(
+                  padding: const EdgeInsets.all(8),
+                  onPressed: _currentIndex > 0 ? () => _navigatePost(-1) : null,
+                  child: Icon(
+                    CupertinoIcons.chevron_left,
+                    color: _currentIndex > 0
+                        ? (isDark ? CupertinoColors.white : CupertinoColors.black)
+                        : CupertinoColors.systemGrey,
+                  ),
+                ),
+                CupertinoButton(
+                  padding: const EdgeInsets.all(8),
+                  onPressed: _currentIndex < _postIds.length - 1
+                      ? () => _navigatePost(1)
+                      : null,
+                  child: Icon(
+                    CupertinoIcons.chevron_right,
+                    color: _currentIndex < _postIds.length - 1
+                        ? (isDark ? CupertinoColors.white : CupertinoColors.black)
+                        : CupertinoColors.systemGrey,
                   ),
                 ),
               ],
-            ),
+            ],
           ),
-          const Spacer(),
-          // Post title
-          Text(
-            hasMultiple
-                ? 'Post #$_currentPostId (${_currentIndex + 1}/${_postIds.length})'
-                : 'Post #$_currentPostId',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-          const Spacer(),
-          // Navigation buttons (if multiple posts)
-          if (hasMultiple) ...[
-            CupertinoButton(
-              padding: const EdgeInsets.all(8),
-              onPressed: _currentIndex > 0 ? () => _navigatePost(-1) : null,
-              child: Icon(
-                CupertinoIcons.chevron_left,
-                color: _currentIndex > 0
-                    ? (isDark ? CupertinoColors.white : CupertinoColors.black)
-                    : CupertinoColors.systemGrey,
-              ),
-            ),
-            CupertinoButton(
-              padding: const EdgeInsets.all(8),
-              onPressed: _currentIndex < _postIds.length - 1
-                  ? () => _navigatePost(1)
-                  : null,
-              child: Icon(
-                CupertinoIcons.chevron_right,
-                color: _currentIndex < _postIds.length - 1
-                    ? (isDark ? CupertinoColors.white : CupertinoColors.black)
-                    : CupertinoColors.systemGrey,
-              ),
-            ),
-          ],
-        ],
+        ),
       ),
     );
   }
