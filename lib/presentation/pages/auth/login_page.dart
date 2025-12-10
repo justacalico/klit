@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../../app/routes.dart';
@@ -13,7 +14,8 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage>
+    with SingleTickerProviderStateMixin {
   final _usernameController = TextEditingController();
   final _apiKeyController = TextEditingController();
   final _hostController = TextEditingController();
@@ -21,10 +23,38 @@ class _LoginPageState extends State<LoginPage> {
   bool _useCustomHost = false;
   bool _obscureApiKey = true;
 
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
   @override
   void initState() {
     super.initState();
     _hostController.text = ApiConstants.defaultHost;
+
+    // Setup animations
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      ),
+    );
+
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: const Interval(0.2, 0.8, curve: Curves.easeOutCubic),
+          ),
+        );
+
+    _animationController.forward();
+
     // Defer session check to after first frame to avoid build-time errors
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkExistingSession();
@@ -48,6 +78,7 @@ class _LoginPageState extends State<LoginPage> {
     _usernameController.dispose();
     _apiKeyController.dispose();
     _hostController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -114,31 +145,185 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final size = MediaQuery.of(context).size;
+    final isLandscape = size.width > size.height;
+    final isDesktop = size.width > 800;
 
     return CupertinoPageScaffold(
       backgroundColor: isDark
           ? AppColors.darkBackground
-          : AppColors.lightSecondaryBackground,
-      child: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          : AppColors.lightBackground,
+      child: Stack(
+        children: [
+          // Animated background
+          _buildAnimatedBackground(isDark),
+
+          // Main content
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isDesktop ? size.width * 0.25 : 24,
+                  vertical: 24,
+                ),
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: isLandscape && !isDesktop
+                        ? _buildLandscapeLayout(isDark)
+                        : _buildPortraitLayout(isDark),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnimatedBackground(bool isDark) {
+    return Positioned.fill(
+      child: CustomPaint(
+        painter: _BackgroundPainter(
+          isDark: isDark,
+          animation: _animationController,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPortraitLayout(bool isDark) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 400),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildLogo(isDark),
+          const SizedBox(height: 16),
+          _buildWelcomeText(isDark),
+          const SizedBox(height: 40),
+          _buildForm(isDark),
+          const SizedBox(height: 24),
+          _buildLoginButton(),
+          const SizedBox(height: 12),
+          _buildGuestButton(isDark),
+          const SizedBox(height: 32),
+          _buildHelpText(isDark),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLandscapeLayout(bool isDark) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          flex: 2,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(height: 40),
-              _buildHeader(),
-              const SizedBox(height: 48),
-              _buildForm(),
-              const SizedBox(height: 32),
-              _buildLoginButton(),
+              _buildLogo(isDark, size: 100),
               const SizedBox(height: 16),
-              _buildGuestButton(),
-              const SizedBox(height: 24),
-              _buildHelpText(),
+              _buildWelcomeText(isDark),
             ],
           ),
         ),
+        const SizedBox(width: 48),
+        Expanded(
+          flex: 3,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildForm(isDark),
+              const SizedBox(height: 24),
+              _buildLoginButton(),
+              const SizedBox(height: 12),
+              _buildGuestButton(isDark),
+              const SizedBox(height: 24),
+              _buildHelpText(isDark),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLogo(bool isDark, {double size = 120}) {
+    return Center(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF6366F1), // Indigo
+              Color(0xFF8B5CF6), // Purple
+              Color(0xFFA855F7), // Violet
+            ],
+          ),
+          borderRadius: BorderRadius.circular(size * 0.28),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF8B5CF6).withValues(alpha: 0.4),
+              blurRadius: 30,
+              offset: const Offset(0, 15),
+              spreadRadius: 0,
+            ),
+            BoxShadow(
+              color: const Color(0xFF6366F1).withValues(alpha: 0.2),
+              blurRadius: 60,
+              offset: const Offset(0, 30),
+              spreadRadius: -10,
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            'K',
+            style: TextStyle(
+              fontSize: size * 0.5,
+              fontWeight: FontWeight.w700,
+              color: CupertinoColors.white,
+              letterSpacing: -2,
+            ),
+          ),
+        ),
       ),
+    );
+  }
+
+  Widget _buildWelcomeText(bool isDark) {
+    return Column(
+      children: [
+        Text(
+          'Welcome to Klit',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.5,
+            color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Your gateway to e926',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w400,
+            color: isDark
+                ? CupertinoColors.systemGrey
+                : CupertinoColors.systemGrey,
+          ),
+        ),
+      ],
     );
   }
 
@@ -150,124 +335,117 @@ class _LoginPageState extends State<LoginPage> {
     ).pushNamedAndRemoveUntil(AppRoutes.main, (route) => false);
   }
 
-  Widget _buildGuestButton() {
+  Widget _buildGuestButton(bool isDark) {
     return CupertinoButton(
       padding: const EdgeInsets.symmetric(vertical: 16),
       onPressed: _continueAsGuest,
-      child: Text(
-        'Continue as Guest',
-        style: TextStyle(
-          fontSize: 17,
-          fontWeight: FontWeight.w500,
-          color: CupertinoColors.secondaryLabel.resolveFrom(context),
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            CupertinoIcons.arrow_right_circle,
+            size: 18,
+            color: isDark
+                ? CupertinoColors.systemGrey
+                : CupertinoColors.systemGrey,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            'Continue as Guest',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: isDark
+                  ? CupertinoColors.systemGrey
+                  : CupertinoColors.systemGrey,
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildHeader() {
-    return Column(
-      children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            color: AppColors.primaryBlue,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primaryBlue.withValues(alpha: 0.3),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: const Center(
-            child: Text(
-              'K',
-              style: TextStyle(
-                fontSize: 40,
-                fontWeight: FontWeight.bold,
-                color: CupertinoColors.white,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 24),
-        const Text(
-          'Welcome to Klit',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Sign in with your e926 account',
-          style: TextStyle(
-            fontSize: 16,
-            color: CupertinoColors.secondaryLabel.resolveFrom(context),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildForm() {
-    final brightness = CupertinoTheme.brightnessOf(context);
-    final isDark = brightness == Brightness.dark;
-    final backgroundColor = isDark
-        ? AppColors.darkSecondaryBackground
-        : CupertinoColors.white;
-
+  Widget _buildForm(bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
+        color: isDark
+            ? const Color(0xFF1C1C1E).withValues(alpha: 0.8)
+            : CupertinoColors.white.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDark
+              ? CupertinoColors.systemGrey.darkColor.withValues(alpha: 0.3)
+              : CupertinoColors.systemGrey.withValues(alpha: 0.1),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: CupertinoColors.black.withValues(alpha: isDark ? 0.3 : 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: CupertinoColors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+            spreadRadius: -4,
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _buildSectionHeader('Account', CupertinoIcons.person_circle, isDark),
+          const SizedBox(height: 16),
           _buildTextField(
             controller: _usernameController,
             placeholder: 'Username',
             icon: CupertinoIcons.person,
             textInputAction: TextInputAction.next,
+            isDark: isDark,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           _buildTextField(
             controller: _apiKeyController,
             placeholder: 'API Key',
             icon: CupertinoIcons.lock,
             obscureText: _obscureApiKey,
+            isDark: isDark,
             suffix: CupertinoButton(
               padding: EdgeInsets.zero,
+              minSize: 0,
               onPressed: () => setState(() => _obscureApiKey = !_obscureApiKey),
               child: Icon(
                 _obscureApiKey ? CupertinoIcons.eye : CupertinoIcons.eye_slash,
                 size: 20,
-                color: CupertinoColors.secondaryLabel,
+                color: CupertinoColors.systemGrey,
               ),
             ),
           ),
           const SizedBox(height: 20),
-          _buildCustomHostToggle(),
-          if (_useCustomHost) ...[
-            const SizedBox(height: 16),
-            _buildTextField(
-              controller: _hostController,
-              placeholder: 'API Host URL',
-              icon: CupertinoIcons.globe,
-              keyboardType: TextInputType.url,
-            ),
-          ],
+          _buildCustomHostSection(isDark),
         ],
       ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, IconData icon, bool isDark) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, size: 18, color: const Color(0xFF8B5CF6)),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: isDark ? CupertinoColors.white : const Color(0xFF374151),
+          ),
+        ),
+      ],
     );
   }
 
@@ -275,56 +453,154 @@ class _LoginPageState extends State<LoginPage> {
     required TextEditingController controller,
     required String placeholder,
     required IconData icon,
+    required bool isDark,
     bool obscureText = false,
     Widget? suffix,
     TextInputType? keyboardType,
     TextInputAction? textInputAction,
   }) {
-    return CupertinoTextField(
-      controller: controller,
-      placeholder: placeholder,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      textInputAction: textInputAction,
-      padding: const EdgeInsets.all(16),
-      prefix: Padding(
-        padding: const EdgeInsets.only(left: 12),
-        child: Icon(icon, size: 20, color: CupertinoColors.secondaryLabel),
-      ),
-      suffix: suffix != null
-          ? Padding(padding: const EdgeInsets.only(right: 8), child: suffix)
-          : null,
+    final bgColor = isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF3F4F6);
+    final borderColor = isDark
+        ? const Color(0xFF3A3A3C)
+        : const Color(0xFFE5E7EB);
+
+    return Container(
       decoration: BoxDecoration(
-        color: CupertinoColors.systemGrey6.resolveFrom(context),
-        borderRadius: BorderRadius.circular(12),
+        color: bgColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: borderColor, width: 1),
+      ),
+      child: CupertinoTextField(
+        controller: controller,
+        placeholder: placeholder,
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        textInputAction: textInputAction,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        style: TextStyle(
+          fontSize: 16,
+          color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+        ),
+        placeholderStyle: TextStyle(
+          fontSize: 16,
+          color: isDark
+              ? CupertinoColors.systemGrey
+              : CupertinoColors.systemGrey,
+        ),
+        prefix: Padding(
+          padding: const EdgeInsets.only(left: 14),
+          child: Icon(
+            icon,
+            size: 20,
+            color: isDark
+                ? CupertinoColors.systemGrey
+                : CupertinoColors.systemGrey,
+          ),
+        ),
+        suffix: suffix != null
+            ? Padding(padding: const EdgeInsets.only(right: 14), child: suffix)
+            : null,
+        decoration: const BoxDecoration(),
       ),
     );
   }
 
-  Widget _buildCustomHostToggle() {
-    return Row(
+  Widget _buildCustomHostSection(bool isDark) {
+    return Column(
       children: [
-        CupertinoSwitch(
-          value: _useCustomHost,
-          onChanged: (value) => setState(() => _useCustomHost = value),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Use custom host',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+        GestureDetector(
+          onTap: () => setState(() => _useCustomHost = !_useCustomHost),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF3F4F6),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: _useCustomHost
+                    ? const Color(0xFF8B5CF6).withValues(alpha: 0.5)
+                    : (isDark
+                          ? const Color(0xFF3A3A3C)
+                          : const Color(0xFFE5E7EB)),
+                width: 1,
               ),
-              Text(
-                'Connect to a different e926-compatible server',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: CupertinoColors.secondaryLabel.resolveFrom(context),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    color: _useCustomHost
+                        ? const Color(0xFF8B5CF6)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: _useCustomHost
+                          ? const Color(0xFF8B5CF6)
+                          : CupertinoColors.systemGrey,
+                      width: 2,
+                    ),
+                  ),
+                  child: _useCustomHost
+                      ? const Icon(
+                          CupertinoIcons.checkmark,
+                          size: 16,
+                          color: CupertinoColors.white,
+                        )
+                      : null,
                 ),
-              ),
-            ],
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Custom Server',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: isDark
+                              ? CupertinoColors.white
+                              : const Color(0xFF374151),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Connect to a different e926-compatible server',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: CupertinoColors.systemGrey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  _useCustomHost
+                      ? CupertinoIcons.chevron_up
+                      : CupertinoIcons.chevron_down,
+                  size: 16,
+                  color: CupertinoColors.systemGrey,
+                ),
+              ],
+            ),
+          ),
+        ),
+        AnimatedCrossFade(
+          duration: const Duration(milliseconds: 200),
+          crossFadeState: _useCustomHost
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
+          firstChild: const SizedBox.shrink(),
+          secondChild: Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: _buildTextField(
+              controller: _hostController,
+              placeholder: 'API Host URL',
+              icon: CupertinoIcons.globe,
+              keyboardType: TextInputType.url,
+              isDark: isDark,
+            ),
           ),
         ),
       ],
@@ -334,70 +610,285 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildLoginButton() {
     return Consumer<AuthProvider>(
       builder: (context, auth, _) {
-        return CupertinoButton.filled(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          borderRadius: BorderRadius.circular(12),
-          onPressed: auth.isLoading ? null : _login,
-          child: auth.isLoading
-              ? const CupertinoActivityIndicator(color: CupertinoColors.white)
-              : const Text(
-                  'Sign In',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-                ),
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF6366F1).withValues(alpha: 0.4),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: CupertinoButton(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            borderRadius: BorderRadius.circular(14),
+            color: Colors.transparent,
+            onPressed: auth.isLoading ? null : _login,
+            child: auth.isLoading
+                ? const CupertinoActivityIndicator(color: CupertinoColors.white)
+                : const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Sign In',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: CupertinoColors.white,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(
+                        CupertinoIcons.arrow_right,
+                        size: 18,
+                        color: CupertinoColors.white,
+                      ),
+                    ],
+                  ),
+          ),
         );
       },
     );
   }
 
-  Widget _buildHelpText() {
-    return Column(
-      children: [
-        Text(
-          'Don\'t have an API key?',
-          style: TextStyle(
-            fontSize: 14,
-            color: CupertinoColors.secondaryLabel.resolveFrom(context),
+  Widget _buildHelpText(bool isDark) {
+    return Center(
+      child: Column(
+        children: [
+          Text(
+            'Don\'t have an API key?',
+            style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey),
           ),
-        ),
-        const SizedBox(height: 4),
-        CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () {
-            // Could open a URL to e926 API key page
-            _showApiKeyHelp();
-          },
-          child: const Text(
-            'Learn how to get one',
-            style: TextStyle(fontSize: 14),
+          const SizedBox(height: 4),
+          CupertinoButton(
+            padding: EdgeInsets.zero,
+            minSize: 0,
+            onPressed: _showApiKeyHelp,
+            child: const Text(
+              'Learn how to get one',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF8B5CF6),
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   void _showApiKeyHelp() {
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+
     showCupertinoModalPopup(
       context: context,
-      builder: (context) => CupertinoActionSheet(
-        title: const Text('Getting an API Key'),
-        message: const Text(
-          '1. Log in to e926.net\n'
-          '2. Go to Account → Manage API Access\n'
-          '3. Create a new API key\n'
-          '4. Copy the key and use it here',
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        margin: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white,
+          borderRadius: BorderRadius.circular(20),
         ),
-        actions: [
-          CupertinoActionSheetAction(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Got it'),
-          ),
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          onPressed: () => Navigator.of(context).pop(),
-          isDestructiveAction: true,
-          child: const Text('Cancel'),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Icon(
+                CupertinoIcons.lock_shield,
+                size: 32,
+                color: Color(0xFF8B5CF6),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Getting an API Key',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildStep('1', 'Log in to e926.net', isDark),
+            _buildStep('2', 'Go to Account → Manage API Access', isDark),
+            _buildStep('3', 'Create a new API key', isDark),
+            _buildStep('4', 'Copy the key and use it here', isDark),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: CupertinoButton(
+                color: const Color(0xFF8B5CF6),
+                borderRadius: BorderRadius.circular(12),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Got it',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: CupertinoColors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  Widget _buildStep(String number, String text, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Center(
+              child: Text(
+                number,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF8B5CF6),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 15,
+                color: isDark ? CupertinoColors.white : const Color(0xFF374151),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Abstract Color class for compatibility
+class Colors {
+  static const Color transparent = Color(0x00000000);
+}
+
+/// Custom painter for animated background
+class _BackgroundPainter extends CustomPainter {
+  final bool isDark;
+  final Animation<double> animation;
+
+  _BackgroundPainter({required this.isDark, required this.animation})
+    : super(repaint: animation);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint();
+
+    // Draw gradient orbs
+    final colors = isDark
+        ? [
+            const Color(0xFF6366F1).withValues(alpha: 0.15),
+            const Color(0xFF8B5CF6).withValues(alpha: 0.1),
+            const Color(0xFFA855F7).withValues(alpha: 0.08),
+          ]
+        : [
+            const Color(0xFF6366F1).withValues(alpha: 0.08),
+            const Color(0xFF8B5CF6).withValues(alpha: 0.06),
+            const Color(0xFFA855F7).withValues(alpha: 0.05),
+          ];
+
+    // Animated positions based on animation value
+    final animValue = animation.value;
+
+    // Top right orb
+    paint.shader =
+        RadialGradient(
+          colors: [colors[0], colors[0].withValues(alpha: 0)],
+        ).createShader(
+          Rect.fromCircle(
+            center: Offset(
+              size.width * 0.85 + math.sin(animValue * math.pi * 2) * 20,
+              size.height * 0.15 + math.cos(animValue * math.pi * 2) * 20,
+            ),
+            radius: size.width * 0.5,
+          ),
+        );
+    canvas.drawCircle(
+      Offset(
+        size.width * 0.85 + math.sin(animValue * math.pi * 2) * 20,
+        size.height * 0.15 + math.cos(animValue * math.pi * 2) * 20,
+      ),
+      size.width * 0.5,
+      paint,
+    );
+
+    // Bottom left orb
+    paint.shader =
+        RadialGradient(
+          colors: [colors[1], colors[1].withValues(alpha: 0)],
+        ).createShader(
+          Rect.fromCircle(
+            center: Offset(
+              size.width * 0.15 + math.cos(animValue * math.pi * 2) * 15,
+              size.height * 0.85 + math.sin(animValue * math.pi * 2) * 15,
+            ),
+            radius: size.width * 0.4,
+          ),
+        );
+    canvas.drawCircle(
+      Offset(
+        size.width * 0.15 + math.cos(animValue * math.pi * 2) * 15,
+        size.height * 0.85 + math.sin(animValue * math.pi * 2) * 15,
+      ),
+      size.width * 0.4,
+      paint,
+    );
+
+    // Center orb
+    paint.shader =
+        RadialGradient(
+          colors: [colors[2], colors[2].withValues(alpha: 0)],
+        ).createShader(
+          Rect.fromCircle(
+            center: Offset(
+              size.width * 0.5,
+              size.height * 0.5 + math.sin(animValue * math.pi * 2 + 1) * 30,
+            ),
+            radius: size.width * 0.35,
+          ),
+        );
+    canvas.drawCircle(
+      Offset(
+        size.width * 0.5,
+        size.height * 0.5 + math.sin(animValue * math.pi * 2 + 1) * 30,
+      ),
+      size.width * 0.35,
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _BackgroundPainter oldDelegate) {
+    return oldDelegate.isDark != isDark;
   }
 }
