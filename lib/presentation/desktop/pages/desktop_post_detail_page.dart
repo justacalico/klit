@@ -535,19 +535,36 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
     final isVoting = _isVoting[_currentIndex] == true;
     final isTogglingFav = _isTogglingFavorite[_currentIndex] == true;
 
-    return Container(
-      color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
-      child: Column(
-        children: [
-          // Action buttons
-          _buildActionBar(
-            score,
-            isFav,
-            userVote,
-            isVoting,
-            isTogglingFav,
-            isDark,
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [
+                      const Color(0xFF2C2C2E).withValues(alpha: 0.7),
+                      const Color(0xFF1C1C1E).withValues(alpha: 0.8),
+                    ]
+                  : [
+                      const Color(0xFFFFFFFF).withValues(alpha: 0.7),
+                      const Color(0xFFF8F8FA).withValues(alpha: 0.8),
+                    ],
+            ),
           ),
+          child: Column(
+            children: [
+              // Action buttons
+              _buildActionBar(
+                score,
+                isFav,
+                userVote,
+                isVoting,
+                isTogglingFav,
+                isDark,
+              ),
           // Scrollable content
           Expanded(
             child: SingleChildScrollView(
@@ -571,6 +588,8 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
           ),
         ],
       ),
+        ),
+      ),
     );
   }
 
@@ -587,7 +606,9 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
+            color: isDark
+                ? const Color(0xFF3D3D3F).withValues(alpha: 0.5)
+                : const Color(0xFFE5E5E7).withValues(alpha: 0.8),
           ),
         ),
       ),
@@ -682,57 +703,81 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
         ? (isFav ? post.favCount + 1 : post.favCount - 1)
         : post.favCount;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkBackground : CupertinoColors.systemGrey6,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [
+                      const Color(0xFF1C1C1E).withValues(alpha: 0.6),
+                      const Color(0xFF0C0C0E).withValues(alpha: 0.7),
+                    ]
+                  : [
+                      const Color(0xFFF0F0F2).withValues(alpha: 0.6),
+                      const Color(0xFFE8E8EA).withValues(alpha: 0.7),
+                    ],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDark
+                  ? const Color(0xFF3D3D3F).withValues(alpha: 0.3)
+                  : const Color(0xFFE5E5E7).withValues(alpha: 0.5),
+              width: 0.5,
+            ),
+          ),
+          child: Column(
             children: [
-              _buildStatColumn(
-                icon: CupertinoIcons.arrow_up,
-                value: score.total.toString(),
-                label: 'Score',
-                color: score.total >= 0
-                    ? AppColors.safeColor
-                    : AppColors.explicitColor,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildStatColumn(
+                    icon: CupertinoIcons.arrow_up,
+                    value: score.total.toString(),
+                    label: 'Score',
+                    color: score.total >= 0
+                        ? AppColors.safeColor
+                        : AppColors.explicitColor,
+                  ),
+                  _buildStatColumn(
+                    icon: CupertinoIcons.heart_fill,
+                    value: favCount.compact,
+                    label: 'Favorites',
+                    color: AppColors.explicitColor,
+                  ),
+                  _buildStatColumn(
+                    icon: CupertinoIcons.chat_bubble_fill,
+                    value: post.commentCount.toString(),
+                    label: 'Comments',
+                    color: AppColors.primaryBlue,
+                  ),
+                ],
               ),
-              _buildStatColumn(
-                icon: CupertinoIcons.heart_fill,
-                value: favCount.compact,
-                label: 'Favorites',
-                color: AppColors.explicitColor,
-              ),
-              _buildStatColumn(
-                icon: CupertinoIcons.chat_bubble_fill,
-                value: post.commentCount.toString(),
-                label: 'Comments',
-                color: AppColors.primaryBlue,
+              const SizedBox(height: 12),
+              // Rating badge
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: post.ratingColor,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '${post.rating.toUpperCase()} - ${post.ratingLabel}',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: CupertinoColors.white,
+                  ),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          // Rating badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: post.ratingColor,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '${post.rating.toUpperCase()} - ${post.ratingLabel}',
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: CupertinoColors.white,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
