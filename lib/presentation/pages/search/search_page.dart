@@ -9,6 +9,12 @@ import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 import '../post/post_detail_page.dart';
 
+/// Design constants for the purple/indigo mobile theme
+class _ThemeColors {
+  static const Color primaryIndigo = Color(0xFF6366F1);
+  static const Color primaryPurple = Color(0xFF8B5CF6);
+}
+
 /// Search page
 class SearchPage extends StatefulWidget {
   final String? initialQuery;
@@ -251,11 +257,59 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         automaticallyImplyLeading: false,
-        middle: const Text('Search'),
+        backgroundColor: isDark
+            ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
+            : CupertinoColors.white.withValues(alpha: 0.85),
+        border: Border(
+          bottom: BorderSide(
+            color: isDark
+                ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
+                : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+            width: 0.5,
+          ),
+        ),
+        middle: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    _ThemeColors.primaryIndigo,
+                    _ThemeColors.primaryPurple,
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(6),
+                boxShadow: [
+                  BoxShadow(
+                    color: _ThemeColors.primaryPurple.withValues(alpha: 0.3),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                CupertinoIcons.search,
+                size: 14,
+                color: CupertinoColors.white,
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Text('Search'),
+          ],
+        ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(
+            'Cancel',
+            style: TextStyle(
+              color: _ThemeColors.primaryPurple,
+            ),
+          ),
         ),
       ),
       child: SafeArea(
@@ -525,15 +579,29 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
     VoidCallback? onTap, {
     bool disabled = false,
   }) {
+    final isDark = CupertinoTheme.of(context).brightness == Brightness.dark;
+    
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: disabled
-              ? CupertinoColors.systemGrey4.resolveFrom(context)
-              : CupertinoColors.systemGrey5.resolveFrom(context),
-          borderRadius: BorderRadius.circular(8),
+              ? (isDark
+                  ? const Color(0xFF2C2C2E).withValues(alpha: 0.4)
+                  : CupertinoColors.systemGrey4.resolveFrom(context))
+              : (isDark
+                  ? const Color(0xFF2C2C2E).withValues(alpha: 0.6)
+                  : const Color(0xFFF3F4F6).withValues(alpha: 0.8)),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: disabled
+                ? Colors.transparent
+                : (isDark
+                    ? _ThemeColors.primaryPurple.withValues(alpha: 0.2)
+                    : _ThemeColors.primaryPurple.withValues(alpha: 0.1)),
+            width: 1,
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -545,13 +613,21 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                   fontSize: 13,
                   color: disabled
                       ? CupertinoColors.systemGrey.resolveFrom(context)
-                      : null,
+                      : (isDark
+                          ? CupertinoColors.white.withValues(alpha: 0.8)
+                          : const Color(0xFF374151)),
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             const SizedBox(width: 4),
-            const Icon(CupertinoIcons.chevron_down, size: 14),
+            Icon(
+              CupertinoIcons.chevron_down, 
+              size: 14,
+              color: disabled
+                  ? CupertinoColors.systemGrey.resolveFrom(context)
+                  : _ThemeColors.primaryPurple.withValues(alpha: 0.7),
+            ),
           ],
         ),
       ),
