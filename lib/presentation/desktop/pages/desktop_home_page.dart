@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -6,6 +5,7 @@ import '../../../data/models/models.dart';
 import '../../pages/post/post_detail_page.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
+import '../widgets/desktop_toolbar.dart';
 
 /// Desktop home page with larger grid and toolbar
 class DesktopHomePage extends StatefulWidget {
@@ -74,13 +74,29 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = CupertinoTheme.brightnessOf(context);
-    final isDark = brightness == Brightness.dark;
-
     return Column(
       children: [
         // Toolbar
-        _buildToolbar(context, isDark),
+        DesktopToolbar(
+          title: 'Latest Posts',
+          icon: CupertinoIcons.house_fill,
+          actions: [
+            DesktopGridSizeSelector(
+              value: _gridColumns,
+              onChanged: (val) => setState(() => _gridColumns = val),
+            ),
+            const SizedBox(width: 16),
+            DesktopToolbarButton(
+              icon: CupertinoIcons.search,
+              onPressed: () => widget.onSearchTap(),
+            ),
+            const SizedBox(width: 8),
+            DesktopToolbarButton(
+              icon: CupertinoIcons.refresh,
+              onPressed: () => _loadPosts(refresh: true),
+            ),
+          ],
+        ),
         // Content
         Expanded(
           child: Consumer<PostsProvider>(
