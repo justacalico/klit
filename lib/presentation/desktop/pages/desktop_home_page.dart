@@ -140,31 +140,33 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
               ),
             ),
           ),
-      child: Row(
-        children: [
-          const Text(
-            'Latest Posts',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
+          child: Row(
+            children: [
+              const Text(
+                'Latest Posts',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Spacer(),
+              // Grid size selector
+              _buildGridSizeSelector(isDark),
+              const SizedBox(width: 12),
+              // Search button
+              CupertinoButton(
+                padding: const EdgeInsets.all(8),
+                onPressed: () => widget.onSearchTap(),
+                child: const Icon(CupertinoIcons.search, size: 20),
+              ),
+              // Refresh button
+              CupertinoButton(
+                padding: const EdgeInsets.all(8),
+                onPressed: () => _loadPosts(refresh: true),
+                child: const Icon(CupertinoIcons.refresh, size: 20),
+              ),
+            ],
           ),
-          const Spacer(),
-          // Grid size selector
-          _buildGridSizeSelector(isDark),
-          const SizedBox(width: 12),
-          // Search button
-          CupertinoButton(
-            padding: const EdgeInsets.all(8),
-            onPressed: () => widget.onSearchTap(),
-            child: const Icon(CupertinoIcons.search, size: 20),
-          ),
-          child: CupertinoButton(
-            padding: const EdgeInsets.all(8),
-            onPressed: () => _loadPosts(refresh: true),
-            child: const Icon(CupertinoIcons.refresh, size: 20),
-          ),
-        ],
         ),
       ),
     );
