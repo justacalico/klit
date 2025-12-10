@@ -26,12 +26,21 @@ class StorageService {
     if (_initialized) return;
     _prefs = await SharedPreferences.getInstance();
 
-    // Test if secure storage works on Linux
+    // Test if secure storage works on Linux by doing a write+read cycle
+    // Reading alone may not detect libsecret failures
     if (Platform.isLinux) {
       try {
-        await _secureStorage.read(key: '_test_key_');
-      } on PlatformException {
-        // libsecret failed, use fallback
+        const testKey = '_klit_secure_storage_test_';
+        const testValue = 'test_value';
+        await _secureStorage.write(key: testKey, value: testValue);
+        final readValue = await _secureStorage.read(key: testKey);
+        await _secureStorage.delete(key: testKey);
+        // If write succeeded but read returned different value, storage is broken
+        if (readValue != testValue) {
+          _useSecureStorageFallback = true;
+        }
+      } catch (e) {
+        // Any error (PlatformException, etc.) means libsecret failed
         _useSecureStorageFallback = true;
       }
     }
