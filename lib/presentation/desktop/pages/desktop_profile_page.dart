@@ -7,6 +7,7 @@ import '../../../core/extensions/extensions.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
 import '../../providers/providers.dart';
+import '../widgets/desktop_toolbar.dart';
 
 /// Desktop profile page with wider layout
 class DesktopProfilePage extends StatefulWidget {
