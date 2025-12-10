@@ -409,8 +409,7 @@ class _LoginPageState extends State<LoginPage>
             isDark: isDark,
             suffix: CupertinoButton(
               padding: EdgeInsets.zero,
-              minSize: 0,
-              onPressed: () => setState(() => _obscureApiKey = !_obscureApiKey),
+              onPressed: () => setState(() => _obscureApiKey = !_obscureApiKey), minimumSize: Size(0, 0),
               child: Icon(
                 _obscureApiKey ? CupertinoIcons.eye : CupertinoIcons.eye_slash,
                 size: 20,
@@ -669,8 +668,7 @@ class _LoginPageState extends State<LoginPage>
           const SizedBox(height: 4),
           CupertinoButton(
             padding: EdgeInsets.zero,
-            minSize: 0,
-            onPressed: _showApiKeyHelp,
+            onPressed: _showApiKeyHelp, minimumSize: Size(0, 0),
             child: const Text(
               'Learn how to get one',
               style: TextStyle(
