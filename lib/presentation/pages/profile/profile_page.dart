@@ -529,7 +529,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: CupertinoColors.systemBlue.withValues(alpha: 0.4),
+                    color: _ThemeColors.primaryPurple.withValues(alpha: 0.4),
                     blurRadius: 20,
                     spreadRadius: 2,
                   ),
@@ -544,8 +544,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        CupertinoColors.systemBlue.withValues(alpha: 0.3),
-                        CupertinoColors.systemPurple.withValues(alpha: 0.3),
+                        _ThemeColors.primaryIndigo.withValues(alpha: 0.3),
+                        _ThemeColors.primaryPurple.withValues(alpha: 0.3),
                       ],
                     ),
                   ),
