@@ -1,9 +1,9 @@
-import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../../app/routes.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../providers/providers.dart';
+import '../widgets/desktop_toolbar.dart';
 
 /// Desktop settings page with macOS-style preferences
 class DesktopSettingsPage extends StatelessWidget {
@@ -13,12 +13,12 @@ class DesktopSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = CupertinoTheme.brightnessOf(context);
-    final isDark = brightness == Brightness.dark;
-
     return Column(
       children: [
-        _buildToolbar(context, isDark),
+        const DesktopToolbar(
+          title: 'Settings',
+          icon: CupertinoIcons.settings,
+        ),
         Expanded(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
@@ -32,14 +32,14 @@ class DesktopSettingsPage extends StatelessWidget {
                       context,
                       title: 'Account',
                       icon: CupertinoIcons.person_circle,
-                      children: [_buildAccountCard(context, isDark)],
+                      children: [_buildAccountCard(context, CupertinoTheme.brightnessOf(context) == Brightness.dark)],
                     ),
                     const SizedBox(height: 24),
                     _buildSection(
                       context,
                       title: 'Appearance',
                       icon: CupertinoIcons.paintbrush,
-                      children: [_buildThemeSelector(context, isDark)],
+                      children: [_buildThemeSelector(context, CupertinoTheme.brightnessOf(context) == Brightness.dark)],
                     ),
                     const SizedBox(height: 24),
                     _buildSection(
@@ -47,9 +47,9 @@ class DesktopSettingsPage extends StatelessWidget {
                       title: 'Content',
                       icon: CupertinoIcons.photo_on_rectangle,
                       children: [
-                        _buildGridSizeSetting(context, isDark),
+                        _buildGridSizeSetting(context, CupertinoTheme.brightnessOf(context) == Brightness.dark),
                         const SizedBox(height: 12),
-                        _buildSafeModeSetting(context, isDark),
+                        _buildSafeModeSetting(context, CupertinoTheme.brightnessOf(context) == Brightness.dark),
                       ],
                     ),
                     const SizedBox(height: 24),
@@ -57,14 +57,14 @@ class DesktopSettingsPage extends StatelessWidget {
                       context,
                       title: 'Connection',
                       icon: CupertinoIcons.globe,
-                      children: [_buildHostSetting(context, isDark)],
+                      children: [_buildHostSetting(context, CupertinoTheme.brightnessOf(context) == Brightness.dark)],
                     ),
                     const SizedBox(height: 24),
                     _buildSection(
                       context,
                       title: 'About',
                       icon: CupertinoIcons.info_circle,
-                      children: [_buildAboutCard(context, isDark)],
+                      children: [_buildAboutCard(context, CupertinoTheme.brightnessOf(context) == Brightness.dark)],
                     ),
                   ],
                 ),
@@ -73,51 +73,6 @@ class DesktopSettingsPage extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildToolbar(BuildContext context, bool isDark) {
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-        child: Container(
-          height: 52,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isDark
-                  ? [
-                      const Color(0xFF2C2C2E).withValues(alpha: 0.8),
-                      const Color(0xFF1C1C1E).withValues(alpha: 0.9),
-                    ]
-                  : [
-                      const Color(0xFFFFFFFF).withValues(alpha: 0.8),
-                      const Color(0xFFF8F8FA).withValues(alpha: 0.9),
-                    ],
-            ),
-            border: Border(
-              bottom: BorderSide(
-                color: isDark
-                    ? const Color(0xFF3D3D3F).withValues(alpha: 0.5)
-                    : const Color(0xFFE5E5E7).withValues(alpha: 0.8),
-                width: 0.5,
-              ),
-            ),
-          ),
-          child: const Row(
-            children: [
-              Icon(CupertinoIcons.settings),
-              SizedBox(width: 8),
-              Text(
-                'Settings',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -132,8 +87,15 @@ class DesktopSettingsPage extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(icon, size: 18, color: AppColors.primaryBlue),
-            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, size: 16, color: const Color(0xFF8B5CF6)),
+            ),
+            const SizedBox(width: 10),
             Text(
               title,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
