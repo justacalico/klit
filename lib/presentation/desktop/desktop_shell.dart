@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import '../../core/constants/app_constants.dart';
 import '../pages/post/post_detail_page.dart';
@@ -66,7 +67,27 @@ class _DesktopShellState extends State<DesktopShell> {
     final isDark = brightness == Brightness.dark;
 
     return CupertinoPageScaffold(
-      child: Stack(
+      child: Container(
+        // Gradient background that shows through glass elements
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark
+                ? [
+                    const Color(0xFF0A0A0C),
+                    const Color(0xFF1A1A1E),
+                    const Color(0xFF0D0D0F),
+                  ]
+                : [
+                    const Color(0xFFF5F5FA),
+                    const Color(0xFFE8E8F0),
+                    const Color(0xFFF8F8FC),
+                  ],
+            stops: const [0.0, 0.5, 1.0],
+          ),
+        ),
+        child: Stack(
         children: [
           // Main layout with sidebar
           Row(
@@ -78,20 +99,14 @@ class _DesktopShellState extends State<DesktopShell> {
                 isCollapsed: _sidebarCollapsed,
                 onToggleCollapse: _toggleSidebar,
               ),
-              // Separator
-              Container(
-                width: 1,
-                color: isDark
-                    ? AppColors.darkSeparator
-                    : AppColors.lightSeparator,
-              ),
-              // Main content
+              // Main content (no separator - glass effect handles visual separation)
               Expanded(child: _buildMainContent()),
             ],
           ),
           // Full-screen post detail overlay
           if (_postDetailArgs != null) _buildPostDetailOverlay(isDark),
         ],
+      ),
       ),
     );
   }
