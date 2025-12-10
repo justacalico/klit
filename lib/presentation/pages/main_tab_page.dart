@@ -10,6 +10,13 @@ import 'popular/popular_page.dart';
 import 'profile/profile_page.dart';
 import 'settings/settings_page.dart';
 
+/// Design constants for the purple/indigo mobile theme
+class MobileThemeColors {
+  static const Color primaryIndigo = Color(0xFF6366F1);
+  static const Color primaryPurple = Color(0xFF8B5CF6);
+  static const Color primaryViolet = Color(0xFFA855F7);
+}
+
 /// Main tab navigation page
 class MainTabPage extends StatefulWidget {
   const MainTabPage({super.key});
@@ -71,12 +78,12 @@ class _MainTabPageState extends State<MainTabPage> {
           children: [
             // Page content - in guest mode, don't show settings (index 4)
             IndexedStack(index: _currentIndex, children: _pages),
-            // Liquid Glass navigation bar
+            // Modern gradient navigation bar
             Positioned(
-              left: 20,
-              right: 20,
-              bottom: MediaQuery.of(context).padding.bottom + 20,
-              child: _buildLiquidGlassNavBar(isDark, isGuest),
+              left: 16,
+              right: 16,
+              bottom: MediaQuery.of(context).padding.bottom + 16,
+              child: _buildModernNavBar(isDark, isGuest),
             ),
           ],
         ),
@@ -84,86 +91,82 @@ class _MainTabPageState extends State<MainTabPage> {
     );
   }
 
-  Widget _buildLiquidGlassNavBar(bool isDark, bool isGuest) {
+  Widget _buildModernNavBar(bool isDark, bool isGuest) {
     return Container(
-      height: 64,
+      height: 68,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          // Outer glow/shadow
+          // Purple glow effect
           BoxShadow(
-            color: isDark
-                ? CupertinoColors.black.withValues(alpha: 0.4)
-                : CupertinoColors.black.withValues(alpha: 0.08),
+            color: MobileThemeColors.primaryPurple.withValues(alpha: isDark ? 0.3 : 0.15),
+            blurRadius: 20,
+            spreadRadius: -2,
+            offset: const Offset(0, 8),
+          ),
+          // Outer shadow
+          BoxShadow(
+            color: CupertinoColors.black.withValues(alpha: isDark ? 0.4 : 0.1),
             blurRadius: 24,
             spreadRadius: 0,
             offset: const Offset(0, 8),
           ),
-          // Inner highlight (top)
-          BoxShadow(
-            color: isDark
-                ? CupertinoColors.white.withValues(alpha: 0.05)
-                : CupertinoColors.white.withValues(alpha: 0.8),
-            blurRadius: 1,
-            spreadRadius: 0,
-            offset: const Offset(0, -0.5),
-          ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(24),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(32),
-              // Liquid glass gradient
+              borderRadius: BorderRadius.circular(24),
+              // Modern gradient with purple tint
               gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
                 colors: isDark
                     ? [
-                        CupertinoColors.white.withValues(alpha: 0.18),
-                        CupertinoColors.white.withValues(alpha: 0.08),
+                        const Color(0xFF1C1C1E).withValues(alpha: 0.9),
+                        const Color(0xFF2C2C2E).withValues(alpha: 0.85),
                       ]
                     : [
+                        CupertinoColors.white.withValues(alpha: 0.92),
                         CupertinoColors.white.withValues(alpha: 0.85),
-                        CupertinoColors.white.withValues(alpha: 0.65),
                       ],
               ),
-              // Subtle border for glass edge effect
+              // Purple tinted border
               border: Border.all(
                 color: isDark
-                    ? CupertinoColors.white.withValues(alpha: 0.2)
-                    : CupertinoColors.white.withValues(alpha: 0.6),
+                    ? MobileThemeColors.primaryPurple.withValues(alpha: 0.2)
+                    : MobileThemeColors.primaryPurple.withValues(alpha: 0.1),
                 width: 1,
               ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildLiquidGlassNavItem(
+                _buildModernNavItem(
                   index: 0,
                   icon: CupertinoIcons.home,
                   activeIcon: CupertinoIcons.house_fill,
                   label: 'Home',
                   isDark: isDark,
                 ),
-                _buildLiquidGlassNavItem(
+                _buildModernNavItem(
                   index: 1,
                   icon: CupertinoIcons.flame,
                   activeIcon: CupertinoIcons.flame_fill,
                   label: 'Hot',
                   isDark: isDark,
                 ),
-                _buildLiquidGlassNavItem(
+                _buildModernNavItem(
                   index: 2,
                   icon: CupertinoIcons.star,
                   activeIcon: CupertinoIcons.star_fill,
                   label: 'Popular',
                   isDark: isDark,
                 ),
-                _buildLiquidGlassNavItem(
+                _buildModernNavItem(
                   index: 3,
                   icon: CupertinoIcons.person,
                   activeIcon: CupertinoIcons.person_fill,
@@ -174,7 +177,7 @@ class _MainTabPageState extends State<MainTabPage> {
                 if (isGuest)
                   _buildLogoutNavItem(isDark)
                 else
-                  _buildLiquidGlassNavItem(
+                  _buildModernNavItem(
                     index: 4,
                     icon: CupertinoIcons.settings,
                     activeIcon: CupertinoIcons.settings_solid,
@@ -208,7 +211,7 @@ class _MainTabPageState extends State<MainTabPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(CupertinoIcons.square_arrow_right, color: color, size: 24),
-            const SizedBox(height: 2),
+            const SizedBox(height: 4),
             Text(
               'Sign Out',
               style: TextStyle(
@@ -223,7 +226,7 @@ class _MainTabPageState extends State<MainTabPage> {
     );
   }
 
-  Widget _buildLiquidGlassNavItem({
+  Widget _buildModernNavItem({
     required int index,
     required IconData icon,
     required IconData activeIcon,
@@ -232,10 +235,8 @@ class _MainTabPageState extends State<MainTabPage> {
   }) {
     final isSelected = _currentIndex == index;
 
-    // Colors matching iOS 26 liquid glass style
-    final selectedColor = isDark
-        ? CupertinoColors.white
-        : CupertinoColors.black;
+    // Purple gradient for selected items
+    final selectedColor = MobileThemeColors.primaryPurple;
     final unselectedColor = isDark
         ? CupertinoColors.white.withValues(alpha: 0.5)
         : CupertinoColors.black.withValues(alpha: 0.4);
@@ -253,10 +254,15 @@ class _MainTabPageState extends State<MainTabPage> {
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: isSelected
             ? BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                color: isDark
-                    ? CupertinoColors.white.withValues(alpha: 0.15)
-                    : CupertinoColors.black.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(16),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    MobileThemeColors.primaryIndigo.withValues(alpha: 0.2),
+                    MobileThemeColors.primaryPurple.withValues(alpha: 0.15),
+                  ],
+                ),
               )
             : null,
         child: Column(
@@ -272,7 +278,7 @@ class _MainTabPageState extends State<MainTabPage> {
                 size: 24,
               ),
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 4),
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
               style: TextStyle(
