@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/constants.dart';
@@ -7,6 +6,7 @@ import '../../../data/services/services.dart';
 import '../../pages/post/post_detail_page.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
+import '../widgets/desktop_toolbar.dart';
 
 /// Desktop favorites page with larger grid
 class DesktopFavoritesPage extends StatefulWidget {
@@ -136,95 +136,19 @@ class _DesktopFavoritesPageState extends State<DesktopFavoritesPage> {
   }
 
   Widget _buildToolbar(bool isDark) {
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-        child: Container(
-          height: 52,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isDark
-                  ? [
-                      const Color(0xFF2C2C2E).withValues(alpha: 0.8),
-                      const Color(0xFF1C1C1E).withValues(alpha: 0.9),
-                    ]
-                  : [
-                      const Color(0xFFFFFFFF).withValues(alpha: 0.8),
-                      const Color(0xFFF8F8FA).withValues(alpha: 0.9),
-                    ],
-            ),
-            border: Border(
-              bottom: BorderSide(
-                color: isDark
-                    ? const Color(0xFF3D3D3F).withValues(alpha: 0.5)
-                    : const Color(0xFFE5E5E7).withValues(alpha: 0.8),
-                width: 0.5,
-              ),
-            ),
-          ),
-          child: Row(
-            children: [
-              const Icon(CupertinoIcons.heart_fill, color: AppColors.explicitColor),
-              const SizedBox(width: 12),
-              const Text(
-                'Favorites',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-              ),
-              const Spacer(),
-              // Grid size selector
-              _buildGridSizeSelector(isDark),
-              const SizedBox(width: 12),
-              // Refresh button
-              CupertinoButton(
-                padding: const EdgeInsets.all(8),
-                onPressed: () => _loadFavorites(refresh: true),
-                child: const Icon(CupertinoIcons.refresh, size: 20),
-              ),
-            ],
-          ),
+    return DesktopToolbar(
+      title: 'Favorites',
+      icon: CupertinoIcons.heart_fill,
+      actions: [
+        DesktopGridSizeSelector(
+          value: _gridColumns,
+          onChanged: (value) => setState(() => _gridColumns = value),
         ),
-      ),
-    );
-  }
-
-  Widget _buildGridSizeSelector(bool isDark) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Icon(
-          CupertinoIcons.square_grid_2x2,
-          size: 16,
-          color: CupertinoColors.secondaryLabel,
-        ),
-        const SizedBox(width: 8),
-        CupertinoSlidingSegmentedControl<int>(
-          groupValue: _gridColumns,
-          children: const {
-            3: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text('3', style: TextStyle(fontSize: 13)),
-            ),
-            4: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text('4', style: TextStyle(fontSize: 13)),
-            ),
-            5: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text('5', style: TextStyle(fontSize: 13)),
-            ),
-            6: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text('6', style: TextStyle(fontSize: 13)),
-            ),
-          },
-          onValueChanged: (value) {
-            if (value != null) {
-              setState(() => _gridColumns = value);
-            }
-          },
+        const SizedBox(width: 12),
+        DesktopToolbarButton(
+          icon: CupertinoIcons.refresh,
+          tooltip: 'Refresh',
+          onPressed: () => _loadFavorites(refresh: true),
         ),
       ],
     );
