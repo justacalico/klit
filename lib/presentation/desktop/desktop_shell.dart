@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
-import '../../core/constants/app_constants.dart';
 import '../pages/post/post_detail_page.dart';
 import 'pages/desktop_favorites_page.dart';
 import 'pages/desktop_home_page.dart';
