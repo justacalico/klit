@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import '../pages/post/post_detail_page.dart';
@@ -11,7 +12,14 @@ import 'pages/desktop_search_page.dart';
 import 'pages/desktop_settings_page.dart';
 import 'widgets/desktop_sidebar.dart';
 
-/// Desktop shell with macOS-style sidebar navigation
+/// Design constants matching the login page theme
+class _ShellColors {
+  static const Color primaryIndigo = Color(0xFF6366F1);
+  static const Color primaryPurple = Color(0xFF8B5CF6);
+  static const Color primaryViolet = Color(0xFFA855F7);
+}
+
+/// Desktop shell with macOS-style sidebar navigation and modern design
 class DesktopShell extends StatefulWidget {
   const DesktopShell({super.key});
 
@@ -19,13 +27,32 @@ class DesktopShell extends StatefulWidget {
   State<DesktopShell> createState() => _DesktopShellState();
 }
 
-class _DesktopShellState extends State<DesktopShell> {
+class _DesktopShellState extends State<DesktopShell>
+    with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
   bool _sidebarCollapsed = false;
 
   // For post detail view
   PostDetailArguments? _postDetailArgs;
   String? _searchQuery;
+
+  // Background animation
+  late AnimationController _bgAnimationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _bgAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 15),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _bgAnimationController.dispose();
+    super.dispose();
+  }
 
   void _onNavItemSelected(int index) {
     setState(() {
@@ -67,45 +94,45 @@ class _DesktopShellState extends State<DesktopShell> {
 
     return CupertinoPageScaffold(
       child: Container(
-        // Gradient background that shows through glass elements
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDark
-                ? [
-                    const Color(0xFF0A0A0C),
-                    const Color(0xFF1A1A1E),
-                    const Color(0xFF0D0D0F),
-                  ]
-                : [
-                    const Color(0xFFF5F5FA),
-                    const Color(0xFFE8E8F0),
-                    const Color(0xFFF8F8FC),
-                  ],
-            stops: const [0.0, 0.5, 1.0],
-          ),
-        ),
+        // Base background color
+        color: isDark ? const Color(0xFF0A0A0C) : const Color(0xFFF8F8FC),
         child: Stack(
-        children: [
-          // Main layout with sidebar
-          Row(
-            children: [
-              // Sidebar
-              DesktopSidebar(
-                selectedIndex: _selectedIndex,
-                onItemSelected: _onNavItemSelected,
-                isCollapsed: _sidebarCollapsed,
-                onToggleCollapse: _toggleSidebar,
-              ),
-              // Main content (no separator - glass effect handles visual separation)
-              Expanded(child: _buildMainContent()),
-            ],
-          ),
-          // Full-screen post detail overlay
-          if (_postDetailArgs != null) _buildPostDetailOverlay(isDark),
-        ],
-      ),
+          children: [
+            // Animated gradient background
+            AnimatedBuilder(
+              animation: _bgAnimationController,
+              builder: (context, child) {
+                return CustomPaint(
+                  painter: _ShellBackgroundPainter(
+                    isDark: isDark,
+                    animationValue: _bgAnimationController.value,
+                  ),
+                  size: Size.infinite,
+                );
+              },
+            ),
+            // Main layout with sidebar
+            Row(
+              children: [
+                // Sidebar
+                DesktopSidebar(
+                  selectedIndex: _selectedIndex,
+                  onItemSelected: _onNavItemSelected,
+                  isCollapsed: _sidebarCollapsed,
+                  onToggleCollapse: _toggleSidebar,
+                ),
+                // Main content area
+                Expanded(
+                  child: ClipRect(
+                    child: _buildMainContent(),
+                  ),
+                ),
+              ],
+            ),
+            // Full-screen post detail overlay
+            if (_postDetailArgs != null) _buildPostDetailOverlay(isDark),
+          ],
+        ),
       ),
     );
   }
@@ -171,5 +198,122 @@ class _DesktopShellState extends State<DesktopShell> {
       onLoadMore: _postDetailArgs!.onLoadMore,
       hasMore: _postDetailArgs!.hasMore,
     );
+  }
+}
+
+/// Background painter for animated gradient orbs
+class _ShellBackgroundPainter extends CustomPainter {
+  final bool isDark;
+  final double animationValue;
+
+  _ShellBackgroundPainter({
+    required this.isDark,
+    required this.animationValue,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint();
+    final colors = isDark
+        ? [
+            _ShellColors.primaryIndigo.withValues(alpha: 0.06),
+            _ShellColors.primaryPurple.withValues(alpha: 0.05),
+            _ShellColors.primaryViolet.withValues(alpha: 0.04),
+          ]
+        : [
+            _ShellColors.primaryIndigo.withValues(alpha: 0.04),
+            _ShellColors.primaryPurple.withValues(alpha: 0.03),
+            _ShellColors.primaryViolet.withValues(alpha: 0.025),
+          ];
+
+    // Top right orb
+    paint.shader = RadialGradient(
+      colors: [colors[0], colors[0].withValues(alpha: 0)],
+    ).createShader(
+      Rect.fromCircle(
+        center: Offset(
+          size.width * 0.85 + math.sin(animationValue * math.pi * 2) * 30,
+          size.height * 0.15 + math.cos(animationValue * math.pi * 2) * 25,
+        ),
+        radius: size.width * 0.4,
+      ),
+    );
+    canvas.drawCircle(
+      Offset(
+        size.width * 0.85 + math.sin(animationValue * math.pi * 2) * 30,
+        size.height * 0.15 + math.cos(animationValue * math.pi * 2) * 25,
+      ),
+      size.width * 0.4,
+      paint,
+    );
+
+    // Bottom left orb
+    paint.shader = RadialGradient(
+      colors: [colors[1], colors[1].withValues(alpha: 0)],
+    ).createShader(
+      Rect.fromCircle(
+        center: Offset(
+          size.width * 0.2 + math.cos(animationValue * math.pi * 2) * 20,
+          size.height * 0.8 + math.sin(animationValue * math.pi * 2) * 30,
+        ),
+        radius: size.width * 0.35,
+      ),
+    );
+    canvas.drawCircle(
+      Offset(
+        size.width * 0.2 + math.cos(animationValue * math.pi * 2) * 20,
+        size.height * 0.8 + math.sin(animationValue * math.pi * 2) * 30,
+      ),
+      size.width * 0.35,
+      paint,
+    );
+
+    // Center right orb
+    paint.shader = RadialGradient(
+      colors: [colors[2], colors[2].withValues(alpha: 0)],
+    ).createShader(
+      Rect.fromCircle(
+        center: Offset(
+          size.width * 0.7 + math.sin(animationValue * math.pi * 2 + 1) * 25,
+          size.height * 0.5 + math.cos(animationValue * math.pi * 2 + 1) * 35,
+        ),
+        radius: size.width * 0.3,
+      ),
+    );
+    canvas.drawCircle(
+      Offset(
+        size.width * 0.7 + math.sin(animationValue * math.pi * 2 + 1) * 25,
+        size.height * 0.5 + math.cos(animationValue * math.pi * 2 + 1) * 35,
+      ),
+      size.width * 0.3,
+      paint,
+    );
+
+    // Extra small accent orb
+    paint.shader = RadialGradient(
+      colors: [colors[0], colors[0].withValues(alpha: 0)],
+    ).createShader(
+      Rect.fromCircle(
+        center: Offset(
+          size.width * 0.4 + math.cos(animationValue * math.pi * 2 + 2) * 15,
+          size.height * 0.3 + math.sin(animationValue * math.pi * 2 + 2) * 20,
+        ),
+        radius: size.width * 0.2,
+      ),
+    );
+    canvas.drawCircle(
+      Offset(
+        size.width * 0.4 + math.cos(animationValue * math.pi * 2 + 2) * 15,
+        size.height * 0.3 + math.sin(animationValue * math.pi * 2 + 2) * 20,
+      ),
+      size.width * 0.2,
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _ShellBackgroundPainter oldDelegate) {
+    return oldDelegate.animationValue != animationValue ||
+        oldDelegate.isDark != isDark;
   }
 }
