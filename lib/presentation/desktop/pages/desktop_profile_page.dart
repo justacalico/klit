@@ -85,28 +85,25 @@ class _DesktopProfilePageState extends State<DesktopProfilePage> {
     return DesktopToolbar(
       title: 'Profile',
       icon: CupertinoIcons.person_fill,
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          DesktopToolbarButton(
-            icon: CupertinoIcons.refresh,
-            tooltip: 'Refresh',
-            onPressed: _loadProfile,
-          ),
-          const SizedBox(width: 8),
-          DesktopToolbarButton(
-            icon: CupertinoIcons.gear,
-            tooltip: 'Account Settings',
-            onPressed: () {
-              if (widget.onNavigate != null) {
-                widget.onNavigate!(AppRoutes.accountManagement);
-              } else {
-                Navigator.of(context).pushNamed(AppRoutes.accountManagement);
-              }
-            },
-          ),
-        ],
-      ),
+      actions: [
+        DesktopToolbarButton(
+          icon: CupertinoIcons.refresh,
+          tooltip: 'Refresh',
+          onPressed: _loadProfile,
+        ),
+        const SizedBox(width: 8),
+        DesktopToolbarButton(
+          icon: CupertinoIcons.gear,
+          tooltip: 'Account Settings',
+          onPressed: () {
+            if (widget.onNavigate != null) {
+              widget.onNavigate!(AppRoutes.accountManagement);
+            } else {
+              Navigator.of(context).pushNamed(AppRoutes.accountManagement);
+            }
+          },
+        ),
+      ],
     );
   }
 
