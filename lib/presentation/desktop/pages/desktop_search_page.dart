@@ -25,7 +25,8 @@ class DesktopSearchPage extends StatefulWidget {
   State<DesktopSearchPage> createState() => _DesktopSearchPageState();
 }
 
-class _DesktopSearchPageState extends State<DesktopSearchPage> {
+class _DesktopSearchPageState extends State<DesktopSearchPage>
+    with SingleTickerProviderStateMixin {
   final _searchController = TextEditingController();
   final _focusNode = FocusNode();
   final _tagDebouncer = Debouncer(delay: const Duration(milliseconds: 300));
@@ -33,6 +34,11 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
   String? _selectedRating;
   String _selectedOrder = 'id_desc';
   bool _showFilters = false;
+  
+  // Animation for filters
+  late AnimationController _filterAnimationController;
+  late Animation<double> _filterSlideAnimation;
+  late Animation<double> _filterFadeAnimation;
   
   // Tag suggestions
   List<Tag> _tagSuggestions = [];
@@ -49,6 +55,25 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
   @override
   void initState() {
     super.initState();
+    
+    // Initialize filter animation
+    _filterAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 250),
+      vsync: this,
+    );
+    _filterSlideAnimation = Tween<double>(begin: -20, end: 0).animate(
+      CurvedAnimation(
+        parent: _filterAnimationController,
+        curve: Curves.easeOutCubic,
+      ),
+    );
+    _filterFadeAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _filterAnimationController,
+        curve: Curves.easeOutCubic,
+      ),
+    );
+    
     if (widget.initialQuery != null) {
       _searchController.text = widget.initialQuery!;
       _performSearch();
@@ -60,6 +85,7 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
 
   @override
   void dispose() {
+    _filterAnimationController.dispose();
     _searchController.dispose();
     _focusNode.dispose();
     _tagDebouncer.dispose();
@@ -200,6 +226,15 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
         );
   }
 
+  void _toggleFilters() {
+    setState(() => _showFilters = !_showFilters);
+    if (_showFilters) {
+      _filterAnimationController.forward();
+    } else {
+      _filterAnimationController.reverse();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
@@ -210,7 +245,6 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
         Column(
           children: [
             _buildToolbar(context, isDark),
-            if (_showFilters) _buildFilters(context, isDark),
             Expanded(
               child: Row(
                 children: [
@@ -231,6 +265,22 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
             ),
           ],
         ),
+        // Floating filters panel with animation
+        if (_showFilters || _filterAnimationController.isAnimating)
+          AnimatedBuilder(
+            animation: _filterAnimationController,
+            builder: (context, child) {
+              return Positioned(
+                top: 60 + _filterSlideAnimation.value,
+                left: 220,
+                right: 20,
+                child: Opacity(
+                  opacity: _filterFadeAnimation.value,
+                  child: _buildFilters(context, isDark),
+                ),
+              );
+            },
+          ),
         // Tag suggestions overlay
         if (_showTagSuggestions && _tagSuggestions.isNotEmpty)
           Positioned(
