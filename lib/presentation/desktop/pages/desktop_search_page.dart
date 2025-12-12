@@ -34,12 +34,12 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
   String? _selectedRating;
   String _selectedOrder = 'id_desc';
   bool _showFilters = false;
-  
+
   // Animation for filters
   late AnimationController _filterAnimationController;
   late Animation<double> _filterSlideAnimation;
   late Animation<double> _filterFadeAnimation;
-  
+
   // Tag suggestions
   List<Tag> _tagSuggestions = [];
   bool _showTagSuggestions = false;
@@ -55,7 +55,7 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize filter animation
     _filterAnimationController = AnimationController(
       duration: const Duration(milliseconds: 250),
@@ -73,7 +73,7 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
         curve: Curves.easeOutCubic,
       ),
     );
-    
+
     if (widget.initialQuery != null) {
       _searchController.text = widget.initialQuery!;
       _performSearch();
@@ -97,7 +97,7 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
     final text = _searchController.text;
     final cursorPos = _searchController.selection.baseOffset;
     if (cursorPos < 0) return text.split(' ').last;
-    
+
     final textBeforeCursor = text.substring(0, cursorPos);
     final words = textBeforeCursor.split(' ');
     return words.isNotEmpty ? words.last : '';
@@ -142,7 +142,7 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
   void _insertTagSuggestion(String tagName) {
     final text = _searchController.text;
     final cursorPos = _searchController.selection.baseOffset;
-    
+
     if (cursorPos < 0) {
       final words = text.split(' ');
       if (words.isNotEmpty) {
@@ -154,23 +154,23 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
     } else {
       final textBeforeCursor = text.substring(0, cursorPos);
       final textAfterCursor = text.substring(cursorPos);
-      
+
       final lastSpaceIndex = textBeforeCursor.lastIndexOf(' ');
-      final newTextBeforeCursor = lastSpaceIndex >= 0 
+      final newTextBeforeCursor = lastSpaceIndex >= 0
           ? '${textBeforeCursor.substring(0, lastSpaceIndex + 1)}$tagName '
           : '$tagName ';
-      
+
       _searchController.text = newTextBeforeCursor + textAfterCursor;
       _searchController.selection = TextSelection.collapsed(
         offset: newTextBeforeCursor.length,
       );
     }
-    
+
     setState(() {
       _showTagSuggestions = false;
       _tagSuggestions = [];
     });
-    
+
     _focusNode.requestFocus();
   }
 
@@ -180,12 +180,12 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
 
     final settingsProvider = context.read<SettingsProvider>();
     context.read<PostsProvider>().searchPosts(
-          query: query,
-          refresh: true,
-          rating: _selectedRating,
-          order: _selectedOrder,
-          safeMode: settingsProvider.safeMode,
-        );
+      query: query,
+      refresh: true,
+      rating: _selectedRating,
+      order: _selectedOrder,
+      safeMode: settingsProvider.safeMode,
+    );
 
     settingsProvider.addToSearchHistory(query);
   }
@@ -196,20 +196,22 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
     final posts = postsProvider.searchResults;
     final index = posts.indexWhere((p) => p.id == post.id);
 
-    widget.onPostTap(PostDetailArguments(
-      postIds: posts.map((p) => p.id).toList(),
-      initialIndex: index >= 0 ? index : 0,
-      hasMore: postsProvider.hasMoreSearch,
-      onLoadMore: () async {
-        await postsProvider.searchPosts(
-          query: postsProvider.currentSearchQuery,
-          rating: _selectedRating,
-          order: _selectedOrder,
-          safeMode: settingsProvider.safeMode,
-        );
-        return postsProvider.searchResults.map((p) => p.id).toList();
-      },
-    ));
+    widget.onPostTap(
+      PostDetailArguments(
+        postIds: posts.map((p) => p.id).toList(),
+        initialIndex: index >= 0 ? index : 0,
+        hasMore: postsProvider.hasMoreSearch,
+        onLoadMore: () async {
+          await postsProvider.searchPosts(
+            query: postsProvider.currentSearchQuery,
+            rating: _selectedRating,
+            order: _selectedOrder,
+            safeMode: settingsProvider.safeMode,
+          );
+          return postsProvider.searchResults.map((p) => p.id).toList();
+        },
+      ),
+    );
   }
 
   void _loadMore() {
@@ -218,12 +220,12 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
 
     final settingsProvider = context.read<SettingsProvider>();
     context.read<PostsProvider>().searchPosts(
-          query: query,
-          refresh: false,
-          rating: _selectedRating,
-          order: _selectedOrder,
-          safeMode: settingsProvider.safeMode,
-        );
+      query: query,
+      refresh: false,
+      rating: _selectedRating,
+      order: _selectedOrder,
+      safeMode: settingsProvider.safeMode,
+    );
   }
 
   void _toggleFilters() {
@@ -257,9 +259,7 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
                         : AppColors.lightSeparator,
                   ),
                   // Results
-                  Expanded(
-                    child: _buildResults(context),
-                  ),
+                  Expanded(child: _buildResults(context)),
                 ],
               ),
             ),
@@ -368,7 +368,11 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
               itemCount: _tagSuggestions.length,
               itemBuilder: (context, index) {
                 final tag = _tagSuggestions[index];
-                return _buildTagSuggestionItem(tag, isDark, index == _tagSuggestions.length - 1);
+                return _buildTagSuggestionItem(
+                  tag,
+                  isDark,
+                  index == _tagSuggestions.length - 1,
+                );
               },
             ),
           ),
@@ -506,15 +510,20 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
                   controller: _searchController,
                   focusNode: _focusNode,
                   placeholder: 'Search tags...',
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
                   style: TextStyle(
                     fontSize: 15,
-                    color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+                    color: isDark
+                        ? CupertinoColors.white
+                        : const Color(0xFF1F2937),
                   ),
                   placeholderStyle: TextStyle(
                     fontSize: 15,
-                    color: isDark 
-                        ? CupertinoColors.systemGrey 
+                    color: isDark
+                        ? CupertinoColors.systemGrey
                         : CupertinoColors.systemGrey2,
                   ),
                   decoration: BoxDecoration(
@@ -524,8 +533,12 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isDark
-                          ? DesktopToolbarColors.primaryPurple.withValues(alpha: 0.2)
-                          : DesktopToolbarColors.primaryPurple.withValues(alpha: 0.15),
+                          ? DesktopToolbarColors.primaryPurple.withValues(
+                              alpha: 0.2,
+                            )
+                          : DesktopToolbarColors.primaryPurple.withValues(
+                              alpha: 0.15,
+                            ),
                       width: 1,
                     ),
                   ),
@@ -537,7 +550,7 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
                       });
                       return;
                     }
-                    
+
                     final currentWord = _getCurrentWord();
                     _tagDebouncer.run(() {
                       _fetchTagSuggestions(currentWord);
@@ -616,7 +629,9 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
                 offset: const Offset(0, 8),
               ),
               BoxShadow(
-                color: DesktopToolbarColors.primaryPurple.withValues(alpha: 0.1),
+                color: DesktopToolbarColors.primaryPurple.withValues(
+                  alpha: 0.1,
+                ),
                 blurRadius: 30,
                 offset: const Offset(0, 4),
               ),
@@ -647,7 +662,10 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
                       ),
                       'q': Padding(
                         padding: EdgeInsets.symmetric(horizontal: 12),
-                        child: Text('Questionable', style: TextStyle(fontSize: 12)),
+                        child: Text(
+                          'Questionable',
+                          style: TextStyle(fontSize: 12),
+                        ),
                       ),
                       'e': Padding(
                         padding: EdgeInsets.symmetric(horizontal: 12),
@@ -655,7 +673,9 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
                       ),
                     },
                     onValueChanged: (value) {
-                      setState(() => _selectedRating = value == 'all' ? null : value);
+                      setState(
+                        () => _selectedRating = value == 'all' ? null : value,
+                      );
                       if (_searchController.text.isNotEmpty) {
                         _performSearch();
                       }
@@ -677,7 +697,10 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
                       for (final entry in _orderOptions.entries)
                         entry.key: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Text(entry.value, style: const TextStyle(fontSize: 12)),
+                          child: Text(
+                            entry.value,
+                            style: const TextStyle(fontSize: 12),
+                          ),
                         ),
                     },
                     onValueChanged: (value) {
@@ -725,7 +748,8 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
                   padding: EdgeInsets.zero,
                   onPressed: () {
                     context.read<SettingsProvider>().clearSearchHistory();
-                  }, minimumSize: Size(0, 0),
+                  },
+                  minimumSize: Size(0, 0),
                   child: Text(
                     'Clear',
                     style: TextStyle(
@@ -747,7 +771,9 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
                       'No recent searches',
                       style: TextStyle(
                         fontSize: 12,
-                        color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                        color: CupertinoColors.secondaryLabel.resolveFrom(
+                          context,
+                        ),
                       ),
                     ),
                   );
