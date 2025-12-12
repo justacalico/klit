@@ -24,8 +24,10 @@ class DesktopPostDetailPage extends StatefulWidget {
   final int initialIndex;
   final void Function(String tag)? onSearchTag;
   final VoidCallback? onClose;
+
   /// Callback to load more posts, returns new post IDs
   final Future<List<int>> Function()? onLoadMore;
+
   /// Whether there are more posts to load
   final bool hasMore;
 
@@ -90,10 +92,10 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
     if (_currentIndex < _postIds.length - 1) {
       _loadPost(_currentIndex + 1);
     }
-    
+
     // Load more posts when approaching the end (3 posts before the end)
-    if (_hasMore && 
-        !_isLoadingMore && 
+    if (_hasMore &&
+        !_isLoadingMore &&
         widget.onLoadMore != null &&
         _currentIndex >= _postIds.length - 3) {
       _loadMorePosts();
@@ -102,11 +104,11 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
 
   Future<void> _loadMorePosts() async {
     if (_isLoadingMore || !_hasMore || widget.onLoadMore == null) return;
-    
+
     setState(() {
       _isLoadingMore = true;
     });
-    
+
     try {
       final newPostIds = await widget.onLoadMore!();
       if (mounted) {
@@ -611,29 +613,29 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                 isTogglingFav,
                 isDark,
               ),
-          // Scrollable content
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildStatsCard(post, score, isFav, isDark),
-                  const SizedBox(height: 16),
-                  if (post.description.isNotEmpty) ...[
-                    _buildDescriptionCard(post, isDark),
-                    const SizedBox(height: 16),
-                  ],
-                  _buildTagsCard(post, isDark),
-                  const SizedBox(height: 16),
-                  _buildMetadataCard(post, isDark),
-                  const SizedBox(height: 32),
-                ],
+              // Scrollable content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildStatsCard(post, score, isFav, isDark),
+                      const SizedBox(height: 16),
+                      if (post.description.isNotEmpty) ...[
+                        _buildDescriptionCard(post, isDark),
+                        const SizedBox(height: 16),
+                      ],
+                      _buildTagsCard(post, isDark),
+                      const SizedBox(height: 16),
+                      _buildMetadataCard(post, isDark),
+                      const SizedBox(height: 32),
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
         ),
       ),
     );
@@ -704,7 +706,10 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                 label: 'Favorite',
                 isActive: isFav,
                 isLoading: isTogglingFav,
-                activeGradient: [_ThemeColors.primaryPurple, _ThemeColors.primaryViolet],
+                activeGradient: [
+                  _ThemeColors.primaryPurple,
+                  _ThemeColors.primaryViolet,
+                ],
                 isDark: isDark,
                 onTap: _toggleFavorite,
               ),
@@ -714,7 +719,10 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                 label: 'Download',
                 isActive: false,
                 isLoading: false,
-                activeGradient: [_ThemeColors.primaryIndigo, _ThemeColors.primaryPurple],
+                activeGradient: [
+                  _ThemeColors.primaryIndigo,
+                  _ThemeColors.primaryPurple,
+                ],
                 isDark: isDark,
                 onTap: () {
                   // TODO: Implement download
@@ -753,15 +761,15 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
           color: isActive
               ? null
               : (isDark
-                  ? const Color(0xFF2C2C2E).withValues(alpha: 0.6)
-                  : const Color(0xFFF3F4F6).withValues(alpha: 0.8)),
+                    ? const Color(0xFF2C2C2E).withValues(alpha: 0.6)
+                    : const Color(0xFFF3F4F6).withValues(alpha: 0.8)),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isActive
                 ? Colors.transparent
                 : (isDark
-                    ? _ThemeColors.primaryPurple.withValues(alpha: 0.2)
-                    : _ThemeColors.primaryPurple.withValues(alpha: 0.1)),
+                      ? _ThemeColors.primaryPurple.withValues(alpha: 0.2)
+                      : _ThemeColors.primaryPurple.withValues(alpha: 0.1)),
             width: 1,
           ),
           boxShadow: isActive
@@ -782,7 +790,9 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                 width: 18,
                 height: 18,
                 child: CupertinoActivityIndicator(
-                  color: isActive ? CupertinoColors.white : _ThemeColors.primaryPurple,
+                  color: isActive
+                      ? CupertinoColors.white
+                      : _ThemeColors.primaryPurple,
                 ),
               )
             else
@@ -792,8 +802,8 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                 color: isActive
                     ? CupertinoColors.white
                     : (isDark
-                        ? CupertinoColors.white.withValues(alpha: 0.7)
-                        : const Color(0xFF374151)),
+                          ? CupertinoColors.white.withValues(alpha: 0.7)
+                          : const Color(0xFF374151)),
               ),
             const SizedBox(width: 8),
             Text(
@@ -804,8 +814,8 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                 color: isActive
                     ? CupertinoColors.white
                     : (isDark
-                        ? CupertinoColors.white.withValues(alpha: 0.7)
-                        : const Color(0xFF374151)),
+                          ? CupertinoColors.white.withValues(alpha: 0.7)
+                          : const Color(0xFF374151)),
               ),
             ),
           ],
@@ -880,7 +890,10 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
               const SizedBox(height: 16),
               // Rating badge with gradient
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
@@ -1024,7 +1037,9 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+                      color: isDark
+                          ? CupertinoColors.white
+                          : const Color(0xFF1F2937),
                     ),
                   ),
                 ],
@@ -1107,12 +1122,17 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+                      color: isDark
+                          ? CupertinoColors.white
+                          : const Color(0xFF1F2937),
                     ),
                   ),
                   const Spacer(),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: isDark
                           ? _ThemeColors.primaryPurple.withValues(alpha: 0.2)
@@ -1199,7 +1219,9 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+                      color: isDark
+                          ? CupertinoColors.white
+                          : const Color(0xFF1F2937),
                     ),
                   ),
                 ],
@@ -1215,7 +1237,11 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
               _buildMetadataRow('File Size', post.file.size.fileSize, isDark),
               _buildMetadataRow('Type', post.file.ext.toUpperCase(), isDark),
               if (post.sources.isNotEmpty)
-                _buildMetadataRow('Sources', '${post.sources.length} source(s)', isDark),
+                _buildMetadataRow(
+                  'Sources',
+                  '${post.sources.length} source(s)',
+                  isDark,
+                ),
             ],
           ),
         ),
@@ -1297,7 +1323,9 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: _ThemeColors.primaryPurple.withValues(alpha: 0.4),
+                        color: _ThemeColors.primaryPurple.withValues(
+                          alpha: 0.4,
+                        ),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
