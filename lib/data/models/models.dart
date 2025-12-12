@@ -1,6 +1,7 @@
 export 'account.dart';
 export 'comment.dart';
 export 'post.dart';
+export 'proxy_config.dart';
 export 'tag.dart';
 export 'user.dart';
 export 'api_error.dart';
