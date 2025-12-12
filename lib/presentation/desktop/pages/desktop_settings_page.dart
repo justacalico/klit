@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../../app/routes.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../data/models/proxy_config.dart';
 import '../../providers/providers.dart';
 import '../widgets/desktop_toolbar.dart';
 
