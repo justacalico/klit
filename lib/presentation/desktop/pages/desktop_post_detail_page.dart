@@ -683,7 +683,6 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                 child: _buildGradientActionButton(
                   icon: CupertinoIcons.arrow_up,
                   activeIcon: CupertinoIcons.arrow_up_circle_fill,
-                  label: 'Up',
                   isActive: userVote == 1,
                   isLoading: isVoting,
                   activeGradient: const [Color(0xFF22C55E), Color(0xFF16A34A)],
@@ -696,7 +695,6 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                 child: _buildGradientActionButton(
                   icon: CupertinoIcons.arrow_down,
                   activeIcon: CupertinoIcons.arrow_down_circle_fill,
-                  label: 'Down',
                   isActive: userVote == -1,
                   isLoading: isVoting,
                   activeGradient: const [Color(0xFFEF4444), Color(0xFFDC2626)],
@@ -709,7 +707,6 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                 child: _buildGradientActionButton(
                   icon: CupertinoIcons.heart,
                   activeIcon: CupertinoIcons.heart_fill,
-                  label: 'Fav',
                   isActive: isFav,
                   isLoading: isTogglingFav,
                   activeGradient: [
@@ -725,7 +722,6 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                 child: _buildGradientActionButton(
                   icon: CupertinoIcons.square_arrow_down,
                   activeIcon: CupertinoIcons.square_arrow_down_fill,
-                  label: 'Save',
                   isActive: false,
                   isLoading: false,
                   activeGradient: [
@@ -748,7 +744,6 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
   Widget _buildGradientActionButton({
     required IconData icon,
     required IconData activeIcon,
-    String? label,
     required bool isActive,
     required bool isLoading,
     required List<Color> activeGradient,
