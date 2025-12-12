@@ -21,6 +21,8 @@ class AppConstants {
   static const String upvoteWhenFavoritedKey = 'upvote_when_favorited';
   static const String searchHistoryKey = 'search_history';
   static const String proxyConfigKey = 'proxy_config';
+  static const String blacklistKey = 'user_blacklist';
+  static const String blacklistEnabledKey = 'blacklist_enabled';
 
   /// Default grid columns
   static const int defaultGridColumns = 2;
