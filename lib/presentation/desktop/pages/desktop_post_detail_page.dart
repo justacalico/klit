@@ -1277,19 +1277,37 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                 child: CupertinoActivityIndicator(color: CupertinoColors.white),
               ),
             ),
-            // Close button
+            // Close button with gradient
             Positioned(
-              top: 16,
-              left: 16,
-              child: CupertinoButton(
-                padding: const EdgeInsets.all(12),
-                color: CupertinoColors.black.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(8),
-                onPressed: () => setState(() => _isFullScreen = false),
-                child: const Icon(
-                  CupertinoIcons.xmark,
-                  color: CupertinoColors.white,
-                  size: 20,
+              top: 20,
+              left: 20,
+              child: GestureDetector(
+                onTap: () => setState(() => _isFullScreen = false),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        _ThemeColors.primaryPurple.withValues(alpha: 0.9),
+                        _ThemeColors.primaryIndigo.withValues(alpha: 0.9),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _ThemeColors.primaryPurple.withValues(alpha: 0.4),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    CupertinoIcons.xmark,
+                    color: CupertinoColors.white,
+                    size: 20,
+                  ),
                 ),
               ),
             ),
