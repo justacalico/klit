@@ -3,6 +3,9 @@ import '../../core/constants/constants.dart';
 import '../../data/models/models.dart';
 import '../../data/services/services.dart';
 
+/// Callback type for when proxy configuration changes
+typedef ProxyChangeCallback = void Function(ProxyConfig config);
+
 /// Provider for app settings
 class SettingsProvider extends ChangeNotifier {
   final StorageService _storageService;
@@ -14,6 +17,10 @@ class SettingsProvider extends ChangeNotifier {
   bool _upvoteWhenFavorited = true;
   String _host = ApiConstants.defaultHost;
   List<SearchHistoryItem> _searchHistory = [];
+  ProxyConfig _proxyConfig = const ProxyConfig();
+
+  /// Callback to notify when proxy configuration changes
+  ProxyChangeCallback? onProxyChanged;
 
   SettingsProvider({required StorageService storageService})
       : _storageService = storageService;
@@ -26,6 +33,7 @@ class SettingsProvider extends ChangeNotifier {
   bool get upvoteWhenFavorited => _upvoteWhenFavorited;
   String get host => _host;
   List<SearchHistoryItem> get searchHistory => _searchHistory;
+  ProxyConfig get proxyConfig => _proxyConfig;
 
   /// Initialize settings from storage
   Future<void> initialize() async {
@@ -36,6 +44,7 @@ class SettingsProvider extends ChangeNotifier {
     _upvoteWhenFavorited = _storageService.getUpvoteWhenFavorited();
     _host = _storageService.getHost();
     _searchHistory = _storageService.getSearchHistory();
+    _proxyConfig = _storageService.getProxyConfig();
     notifyListeners();
   }
 
