@@ -478,30 +478,48 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
 
   Widget _buildMediaPanel(Post post, bool isDark) {
     return Container(
-      color: isDark ? CupertinoColors.black : CupertinoColors.systemGrey6,
+      color: isDark ? const Color(0xFF0A0A0C) : CupertinoColors.systemGrey6,
       child: Stack(
         children: [
           // Media content
           Center(child: _buildMedia(post)),
-          // Fullscreen button
+          // Fullscreen button with gradient
           Positioned(
-            bottom: 16,
-            right: 16,
-            child: CupertinoButton(
-              padding: const EdgeInsets.all(12),
-              color: CupertinoColors.black.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(8),
-              onPressed: () {
+            bottom: 20,
+            right: 20,
+            child: GestureDetector(
+              onTap: () {
                 if (post.isVideo) {
                   _openFullScreenVideo(post);
                 } else {
                   setState(() => _isFullScreen = true);
                 }
               },
-              child: const Icon(
-                CupertinoIcons.fullscreen,
-                color: CupertinoColors.white,
-                size: 20,
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      _ThemeColors.primaryPurple.withValues(alpha: 0.9),
+                      _ThemeColors.primaryIndigo.withValues(alpha: 0.9),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: _ThemeColors.primaryPurple.withValues(alpha: 0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  CupertinoIcons.fullscreen,
+                  color: CupertinoColors.white,
+                  size: 20,
+                ),
               ),
             ),
           ),
@@ -1123,52 +1141,81 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
 
   Widget _buildMetadataCard(Post post, bool isDark) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
                   ? [
-                      const Color(0xFF1C1C1E).withValues(alpha: 0.6),
-                      const Color(0xFF0C0C0E).withValues(alpha: 0.7),
+                      _ThemeColors.primaryViolet.withValues(alpha: 0.06),
+                      _ThemeColors.primaryIndigo.withValues(alpha: 0.04),
                     ]
                   : [
-                      const Color(0xFFF0F0F2).withValues(alpha: 0.6),
-                      const Color(0xFFE8E8EA).withValues(alpha: 0.7),
+                      _ThemeColors.primaryViolet.withValues(alpha: 0.04),
+                      _ThemeColors.primaryIndigo.withValues(alpha: 0.02),
                     ],
             ),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isDark
-                  ? const Color(0xFF3D3D3F).withValues(alpha: 0.3)
-                  : const Color(0xFFE5E5E7).withValues(alpha: 0.5),
-              width: 0.5,
+                  ? _ThemeColors.primaryViolet.withValues(alpha: 0.15)
+                  : _ThemeColors.primaryViolet.withValues(alpha: 0.1),
+              width: 1,
             ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Details',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          _ThemeColors.primaryViolet,
+                          _ThemeColors.primaryIndigo,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      CupertinoIcons.info_circle_fill,
+                      size: 12,
+                      color: CupertinoColors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Details',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              _buildMetadataRow('ID', '#${post.id}'),
-              _buildMetadataRow('Posted', post.createdAt.relativeTime),
+              const SizedBox(height: 16),
+              _buildMetadataRow('ID', '#${post.id}', isDark),
+              _buildMetadataRow('Posted', post.createdAt.relativeTime, isDark),
               _buildMetadataRow(
                 'Resolution',
                 '${post.file.width}×${post.file.height}',
+                isDark,
               ),
-              _buildMetadataRow('File Size', post.file.size.fileSize),
-              _buildMetadataRow('Type', post.file.ext.toUpperCase()),
+              _buildMetadataRow('File Size', post.file.size.fileSize, isDark),
+              _buildMetadataRow('Type', post.file.ext.toUpperCase(), isDark),
               if (post.sources.isNotEmpty)
-                _buildMetadataRow('Sources', '${post.sources.length} source(s)'),
+                _buildMetadataRow('Sources', '${post.sources.length} source(s)', isDark),
             ],
           ),
         ),
@@ -1176,22 +1223,29 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
     );
   }
 
-  Widget _buildMetadataRow(String label, String value) {
+  Widget _buildMetadataRow(String label, String value, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
-              color: CupertinoColors.secondaryLabel,
+              fontWeight: FontWeight.w500,
+              color: isDark
+                  ? CupertinoColors.white.withValues(alpha: 0.6)
+                  : const Color(0xFF6B7280),
             ),
           ),
           Text(
             value,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+            ),
           ),
         ],
       ),
