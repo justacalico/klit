@@ -299,6 +299,24 @@ class StorageService {
     await _prefs.remove(AppConstants.searchHistoryKey);
   }
 
+  // ==================== Proxy Configuration ====================
+
+  /// Get proxy configuration
+  ProxyConfig getProxyConfig() {
+    final proxyJson = _prefs.getString(AppConstants.proxyConfigKey);
+    if (proxyJson == null) return const ProxyConfig();
+    try {
+      return ProxyConfig.fromJsonString(proxyJson);
+    } catch (e) {
+      return const ProxyConfig();
+    }
+  }
+
+  /// Set proxy configuration
+  Future<void> setProxyConfig(ProxyConfig config) async {
+    await _prefs.setString(AppConstants.proxyConfigKey, config.toJsonString());
+  }
+
   // ==================== Cache Management ====================
 
   /// Clear all preferences (not secure storage)
