@@ -18,6 +18,8 @@ class SettingsProvider extends ChangeNotifier {
   String _host = ApiConstants.defaultHost;
   List<SearchHistoryItem> _searchHistory = [];
   ProxyConfig _proxyConfig = const ProxyConfig();
+  String _blacklist = '';
+  bool _blacklistEnabled = true;
 
   /// Callback to notify when proxy configuration changes
   ProxyChangeCallback? onProxyChanged;
@@ -34,6 +36,18 @@ class SettingsProvider extends ChangeNotifier {
   String get host => _host;
   List<SearchHistoryItem> get searchHistory => _searchHistory;
   ProxyConfig get proxyConfig => _proxyConfig;
+  String get blacklist => _blacklist;
+  bool get blacklistEnabled => _blacklistEnabled;
+
+  /// Get blacklist as a list of tag queries (each line is a filter)
+  List<String> get blacklistLines {
+    if (_blacklist.isEmpty) return [];
+    return _blacklist
+        .split('\n')
+        .map((line) => line.trim())
+        .where((line) => line.isNotEmpty && !line.startsWith('#'))
+        .toList();
+  }
 
   /// Initialize settings from storage
   Future<void> initialize() async {
@@ -45,6 +59,8 @@ class SettingsProvider extends ChangeNotifier {
     _host = _storageService.getHost();
     _searchHistory = _storageService.getSearchHistory();
     _proxyConfig = _storageService.getProxyConfig();
+    _blacklist = _storageService.getBlacklist();
+    _blacklistEnabled = _storageService.getBlacklistEnabled();
     notifyListeners();
   }
 
@@ -141,6 +157,20 @@ class SettingsProvider extends ChangeNotifier {
       username: username,
       password: password,
     ));
+  }
+
+  /// Set blacklist (raw string with newlines)
+  Future<void> setBlacklist(String blacklist) async {
+    _blacklist = blacklist;
+    await _storageService.setBlacklist(blacklist);
+    notifyListeners();
+  }
+
+  /// Set blacklist enabled
+  Future<void> setBlacklistEnabled(bool enabled) async {
+    _blacklistEnabled = enabled;
+    await _storageService.setBlacklistEnabled(enabled);
+    notifyListeners();
   }
 
   /// Clear all preferences (not accounts)
