@@ -20,6 +20,7 @@ class AppConstants {
   static const String leftHandedModeKey = 'left_handed_mode';
   static const String upvoteWhenFavoritedKey = 'upvote_when_favorited';
   static const String searchHistoryKey = 'search_history';
+  static const String proxyConfigKey = 'proxy_config';
 
   /// Default grid columns
   static const int defaultGridColumns = 2;
