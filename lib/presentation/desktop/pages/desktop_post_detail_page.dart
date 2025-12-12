@@ -629,99 +629,169 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
     bool isTogglingFav,
     bool isDark,
   ) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: isDark
-                ? const Color(0xFF3D3D3F).withValues(alpha: 0.5)
-                : const Color(0xFFE5E5E7).withValues(alpha: 0.8),
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [
+                      _ThemeColors.primaryPurple.withValues(alpha: 0.08),
+                      _ThemeColors.primaryIndigo.withValues(alpha: 0.05),
+                    ]
+                  : [
+                      _ThemeColors.primaryPurple.withValues(alpha: 0.05),
+                      _ThemeColors.primaryIndigo.withValues(alpha: 0.03),
+                    ],
+            ),
+            border: Border(
+              bottom: BorderSide(
+                color: isDark
+                    ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
+                    : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+                width: 1,
+              ),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildGradientActionButton(
+                icon: CupertinoIcons.arrow_up,
+                activeIcon: CupertinoIcons.arrow_up_circle_fill,
+                label: 'Upvote',
+                isActive: userVote == 1,
+                isLoading: isVoting,
+                activeGradient: const [Color(0xFF22C55E), Color(0xFF16A34A)],
+                isDark: isDark,
+                onTap: () => _vote(userVote == 1 ? 0 : 1),
+              ),
+              _buildGradientActionButton(
+                icon: CupertinoIcons.arrow_down,
+                activeIcon: CupertinoIcons.arrow_down_circle_fill,
+                label: 'Downvote',
+                isActive: userVote == -1,
+                isLoading: isVoting,
+                activeGradient: const [Color(0xFFEF4444), Color(0xFFDC2626)],
+                isDark: isDark,
+                onTap: () => _vote(userVote == -1 ? 0 : -1),
+              ),
+              _buildGradientActionButton(
+                icon: CupertinoIcons.heart,
+                activeIcon: CupertinoIcons.heart_fill,
+                label: 'Favorite',
+                isActive: isFav,
+                isLoading: isTogglingFav,
+                activeGradient: [_ThemeColors.primaryPurple, _ThemeColors.primaryViolet],
+                isDark: isDark,
+                onTap: _toggleFavorite,
+              ),
+              _buildGradientActionButton(
+                icon: CupertinoIcons.square_arrow_down,
+                activeIcon: CupertinoIcons.square_arrow_down_fill,
+                label: 'Download',
+                isActive: false,
+                isLoading: false,
+                activeGradient: [_ThemeColors.primaryIndigo, _ThemeColors.primaryPurple],
+                isDark: isDark,
+                onTap: () {
+                  // TODO: Implement download
+                },
+              ),
+            ],
           ),
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildActionButton(
-            icon: CupertinoIcons.arrow_up,
-            activeIcon: CupertinoIcons.arrow_up_circle_fill,
-            label: 'Up',
-            isActive: userVote == 1,
-            isLoading: isVoting,
-            color: AppColors.safeColor,
-            onTap: () => _vote(userVote == 1 ? 0 : 1),
-          ),
-          _buildActionButton(
-            icon: CupertinoIcons.arrow_down,
-            activeIcon: CupertinoIcons.arrow_down_circle_fill,
-            label: 'Down',
-            isActive: userVote == -1,
-            isLoading: isVoting,
-            color: AppColors.explicitColor,
-            onTap: () => _vote(userVote == -1 ? 0 : -1),
-          ),
-          _buildActionButton(
-            icon: CupertinoIcons.heart,
-            activeIcon: CupertinoIcons.heart_fill,
-            label: 'Fav',
-            isActive: isFav,
-            isLoading: isTogglingFav,
-            color: AppColors.explicitColor,
-            onTap: _toggleFavorite,
-          ),
-          _buildActionButton(
-            icon: CupertinoIcons.square_arrow_down,
-            activeIcon: CupertinoIcons.square_arrow_down_fill,
-            label: 'Save',
-            isActive: false,
-            isLoading: false,
-            color: AppColors.primaryBlue,
-            onTap: () {
-              // TODO: Implement download
-            },
-          ),
-        ],
       ),
     );
   }
 
-  Widget _buildActionButton({
+  Widget _buildGradientActionButton({
     required IconData icon,
     required IconData activeIcon,
     required String label,
     required bool isActive,
     required bool isLoading,
-    required Color color,
+    required List<Color> activeGradient,
+    required bool isDark,
     required VoidCallback onTap,
   }) {
-    return CupertinoButton(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      onPressed: isLoading ? null : onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (isLoading)
-            SizedBox(
-              width: 22,
-              height: 22,
-              child: CupertinoActivityIndicator(color: color),
-            )
-          else
-            Icon(
-              isActive ? activeIcon : icon,
-              size: 22,
-              color: isActive ? color : CupertinoColors.secondaryLabel,
-            ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: isActive ? color : CupertinoColors.secondaryLabel,
-            ),
+    return GestureDetector(
+      onTap: isLoading ? null : onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          gradient: isActive
+              ? LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: activeGradient,
+                )
+              : null,
+          color: isActive
+              ? null
+              : (isDark
+                  ? const Color(0xFF2C2C2E).withValues(alpha: 0.6)
+                  : const Color(0xFFF3F4F6).withValues(alpha: 0.8)),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isActive
+                ? Colors.transparent
+                : (isDark
+                    ? _ThemeColors.primaryPurple.withValues(alpha: 0.2)
+                    : _ThemeColors.primaryPurple.withValues(alpha: 0.1)),
+            width: 1,
           ),
-        ],
+          boxShadow: isActive
+              ? [
+                  BoxShadow(
+                    color: activeGradient[0].withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isLoading)
+              SizedBox(
+                width: 18,
+                height: 18,
+                child: CupertinoActivityIndicator(
+                  color: isActive ? CupertinoColors.white : _ThemeColors.primaryPurple,
+                ),
+              )
+            else
+              Icon(
+                isActive ? activeIcon : icon,
+                size: 18,
+                color: isActive
+                    ? CupertinoColors.white
+                    : (isDark
+                        ? CupertinoColors.white.withValues(alpha: 0.7)
+                        : const Color(0xFF374151)),
+              ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: isActive
+                    ? CupertinoColors.white
+                    : (isDark
+                        ? CupertinoColors.white.withValues(alpha: 0.7)
+                        : const Color(0xFF374151)),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
