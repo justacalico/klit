@@ -11,6 +11,13 @@ import '../../../data/services/services.dart';
 import '../../widgets/widgets.dart';
 import '../widgets/desktop_toolbar.dart';
 
+/// Design constants for the purple/indigo theme
+class _ThemeColors {
+  static const Color primaryIndigo = Color(0xFF6366F1);
+  static const Color primaryPurple = Color(0xFF8B5CF6);
+  static const Color primaryViolet = Color(0xFFA855F7);
+}
+
 /// Desktop-optimized post detail page with side-by-side layout
 class DesktopPostDetailPage extends StatefulWidget {
   final List<int> postIds;
