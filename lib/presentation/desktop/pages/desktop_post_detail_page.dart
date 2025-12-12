@@ -1328,16 +1328,4 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
     );
   }
 
-  void _openFullScreenVideo(Post post) {
-    if (post.file.url == null) return;
-    Navigator.of(context).push(
-      CupertinoPageRoute(
-        fullscreenDialog: true,
-        builder: (context) => FullScreenVideoViewer(
-          videoUrl: post.file.url!,
-          thumbnailUrl: post.preview.url,
-        ),
-      ),
-    );
-  }
 }
