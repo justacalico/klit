@@ -83,6 +83,8 @@ class SettingsPage extends StatelessWidget {
                 const SizedBox(height: 24),
                 _buildAppearanceSection(context, isDark),
                 const SizedBox(height: 24),
+                _buildNetworkSection(context, isDark),
+                const SizedBox(height: 24),
                 _buildCacheSection(context, isDark),
                 const SizedBox(height: 24),
                 _buildAboutSection(context, isDark),
@@ -296,6 +298,359 @@ class SettingsPage extends StatelessWidget {
               ),
             );
           },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNetworkSection(BuildContext context, bool isDark) {
+    return _buildLiquidGlassSection(
+      context,
+      isDark: isDark,
+      title: 'NETWORK',
+      children: [
+        Consumer<SettingsProvider>(
+          builder: (context, settings, _) {
+            return _buildLiquidGlassTile(
+              context,
+              isDark: isDark,
+              icon: CupertinoIcons.globe,
+              iconColor: AppColors.primaryTeal,
+              title: 'HTTP Proxy',
+              subtitle: settings.proxyConfig.enabled
+                  ? '${settings.proxyConfig.host}:${settings.proxyConfig.port}'
+                  : 'Disabled',
+              trailing: CupertinoSwitch(
+                value: settings.proxyConfig.enabled,
+                activeTrackColor: AppColors.primaryGreen,
+                onChanged: (value) => settings.setProxyEnabled(value),
+              ),
+            );
+          },
+        ),
+        _buildLiquidGlassDivider(isDark),
+        Consumer<SettingsProvider>(
+          builder: (context, settings, _) {
+            return _buildLiquidGlassTile(
+              context,
+              isDark: isDark,
+              icon: CupertinoIcons.gear_alt_fill,
+              iconColor: AppColors.primaryOrange,
+              title: 'Proxy Settings',
+              subtitle: 'Configure proxy host, port, and authentication',
+              showChevron: true,
+              onTap: () => _showProxySettingsDialog(context, isDark, settings),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  void _showProxySettingsDialog(
+    BuildContext context,
+    bool isDark,
+    SettingsProvider settings,
+  ) {
+    final hostController = TextEditingController(
+      text: settings.proxyConfig.host,
+    );
+    final portController = TextEditingController(
+      text: settings.proxyConfig.port.toString(),
+    );
+    final usernameController = TextEditingController(
+      text: settings.proxyConfig.username ?? '',
+    );
+    final passwordController = TextEditingController(
+      text: settings.proxyConfig.password ?? '',
+    );
+
+    bool useAuth = settings.proxyConfig.useAuthentication;
+
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => Container(
+          height: MediaQuery.of(context).size.height * 0.75,
+          decoration: BoxDecoration(
+            color: isDark
+                ? const Color(0xFF1C1C1E).withValues(alpha: 0.95)
+                : CupertinoColors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+              child: Column(
+                children: [
+                  // Handle bar
+                  Container(
+                    margin: const EdgeInsets.only(top: 8),
+                    width: 36,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? CupertinoColors.white.withValues(alpha: 0.3)
+                          : CupertinoColors.black.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(2.5),
+                    ),
+                  ),
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                              fontSize: 17,
+                              color: CupertinoColors.systemGrey,
+                            ),
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        Text(
+                          'Proxy Settings',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                            color: isDark
+                                ? CupertinoColors.white
+                                : CupertinoColors.black,
+                          ),
+                        ),
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          child: Text(
+                            'Save',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: _ThemeColors.primaryPurple,
+                            ),
+                          ),
+                          onPressed: () {
+                            final port = int.tryParse(portController.text) ?? 8080;
+                            settings.setProxyConfig(
+                              settings.proxyConfig.copyWith(
+                                host: hostController.text.trim(),
+                                port: port,
+                                useAuthentication: useAuth,
+                                username: usernameController.text.trim().isEmpty
+                                    ? null
+                                    : usernameController.text.trim(),
+                                password: passwordController.text.isEmpty
+                                    ? null
+                                    : passwordController.text,
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Divider
+                  Container(
+                    height: 0.5,
+                    color: isDark
+                        ? CupertinoColors.white.withValues(alpha: 0.1)
+                        : CupertinoColors.black.withValues(alpha: 0.1),
+                  ),
+                  // Content
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Host field
+                          _buildProxyTextField(
+                            isDark: isDark,
+                            label: 'Proxy Host',
+                            placeholder: 'e.g., 127.0.0.1 or proxy.example.com',
+                            controller: hostController,
+                            keyboardType: TextInputType.url,
+                          ),
+                          const SizedBox(height: 16),
+                          // Port field
+                          _buildProxyTextField(
+                            isDark: isDark,
+                            label: 'Proxy Port',
+                            placeholder: 'e.g., 8080',
+                            controller: portController,
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(height: 24),
+                          // Authentication toggle
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? CupertinoColors.white.withValues(alpha: 0.1)
+                                  : CupertinoColors.black.withValues(alpha: 0.05),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Use Authentication',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: isDark
+                                            ? CupertinoColors.white
+                                            : CupertinoColors.black,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Enable if proxy requires login',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: isDark
+                                            ? CupertinoColors.white.withValues(alpha: 0.5)
+                                            : CupertinoColors.black.withValues(alpha: 0.5),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                CupertinoSwitch(
+                                  value: useAuth,
+                                  activeTrackColor: _ThemeColors.primaryPurple,
+                                  onChanged: (value) {
+                                    setState(() => useAuth = value);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (useAuth) ...[
+                            const SizedBox(height: 16),
+                            _buildProxyTextField(
+                              isDark: isDark,
+                              label: 'Username',
+                              placeholder: 'Proxy username',
+                              controller: usernameController,
+                              keyboardType: TextInputType.text,
+                            ),
+                            const SizedBox(height: 16),
+                            _buildProxyTextField(
+                              isDark: isDark,
+                              label: 'Password',
+                              placeholder: 'Proxy password',
+                              controller: passwordController,
+                              keyboardType: TextInputType.visiblePassword,
+                              obscureText: true,
+                            ),
+                          ],
+                          const SizedBox(height: 24),
+                          // Info text
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: _ThemeColors.primaryPurple.withValues(alpha: 0.2),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  CupertinoIcons.info_circle_fill,
+                                  size: 20,
+                                  color: _ThemeColors.primaryPurple,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'The HTTP proxy will be used for all API requests. Supports HTTP/HTTPS proxies on all platforms (macOS, Windows, Linux, Android, iOS). Web platform uses browser settings.',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      height: 1.4,
+                                      color: isDark
+                                          ? CupertinoColors.white.withValues(alpha: 0.7)
+                                          : CupertinoColors.black.withValues(alpha: 0.7),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProxyTextField({
+    required bool isDark,
+    required String label,
+    required String placeholder,
+    required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
+    bool obscureText = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: isDark
+                ? CupertinoColors.white.withValues(alpha: 0.7)
+                : CupertinoColors.black.withValues(alpha: 0.7),
+          ),
+        ),
+        const SizedBox(height: 8),
+        CupertinoTextField(
+          controller: controller,
+          placeholder: placeholder,
+          keyboardType: keyboardType,
+          obscureText: obscureText,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: isDark
+                ? CupertinoColors.white.withValues(alpha: 0.1)
+                : CupertinoColors.black.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDark
+                  ? CupertinoColors.white.withValues(alpha: 0.15)
+                  : CupertinoColors.black.withValues(alpha: 0.1),
+              width: 1,
+            ),
+          ),
+          style: TextStyle(
+            fontSize: 16,
+            color: isDark ? CupertinoColors.white : CupertinoColors.black,
+          ),
+          placeholderStyle: TextStyle(
+            fontSize: 16,
+            color: isDark
+                ? CupertinoColors.white.withValues(alpha: 0.4)
+                : CupertinoColors.black.withValues(alpha: 0.4),
+          ),
         ),
       ],
     );
