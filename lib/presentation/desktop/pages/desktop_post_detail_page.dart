@@ -683,6 +683,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                 child: _buildGradientActionButton(
                   icon: CupertinoIcons.arrow_up,
                   activeIcon: CupertinoIcons.arrow_up_circle_fill,
+                  label: 'Up',
                   isActive: userVote == 1,
                   isLoading: isVoting,
                   activeGradient: const [Color(0xFF22C55E), Color(0xFF16A34A)],
@@ -695,6 +696,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                 child: _buildGradientActionButton(
                   icon: CupertinoIcons.arrow_down,
                   activeIcon: CupertinoIcons.arrow_down_circle_fill,
+                  label: 'Down',
                   isActive: userVote == -1,
                   isLoading: isVoting,
                   activeGradient: const [Color(0xFFEF4444), Color(0xFFDC2626)],
@@ -707,6 +709,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                 child: _buildGradientActionButton(
                   icon: CupertinoIcons.heart,
                   activeIcon: CupertinoIcons.heart_fill,
+                  label: 'Fav',
                   isActive: isFav,
                   isLoading: isTogglingFav,
                   activeGradient: [
@@ -722,6 +725,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                 child: _buildGradientActionButton(
                   icon: CupertinoIcons.square_arrow_down,
                   activeIcon: CupertinoIcons.square_arrow_down_fill,
+                  label: 'Save',
                   isActive: false,
                   isLoading: false,
                   activeGradient: [
@@ -789,12 +793,13 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
               : null,
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
           children: [
             if (isLoading)
               SizedBox(
-                width: 18,
-                height: 18,
+                width: 16,
+                height: 16,
                 child: CupertinoActivityIndicator(
                   color: isActive
                       ? CupertinoColors.white
@@ -804,7 +809,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
             else
               Icon(
                 isActive ? activeIcon : icon,
-                size: 18,
+                size: 16,
                 color: isActive
                     ? CupertinoColors.white
                     : (isDark
