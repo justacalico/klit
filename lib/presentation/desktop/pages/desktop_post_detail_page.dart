@@ -948,43 +948,80 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
 
   Widget _buildDescriptionCard(Post post, bool isDark) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
                   ? [
-                      const Color(0xFF1C1C1E).withValues(alpha: 0.6),
-                      const Color(0xFF0C0C0E).withValues(alpha: 0.7),
+                      _ThemeColors.primaryIndigo.withValues(alpha: 0.06),
+                      _ThemeColors.primaryPurple.withValues(alpha: 0.04),
                     ]
                   : [
-                      const Color(0xFFF0F0F2).withValues(alpha: 0.6),
-                      const Color(0xFFE8E8EA).withValues(alpha: 0.7),
+                      _ThemeColors.primaryIndigo.withValues(alpha: 0.04),
+                      _ThemeColors.primaryPurple.withValues(alpha: 0.02),
                     ],
             ),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isDark
-                  ? const Color(0xFF3D3D3F).withValues(alpha: 0.3)
-                  : const Color(0xFFE5E5E7).withValues(alpha: 0.5),
-              width: 0.5,
+                  ? _ThemeColors.primaryIndigo.withValues(alpha: 0.15)
+                  : _ThemeColors.primaryIndigo.withValues(alpha: 0.1),
+              width: 1,
             ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Description',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          _ThemeColors.primaryIndigo,
+                          _ThemeColors.primaryPurple,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      CupertinoIcons.doc_text_fill,
+                      size: 12,
+                      color: CupertinoColors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Description',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              Text(post.description, style: const TextStyle(fontSize: 14)),
+              const SizedBox(height: 14),
+              Text(
+                post.description,
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 1.5,
+                  color: isDark
+                      ? CupertinoColors.white.withValues(alpha: 0.85)
+                      : const Color(0xFF374151),
+                ),
+              ),
             ],
           ),
         ),
@@ -994,42 +1031,88 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
 
   Widget _buildTagsCard(Post post, bool isDark) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
                   ? [
-                      const Color(0xFF1C1C1E).withValues(alpha: 0.6),
-                      const Color(0xFF0C0C0E).withValues(alpha: 0.7),
+                      _ThemeColors.primaryPurple.withValues(alpha: 0.06),
+                      _ThemeColors.primaryViolet.withValues(alpha: 0.04),
                     ]
                   : [
-                      const Color(0xFFF0F0F2).withValues(alpha: 0.6),
-                      const Color(0xFFE8E8EA).withValues(alpha: 0.7),
+                      _ThemeColors.primaryPurple.withValues(alpha: 0.04),
+                      _ThemeColors.primaryViolet.withValues(alpha: 0.02),
                     ],
             ),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isDark
-                  ? const Color(0xFF3D3D3F).withValues(alpha: 0.3)
-                  : const Color(0xFFE5E5E7).withValues(alpha: 0.5),
-              width: 0.5,
+                  ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
+                  : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+              width: 1,
             ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Tags',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          _ThemeColors.primaryPurple,
+                          _ThemeColors.primaryViolet,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      CupertinoIcons.tag_fill,
+                      size: 12,
+                      color: CupertinoColors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Tags',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+                    ),
+                  ),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? _ThemeColors.primaryPurple.withValues(alpha: 0.2)
+                          : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '${post.tags.all.length}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: _ThemeColors.primaryPurple,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               CategorizedTagList(tags: post.tags, onTagTap: _searchTag),
             ],
           ),
