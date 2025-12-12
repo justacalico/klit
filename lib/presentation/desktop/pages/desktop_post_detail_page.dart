@@ -677,12 +677,10 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
               ),
             ),
           ),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildGradientActionButton(
+          child: Row(
+            children: [
+              Expanded(
+                child: _buildGradientActionButton(
                   icon: CupertinoIcons.arrow_up,
                   activeIcon: CupertinoIcons.arrow_up_circle_fill,
                   isActive: userVote == 1,
@@ -691,8 +689,10 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                   isDark: isDark,
                   onTap: () => _vote(userVote == 1 ? 0 : 1),
                 ),
-                const SizedBox(width: 8),
-                _buildGradientActionButton(
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildGradientActionButton(
                   icon: CupertinoIcons.arrow_down,
                   activeIcon: CupertinoIcons.arrow_down_circle_fill,
                   isActive: userVote == -1,
@@ -701,8 +701,10 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                   isDark: isDark,
                   onTap: () => _vote(userVote == -1 ? 0 : -1),
                 ),
-                const SizedBox(width: 8),
-                _buildGradientActionButton(
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildGradientActionButton(
                   icon: CupertinoIcons.heart,
                   activeIcon: CupertinoIcons.heart_fill,
                   isActive: isFav,
@@ -714,8 +716,10 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                   isDark: isDark,
                   onTap: _toggleFavorite,
                 ),
-                const SizedBox(width: 8),
-                _buildGradientActionButton(
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildGradientActionButton(
                   icon: CupertinoIcons.square_arrow_down,
                   activeIcon: CupertinoIcons.square_arrow_down_fill,
                   isActive: false,
@@ -729,8 +733,8 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                     // TODO: Implement download
                   },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
