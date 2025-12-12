@@ -317,6 +317,28 @@ class StorageService {
     await _prefs.setString(AppConstants.proxyConfigKey, config.toJsonString());
   }
 
+  // ==================== Blacklist Configuration ====================
+
+  /// Get user blacklist (raw string with newlines)
+  String getBlacklist() {
+    return _prefs.getString(AppConstants.blacklistKey) ?? '';
+  }
+
+  /// Set user blacklist
+  Future<void> setBlacklist(String blacklist) async {
+    await _prefs.setString(AppConstants.blacklistKey, blacklist);
+  }
+
+  /// Get whether blacklist is enabled
+  bool getBlacklistEnabled() {
+    return _prefs.getBool(AppConstants.blacklistEnabledKey) ?? true;
+  }
+
+  /// Set whether blacklist is enabled
+  Future<void> setBlacklistEnabled(bool enabled) async {
+    await _prefs.setBool(AppConstants.blacklistEnabledKey, enabled);
+  }
+
   // ==================== Cache Management ====================
 
   /// Clear all preferences (not secure storage)
