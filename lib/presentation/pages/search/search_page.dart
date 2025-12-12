@@ -204,7 +204,12 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
       return;
     }
 
-    setState(() => _showHistory = false);
+    // Close tag suggestions and history when searching
+    setState(() {
+      _showHistory = false;
+      _showTagSuggestions = false;
+      _tagSuggestions = [];
+    });
 
     final settingsProvider = context.read<SettingsProvider>();
     final safeMode = _shouldEnforceSafeMode(context);
