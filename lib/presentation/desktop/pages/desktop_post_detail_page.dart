@@ -485,46 +485,41 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
         children: [
           // Media content
           Center(child: _buildMedia(post)),
-          // Fullscreen button with gradient
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: GestureDetector(
-              onTap: () {
-                if (post.isVideo) {
-                  _openFullScreenVideo(post);
-                } else {
-                  setState(() => _isFullScreen = true);
-                }
-              },
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      _ThemeColors.primaryPurple.withValues(alpha: 0.9),
-                      _ThemeColors.primaryIndigo.withValues(alpha: 0.9),
+          // Fullscreen button with gradient (only for images, video player has its own)
+          if (!post.isVideo)
+            Positioned(
+              bottom: 20,
+              right: 20,
+              child: GestureDetector(
+                onTap: () => setState(() => _isFullScreen = true),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        _ThemeColors.primaryPurple.withValues(alpha: 0.9),
+                        _ThemeColors.primaryIndigo.withValues(alpha: 0.9),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _ThemeColors.primaryPurple.withValues(alpha: 0.4),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: _ThemeColors.primaryPurple.withValues(alpha: 0.4),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  CupertinoIcons.fullscreen,
-                  color: CupertinoColors.white,
-                  size: 20,
+                  child: const Icon(
+                    CupertinoIcons.fullscreen,
+                    color: CupertinoColors.white,
+                    size: 20,
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
