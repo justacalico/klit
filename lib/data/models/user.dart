@@ -16,6 +16,7 @@ class User {
   final int negativeFeedbackCount;
   final DateTime createdAt;
   final String? avatarId;
+  final String? blacklistedTags;
 
   const User({
     required this.id,
@@ -34,6 +35,7 @@ class User {
     required this.negativeFeedbackCount,
     required this.createdAt,
     this.avatarId,
+    this.blacklistedTags,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
