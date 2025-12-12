@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 import '../../core/constants/constants.dart';
 import '../models/models.dart';
@@ -9,12 +11,13 @@ class ApiService {
   late final Dio _dio;
   String _baseUrl;
   String? _authHeader;
+  ProxyConfig _proxyConfig = const ProxyConfig();
 
   // Rate limiting
   DateTime? _lastRequestTime;
   static const _minRequestInterval = Duration(milliseconds: 500);
 
-  ApiService({String? baseUrl})
+  ApiService({String? baseUrl, ProxyConfig? proxyConfig})
     : _baseUrl = baseUrl ?? ApiConstants.defaultHost {
     _dio = Dio(
       BaseOptions(
@@ -24,6 +27,12 @@ class ApiService {
         headers: ApiConstants.defaultHeaders,
       ),
     );
+
+    // Apply initial proxy config if provided
+    if (proxyConfig != null) {
+      _proxyConfig = proxyConfig;
+      _applyProxyConfig();
+    }
 
     _dio.interceptors.add(
       InterceptorsWrapper(
@@ -59,6 +68,54 @@ class ApiService {
       ),
     );
   }
+
+  /// Apply proxy configuration to Dio
+  void _applyProxyConfig() {
+    // Skip proxy configuration on web platform
+    if (kIsWeb) return;
+
+    if (_proxyConfig.enabled && _proxyConfig.host.isNotEmpty) {
+      _dio.httpClientAdapter = IOHttpClientAdapter(
+        createHttpClient: () {
+          final client = HttpClient();
+          client.findProxy = (uri) => _proxyConfig.findProxyString;
+          
+          // Set up proxy authentication if enabled
+          if (_proxyConfig.useAuthentication && 
+              _proxyConfig.username != null && 
+              _proxyConfig.username!.isNotEmpty) {
+            client.addProxyCredentials(
+              _proxyConfig.host,
+              _proxyConfig.port,
+              'Basic',
+              HttpClientBasicCredentials(
+                _proxyConfig.username!,
+                _proxyConfig.password ?? '',
+              ),
+            );
+          }
+          
+          // Allow bad certificates for proxy servers (common for local proxies)
+          // In production, you might want to make this configurable
+          client.badCertificateCallback = (cert, host, port) => true;
+          
+          return client;
+        },
+      );
+    } else {
+      // Reset to default adapter when proxy is disabled
+      _dio.httpClientAdapter = IOHttpClientAdapter();
+    }
+  }
+
+  /// Update proxy configuration
+  void setProxyConfig(ProxyConfig config) {
+    _proxyConfig = config;
+    _applyProxyConfig();
+  }
+
+  /// Get current proxy configuration
+  ProxyConfig get proxyConfig => _proxyConfig;
 
   /// Enforce rate limiting
   Future<void> _enforceRateLimit() async {
