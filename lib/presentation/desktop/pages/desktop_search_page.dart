@@ -32,7 +32,7 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
   int _gridColumns = 4;
   String? _selectedRating;
   String _selectedOrder = 'id_desc';
-  bool _showFilters = true;
+  bool _showFilters = false;
   
   // Tag suggestions
   List<Tag> _tagSuggestions = [];
@@ -565,54 +565,66 @@ class _DesktopSearchPageState extends State<DesktopSearchPage> {
                 // Rating filter
                 const Text('Rating:', style: TextStyle(fontSize: 13)),
                 const SizedBox(width: 8),
-                CupertinoSlidingSegmentedControl<String>(
-                  groupValue: _selectedRating ?? 'all',
-                  children: const {
-                    'all': Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Text('All', style: TextStyle(fontSize: 12)),
-                    ),
-                    's': Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Text('Safe', style: TextStyle(fontSize: 12)),
-                    ),
-                    'q': Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Text('Questionable', style: TextStyle(fontSize: 12)),
-                    ),
-                    'e': Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Text('Explicit', style: TextStyle(fontSize: 12)),
-                    ),
-                  },
-                  onValueChanged: (value) {
-                    setState(() => _selectedRating = value == 'all' ? null : value);
-                    if (_searchController.text.isNotEmpty) {
-                      _performSearch();
-                    }
-                  },
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: CupertinoSlidingSegmentedControl<String>(
+                    groupValue: _selectedRating ?? 'all',
+                    children: const {
+                      'all': Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: Text('All', style: TextStyle(fontSize: 12)),
+                      ),
+                      's': Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: Text('Safe', style: TextStyle(fontSize: 12)),
+                      ),
+                      'q': Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: Text('Questionable', style: TextStyle(fontSize: 12)),
+                      ),
+                      'e': Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: Text('Explicit', style: TextStyle(fontSize: 12)),
+                      ),
+                    },
+                    onValueChanged: (value) {
+                      setState(() => _selectedRating = value == 'all' ? null : value);
+                      if (_searchController.text.isNotEmpty) {
+                        _performSearch();
+                      }
+                    },
+                  ),
                 ),
                 const SizedBox(width: 24),
                 // Order filter
                 const Text('Sort:', style: TextStyle(fontSize: 13)),
                 const SizedBox(width: 8),
-                CupertinoSlidingSegmentedControl<String>(
-                  groupValue: _selectedOrder,
-                  children: {
-                    for (final entry in _orderOptions.entries)
-                      entry.key: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(entry.value, style: const TextStyle(fontSize: 12)),
-                      ),
-                  },
-                  onValueChanged: (value) {
-                    if (value != null) {
-                      setState(() => _selectedOrder = value);
-                      if (_searchController.text.isNotEmpty) {
-                        _performSearch();
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: CupertinoSlidingSegmentedControl<String>(
+                    groupValue: _selectedOrder,
+                    children: {
+                      for (final entry in _orderOptions.entries)
+                        entry.key: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Text(entry.value, style: const TextStyle(fontSize: 12)),
+                        ),
+                    },
+                    onValueChanged: (value) {
+                      if (value != null) {
+                        setState(() => _selectedOrder = value);
+                        if (_searchController.text.isNotEmpty) {
+                          _performSearch();
+                        }
                       }
-                    }
-                  },
+                    },
+                  ),
                 ),
                 const SizedBox(width: 24),
                 // Grid size
