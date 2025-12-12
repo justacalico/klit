@@ -72,12 +72,27 @@ build_platform() {
             ;;
         ios)
             if [[ "$OSTYPE" == "darwin"* ]]; then
-                flutter build ipa --release --no-codesign || flutter build ios --release --no-codesign
+                # Build the archive first
+                flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+                
+                # If that fails, try building archive and exporting manually
+                if [ ! -f "build/ios/ipa/"*.ipa ]; then
+                    print_warning "Direct IPA build failed, trying manual export..."
+                    flutter build ios --release
+                    if [ -d "build/ios/archive/Runner.xcarchive" ]; then
+                        xcodebuild -exportArchive \
+                            -archivePath build/ios/archive/Runner.xcarchive \
+                            -exportOptionsPlist ios/ExportOptions.plist \
+                            -exportPath build/ios/ipa \
+                            -allowProvisioningUpdates
+                    fi
+                fi
+                
                 if [ -d "build/ios/ipa" ]; then
                     for ipa in build/ios/ipa/*.ipa; do
                         if [ -f "$ipa" ]; then
                             cp "$ipa" "$DIST_DIR/klit-ios-$VERSION.ipa"
-                            print_status "IPA built successfully: $DIST_DIR/klit-ios-$VERSION.ipa"
+                            print_status "Signed IPA built successfully: $DIST_DIR/klit-ios-$VERSION.ipa"
                         fi
                     done
                 else
