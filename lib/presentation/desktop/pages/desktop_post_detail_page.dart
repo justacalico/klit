@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Colors hide TextStyle, Icons;
 import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +8,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/extensions/extensions.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
-import '../../widgets/widgets.dart' hide Colors;
+import '../../widgets/widgets.dart';
 import '../widgets/desktop_toolbar.dart';
 
 /// Design constants for the purple/indigo theme
