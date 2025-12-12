@@ -42,6 +42,10 @@ class PostsProvider extends ChangeNotifier {
   String _hotTimeRange = 'day';
   String _popularTimeRange = 'day';
 
+  // Blacklist
+  List<String> _blacklistLines = [];
+  bool _blacklistEnabled = true;
+
   PostsProvider({required ApiService apiService}) : _apiService = apiService;
 
   // Getters
@@ -68,6 +72,93 @@ class PostsProvider extends ChangeNotifier {
   String get currentSearchQuery => _currentSearchQuery;
   String get hotTimeRange => _hotTimeRange;
   String get popularTimeRange => _popularTimeRange;
+
+  /// Update blacklist settings
+  void updateBlacklist(List<String> blacklistLines, bool enabled) {
+    _blacklistLines = blacklistLines;
+    _blacklistEnabled = enabled;
+  }
+
+  /// Check if a post matches any blacklist entry
+  bool _isPostBlacklisted(Post post) {
+    if (!_blacklistEnabled || _blacklistLines.isEmpty) return false;
+    
+    // Get all tags from the post
+    final postTags = post.tags.all.map((t) => t.toLowerCase()).toSet();
+    
+    for (final line in _blacklistLines) {
+      if (_matchesBlacklistLine(post, postTags, line)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Check if a post matches a single blacklist line
+  /// Supports: tag, -tag (negation), rating:s/q/e, and combinations
+  bool _matchesBlacklistLine(Post post, Set<String> postTags, String line) {
+    final parts = line.toLowerCase().split(RegExp(r'\s+'));
+    if (parts.isEmpty) return false;
+    
+    for (final part in parts) {
+      if (part.isEmpty) continue;
+      
+      // Handle negation
+      if (part.startsWith('-')) {
+        final tag = part.substring(1);
+        // If negated tag is present, this line doesn't match
+        if (_tagMatches(post, postTags, tag)) {
+          return false;
+        }
+      } else {
+        // Positive tag - must be present for line to match
+        if (!_tagMatches(post, postTags, part)) {
+          return false;
+        }
+      }
+    }
+    
+    // All conditions in the line matched
+    return true;
+  }
+
+  /// Check if a single tag condition matches the post
+  bool _tagMatches(Post post, Set<String> postTags, String condition) {
+    // Handle rating: prefix
+    if (condition.startsWith('rating:')) {
+      final rating = condition.substring(7);
+      return post.rating.toLowerCase() == rating;
+    }
+    
+    // Handle type: prefix
+    if (condition.startsWith('type:')) {
+      final type = condition.substring(5);
+      if (type == 'video' || type == 'webm' || type == 'gif') {
+        return post.isVideo || post.file.ext.toLowerCase() == 'gif';
+      }
+      return post.file.ext.toLowerCase() == type;
+    }
+    
+    // Handle user: prefix (uploader)
+    if (condition.startsWith('user:')) {
+      final uploader = condition.substring(5);
+      return post.uploaderId.toString() == uploader;
+    }
+    
+    // Regular tag match (with wildcard support)
+    if (condition.contains('*')) {
+      final pattern = RegExp('^${condition.replaceAll('*', '.*')}\$');
+      return postTags.any((tag) => pattern.hasMatch(tag));
+    }
+    
+    return postTags.contains(condition);
+  }
+
+  /// Filter a list of posts through the blacklist
+  List<Post> _filterBlacklist(List<Post> posts) {
+    if (!_blacklistEnabled || _blacklistLines.isEmpty) return posts;
+    return posts.where((post) => !_isPostBlacklisted(post)).toList();
+  }
 
   /// Load latest posts
   /// If [safeMode] is true, only safe-rated posts will be returned
