@@ -570,7 +570,7 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
                     ? CupertinoIcons.slider_horizontal_below_rectangle
                     : CupertinoIcons.slider_horizontal_3,
                 tooltip: 'Toggle Filters',
-                onPressed: () => setState(() => _showFilters = !_showFilters),
+                onPressed: _toggleFilters,
               ),
             ],
           ),
@@ -580,9 +580,10 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
   }
 
   Widget _buildFilters(BuildContext context, bool isDark) {
-    return ClipRect(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           decoration: BoxDecoration(
@@ -591,22 +592,35 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
               end: Alignment.bottomRight,
               colors: isDark
                   ? [
-                      const Color(0xFF18181B).withValues(alpha: 0.75),
-                      const Color(0xFF1F1F23).withValues(alpha: 0.8),
+                      const Color(0xFF18181B).withValues(alpha: 0.85),
+                      const Color(0xFF1F1F23).withValues(alpha: 0.9),
                     ]
                   : [
-                      const Color(0xFFFAFAFC).withValues(alpha: 0.8),
-                      const Color(0xFFF4F4F5).withValues(alpha: 0.85),
+                      const Color(0xFFFFFFFF).withValues(alpha: 0.9),
+                      const Color(0xFFF4F4F5).withValues(alpha: 0.95),
                     ],
             ),
-            border: Border(
-              bottom: BorderSide(
-                color: isDark
-                    ? DesktopToolbarColors.primaryPurple.withValues(alpha: 0.1)
-                    : DesktopToolbarColors.primaryPurple.withValues(alpha: 0.08),
-                width: 1,
-              ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark
+                  ? DesktopToolbarColors.primaryPurple.withValues(alpha: 0.2)
+                  : DesktopToolbarColors.primaryPurple.withValues(alpha: 0.15),
+              width: 1,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: isDark
+                    ? CupertinoColors.black.withValues(alpha: 0.4)
+                    : CupertinoColors.black.withValues(alpha: 0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+              BoxShadow(
+                color: DesktopToolbarColors.primaryPurple.withValues(alpha: 0.1),
+                blurRadius: 30,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
