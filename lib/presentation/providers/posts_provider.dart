@@ -241,10 +241,11 @@ class PostsProvider extends ChangeNotifier {
 
     result.when(
       success: (posts) {
+        final filteredPosts = _filterBlacklist(posts);
         if (refresh) {
-          _hotPosts = posts;
+          _hotPosts = filteredPosts;
         } else {
-          _hotPosts = [..._hotPosts, ...posts];
+          _hotPosts = [..._hotPosts, ...filteredPosts];
         }
         _hasMoreHot = posts.length >= ApiConstants.defaultPageSize;
         _hotPage++;
@@ -289,10 +290,11 @@ class PostsProvider extends ChangeNotifier {
 
     result.when(
       success: (posts) {
+        final filteredPosts = _filterBlacklist(posts);
         if (refresh) {
-          _popularPosts = posts;
+          _popularPosts = filteredPosts;
         } else {
-          _popularPosts = [..._popularPosts, ...posts];
+          _popularPosts = [..._popularPosts, ...filteredPosts];
         }
         _hasMorePopular = posts.length >= ApiConstants.defaultPageSize;
         _popularPage++;
@@ -347,10 +349,11 @@ class PostsProvider extends ChangeNotifier {
 
     result.when(
       success: (posts) {
+        final filteredPosts = _filterBlacklist(posts);
         if (refresh || _searchPage == 1) {
-          _searchResults = posts;
+          _searchResults = filteredPosts;
         } else {
-          _searchResults = [..._searchResults, ...posts];
+          _searchResults = [..._searchResults, ...filteredPosts];
         }
         _hasMoreSearch = posts.length >= ApiConstants.defaultPageSize;
         _searchPage++;
