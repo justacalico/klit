@@ -787,46 +787,26 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                 ]
               : null,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            if (isLoading)
-              SizedBox(
-                width: 16,
-                height: 16,
-                child: CupertinoActivityIndicator(
-                  color: isActive
-                      ? CupertinoColors.white
-                      : _ThemeColors.primaryPurple,
-                ),
-              )
-            else
-              Icon(
-                isActive ? activeIcon : icon,
-                size: 16,
-                color: isActive
-                    ? CupertinoColors.white
-                    : (isDark
-                          ? CupertinoColors.white.withValues(alpha: 0.7)
-                          : const Color(0xFF374151)),
-              ),
-            if (label != null) ...[
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+        child: Center(
+          child: isLoading
+              ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CupertinoActivityIndicator(
+                    color: isActive
+                        ? CupertinoColors.white
+                        : _ThemeColors.primaryPurple,
+                  ),
+                )
+              : Icon(
+                  isActive ? activeIcon : icon,
+                  size: 20,
                   color: isActive
                       ? CupertinoColors.white
                       : (isDark
                             ? CupertinoColors.white.withValues(alpha: 0.7)
                             : const Color(0xFF374151)),
                 ),
-              ),
-            ],
-          ],
         ),
       ),
     );
