@@ -15,15 +15,24 @@ void main() async {
   final storageService = StorageService();
   await storageService.init();
 
-  final apiService = ApiService();
+  // Initialize settings first to get proxy config
+  final settingsProvider = SettingsProvider(storageService: storageService);
+  await settingsProvider.initialize();
+
+  // Create API service with proxy configuration
+  final apiService = ApiService(
+    proxyConfig: settingsProvider.proxyConfig,
+  );
+  
+  // Listen for proxy changes and update API service
+  settingsProvider.onProxyChanged = (config) {
+    apiService.setProxyConfig(config);
+  };
+
   final authService = AuthService(
     apiService: apiService,
     storageService: storageService,
   );
-
-  // Initialize providers
-  final settingsProvider = SettingsProvider(storageService: storageService);
-  await settingsProvider.initialize();
 
   final authProvider = AuthProvider(authService: authService);
   // Allow auth provider to control API service and initialize authentication
