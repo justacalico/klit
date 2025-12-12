@@ -107,6 +107,42 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Set proxy configuration
+  Future<void> setProxyConfig(ProxyConfig config) async {
+    _proxyConfig = config;
+    await _storageService.setProxyConfig(config);
+    onProxyChanged?.call(config);
+    notifyListeners();
+  }
+
+  /// Enable/disable proxy
+  Future<void> setProxyEnabled(bool enabled) async {
+    await setProxyConfig(_proxyConfig.copyWith(enabled: enabled));
+  }
+
+  /// Set proxy host
+  Future<void> setProxyHost(String host) async {
+    await setProxyConfig(_proxyConfig.copyWith(host: host));
+  }
+
+  /// Set proxy port
+  Future<void> setProxyPort(int port) async {
+    await setProxyConfig(_proxyConfig.copyWith(port: port));
+  }
+
+  /// Set proxy authentication
+  Future<void> setProxyAuthentication({
+    required bool useAuthentication,
+    String? username,
+    String? password,
+  }) async {
+    await setProxyConfig(_proxyConfig.copyWith(
+      useAuthentication: useAuthentication,
+      username: username,
+      password: password,
+    ));
+  }
+
   /// Clear all preferences (not accounts)
   Future<void> clearPreferences() async {
     await _storageService.clearPreferences();
