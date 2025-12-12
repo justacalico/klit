@@ -47,6 +47,11 @@ class _ProfilePageState extends State<ProfilePage> {
       );
       result.when(
         success: (user) {
+          // Sync blacklist from e621 profile to local settings
+          if (user.blacklistedTags != null && user.blacklistedTags!.isNotEmpty) {
+            final settingsProvider = context.read<SettingsProvider>();
+            settingsProvider.setBlacklist(user.blacklistedTags!);
+          }
           setState(() {
             _user = user;
             _isLoading = false;
