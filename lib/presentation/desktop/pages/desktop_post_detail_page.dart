@@ -719,17 +719,18 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                   icon: CupertinoIcons.square_arrow_down,
                   activeIcon: CupertinoIcons.square_arrow_down_fill,
                   isActive: false,
-                isLoading: false,
-                activeGradient: [
-                  _ThemeColors.primaryIndigo,
-                  _ThemeColors.primaryPurple,
-                ],
-                isDark: isDark,
-                onTap: () {
-                  // TODO: Implement download
-                },
-              ),
-            ],
+                  isLoading: false,
+                  activeGradient: [
+                    _ThemeColors.primaryIndigo,
+                    _ThemeColors.primaryPurple,
+                  ],
+                  isDark: isDark,
+                  onTap: () {
+                    // TODO: Implement download
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -739,7 +740,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
   Widget _buildGradientActionButton({
     required IconData icon,
     required IconData activeIcon,
-    required String label,
+    String? label,
     required bool isActive,
     required bool isLoading,
     required List<Color> activeGradient,
@@ -750,7 +751,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
       onTap: isLoading ? null : onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           gradient: isActive
               ? LinearGradient(
@@ -806,19 +807,21 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                           ? CupertinoColors.white.withValues(alpha: 0.7)
                           : const Color(0xFF374151)),
               ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: isActive
-                    ? CupertinoColors.white
-                    : (isDark
-                          ? CupertinoColors.white.withValues(alpha: 0.7)
-                          : const Color(0xFF374151)),
+            if (label != null) ...[
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: isActive
+                      ? CupertinoColors.white
+                      : (isDark
+                            ? CupertinoColors.white.withValues(alpha: 0.7)
+                            : const Color(0xFF374151)),
+                ),
               ),
-            ),
+            ],
           ],
         ),
       ),
