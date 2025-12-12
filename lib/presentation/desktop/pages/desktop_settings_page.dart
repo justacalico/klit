@@ -60,7 +60,11 @@ class DesktopSettingsPage extends StatelessWidget {
                       context,
                       title: 'Connection',
                       icon: CupertinoIcons.globe,
-                      children: [_buildHostSetting(context, CupertinoTheme.brightnessOf(context) == Brightness.dark)],
+                      children: [
+                        _buildHostSetting(context, CupertinoTheme.brightnessOf(context) == Brightness.dark),
+                        const SizedBox(height: 12),
+                        _buildProxySetting(context, CupertinoTheme.brightnessOf(context) == Brightness.dark),
+                      ],
                     ),
                     const SizedBox(height: 24),
                     _buildSection(
@@ -448,6 +452,193 @@ class DesktopSettingsPage extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildProxySetting(BuildContext context, bool isDark) {
+    return Consumer<SettingsProvider>(
+      builder: (context, settings, _) {
+        final proxyConfig = settings.proxyConfig;
+        return _buildCard(
+          context,
+          isDark,
+          child: Row(
+            children: [
+              const Icon(CupertinoIcons.arrow_right_arrow_left, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('HTTP Proxy', style: TextStyle(fontSize: 15)),
+                    Text(
+                      proxyConfig.enabled
+                          ? '${proxyConfig.host}:${proxyConfig.port}'
+                          : 'Disabled',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: CupertinoColors.secondaryLabel,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              CupertinoSwitch(
+                value: proxyConfig.enabled,
+                onChanged: (value) => settings.setProxyEnabled(value),
+              ),
+              const SizedBox(width: 8),
+              CupertinoButton(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                onPressed: () => _showProxySettingsDialog(context, isDark),
+                child: const Text('Configure'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showProxySettingsDialog(BuildContext context, bool isDark) {
+    final settings = context.read<SettingsProvider>();
+    final proxyConfig = settings.proxyConfig;
+    
+    final hostController = TextEditingController(text: proxyConfig.host);
+    final portController = TextEditingController(
+      text: proxyConfig.port > 0 ? proxyConfig.port.toString() : '8080',
+    );
+    final usernameController = TextEditingController(text: proxyConfig.username ?? '');
+    final passwordController = TextEditingController(text: proxyConfig.password ?? '');
+    bool useAuth = proxyConfig.useAuthentication;
+
+    showCupertinoDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setState) => CupertinoAlertDialog(
+          title: const Text('Proxy Settings'),
+          content: Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CupertinoTextField(
+                  controller: hostController,
+                  placeholder: 'Proxy Host (e.g., 127.0.0.1)',
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF2C2C2E)
+                        : CupertinoColors.systemGrey6,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                CupertinoTextField(
+                  controller: portController,
+                  placeholder: 'Port (e.g., 8080)',
+                  keyboardType: TextInputType.number,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF2C2C2E)
+                        : CupertinoColors.systemGrey6,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Use Authentication',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isDark
+                              ? CupertinoColors.white
+                              : CupertinoColors.black,
+                        ),
+                      ),
+                    ),
+                    CupertinoSwitch(
+                      value: useAuth,
+                      onChanged: (value) => setState(() => useAuth = value),
+                    ),
+                  ],
+                ),
+                if (useAuth) ...[
+                  const SizedBox(height: 12),
+                  CupertinoTextField(
+                    controller: usernameController,
+                    placeholder: 'Username',
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFF2C2C2E)
+                          : CupertinoColors.systemGrey6,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  CupertinoTextField(
+                    controller: passwordController,
+                    placeholder: 'Password',
+                    obscureText: true,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFF2C2C2E)
+                          : CupertinoColors.systemGrey6,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                Text(
+                  'Proxy settings apply to all API requests.',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: isDark
+                        ? CupertinoColors.systemGrey
+                        : CupertinoColors.systemGrey2,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              onPressed: () {
+                final host = hostController.text.trim();
+                final port = int.tryParse(portController.text.trim()) ?? 8080;
+                final username = usernameController.text.trim();
+                final password = passwordController.text;
+
+                settings.setProxyConfig(ProxyConfig(
+                  enabled: proxyConfig.enabled,
+                  host: host,
+                  port: port,
+                  useAuthentication: useAuth,
+                  username: useAuth ? username : null,
+                  password: useAuth ? password : null,
+                ));
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
