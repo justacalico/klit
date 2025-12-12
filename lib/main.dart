@@ -39,6 +39,20 @@ void main() async {
   authProvider.setApiService(apiService);
   await authProvider.initialize();
   final postsProvider = PostsProvider(apiService: apiService);
+  
+  // Sync blacklist from settings to posts provider
+  postsProvider.updateBlacklist(
+    settingsProvider.blacklistLines,
+    settingsProvider.blacklistEnabled,
+  );
+  
+  // Listen for settings changes to update blacklist in posts provider
+  settingsProvider.addListener(() {
+    postsProvider.updateBlacklist(
+      settingsProvider.blacklistLines,
+      settingsProvider.blacklistEnabled,
+    );
+  });
 
   runApp(
     MultiProvider(
