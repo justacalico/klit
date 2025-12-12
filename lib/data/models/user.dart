@@ -56,7 +56,19 @@ class User {
       negativeFeedbackCount: json['negative_feedback_count'] as int? ?? 0,
       createdAt: DateTime.parse(json['created_at'] as String),
       avatarId: json['avatar_id']?.toString(),
+      blacklistedTags: json['blacklisted_tags'] as String?,
     );
+  }
+
+  /// Parse the blacklisted tags string into a list of tag queries
+  /// Each line in the blacklist is a separate filter
+  List<String> get blacklistLines {
+    if (blacklistedTags == null || blacklistedTags!.isEmpty) return [];
+    return blacklistedTags!
+        .split('\n')
+        .map((line) => line.trim())
+        .where((line) => line.isNotEmpty && !line.startsWith('#'))
+        .toList();
   }
 
   static String _levelToString(int level) {
