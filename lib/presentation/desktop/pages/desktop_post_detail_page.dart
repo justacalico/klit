@@ -802,31 +802,31 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
         : post.favCount;
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
                   ? [
-                      const Color(0xFF1C1C1E).withValues(alpha: 0.6),
-                      const Color(0xFF0C0C0E).withValues(alpha: 0.7),
+                      _ThemeColors.primaryPurple.withValues(alpha: 0.08),
+                      _ThemeColors.primaryIndigo.withValues(alpha: 0.05),
                     ]
                   : [
-                      const Color(0xFFF0F0F2).withValues(alpha: 0.6),
-                      const Color(0xFFE8E8EA).withValues(alpha: 0.7),
+                      _ThemeColors.primaryPurple.withValues(alpha: 0.06),
+                      _ThemeColors.primaryIndigo.withValues(alpha: 0.03),
                     ],
             ),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isDark
-                  ? const Color(0xFF3D3D3F).withValues(alpha: 0.3)
-                  : const Color(0xFFE5E5E7).withValues(alpha: 0.5),
-              width: 0.5,
+                  ? _ThemeColors.primaryPurple.withValues(alpha: 0.2)
+                  : _ThemeColors.primaryPurple.withValues(alpha: 0.12),
+              width: 1,
             ),
           ),
           child: Column(
@@ -835,41 +835,59 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _buildStatColumn(
-                    icon: CupertinoIcons.arrow_up,
+                    icon: CupertinoIcons.arrow_up_circle_fill,
                     value: score.total.toString(),
                     label: 'Score',
                     color: score.total >= 0
-                        ? AppColors.safeColor
-                        : AppColors.explicitColor,
+                        ? const Color(0xFF22C55E)
+                        : const Color(0xFFEF4444),
+                    isDark: isDark,
                   ),
                   _buildStatColumn(
                     icon: CupertinoIcons.heart_fill,
                     value: favCount.compact,
                     label: 'Favorites',
-                    color: AppColors.explicitColor,
+                    color: _ThemeColors.primaryViolet,
+                    isDark: isDark,
                   ),
                   _buildStatColumn(
                     icon: CupertinoIcons.chat_bubble_fill,
                     value: post.commentCount.toString(),
                     label: 'Comments',
-                    color: AppColors.primaryBlue,
+                    color: _ThemeColors.primaryIndigo,
+                    isDark: isDark,
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              // Rating badge
+              const SizedBox(height: 16),
+              // Rating badge with gradient
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
-                  color: post.ratingColor,
-                  borderRadius: BorderRadius.circular(8),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      post.ratingColor,
+                      post.ratingColor.withValues(alpha: 0.8),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: post.ratingColor.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Text(
                   '${post.rating.toUpperCase()} - ${post.ratingLabel}',
                   style: const TextStyle(
                     fontSize: 13,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                     color: CupertinoColors.white,
+                    letterSpacing: 0.5,
                   ),
                 ),
               ),
@@ -885,24 +903,43 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
     required String value,
     required String label,
     required Color color,
+    required bool isDark,
   }) {
     return Column(
       children: [
-        Icon(icon, size: 20, color: color),
-        const SizedBox(height: 4),
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                color.withValues(alpha: 0.15),
+                color.withValues(alpha: 0.08),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, size: 22, color: color),
+        ),
+        const SizedBox(height: 8),
         Text(
           value,
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: color,
+            color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
           ),
         ),
+        const SizedBox(height: 2),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
-            color: CupertinoColors.secondaryLabel,
+            fontWeight: FontWeight.w500,
+            color: isDark
+                ? CupertinoColors.white.withValues(alpha: 0.6)
+                : const Color(0xFF6B7280),
           ),
         ),
       ],
