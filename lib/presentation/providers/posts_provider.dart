@@ -185,10 +185,11 @@ class PostsProvider extends ChangeNotifier {
 
     result.when(
       success: (posts) {
+        final filteredPosts = _filterBlacklist(posts);
         if (refresh) {
-          _latestPosts = posts;
+          _latestPosts = filteredPosts;
         } else {
-          _latestPosts = [..._latestPosts, ...posts];
+          _latestPosts = [..._latestPosts, ...filteredPosts];
         }
         _hasMoreLatest = posts.length >= ApiConstants.defaultPageSize;
         _latestPage++;
