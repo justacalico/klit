@@ -178,6 +178,12 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
     final query = _searchController.text.trim();
     if (query.isEmpty) return;
 
+    // Close tag suggestions when searching
+    setState(() {
+      _showTagSuggestions = false;
+      _tagSuggestions = [];
+    });
+
     final settingsProvider = context.read<SettingsProvider>();
     context.read<PostsProvider>().searchPosts(
       query: query,
