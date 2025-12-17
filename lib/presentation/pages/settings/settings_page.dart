@@ -323,6 +323,195 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
+  Widget _buildCustomizationSection(BuildContext context, bool isDark) {
+    return _buildLiquidGlassSection(
+      context,
+      isDark: isDark,
+      title: 'CUSTOMIZATION',
+      children: [
+        Consumer<SettingsProvider>(
+          builder: (context, settings, _) {
+            return _buildLiquidGlassTile(
+              context,
+              isDark: isDark,
+              icon: CupertinoIcons.square_stack_3d_up,
+              iconColor: AppColors.primaryIndigo,
+              title: 'Navigation Order',
+              subtitle: 'Customize the order of navigation tabs',
+              showChevron: true,
+              onTap: () => _showNavOrderEditor(context, settings, isDark),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  void _showNavOrderEditor(
+    BuildContext context,
+    SettingsProvider settings,
+    bool isDark,
+  ) {
+    // Navigation items with their icons and labels
+    final navItems = <int, Map<String, dynamic>>{
+      0: {'icon': CupertinoIcons.house_fill, 'label': 'Home'},
+      1: {'icon': CupertinoIcons.flame_fill, 'label': 'Hot'},
+      2: {'icon': CupertinoIcons.star_fill, 'label': 'Popular'},
+      3: {'icon': CupertinoIcons.person_fill, 'label': 'Profile'},
+      4: {'icon': CupertinoIcons.settings_solid, 'label': 'Settings'},
+    };
+
+    List<int> currentOrder = List.from(settings.mobileNavOrder);
+
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) {
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.6,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Column(
+              children: [
+                // Header
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: isDark
+                            ? CupertinoColors.white.withValues(alpha: 0.1)
+                            : CupertinoColors.black.withValues(alpha: 0.1),
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancel'),
+                      ),
+                      const Text(
+                        'Navigation Order',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          settings.setMobileNavOrder(currentOrder);
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Save'),
+                      ),
+                    ],
+                  ),
+                ),
+                // Instructions
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    'Drag to reorder navigation items',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isDark
+                          ? CupertinoColors.white.withValues(alpha: 0.6)
+                          : CupertinoColors.black.withValues(alpha: 0.5),
+                    ),
+                  ),
+                ),
+                // Reorderable list
+                Expanded(
+                  child: ReorderableListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: currentOrder.length,
+                    onReorder: (oldIndex, newIndex) {
+                      setModalState(() {
+                        if (newIndex > oldIndex) newIndex--;
+                        final item = currentOrder.removeAt(oldIndex);
+                        currentOrder.insert(newIndex, item);
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      final itemId = currentOrder[index];
+                      final item = navItems[itemId]!;
+                      return Container(
+                        key: ValueKey(itemId),
+                        margin: const EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF2C2C2E)
+                              : const Color(0xFFF2F2F7),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: ListTile(
+                          leading: Icon(
+                            item['icon'] as IconData,
+                            color: _ThemeColors.primaryPurple,
+                          ),
+                          title: Text(item['label'] as String),
+                          trailing: const Icon(
+                            CupertinoIcons.line_horizontal_3,
+                            color: CupertinoColors.systemGrey,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                // Reset button
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: CupertinoButton(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      color: isDark
+                          ? const Color(0xFF2C2C2E)
+                          : const Color(0xFFF2F2F7),
+                      borderRadius: BorderRadius.circular(12),
+                      onPressed: () {
+                        setModalState(() {
+                          currentOrder = [0, 1, 2, 3, 4];
+                        });
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            CupertinoIcons.arrow_counterclockwise,
+                            size: 18,
+                            color: isDark
+                                ? CupertinoColors.white
+                                : CupertinoColors.black,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Reset to Default',
+                            style: TextStyle(
+                              color: isDark
+                                  ? CupertinoColors.white
+                                  : CupertinoColors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildNetworkSection(BuildContext context, bool isDark) {
     return _buildLiquidGlassSection(
       context,
