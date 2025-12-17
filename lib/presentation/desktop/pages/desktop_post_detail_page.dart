@@ -88,6 +88,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
   @override
   void dispose() {
     _focusNode.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 
