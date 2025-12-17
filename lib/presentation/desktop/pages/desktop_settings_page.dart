@@ -58,6 +58,15 @@ class DesktopSettingsPage extends StatelessWidget {
                     const SizedBox(height: 24),
                     _buildSection(
                       context,
+                      title: 'Behavior',
+                      icon: CupertinoIcons.hand_draw,
+                      children: [
+                        _buildConfettiSetting(context, CupertinoTheme.brightnessOf(context) == Brightness.dark),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    _buildSection(
+                      context,
                       title: 'Connection',
                       icon: CupertinoIcons.globe,
                       children: [
