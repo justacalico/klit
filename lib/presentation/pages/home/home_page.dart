@@ -138,41 +138,43 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildNavigationBar(bool isDark) {
-    return CupertinoSliverNavigationBar(
-      transitionBetweenRoutes: false,
-      backgroundColor: isDark
-          ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
-          : CupertinoColors.white.withValues(alpha: 0.85),
-      border: Border(
-        bottom: BorderSide(
-          color: isDark
-              ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
-              : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
-          width: 0.5,
-        ),
-      ),
-      middle: Text(
-        'Home',
-        style: TextStyle(
-          fontWeight: FontWeight.w600,
-          color: isDark ? CupertinoColors.white : CupertinoColors.black,
-        ),
-      ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildToolbarButton(
-            icon: _isGridView ? CupertinoIcons.list_bullet : CupertinoIcons.square_grid_2x2,
-            isDark: isDark,
-            onTap: () => setState(() => _isGridView = !_isGridView),
+    return SliverToBoxAdapter(
+      child: CupertinoNavigationBar(
+        transitionBetweenRoutes: false,
+        backgroundColor: isDark
+            ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
+            : CupertinoColors.white.withValues(alpha: 0.85),
+        border: Border(
+          bottom: BorderSide(
+            color: isDark
+                ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
+                : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+            width: 0.5,
           ),
-          const SizedBox(width: 8),
-          _buildToolbarButton(
-            icon: CupertinoIcons.search,
-            isDark: isDark,
-            onTap: _openSearch,
+        ),
+        middle: Text(
+          'Home',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: isDark ? CupertinoColors.white : CupertinoColors.black,
           ),
-        ],
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildToolbarButton(
+              icon: _isGridView ? CupertinoIcons.list_bullet : CupertinoIcons.square_grid_2x2,
+              isDark: isDark,
+              onTap: () => setState(() => _isGridView = !_isGridView),
+            ),
+            const SizedBox(width: 8),
+            _buildToolbarButton(
+              icon: CupertinoIcons.search,
+              isDark: isDark,
+              onTap: _openSearch,
+            ),
+          ],
+        ),
       ),
     );
   }

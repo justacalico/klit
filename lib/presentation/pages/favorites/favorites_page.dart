@@ -143,24 +143,26 @@ class _FavoritesPageState extends State<FavoritesPage> {
   }
 
   Widget _buildNavigationBar(bool isDark) {
-    return CupertinoSliverNavigationBar(
-      transitionBetweenRoutes: false,
-      backgroundColor: isDark
-          ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
-          : CupertinoColors.white.withValues(alpha: 0.85),
-      border: Border(
-        bottom: BorderSide(
-          color: isDark
-              ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
-              : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
-          width: 0.5,
+    return SliverToBoxAdapter(
+      child: CupertinoNavigationBar(
+        transitionBetweenRoutes: false,
+        backgroundColor: isDark
+            ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
+            : CupertinoColors.white.withValues(alpha: 0.85),
+        border: Border(
+          bottom: BorderSide(
+            color: isDark
+                ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
+                : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+            width: 0.5,
+          ),
         ),
-      ),
-      middle: Text(
-        'Favorites',
-        style: TextStyle(
-          fontWeight: FontWeight.w600,
-          color: isDark ? CupertinoColors.white : CupertinoColors.black,
+        middle: Text(
+          'Favorites',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: isDark ? CupertinoColors.white : CupertinoColors.black,
+          ),
         ),
       ),
     );

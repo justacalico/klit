@@ -29,24 +29,26 @@ class SettingsPage extends StatelessWidget {
           : AppColors.lightGroupedBackground,
       child: CustomScrollView(
         slivers: [
-          CupertinoSliverNavigationBar(
-            transitionBetweenRoutes: false,
-            backgroundColor: isDark
-                ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
-                : CupertinoColors.white.withValues(alpha: 0.85),
-            border: Border(
-              bottom: BorderSide(
-                color: isDark
-                    ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
-                    : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
-                width: 0.5,
+          SliverToBoxAdapter(
+            child: CupertinoNavigationBar(
+              transitionBetweenRoutes: false,
+              backgroundColor: isDark
+                  ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
+                  : CupertinoColors.white.withValues(alpha: 0.85),
+              border: Border(
+                bottom: BorderSide(
+                  color: isDark
+                      ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
+                      : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+                  width: 0.5,
+                ),
               ),
-            ),
-            middle: Text(
-              'Settings',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: isDark ? CupertinoColors.white : CupertinoColors.black,
+              middle: Text(
+                'Settings',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                ),
               ),
             ),
           ),
