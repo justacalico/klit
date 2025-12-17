@@ -100,20 +100,24 @@ class _MainTabPageState extends State<MainTabPage> {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
     final isGuest = context.watch<AuthProvider>().isGuest;
+    final navOrder = context.watch<SettingsProvider>().mobileNavOrder;
+
+    // Build pages list based on custom order
+    final orderedPages = navOrder.map((id) => _allPages[id]!).toList();
 
     return PopScope(
       canPop: false,
       child: CupertinoPageScaffold(
         child: Stack(
           children: [
-            // Page content - in guest mode, don't show settings (index 4)
-            IndexedStack(index: _currentIndex, children: _pages),
+            // Page content based on custom order
+            IndexedStack(index: _currentIndex, children: orderedPages),
             // Modern gradient navigation bar
             Positioned(
               left: 16,
               right: 16,
               bottom: MediaQuery.of(context).padding.bottom + 16,
-              child: _buildModernNavBar(isDark, isGuest),
+              child: _buildModernNavBar(isDark, isGuest, navOrder),
             ),
           ],
         ),
@@ -121,7 +125,7 @@ class _MainTabPageState extends State<MainTabPage> {
     );
   }
 
-  Widget _buildModernNavBar(bool isDark, bool isGuest) {
+  Widget _buildModernNavBar(bool isDark, bool isGuest, List<int> navOrder) {
     return Container(
       height: 68,
       decoration: BoxDecoration(
@@ -175,45 +179,20 @@ class _MainTabPageState extends State<MainTabPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildModernNavItem(
-                  index: 0,
-                  icon: CupertinoIcons.home,
-                  activeIcon: CupertinoIcons.house_fill,
-                  label: 'Home',
-                  isDark: isDark,
-                ),
-                _buildModernNavItem(
-                  index: 1,
-                  icon: CupertinoIcons.flame,
-                  activeIcon: CupertinoIcons.flame_fill,
-                  label: 'Hot',
-                  isDark: isDark,
-                ),
-                _buildModernNavItem(
-                  index: 2,
-                  icon: CupertinoIcons.star,
-                  activeIcon: CupertinoIcons.star_fill,
-                  label: 'Popular',
-                  isDark: isDark,
-                ),
-                _buildModernNavItem(
-                  index: 3,
-                  icon: CupertinoIcons.person,
-                  activeIcon: CupertinoIcons.person_fill,
-                  label: 'Profile',
-                  isDark: isDark,
-                ),
-                // In guest mode, show Sign Out instead of Settings
-                if (isGuest)
-                  _buildLogoutNavItem(isDark)
-                else
-                  _buildModernNavItem(
-                    index: 4,
-                    icon: CupertinoIcons.settings,
-                    activeIcon: CupertinoIcons.settings_solid,
-                    label: 'Settings',
-                    isDark: isDark,
-                  ),
+                // Build nav items based on custom order
+                for (int i = 0; i < navOrder.length; i++) ...[
+                  // In guest mode, replace Settings (4) with Sign Out
+                  if (isGuest && navOrder[i] == 4)
+                    _buildLogoutNavItem(isDark)
+                  else
+                    _buildModernNavItem(
+                      index: i,
+                      icon: _navItemDefs[navOrder[i]]!['icon'] as IconData,
+                      activeIcon: _navItemDefs[navOrder[i]]!['activeIcon'] as IconData,
+                      label: _navItemDefs[navOrder[i]]!['label'] as String,
+                      isDark: isDark,
+                    ),
+                ],
               ],
             ),
           ),
