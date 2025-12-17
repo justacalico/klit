@@ -9,7 +9,6 @@ import '../post/post_detail_page.dart';
 
 /// Design constants for the purple/indigo mobile theme
 class _ThemeColors {
-  static const Color primaryIndigo = Color(0xFF6366F1);
   static const Color primaryPurple = Color(0xFF8B5CF6);
 }
 
