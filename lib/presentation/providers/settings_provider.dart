@@ -15,6 +15,7 @@ class SettingsProvider extends ChangeNotifier {
   bool _safeMode = false;
   bool _leftHandedMode = false;
   bool _upvoteWhenFavorited = true;
+  bool _confettiOnFavorite = true;
   String _host = ApiConstants.defaultHost;
   List<SearchHistoryItem> _searchHistory = [];
   ProxyConfig _proxyConfig = const ProxyConfig();
@@ -33,6 +34,7 @@ class SettingsProvider extends ChangeNotifier {
   bool get safeMode => _safeMode;
   bool get leftHandedMode => _leftHandedMode;
   bool get upvoteWhenFavorited => _upvoteWhenFavorited;
+  bool get confettiOnFavorite => _confettiOnFavorite;
   String get host => _host;
   List<SearchHistoryItem> get searchHistory => _searchHistory;
   ProxyConfig get proxyConfig => _proxyConfig;
@@ -56,6 +58,7 @@ class SettingsProvider extends ChangeNotifier {
     _safeMode = _storageService.getSafeMode();
     _leftHandedMode = _storageService.getLeftHandedMode();
     _upvoteWhenFavorited = _storageService.getUpvoteWhenFavorited();
+    _confettiOnFavorite = _storageService.getConfettiOnFavorite();
     _host = _storageService.getHost();
     _searchHistory = _storageService.getSearchHistory();
     _proxyConfig = _storageService.getProxyConfig();
@@ -99,6 +102,13 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> setUpvoteWhenFavorited(bool enabled) async {
     _upvoteWhenFavorited = enabled;
     await _storageService.setUpvoteWhenFavorited(enabled);
+    notifyListeners();
+  }
+
+  /// Toggle confetti on favorite
+  Future<void> setConfettiOnFavorite(bool enabled) async {
+    _confettiOnFavorite = enabled;
+    await _storageService.setConfettiOnFavorite(enabled);
     notifyListeners();
   }
 
