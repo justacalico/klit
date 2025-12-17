@@ -42,6 +42,13 @@ class SettingsPage extends StatelessWidget {
                 width: 0.5,
               ),
             ),
+            middle: Text(
+              'Settings',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: isDark ? CupertinoColors.white : CupertinoColors.black,
+              ),
+            ),
             largeTitle: Row(
               children: [
                 Container(
