@@ -336,7 +336,7 @@ class SettingsPage extends StatelessWidget {
               context,
               isDark: isDark,
               icon: CupertinoIcons.square_stack_3d_up,
-              iconColor: AppColors.primaryIndigo,
+              iconColor: _ThemeColors.primaryIndigo,
               title: 'Navigation Order',
               subtitle: 'Customize the order of navigation tabs',
               showChevron: true,
