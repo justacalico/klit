@@ -257,9 +257,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
           // Play confetti animation when adding favorite
           if (!isFav) {
-            _confettiController.play();
-
             final settings = context.read<SettingsProvider>();
+            if (settings.confettiOnFavorite) {
+              _confettiController.play();
+            }
+
             // Auto-upvote when favoriting if the setting is enabled
             if (settings.upvoteWhenFavorited) {
               final currentVote = _userVote[index];
