@@ -235,6 +235,11 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
             _isFavorited[_currentIndex] = !isFav;
             _isTogglingFavorite[_currentIndex] = false;
           });
+
+          // Play confetti animation when adding favorite
+          if (!isFav) {
+            _confettiController.play();
+          }
         },
         failure: (error) {
           setState(() => _isTogglingFavorite[_currentIndex] = false);
