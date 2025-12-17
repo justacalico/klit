@@ -580,11 +580,6 @@ class DesktopSettingsPage extends StatelessWidget {
                                 item['label'] as String,
                                 style: const TextStyle(fontSize: 14),
                               ),
-                              trailing: const Icon(
-                                CupertinoIcons.line_horizontal_3,
-                                color: CupertinoColors.systemGrey,
-                                size: 18,
-                              ),
                             ),
                           );
                         },
