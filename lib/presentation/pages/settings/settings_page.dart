@@ -459,10 +459,6 @@ class SettingsPage extends StatelessWidget {
                               color: _ThemeColors.primaryPurple,
                             ),
                             title: Text(item['label'] as String),
-                            trailing: const Icon(
-                              CupertinoIcons.line_horizontal_3,
-                              color: CupertinoColors.systemGrey,
-                            ),
                           ),
                         );
                       },
