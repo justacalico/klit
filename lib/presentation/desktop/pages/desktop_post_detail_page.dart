@@ -9,6 +9,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/extensions/extensions.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
+import '../../providers/settings_provider.dart';
 import '../../widgets/widgets.dart';
 import '../widgets/desktop_toolbar.dart';
 
