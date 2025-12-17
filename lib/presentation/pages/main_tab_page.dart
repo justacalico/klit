@@ -28,13 +28,43 @@ class MainTabPage extends StatefulWidget {
 class _MainTabPageState extends State<MainTabPage> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = const [
-    HomePage(),
-    HotPage(),
-    PopularPage(),
-    ProfilePage(),
-    SettingsPage(),
-  ];
+  // All available pages mapped by their ID
+  static const Map<int, Widget> _allPages = {
+    0: HomePage(),
+    1: HotPage(),
+    2: PopularPage(),
+    3: ProfilePage(),
+    4: SettingsPage(),
+  };
+
+  // Navigation item definitions
+  static const Map<int, Map<String, dynamic>> _navItemDefs = {
+    0: {
+      'icon': CupertinoIcons.home,
+      'activeIcon': CupertinoIcons.house_fill,
+      'label': 'Home',
+    },
+    1: {
+      'icon': CupertinoIcons.flame,
+      'activeIcon': CupertinoIcons.flame_fill,
+      'label': 'Hot',
+    },
+    2: {
+      'icon': CupertinoIcons.star,
+      'activeIcon': CupertinoIcons.star_fill,
+      'label': 'Popular',
+    },
+    3: {
+      'icon': CupertinoIcons.person,
+      'activeIcon': CupertinoIcons.person_fill,
+      'label': 'Profile',
+    },
+    4: {
+      'icon': CupertinoIcons.settings,
+      'activeIcon': CupertinoIcons.settings_solid,
+      'label': 'Settings',
+    },
+  };
 
   void _handleLogout(BuildContext context) {
     showCupertinoDialog(
