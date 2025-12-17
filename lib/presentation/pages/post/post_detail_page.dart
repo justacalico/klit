@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'dart:math' show pi;
 import 'package:cached_network_image/cached_network_image.dart'
     show CachedNetworkImage, CachedNetworkImageProvider;
 import 'package:confetti/confetti.dart';
