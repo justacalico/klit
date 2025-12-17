@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Material, ListTile, ReorderableListView;
 import 'package:provider/provider.dart';
 import '../../../app/routes.dart';
 import '../../../core/constants/app_constants.dart';
@@ -466,6 +467,159 @@ class DesktopSettingsPage extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildNavOrderSetting(BuildContext context, bool isDark) {
+    return Consumer<SettingsProvider>(
+      builder: (context, settings, _) {
+        return _buildCard(
+          context,
+          isDark,
+          child: Row(
+            children: [
+              const Icon(CupertinoIcons.sidebar_left, size: 20),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Sidebar Order', style: TextStyle(fontSize: 15)),
+                    Text(
+                      'Customize the order of sidebar items',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: CupertinoColors.secondaryLabel,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              CupertinoButton(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                onPressed: () => _showDesktopNavOrderDialog(context, settings, isDark),
+                child: const Text('Configure'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDesktopNavOrderDialog(
+    BuildContext context,
+    SettingsProvider settings,
+    bool isDark,
+  ) {
+    // Desktop navigation items with their icons and labels
+    final navItems = <int, Map<String, dynamic>>{
+      0: {'icon': CupertinoIcons.house_fill, 'label': 'Home'},
+      1: {'icon': CupertinoIcons.flame_fill, 'label': 'Hot'},
+      2: {'icon': CupertinoIcons.star_fill, 'label': 'Popular'},
+      4: {'icon': CupertinoIcons.search, 'label': 'Search'},
+      5: {'icon': CupertinoIcons.person_fill, 'label': 'Profile'},
+      6: {'icon': CupertinoIcons.heart_fill, 'label': 'Favorites'},
+    };
+
+    List<int> currentOrder = List.from(settings.desktopNavOrder);
+
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return CupertinoAlertDialog(
+            title: const Text('Sidebar Order'),
+            content: SizedBox(
+              width: 300,
+              height: 350,
+              child: Column(
+                children: [
+                  const SizedBox(height: 16),
+                  Text(
+                    'Drag to reorder sidebar items',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: Material(
+                      color: CupertinoColors.transparent,
+                      child: ReorderableListView.builder(
+                        shrinkWrap: true,
+                        itemCount: currentOrder.length,
+                        onReorder: (oldIndex, newIndex) {
+                          setDialogState(() {
+                            if (newIndex > oldIndex) newIndex--;
+                            final item = currentOrder.removeAt(oldIndex);
+                            currentOrder.insert(newIndex, item);
+                          });
+                        },
+                        itemBuilder: (context, index) {
+                          final itemId = currentOrder[index];
+                          final item = navItems[itemId]!;
+                          return Container(
+                            key: ValueKey(itemId),
+                            margin: const EdgeInsets.only(bottom: 4),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFF2C2C2E)
+                                  : const Color(0xFFF2F2F7),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ListTile(
+                              dense: true,
+                              leading: Icon(
+                                item['icon'] as IconData,
+                                color: const Color(0xFF8B5CF6),
+                                size: 20,
+                              ),
+                              title: Text(
+                                item['label'] as String,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                              trailing: const Icon(
+                                CupertinoIcons.line_horizontal_3,
+                                color: CupertinoColors.systemGrey,
+                                size: 18,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () {
+                  setDialogState(() {
+                    currentOrder = [0, 1, 2, 4, 5, 6];
+                  });
+                },
+                child: const Text('Reset'),
+              ),
+              CupertinoDialogAction(
+                isDestructiveAction: true,
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                onPressed: () {
+                  settings.setDesktopNavOrder(currentOrder);
+                  Navigator.pop(context);
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 
