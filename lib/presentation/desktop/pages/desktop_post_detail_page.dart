@@ -1,5 +1,7 @@
 import 'dart:ui';
+import 'dart:math' show pi;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:confetti/confetti.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
@@ -65,6 +67,9 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
   bool _isFullScreen = false;
   late FocusNode _focusNode;
 
+  // Confetti controller for favorite animation
+  late ConfettiController _confettiController;
+
   @override
   void initState() {
     super.initState();
@@ -72,6 +77,7 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
     _postIds = List.from(widget.postIds);
     _hasMore = widget.hasMore;
     _focusNode = FocusNode();
+    _confettiController = ConfettiController(duration: const Duration(seconds: 1));
     _loadPost(_currentIndex);
     _preloadAdjacentPosts();
     WidgetsBinding.instance.addPostFrameCallback((_) {
