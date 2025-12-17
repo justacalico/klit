@@ -1,6 +1,8 @@
 import 'dart:ui';
+import 'dart:math' show pi;
 import 'package:cached_network_image/cached_network_image.dart'
     show CachedNetworkImage, CachedNetworkImageProvider;
+import 'package:confetti/confetti.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart'
@@ -81,6 +83,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
   final Map<int, bool> _isVoting = {};
   final Map<int, bool> _isTogglingFavorite = {};
 
+  // Confetti controller for favorite animation
+  late ConfettiController _confettiController;
+
   @override
   void initState() {
     super.initState();
@@ -88,6 +93,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     _postIds = List.from(widget.postIds);
     _hasMore = widget.hasMore;
     _pageController = PageController(initialPage: _currentIndex);
+    _confettiController = ConfettiController(duration: const Duration(seconds: 1));
     _loadPost(_currentIndex);
     _preloadAdjacentPosts();
   }
@@ -95,6 +101,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   @override
   void dispose() {
     _pageController.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 
