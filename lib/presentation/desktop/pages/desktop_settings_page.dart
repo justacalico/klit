@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart'
     show Material, ListTile, ReorderableListView;
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import '../../../app/routes.dart';
 import '../../../core/constants/app_constants.dart';
@@ -49,6 +50,7 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
   String _selectedCategory = 'account';
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  String _appVersion = '...';
 
   static const List<_SettingsCategory> _categories = [
     _SettingsCategory(
@@ -107,6 +109,14 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
       curve: Curves.easeOut,
     );
     _animationController.forward();
+    _loadAppVersion();
+  }
+
+  Future<void> _loadAppVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    if (mounted) {
+      setState(() => _appVersion = packageInfo.version);
+    }
   }
 
   @override
@@ -224,7 +234,7 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              'Klit ${AppConstants.appVersion}',
+              'Klit $_appVersion',
               style: TextStyle(
                 fontSize: 11,
                 color: isDark
@@ -1399,7 +1409,7 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
               ),
               const SizedBox(height: 4),
               Text(
-                'Version ${AppConstants.appVersion}',
+                'Version $_appVersion',
                 style: TextStyle(
                   fontSize: 15,
                   color: isDark
