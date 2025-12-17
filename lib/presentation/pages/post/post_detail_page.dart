@@ -396,16 +396,41 @@ class _PostDetailPageState extends State<PostDetailPage> {
               )
             : null,
       ),
-      child: SafeArea(
-        child: hasMultiplePosts
-            ? PageView.builder(
-                controller: _pageController,
-                itemCount: _postIds.length,
-                onPageChanged: _onPageChanged,
-                itemBuilder: (context, index) =>
-                    _buildPageContent(index, isDark, isOled),
-              )
-            : _buildPageContent(0, isDark, isOled),
+      child: Stack(
+        children: [
+          SafeArea(
+            child: hasMultiplePosts
+                ? PageView.builder(
+                    controller: _pageController,
+                    itemCount: _postIds.length,
+                    onPageChanged: _onPageChanged,
+                    itemBuilder: (context, index) =>
+                        _buildPageContent(index, isDark, isOled),
+                  )
+                : _buildPageContent(0, isDark, isOled),
+          ),
+          // Confetti overlay
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirection: pi / 2, // straight down
+              maxBlastForce: 5,
+              minBlastForce: 2,
+              emissionFrequency: 0.05,
+              numberOfParticles: 20,
+              gravity: 0.2,
+              colors: const [
+                Color(0xFFFF6B9D), // Pink
+                Color(0xFFFF8E53), // Orange
+                Color(0xFFFFD93D), // Yellow
+                Color(0xFF6BCB77), // Green
+                Color(0xFF4D96FF), // Blue
+                Color(0xFFC9B1FF), // Purple
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
