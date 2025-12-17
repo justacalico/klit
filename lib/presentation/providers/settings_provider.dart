@@ -16,6 +16,8 @@ class SettingsProvider extends ChangeNotifier {
   bool _leftHandedMode = false;
   bool _upvoteWhenFavorited = true;
   bool _confettiOnFavorite = true;
+  List<int> _mobileNavOrder = [0, 1, 2, 3, 4];
+  List<int> _desktopNavOrder = [0, 1, 2, 4, 5, 6];
   String _host = ApiConstants.defaultHost;
   List<SearchHistoryItem> _searchHistory = [];
   ProxyConfig _proxyConfig = const ProxyConfig();
@@ -35,6 +37,8 @@ class SettingsProvider extends ChangeNotifier {
   bool get leftHandedMode => _leftHandedMode;
   bool get upvoteWhenFavorited => _upvoteWhenFavorited;
   bool get confettiOnFavorite => _confettiOnFavorite;
+  List<int> get mobileNavOrder => _mobileNavOrder;
+  List<int> get desktopNavOrder => _desktopNavOrder;
   String get host => _host;
   List<SearchHistoryItem> get searchHistory => _searchHistory;
   ProxyConfig get proxyConfig => _proxyConfig;
@@ -59,6 +63,8 @@ class SettingsProvider extends ChangeNotifier {
     _leftHandedMode = _storageService.getLeftHandedMode();
     _upvoteWhenFavorited = _storageService.getUpvoteWhenFavorited();
     _confettiOnFavorite = _storageService.getConfettiOnFavorite();
+    _mobileNavOrder = _storageService.getMobileNavOrder();
+    _desktopNavOrder = _storageService.getDesktopNavOrder();
     _host = _storageService.getHost();
     _searchHistory = _storageService.getSearchHistory();
     _proxyConfig = _storageService.getProxyConfig();
@@ -110,6 +116,30 @@ class SettingsProvider extends ChangeNotifier {
     _confettiOnFavorite = enabled;
     await _storageService.setConfettiOnFavorite(enabled);
     notifyListeners();
+  }
+
+  /// Set mobile navigation order
+  Future<void> setMobileNavOrder(List<int> order) async {
+    _mobileNavOrder = order;
+    await _storageService.setMobileNavOrder(order);
+    notifyListeners();
+  }
+
+  /// Set desktop navigation order
+  Future<void> setDesktopNavOrder(List<int> order) async {
+    _desktopNavOrder = order;
+    await _storageService.setDesktopNavOrder(order);
+    notifyListeners();
+  }
+
+  /// Reset mobile navigation order to default
+  Future<void> resetMobileNavOrder() async {
+    await setMobileNavOrder([0, 1, 2, 3, 4]);
+  }
+
+  /// Reset desktop navigation order to default
+  Future<void> resetDesktopNavOrder() async {
+    await setDesktopNavOrder([0, 1, 2, 4, 5, 6]);
   }
 
   /// Set API host
