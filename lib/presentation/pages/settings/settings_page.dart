@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show ListTile, ReorderableListView;
+import 'package:flutter/material.dart' show ListTile, Material, ReorderableListView;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -429,41 +429,44 @@ class SettingsPage extends StatelessWidget {
                 ),
                 // Reorderable list
                 Expanded(
-                  child: ReorderableListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: currentOrder.length,
-                    onReorder: (oldIndex, newIndex) {
-                      setModalState(() {
-                        if (newIndex > oldIndex) newIndex--;
-                        final item = currentOrder.removeAt(oldIndex);
-                        currentOrder.insert(newIndex, item);
-                      });
-                    },
-                    itemBuilder: (context, index) {
-                      final itemId = currentOrder[index];
-                      final item = navItems[itemId]!;
-                      return Container(
-                        key: ValueKey(itemId),
-                        margin: const EdgeInsets.only(bottom: 8),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF2C2C2E)
-                              : const Color(0xFFF2F2F7),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: ListTile(
-                          leading: Icon(
-                            item['icon'] as IconData,
-                            color: _ThemeColors.primaryPurple,
+                  child: Material(
+                    color: CupertinoColors.transparent,
+                    child: ReorderableListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: currentOrder.length,
+                      onReorder: (oldIndex, newIndex) {
+                        setModalState(() {
+                          if (newIndex > oldIndex) newIndex--;
+                          final item = currentOrder.removeAt(oldIndex);
+                          currentOrder.insert(newIndex, item);
+                        });
+                      },
+                      itemBuilder: (context, index) {
+                        final itemId = currentOrder[index];
+                        final item = navItems[itemId]!;
+                        return Container(
+                          key: ValueKey(itemId),
+                          margin: const EdgeInsets.only(bottom: 8),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? const Color(0xFF2C2C2E)
+                                : const Color(0xFFF2F2F7),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          title: Text(item['label'] as String),
-                          trailing: const Icon(
-                            CupertinoIcons.line_horizontal_3,
-                            color: CupertinoColors.systemGrey,
+                          child: ListTile(
+                            leading: Icon(
+                              item['icon'] as IconData,
+                              color: _ThemeColors.primaryPurple,
+                            ),
+                            title: Text(item['label'] as String),
+                            trailing: const Icon(
+                              CupertinoIcons.line_horizontal_3,
+                              color: CupertinoColors.systemGrey,
+                            ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 ),
                 // Reset button
