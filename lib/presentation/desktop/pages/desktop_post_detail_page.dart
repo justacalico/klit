@@ -323,17 +323,17 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
               ],
             ),
           ),
-          // Confetti overlay
+          // Confetti overlay - positioned near the favorite button on the right panel
           Align(
-            alignment: Alignment.topCenter,
+            alignment: const Alignment(0.85, -0.3),
             child: ConfettiWidget(
               confettiController: _confettiController,
-              blastDirection: pi / 2, // straight down
-              maxBlastForce: 5,
-              minBlastForce: 2,
+              blastDirectionality: BlastDirectionality.explosive,
+              maxBlastForce: 20,
+              minBlastForce: 8,
               emissionFrequency: 0.05,
-              numberOfParticles: 20,
-              gravity: 0.2,
+              numberOfParticles: 25,
+              gravity: 0.3,
               colors: const [
                 Color(0xFFFF6B9D), // Pink
                 Color(0xFFFF8E53), // Orange
