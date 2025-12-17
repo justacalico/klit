@@ -129,38 +129,6 @@ class _ProfilePageState extends State<ProfilePage> {
               color: isDark ? CupertinoColors.white : CupertinoColors.black,
             ),
           ),
-          largeTitle: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      _ThemeColors.primaryIndigo,
-                      _ThemeColors.primaryPurple,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: _ThemeColors.primaryPurple.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  CupertinoIcons.person_fill,
-                  size: 16,
-                  color: CupertinoColors.white,
-                ),
-              ),
-              const SizedBox(width: 10),
-              const Text('Profile'),
-            ],
-          ),
         ),
         CupertinoSliverRefreshControl(onRefresh: _loadUserStats),
         SliverPadding(
