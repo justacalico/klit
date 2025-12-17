@@ -261,6 +261,34 @@ class StorageService {
     await _prefs.setBool(AppConstants.confettiOnFavoriteKey, enabled);
   }
 
+  /// Get mobile navigation order (list of tab IDs)
+  /// Default order: [0, 1, 2, 3, 4] = [Home, Hot, Popular, Profile, Settings]
+  List<int> getMobileNavOrder() {
+    final orderJson = _prefs.getString(AppConstants.mobileNavOrderKey);
+    if (orderJson == null) return [0, 1, 2, 3, 4];
+    final List<dynamic> order = json.decode(orderJson);
+    return order.cast<int>();
+  }
+
+  /// Set mobile navigation order
+  Future<void> setMobileNavOrder(List<int> order) async {
+    await _prefs.setString(AppConstants.mobileNavOrderKey, json.encode(order));
+  }
+
+  /// Get desktop navigation order (list of tab IDs)
+  /// Default order: [0, 1, 2, 4, 5, 6] = [Home, Hot, Popular, Search, Profile, Favorites]
+  List<int> getDesktopNavOrder() {
+    final orderJson = _prefs.getString(AppConstants.desktopNavOrderKey);
+    if (orderJson == null) return [0, 1, 2, 4, 5, 6];
+    final List<dynamic> order = json.decode(orderJson);
+    return order.cast<int>();
+  }
+
+  /// Set desktop navigation order
+  Future<void> setDesktopNavOrder(List<int> order) async {
+    await _prefs.setString(AppConstants.desktopNavOrderKey, json.encode(order));
+  }
+
   /// Get theme mode (0 = system, 1 = light, 2 = dark)
   int getThemeMode() {
     return _prefs.getInt(AppConstants.themeKey) ?? 0;
