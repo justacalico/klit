@@ -19,6 +19,7 @@ class AppConstants {
   static const String safeModeKey = 'safe_mode';
   static const String leftHandedModeKey = 'left_handed_mode';
   static const String upvoteWhenFavoritedKey = 'upvote_when_favorited';
+  static const String confettiOnFavoriteKey = 'confetti_on_favorite';
   static const String searchHistoryKey = 'search_history';
   static const String proxyConfigKey = 'proxy_config';
   static const String blacklistKey = 'user_blacklist';
