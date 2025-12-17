@@ -424,6 +424,42 @@ class DesktopSettingsPage extends StatelessWidget {
     );
   }
 
+  Widget _buildConfettiSetting(BuildContext context, bool isDark) {
+    return Consumer<SettingsProvider>(
+      builder: (context, settings, _) {
+        return _buildCard(
+          context,
+          isDark,
+          child: Row(
+            children: [
+              const Icon(CupertinoIcons.sparkles, size: 20),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Confetti on Favorite', style: TextStyle(fontSize: 15)),
+                    Text(
+                      'Show confetti animation when favoriting',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: CupertinoColors.secondaryLabel,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              CupertinoSwitch(
+                value: settings.confettiOnFavorite,
+                onChanged: (value) => settings.setConfettiOnFavorite(value),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildHostSetting(BuildContext context, bool isDark) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
