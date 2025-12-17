@@ -299,6 +299,24 @@ class SettingsPage extends StatelessWidget {
             );
           },
         ),
+        _buildLiquidGlassDivider(isDark),
+        Consumer<SettingsProvider>(
+          builder: (context, settings, _) {
+            return _buildLiquidGlassTile(
+              context,
+              isDark: isDark,
+              icon: CupertinoIcons.sparkles,
+              iconColor: AppColors.primaryPink,
+              title: 'Confetti on Favorite',
+              subtitle: 'Show confetti animation when favoriting a post',
+              trailing: CupertinoSwitch(
+                value: settings.confettiOnFavorite,
+                activeTrackColor: AppColors.primaryGreen,
+                onChanged: (value) => settings.setConfettiOnFavorite(value),
+              ),
+            );
+          },
+        ),
       ],
     );
   }
