@@ -67,6 +67,15 @@ class DesktopSettingsPage extends StatelessWidget {
                     const SizedBox(height: 24),
                     _buildSection(
                       context,
+                      title: 'Customization',
+                      icon: CupertinoIcons.square_stack_3d_up,
+                      children: [
+                        _buildNavOrderSetting(context, CupertinoTheme.brightnessOf(context) == Brightness.dark),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    _buildSection(
+                      context,
                       title: 'Connection',
                       icon: CupertinoIcons.globe,
                       children: [
