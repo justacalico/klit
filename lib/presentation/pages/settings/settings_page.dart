@@ -83,6 +83,8 @@ class SettingsPage extends StatelessWidget {
                 const SizedBox(height: 24),
                 _buildAppearanceSection(context, isDark),
                 const SizedBox(height: 24),
+                _buildCustomizationSection(context, isDark),
+                const SizedBox(height: 24),
                 _buildNetworkSection(context, isDark),
                 const SizedBox(height: 24),
                 _buildCacheSection(context, isDark),
