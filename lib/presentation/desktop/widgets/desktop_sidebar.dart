@@ -12,6 +12,28 @@ class _DesignColors {
   static const Color primaryViolet = Color(0xFFA855F7);
 }
 
+/// Navigation item definitions for desktop sidebar
+class _NavItemDef {
+  final IconData icon;
+  final String label;
+  final String section; // 'browse', 'tools', 'account'
+
+  const _NavItemDef({
+    required this.icon,
+    required this.label,
+    required this.section,
+  });
+
+  static const Map<int, _NavItemDef> items = {
+    0: _NavItemDef(icon: CupertinoIcons.house_fill, label: 'Home', section: 'browse'),
+    1: _NavItemDef(icon: CupertinoIcons.flame_fill, label: 'Hot', section: 'browse'),
+    2: _NavItemDef(icon: CupertinoIcons.star_fill, label: 'Popular', section: 'browse'),
+    4: _NavItemDef(icon: CupertinoIcons.search, label: 'Search', section: 'tools'),
+    5: _NavItemDef(icon: CupertinoIcons.person_fill, label: 'Profile', section: 'account'),
+    6: _NavItemDef(icon: CupertinoIcons.heart_fill, label: 'Favorites', section: 'account'),
+  };
+}
+
 /// macOS-style sidebar for desktop navigation with modern glassmorphism
 class DesktopSidebar extends StatefulWidget {
   final int selectedIndex;
