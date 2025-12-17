@@ -151,6 +151,13 @@ class _HomePageState extends State<HomePage> {
           width: 0.5,
         ),
       ),
+      middle: Text(
+        'Home',
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          color: isDark ? CupertinoColors.white : CupertinoColors.black,
+        ),
+      ),
       largeTitle: Row(
         children: [
           Container(
