@@ -122,6 +122,13 @@ class _ProfilePageState extends State<ProfilePage> {
               width: 0.5,
             ),
           ),
+          middle: Text(
+            'Profile',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: isDark ? CupertinoColors.white : CupertinoColors.black,
+            ),
+          ),
           largeTitle: Row(
             children: [
               Container(
