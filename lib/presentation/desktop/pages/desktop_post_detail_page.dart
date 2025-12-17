@@ -237,7 +237,10 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
 
           // Play confetti animation when adding favorite
           if (!isFav) {
-            _confettiController.play();
+            final settings = context.read<SettingsProvider>();
+            if (settings.confettiOnFavorite) {
+              _confettiController.play();
+            }
           }
         },
         failure: (error) {
