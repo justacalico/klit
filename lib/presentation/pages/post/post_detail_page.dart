@@ -256,9 +256,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
             _isTogglingFavorite[index] = false;
           });
 
-          // Auto-upvote when favoriting if the setting is enabled
+          // Play confetti animation when adding favorite
           if (!isFav) {
+            _confettiController.play();
+
             final settings = context.read<SettingsProvider>();
+            // Auto-upvote when favoriting if the setting is enabled
             if (settings.upvoteWhenFavorited) {
               final currentVote = _userVote[index];
               // Only upvote if not already upvoted
