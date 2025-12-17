@@ -13,7 +13,6 @@ import '../../providers/providers.dart';
 class _DesignColors {
   static const Color primaryIndigo = Color(0xFF6366F1);
   static const Color primaryPurple = Color(0xFF8B5CF6);
-  static const Color primaryViolet = Color(0xFFA855F7);
   static const Color accentPink = Color(0xFFEC4899);
   static const Color accentTeal = Color(0xFF14B8A6);
   static const Color accentOrange = Color(0xFFF97316);
