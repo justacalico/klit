@@ -241,69 +241,6 @@ class _DesktopSidebarState extends State<DesktopSidebar>
                         ],
                       ),
                     ),
-                            isCollapsed: widget.isCollapsed,
-                            children: [
-                              _SidebarItem(
-                                icon: CupertinoIcons.house_fill,
-                                label: 'Home',
-                                isSelected: widget.selectedIndex == 0,
-                                isCollapsed: widget.isCollapsed,
-                                onTap: () => widget.onItemSelected(0),
-                              ),
-                              _SidebarItem(
-                                icon: CupertinoIcons.flame_fill,
-                                label: 'Hot',
-                                isSelected: widget.selectedIndex == 1,
-                                isCollapsed: widget.isCollapsed,
-                                onTap: () => widget.onItemSelected(1),
-                              ),
-                              _SidebarItem(
-                                icon: CupertinoIcons.star_fill,
-                                label: 'Popular',
-                                isSelected: widget.selectedIndex == 2,
-                                isCollapsed: widget.isCollapsed,
-                                onTap: () => widget.onItemSelected(2),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          _SidebarSection(
-                            title: 'Tools',
-                            isCollapsed: widget.isCollapsed,
-                            children: [
-                              _SidebarItem(
-                                icon: CupertinoIcons.search,
-                                label: 'Search',
-                                isSelected: widget.selectedIndex == 4,
-                                isCollapsed: widget.isCollapsed,
-                                onTap: () => widget.onItemSelected(4),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          _SidebarSection(
-                            title: 'Account',
-                            isCollapsed: widget.isCollapsed,
-                            children: [
-                              _SidebarItem(
-                                icon: CupertinoIcons.person_fill,
-                                label: 'Profile',
-                                isSelected: widget.selectedIndex == 5,
-                                isCollapsed: widget.isCollapsed,
-                                onTap: () => widget.onItemSelected(5),
-                              ),
-                              _SidebarItem(
-                                icon: CupertinoIcons.heart_fill,
-                                label: 'Favorites',
-                                isSelected: widget.selectedIndex == 6,
-                                isCollapsed: widget.isCollapsed,
-                                onTap: () => widget.onItemSelected(6),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
                     // Settings or Sign Out at bottom
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
