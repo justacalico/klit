@@ -106,6 +106,29 @@ class _DesktopSidebarState extends State<DesktopSidebar>
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
     final isGuest = context.watch<AuthProvider>().isGuest;
+    final navOrder = context.watch<SettingsProvider>().desktopNavOrder;
+
+    // Group nav items by section based on custom order
+    final browseItems = <int>[];
+    final toolsItems = <int>[];
+    final accountItems = <int>[];
+
+    for (final id in navOrder) {
+      final item = _NavItemDef.items[id];
+      if (item != null) {
+        switch (item.section) {
+          case 'browse':
+            browseItems.add(id);
+            break;
+          case 'tools':
+            toolsItems.add(id);
+            break;
+          case 'account':
+            accountItems.add(id);
+            break;
+        }
+      }
+    }
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -166,8 +189,58 @@ class _DesktopSidebarState extends State<DesktopSidebar>
                       child: ListView(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         children: [
-                          _SidebarSection(
-                            title: 'Browse',
+                          if (browseItems.isNotEmpty) ...[
+                            _SidebarSection(
+                              title: 'Browse',
+                              isCollapsed: widget.isCollapsed,
+                              children: [
+                                for (final id in browseItems)
+                                  _SidebarItem(
+                                    icon: _NavItemDef.items[id]!.icon,
+                                    label: _NavItemDef.items[id]!.label,
+                                    isSelected: widget.selectedIndex == id,
+                                    isCollapsed: widget.isCollapsed,
+                                    onTap: () => widget.onItemSelected(id),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                          ],
+                          if (toolsItems.isNotEmpty) ...[
+                            _SidebarSection(
+                              title: 'Tools',
+                              isCollapsed: widget.isCollapsed,
+                              children: [
+                                for (final id in toolsItems)
+                                  _SidebarItem(
+                                    icon: _NavItemDef.items[id]!.icon,
+                                    label: _NavItemDef.items[id]!.label,
+                                    isSelected: widget.selectedIndex == id,
+                                    isCollapsed: widget.isCollapsed,
+                                    onTap: () => widget.onItemSelected(id),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                          ],
+                          if (accountItems.isNotEmpty)
+                            _SidebarSection(
+                              title: 'Account',
+                              isCollapsed: widget.isCollapsed,
+                              children: [
+                                for (final id in accountItems)
+                                  _SidebarItem(
+                                    icon: _NavItemDef.items[id]!.icon,
+                                    label: _NavItemDef.items[id]!.label,
+                                    isSelected: widget.selectedIndex == id,
+                                    isCollapsed: widget.isCollapsed,
+                                    onTap: () => widget.onItemSelected(id),
+                                  ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    ),
                             isCollapsed: widget.isCollapsed,
                             children: [
                               _SidebarItem(
