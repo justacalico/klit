@@ -157,6 +157,13 @@ class _PopularPageState extends State<PopularPage> {
           width: 0.5,
         ),
       ),
+      middle: Text(
+        'Popular',
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          color: isDark ? CupertinoColors.white : CupertinoColors.black,
+        ),
+      ),
       largeTitle: Row(
         children: [
           Container(
