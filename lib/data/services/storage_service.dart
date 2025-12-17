@@ -251,6 +251,16 @@ class StorageService {
     await _prefs.setBool(AppConstants.upvoteWhenFavoritedKey, enabled);
   }
 
+  /// Get confetti on favorite setting
+  bool getConfettiOnFavorite() {
+    return _prefs.getBool(AppConstants.confettiOnFavoriteKey) ?? true;
+  }
+
+  /// Set confetti on favorite setting
+  Future<void> setConfettiOnFavorite(bool enabled) async {
+    await _prefs.setBool(AppConstants.confettiOnFavoriteKey, enabled);
+  }
+
   /// Get theme mode (0 = system, 1 = light, 2 = dark)
   int getThemeMode() {
     return _prefs.getInt(AppConstants.themeKey) ?? 0;
