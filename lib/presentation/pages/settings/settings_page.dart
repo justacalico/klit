@@ -951,7 +951,7 @@ class SettingsPage extends StatelessWidget {
   }
 
   Future<void> _openWebsite() async {
-    final uri = Uri.parse('https://openlyst.onrender.com/');
+    final uri = Uri.parse('https://openlyst.ink/');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
