@@ -299,6 +299,16 @@ class StorageService {
     await _prefs.setInt(AppConstants.themeKey, mode);
   }
 
+  /// Get UI style (0 = liquid glass, 1 = material)
+  int getUIStyle() {
+    return _prefs.getInt(AppConstants.uiStyleKey) ?? 0;
+  }
+
+  /// Set UI style
+  Future<void> setUIStyle(int style) async {
+    await _prefs.setInt(AppConstants.uiStyleKey, style);
+  }
+
   // ==================== Search History ====================
 
   /// Get search history

@@ -55,6 +55,41 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     _initializePlayer();
   }
 
+  @override
+  void didUpdateWidget(VideoPlayerWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the video URL changed, reinitialize the player
+    if (oldWidget.videoUrl != widget.videoUrl) {
+      _reinitializePlayer();
+    }
+  }
+
+  Future<void> _reinitializePlayer() async {
+    setState(() {
+      _isInitializing = true;
+      _error = null;
+    });
+
+    // Dispose existing players
+    await _disposeCurrentPlayers();
+
+    // Initialize with new video
+    await _initializePlayer();
+  }
+
+  Future<void> _disposeCurrentPlayers() async {
+    // Dispose mobile player
+    _chewieController?.dispose();
+    _chewieController = null;
+    await _videoController?.dispose();
+    _videoController = null;
+
+    // Dispose desktop player
+    await _player?.dispose();
+    _player = null;
+    _desktopController = null;
+  }
+
   Future<void> _initializePlayer() async {
     try {
       if (isDesktop) {
@@ -187,13 +222,10 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   @override
   void dispose() {
-    // Dispose mobile player
+    // Dispose all players synchronously (fire and forget the async parts)
     _chewieController?.dispose();
     _videoController?.dispose();
-
-    // Dispose desktop player
     _player?.dispose();
-
     super.dispose();
   }
 

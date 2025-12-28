@@ -1,10 +1,14 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
+import '../../core/theme/ui_style_manager.dart';
 
 /// A frosted glass container widget that provides macOS-style vibrancy effects.
 /// 
 /// This widget creates a translucent, blurred background effect similar to
 /// macOS Big Sur and later's "liquid glass" design language.
+/// 
+/// Note: For better performance, consider using [AdaptiveContainer] which
+/// automatically switches between glass and solid styles based on UI settings.
 class GlassContainer extends StatelessWidget {
   final Widget child;
   final double blur;
@@ -17,6 +21,9 @@ class GlassContainer extends StatelessWidget {
   final double? width;
   final double? height;
   final BoxConstraints? constraints;
+  /// If true, respects the UI style setting and uses solid colors in Material mode.
+  /// If false (default), always uses glass effect regardless of settings.
+  final bool respectUIStyle;
 
   const GlassContainer({
     super.key,
@@ -31,6 +38,7 @@ class GlassContainer extends StatelessWidget {
     this.width,
     this.height,
     this.constraints,
+    this.respectUIStyle = false,
   });
 
   @override
@@ -38,6 +46,15 @@ class GlassContainer extends StatelessWidget {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
 
+    // Check if we should use material style
+    if (respectUIStyle && !UIStyleManager.isLiquidGlass(context)) {
+      return _buildMaterialContainer(isDark);
+    }
+
+    return _buildGlassContainer(isDark);
+  }
+
+  Widget _buildGlassContainer(bool isDark) {
     final defaultTint = isDark
         ? const Color(0xFF1C1C1E).withValues(alpha: opacity)
         : const Color(0xFFF2F2F7).withValues(alpha: opacity);
@@ -71,6 +88,35 @@ class GlassContainer extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildMaterialContainer(bool isDark) {
+    final defaultColor = isDark
+        ? const Color(0xFF1C1C1E)
+        : const Color(0xFFF2F2F7);
+
+    final effectiveColor = tintColor ?? defaultColor;
+    final effectiveBorderRadius = borderRadius ?? BorderRadius.circular(12);
+
+    return Container(
+      width: width,
+      height: height,
+      margin: margin,
+      constraints: constraints,
+      padding: padding,
+      decoration: BoxDecoration(
+        color: effectiveColor,
+        borderRadius: effectiveBorderRadius,
+        border: border ??
+            Border.all(
+              color: isDark
+                  ? const Color(0xFF3A3A3C)
+                  : const Color(0xFFD1D1D6),
+              width: 0.5,
+            ),
+      ),
+      child: child,
     );
   }
 }

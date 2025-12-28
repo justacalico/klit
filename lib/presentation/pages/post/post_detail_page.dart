@@ -709,6 +709,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
       return AspectRatio(
         aspectRatio: post.file.aspectRatio.clamp(0.5, 2.0),
         child: VideoPlayerWidget(
+          key: ValueKey('video_${post.id}_${post.file.url}'),
           videoUrl: post.file.url!,
           thumbnailUrl: post.preview.url,
           autoPlay: true,

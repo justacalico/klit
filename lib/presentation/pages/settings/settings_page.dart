@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../app/routes.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/theme/ui_style_manager.dart';
 import '../../providers/providers.dart';
 
 /// Design constants for the purple/indigo mobile theme
@@ -177,6 +178,40 @@ class SettingsPage extends StatelessWidget {
                 ],
               ),
               onTap: () => _showThemePicker(context, settings, isDark),
+            );
+          },
+        ),
+        _buildLiquidGlassDivider(isDark),
+        Consumer<SettingsProvider>(
+          builder: (context, settings, _) {
+            return _buildLiquidGlassTile(
+              context,
+              isDark: isDark,
+              icon: settings.uiStyle.icon,
+              iconColor: AppColors.primaryTeal,
+              title: 'UI Style',
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    settings.uiStyle.displayName,
+                    style: TextStyle(
+                      color: isDark
+                          ? CupertinoColors.white.withValues(alpha: 0.6)
+                          : CupertinoColors.black.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    CupertinoIcons.chevron_right,
+                    size: 16,
+                    color: isDark
+                        ? CupertinoColors.white.withValues(alpha: 0.3)
+                        : CupertinoColors.black.withValues(alpha: 0.25),
+                  ),
+                ],
+              ),
+              onTap: () => _showUIStylePicker(context, settings, isDark),
             );
           },
         ),
@@ -1551,6 +1586,195 @@ Your Privacy is Protected - Everything Stays on Your Device.
                                 CupertinoIcons.checkmark_circle_fill,
                                 size: 24,
                                 color: AppColors.primaryBlue,
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showUIStylePicker(
+    BuildContext context,
+    SettingsProvider settings,
+    bool isDark,
+  ) {
+    final styles = [
+      (UIStyle.liquidGlass, 'Liquid Glass', 'Beautiful frosted glass effects with blur', CupertinoIcons.sparkles),
+      (UIStyle.material, 'Material', 'Performance-focused with solid colors', CupertinoIcons.bolt_fill),
+    ];
+
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+          child: Container(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).padding.bottom,
+            ),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: isDark
+                    ? [
+                        CupertinoColors.white.withValues(alpha: 0.16),
+                        CupertinoColors.white.withValues(alpha: 0.10),
+                      ]
+                    : [
+                        CupertinoColors.white.withValues(alpha: 0.9),
+                        CupertinoColors.white.withValues(alpha: 0.75),
+                      ],
+              ),
+              border: Border(
+                top: BorderSide(
+                  color: isDark
+                      ? CupertinoColors.white.withValues(alpha: 0.2)
+                      : CupertinoColors.white.withValues(alpha: 0.6),
+                  width: 0.5,
+                ),
+              ),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Handle bar
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 12),
+                    width: 36,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? CupertinoColors.white.withValues(alpha: 0.3)
+                          : CupertinoColors.black.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(2.5),
+                    ),
+                  ),
+                  // Title
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Text(
+                      'Choose UI Style',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? CupertinoColors.white
+                            : CupertinoColors.black,
+                      ),
+                    ),
+                  ),
+                  // Style options
+                  ...styles.map((style) {
+                    final (uiStyle, name, description, icon) = style;
+                    final isSelected = settings.uiStyle == uiStyle;
+                    return GestureDetector(
+                      onTap: () {
+                        settings.setUIStyle(uiStyle);
+                        Navigator.of(context).pop();
+                      },
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? (isDark
+                                    ? AppColors.primaryTeal.withValues(
+                                        alpha: 0.3,
+                                      )
+                                    : AppColors.primaryTeal.withValues(
+                                        alpha: 0.15,
+                                      ))
+                              : (isDark
+                                    ? CupertinoColors.white.withValues(
+                                        alpha: 0.08,
+                                      )
+                                    : CupertinoColors.black.withValues(
+                                        alpha: 0.04,
+                                      )),
+                          borderRadius: BorderRadius.circular(12),
+                          border: isSelected
+                              ? Border.all(
+                                  color: AppColors.primaryTeal.withValues(
+                                    alpha: 0.5,
+                                  ),
+                                  width: 1.5,
+                                )
+                              : null,
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              icon,
+                              size: 24,
+                              color: isSelected
+                                  ? AppColors.primaryTeal
+                                  : (isDark
+                                        ? CupertinoColors.white.withValues(
+                                            alpha: 0.7,
+                                          )
+                                        : CupertinoColors.black.withValues(
+                                            alpha: 0.6,
+                                          )),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    name,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: isSelected
+                                          ? AppColors.primaryTeal
+                                          : (isDark
+                                                ? CupertinoColors.white
+                                                : CupertinoColors.black),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    description,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: isDark
+                                          ? CupertinoColors.white.withValues(
+                                              alpha: 0.5,
+                                            )
+                                          : CupertinoColors.black.withValues(
+                                              alpha: 0.5,
+                                            ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (isSelected)
+                              Icon(
+                                CupertinoIcons.checkmark_circle_fill,
+                                size: 24,
+                                color: AppColors.primaryTeal,
                               ),
                           ],
                         ),

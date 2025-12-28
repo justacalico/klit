@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import '../../core/constants/constants.dart';
+import '../../core/theme/ui_style_manager.dart';
 import '../../data/models/models.dart';
 import '../../data/services/services.dart';
 
@@ -23,6 +24,7 @@ class SettingsProvider extends ChangeNotifier {
   ProxyConfig _proxyConfig = const ProxyConfig();
   String _blacklist = '';
   bool _blacklistEnabled = true;
+  UIStyle _uiStyle = UIStyle.liquidGlass;
 
   /// Callback to notify when proxy configuration changes
   ProxyChangeCallback? onProxyChanged;
@@ -44,6 +46,7 @@ class SettingsProvider extends ChangeNotifier {
   ProxyConfig get proxyConfig => _proxyConfig;
   String get blacklist => _blacklist;
   bool get blacklistEnabled => _blacklistEnabled;
+  UIStyle get uiStyle => _uiStyle;
 
   /// Get blacklist as a list of tag queries (each line is a filter)
   List<String> get blacklistLines {
@@ -70,6 +73,7 @@ class SettingsProvider extends ChangeNotifier {
     _proxyConfig = _storageService.getProxyConfig();
     _blacklist = _storageService.getBlacklist();
     _blacklistEnabled = _storageService.getBlacklistEnabled();
+    _uiStyle = UIStyle.values[_storageService.getUIStyle().clamp(0, UIStyle.values.length - 1)];
     notifyListeners();
   }
 
@@ -210,6 +214,13 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> setBlacklistEnabled(bool enabled) async {
     _blacklistEnabled = enabled;
     await _storageService.setBlacklistEnabled(enabled);
+    notifyListeners();
+  }
+
+  /// Set UI style (liquid glass or material)
+  Future<void> setUIStyle(UIStyle style) async {
+    _uiStyle = style;
+    await _storageService.setUIStyle(style.index);
     notifyListeners();
   }
 

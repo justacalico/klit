@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';
+import '../../core/theme/ui_style_manager.dart';
 import '../../core/utils/helpers.dart';
 import '../providers/providers.dart';
 import 'home/home_page.dart';
@@ -101,6 +102,7 @@ class _MainTabPageState extends State<MainTabPage> {
     final isDark = brightness == Brightness.dark;
     final isGuest = context.watch<AuthProvider>().isGuest;
     final navOrder = context.watch<SettingsProvider>().mobileNavOrder;
+    final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
 
     // Build pages list based on custom order
     final orderedPages = navOrder.map((id) => _allPages[id]!).toList();
@@ -117,7 +119,9 @@ class _MainTabPageState extends State<MainTabPage> {
               left: 16,
               right: 16,
               bottom: MediaQuery.of(context).padding.bottom + 16,
-              child: _buildModernNavBar(isDark, isGuest, navOrder),
+              child: isLiquidGlass
+                  ? _buildLiquidGlassNavBar(isDark, isGuest, navOrder)
+                  : _buildMaterialNavBar(isDark, isGuest, navOrder),
             ),
           ],
         ),
@@ -125,7 +129,7 @@ class _MainTabPageState extends State<MainTabPage> {
     );
   }
 
-  Widget _buildModernNavBar(bool isDark, bool isGuest, List<int> navOrder) {
+  Widget _buildLiquidGlassNavBar(bool isDark, bool isGuest, List<int> navOrder) {
     return Container(
       height: 68,
       decoration: BoxDecoration(
@@ -176,28 +180,57 @@ class _MainTabPageState extends State<MainTabPage> {
                 width: 1,
               ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                // Build nav items based on custom order
-                for (int i = 0; i < navOrder.length; i++) ...[
-                  // In guest mode, replace Settings (4) with Sign Out
-                  if (isGuest && navOrder[i] == 4)
-                    _buildLogoutNavItem(isDark)
-                  else
-                    _buildModernNavItem(
-                      index: i,
-                      icon: _navItemDefs[navOrder[i]]!['icon'] as IconData,
-                      activeIcon: _navItemDefs[navOrder[i]]!['activeIcon'] as IconData,
-                      label: _navItemDefs[navOrder[i]]!['label'] as String,
-                      isDark: isDark,
-                    ),
-                ],
-              ],
-            ),
+            child: _buildNavBarContent(isDark, isGuest, navOrder),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildMaterialNavBar(bool isDark, bool isGuest, List<int> navOrder) {
+    return Container(
+      height: 68,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        color: isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white,
+        boxShadow: [
+          BoxShadow(
+            color: CupertinoColors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+            blurRadius: 16,
+            spreadRadius: 0,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(
+          color: isDark
+              ? const Color(0xFF3A3A3C)
+              : const Color(0xFFE5E5E7),
+          width: 1,
+        ),
+      ),
+      child: _buildNavBarContent(isDark, isGuest, navOrder),
+    );
+  }
+
+  Widget _buildNavBarContent(bool isDark, bool isGuest, List<int> navOrder) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        // Build nav items based on custom order
+        for (int i = 0; i < navOrder.length; i++) ...[
+          // In guest mode, replace Settings (4) with Sign Out
+          if (isGuest && navOrder[i] == 4)
+            _buildLogoutNavItem(isDark)
+          else
+            _buildModernNavItem(
+              index: i,
+              icon: _navItemDefs[navOrder[i]]!['icon'] as IconData,
+              activeIcon: _navItemDefs[navOrder[i]]!['activeIcon'] as IconData,
+              label: _navItemDefs[navOrder[i]]!['label'] as String,
+              isDark: isDark,
+            ),
+        ],
+      ],
     );
   }
 

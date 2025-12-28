@@ -7,6 +7,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import '../../../app/routes.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/theme/ui_style_manager.dart';
 import '../../../data/models/proxy_config.dart';
 import '../../providers/providers.dart';
 
@@ -801,9 +802,150 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                 ],
               ),
             ),
+            const SizedBox(height: 20),
+            _buildSettingsCard(
+              isDark: isDark,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'UI Style',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: isDark
+                          ? CupertinoColors.systemGrey
+                          : CupertinoColors.systemGrey2,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Choose between performance-focused Material or beautiful Liquid Glass effects',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark
+                          ? CupertinoColors.systemGrey2
+                          : CupertinoColors.systemGrey,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      _buildUIStyleOption(
+                        isDark: isDark,
+                        isSelected: settings.uiStyle == UIStyle.liquidGlass,
+                        icon: CupertinoIcons.sparkles,
+                        label: 'Liquid Glass',
+                        description: 'Beautiful blur effects',
+                        onTap: () => settings.setUIStyle(UIStyle.liquidGlass),
+                      ),
+                      const SizedBox(width: 12),
+                      _buildUIStyleOption(
+                        isDark: isDark,
+                        isSelected: settings.uiStyle == UIStyle.material,
+                        icon: CupertinoIcons.bolt_fill,
+                        label: 'Material',
+                        description: 'Performance-focused',
+                        onTap: () => settings.setUIStyle(UIStyle.material),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ],
         );
       },
+    );
+  }
+
+  Widget _buildUIStyleOption({
+    required bool isDark,
+    required bool isSelected,
+    required IconData icon,
+    required String label,
+    required String description,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: isSelected
+                ? const LinearGradient(
+                    colors: [
+                      _DesignColors.accentTeal,
+                      Color(0xFF0D9488),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : null,
+            color: isSelected
+                ? null
+                : (isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF2F2F7)),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected
+                  ? _DesignColors.accentTeal
+                  : (isDark
+                        ? _DesignColors.accentTeal.withValues(alpha: 0.1)
+                        : const Color(0xFFE5E5E7)),
+              width: 1,
+            ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: _DesignColors.accentTeal.withValues(alpha: 0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Column(
+            children: [
+              Icon(
+                icon,
+                size: 28,
+                color: isSelected
+                    ? CupertinoColors.white
+                    : (isDark
+                          ? CupertinoColors.white.withValues(alpha: 0.7)
+                          : CupertinoColors.black.withValues(alpha: 0.6)),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: isSelected
+                      ? CupertinoColors.white
+                      : (isDark
+                            ? CupertinoColors.white
+                            : CupertinoColors.black),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                description,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: isSelected
+                      ? CupertinoColors.white.withValues(alpha: 0.8)
+                      : (isDark
+                            ? CupertinoColors.systemGrey
+                            : CupertinoColors.systemGrey2),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

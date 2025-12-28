@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../../app/routes.dart';
+import '../../../core/theme/ui_style_manager.dart';
 import '../../providers/providers.dart';
 
 /// Design constants for the new purple/indigo theme
@@ -107,6 +108,7 @@ class _DesktopSidebarState extends State<DesktopSidebar>
     final isDark = brightness == Brightness.dark;
     final isGuest = context.watch<AuthProvider>().isGuest;
     final navOrder = context.watch<SettingsProvider>().desktopNavOrder;
+    final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
 
     // Group nav items by section based on custom order
     final browseItems = <int>[];
@@ -133,149 +135,197 @@ class _DesktopSidebarState extends State<DesktopSidebar>
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       width: widget.isCollapsed ? 72 : 240,
-      child: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: isDark
-                    ? [
-                        const Color(0xFF18181B).withValues(alpha: 0.85),
-                        const Color(0xFF1F1F23).withValues(alpha: 0.9),
-                        const Color(0xFF18181B).withValues(alpha: 0.95),
-                      ]
-                    : [
-                        const Color(0xFFFFFFFF).withValues(alpha: 0.8),
-                        const Color(0xFFFAFAFC).withValues(alpha: 0.85),
-                        const Color(0xFFF5F5F7).withValues(alpha: 0.9),
-                      ],
-                stops: const [0.0, 0.5, 1.0],
-              ),
-              border: Border(
-                right: BorderSide(
-                  color: isDark
-                      ? _DesignColors.primaryPurple.withValues(alpha: 0.15)
-                      : _DesignColors.primaryPurple.withValues(alpha: 0.1),
-                  width: 1,
-                ),
+      child: isLiquidGlass
+          ? _buildLiquidGlassSidebar(context, isDark, isGuest, browseItems, toolsItems, accountItems)
+          : _buildMaterialSidebar(context, isDark, isGuest, browseItems, toolsItems, accountItems),
+    );
+  }
+
+  Widget _buildLiquidGlassSidebar(
+    BuildContext context,
+    bool isDark,
+    bool isGuest,
+    List<int> browseItems,
+    List<int> toolsItems,
+    List<int> accountItems,
+  ) {
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [
+                      const Color(0xFF18181B).withValues(alpha: 0.85),
+                      const Color(0xFF1F1F23).withValues(alpha: 0.9),
+                      const Color(0xFF18181B).withValues(alpha: 0.95),
+                    ]
+                  : [
+                      const Color(0xFFFFFFFF).withValues(alpha: 0.8),
+                      const Color(0xFFFAFAFC).withValues(alpha: 0.85),
+                      const Color(0xFFF5F5F7).withValues(alpha: 0.9),
+                    ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
+            border: Border(
+              right: BorderSide(
+                color: isDark
+                    ? _DesignColors.primaryPurple.withValues(alpha: 0.15)
+                    : _DesignColors.primaryPurple.withValues(alpha: 0.1),
+                width: 1,
               ),
             ),
-            child: Stack(
-              children: [
-                // Animated gradient orbs in background
-                AnimatedBuilder(
-                  animation: _bgAnimationController,
-                  builder: (context, child) {
-                    return CustomPaint(
-                      painter: _SidebarBackgroundPainter(
-                        isDark: isDark,
-                        animationValue: _bgAnimationController.value,
-                      ),
-                      size: Size.infinite,
-                    );
-                  },
-                ),
-                // Main content
-                Column(
-                  children: [
-                    // App header
-                    _buildHeader(context, isDark),
-                    const SizedBox(height: 12),
-                    // Navigation items
-                    Expanded(
-                      child: ListView(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        children: [
-                          if (browseItems.isNotEmpty) ...[
-                            _SidebarSection(
-                              title: 'Browse',
-                              isCollapsed: widget.isCollapsed,
-                              children: [
-                                for (final id in browseItems)
-                                  _SidebarItem(
-                                    icon: _NavItemDef.items[id]!.icon,
-                                    label: _NavItemDef.items[id]!.label,
-                                    isSelected: widget.selectedIndex == id,
-                                    isCollapsed: widget.isCollapsed,
-                                    onTap: () => widget.onItemSelected(id),
-                                  ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                          ],
-                          if (toolsItems.isNotEmpty) ...[
-                            _SidebarSection(
-                              title: 'Tools',
-                              isCollapsed: widget.isCollapsed,
-                              children: [
-                                for (final id in toolsItems)
-                                  _SidebarItem(
-                                    icon: _NavItemDef.items[id]!.icon,
-                                    label: _NavItemDef.items[id]!.label,
-                                    isSelected: widget.selectedIndex == id,
-                                    isCollapsed: widget.isCollapsed,
-                                    onTap: () => widget.onItemSelected(id),
-                                  ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                          ],
-                          if (accountItems.isNotEmpty)
-                            _SidebarSection(
-                              title: 'Account',
-                              isCollapsed: widget.isCollapsed,
-                              children: [
-                                for (final id in accountItems)
-                                  _SidebarItem(
-                                    icon: _NavItemDef.items[id]!.icon,
-                                    label: _NavItemDef.items[id]!.label,
-                                    isSelected: widget.selectedIndex == id,
-                                    isCollapsed: widget.isCollapsed,
-                                    onTap: () => widget.onItemSelected(id),
-                                  ),
-                              ],
-                            ),
-                        ],
-                      ),
+          ),
+          child: Stack(
+            children: [
+              // Animated gradient orbs in background
+              AnimatedBuilder(
+                animation: _bgAnimationController,
+                builder: (context, child) {
+                  return CustomPaint(
+                    painter: _SidebarBackgroundPainter(
+                      isDark: isDark,
+                      animationValue: _bgAnimationController.value,
                     ),
-                    // Settings or Sign Out at bottom
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: isGuest
-                          ? _SidebarItem(
-                              icon: CupertinoIcons.square_arrow_right,
-                              label: 'Sign Out',
-                              isSelected: false,
-                              isCollapsed: widget.isCollapsed,
-                              onTap: () => _handleLogout(context),
-                            )
-                          : _SidebarItem(
-                              icon: CupertinoIcons.settings,
-                              label: 'Settings',
-                              isSelected: widget.selectedIndex == 3,
-                              isCollapsed: widget.isCollapsed,
-                              onTap: () => widget.onItemSelected(3),
-                            ),
-                    ),
-                    const SizedBox(height: 8),
-                    // Collapse toggle
-                    Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: _GlassCollapseButton(
-                        isCollapsed: widget.isCollapsed,
-                        onTap: widget.onToggleCollapse,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                    size: Size.infinite,
+                  );
+                },
+              ),
+              // Main content
+              _buildSidebarContent(context, isDark, isGuest, browseItems, toolsItems, accountItems),
+            ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildMaterialSidebar(
+    BuildContext context,
+    bool isDark,
+    bool isGuest,
+    List<int> browseItems,
+    List<int> toolsItems,
+    List<int> accountItems,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF18181B) : const Color(0xFFF5F5F7),
+        border: Border(
+          right: BorderSide(
+            color: isDark
+                ? const Color(0xFF3A3A3C)
+                : const Color(0xFFE5E5E7),
+            width: 1,
+          ),
+        ),
+      ),
+      child: _buildSidebarContent(context, isDark, isGuest, browseItems, toolsItems, accountItems),
+    );
+  }
+
+  Widget _buildSidebarContent(
+    BuildContext context,
+    bool isDark,
+    bool isGuest,
+    List<int> browseItems,
+    List<int> toolsItems,
+    List<int> accountItems,
+  ) {
+    return Column(
+      children: [
+        // App header
+        _buildHeader(context, isDark),
+        const SizedBox(height: 12),
+        // Navigation items
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            children: [
+              if (browseItems.isNotEmpty) ...[
+                _SidebarSection(
+                  title: 'Browse',
+                  isCollapsed: widget.isCollapsed,
+                  children: [
+                    for (final id in browseItems)
+                      _SidebarItem(
+                        icon: _NavItemDef.items[id]!.icon,
+                        label: _NavItemDef.items[id]!.label,
+                        isSelected: widget.selectedIndex == id,
+                        isCollapsed: widget.isCollapsed,
+                        onTap: () => widget.onItemSelected(id),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+              ],
+              if (toolsItems.isNotEmpty) ...[
+                _SidebarSection(
+                  title: 'Tools',
+                  isCollapsed: widget.isCollapsed,
+                  children: [
+                    for (final id in toolsItems)
+                      _SidebarItem(
+                        icon: _NavItemDef.items[id]!.icon,
+                        label: _NavItemDef.items[id]!.label,
+                        isSelected: widget.selectedIndex == id,
+                        isCollapsed: widget.isCollapsed,
+                        onTap: () => widget.onItemSelected(id),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+              ],
+              if (accountItems.isNotEmpty)
+                _SidebarSection(
+                  title: 'Account',
+                  isCollapsed: widget.isCollapsed,
+                  children: [
+                    for (final id in accountItems)
+                      _SidebarItem(
+                        icon: _NavItemDef.items[id]!.icon,
+                        label: _NavItemDef.items[id]!.label,
+                        isSelected: widget.selectedIndex == id,
+                        isCollapsed: widget.isCollapsed,
+                        onTap: () => widget.onItemSelected(id),
+                      ),
+                  ],
+                ),
+            ],
+          ),
+        ),
+        // Settings or Sign Out at bottom
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: isGuest
+              ? _SidebarItem(
+                  icon: CupertinoIcons.square_arrow_right,
+                  label: 'Sign Out',
+                  isSelected: false,
+                  isCollapsed: widget.isCollapsed,
+                  onTap: () => _handleLogout(context),
+                )
+              : _SidebarItem(
+                  icon: CupertinoIcons.settings,
+                  label: 'Settings',
+                  isSelected: widget.selectedIndex == 3,
+                  isCollapsed: widget.isCollapsed,
+                  onTap: () => widget.onItemSelected(3),
+                ),
+        ),
+        const SizedBox(height: 8),
+        // Collapse toggle
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: _GlassCollapseButton(
+            isCollapsed: widget.isCollapsed,
+            onTap: widget.onToggleCollapse,
+          ),
+        ),
+      ],
     );
   }
 

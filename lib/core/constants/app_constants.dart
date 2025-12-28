@@ -26,6 +26,7 @@ class AppConstants {
   static const String proxyConfigKey = 'proxy_config';
   static const String blacklistKey = 'user_blacklist';
   static const String blacklistEnabledKey = 'blacklist_enabled';
+  static const String uiStyleKey = 'ui_style';
 
   /// Default grid columns
   static const int defaultGridColumns = 2;

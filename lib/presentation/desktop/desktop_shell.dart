@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
+import '../../core/theme/ui_style_manager.dart';
 import '../pages/post/post_detail_page.dart';
 import 'pages/desktop_favorites_page.dart';
 import 'pages/desktop_home_page.dart';
@@ -90,6 +91,7 @@ class _DesktopShellState extends State<DesktopShell>
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
 
     return CupertinoPageScaffold(
       child: Container(
@@ -97,19 +99,20 @@ class _DesktopShellState extends State<DesktopShell>
         color: isDark ? const Color(0xFF0A0A0C) : const Color(0xFFF8F8FC),
         child: Stack(
           children: [
-            // Animated gradient background
-            AnimatedBuilder(
-              animation: _bgAnimationController,
-              builder: (context, child) {
-                return CustomPaint(
-                  painter: _ShellBackgroundPainter(
-                    isDark: isDark,
-                    animationValue: _bgAnimationController.value,
-                  ),
-                  size: Size.infinite,
-                );
-              },
-            ),
+            // Animated gradient background (only for liquid glass mode)
+            if (isLiquidGlass)
+              AnimatedBuilder(
+                animation: _bgAnimationController,
+                builder: (context, child) {
+                  return CustomPaint(
+                    painter: _ShellBackgroundPainter(
+                      isDark: isDark,
+                      animationValue: _bgAnimationController.value,
+                    ),
+                    size: Size.infinite,
+                  );
+                },
+              ),
             // Main layout with sidebar
             Row(
               children: [
