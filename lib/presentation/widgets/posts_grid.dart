@@ -45,9 +45,12 @@ class PostsGrid extends StatelessWidget {
 
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
-        if (notification is ScrollEndNotification) {
+        // Trigger load more when user is approaching the end (800 pixels threshold)
+        // Use ScrollUpdateNotification to catch scrolling as it happens
+        if (notification is ScrollUpdateNotification || 
+            notification is ScrollEndNotification) {
           final metrics = notification.metrics;
-          if (metrics.pixels >= metrics.maxScrollExtent - 200) {
+          if (metrics.pixels >= metrics.maxScrollExtent - 800) {
             if (hasMore && !isLoading && onLoadMore != null) {
               onLoadMore!();
             }
@@ -204,9 +207,12 @@ class PostsList extends StatelessWidget {
 
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
-        if (notification is ScrollEndNotification) {
+        // Trigger load more when user is approaching the end (800 pixels threshold)
+        // Use ScrollUpdateNotification to catch scrolling as it happens
+        if (notification is ScrollUpdateNotification || 
+            notification is ScrollEndNotification) {
           final metrics = notification.metrics;
-          if (metrics.pixels >= metrics.maxScrollExtent - 200) {
+          if (metrics.pixels >= metrics.maxScrollExtent - 800) {
             if (hasMore && !isLoading && onLoadMore != null) {
               onLoadMore!();
             }
