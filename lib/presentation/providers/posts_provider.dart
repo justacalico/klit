@@ -77,6 +77,34 @@ class PostsProvider extends ChangeNotifier {
   DateTime? get hotCustomDate => _hotCustomDate;
   DateTime? get popularCustomDate => _popularCustomDate;
 
+  /// Clear all cached posts data (used when host changes)
+  void clearAllPosts() {
+    _latestPosts = [];
+    _hotPosts = [];
+    _popularPosts = [];
+    _searchResults = [];
+    
+    _latestPage = 1;
+    _hotPage = 1;
+    _popularPage = 1;
+    _searchPage = 1;
+    
+    _hasMoreLatest = true;
+    _hasMoreHot = true;
+    _hasMorePopular = true;
+    _hasMoreSearch = true;
+    
+    _latestError = null;
+    _hotError = null;
+    _popularError = null;
+    _searchError = null;
+    
+    _hotCustomDate = null;
+    _popularCustomDate = null;
+    
+    notifyListeners();
+  }
+
   /// Update blacklist settings
   void updateBlacklist(List<String> blacklistLines, bool enabled) {
     _blacklistLines = blacklistLines;

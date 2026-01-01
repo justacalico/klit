@@ -58,11 +58,17 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
       return;
     }
 
+    // Save the new host
     await context.read<SettingsProvider>().setHost(host);
+    
+    // Clear all cached posts so they reload from the new host
+    if (mounted) {
+      context.read<PostsProvider>().clearAllPosts();
+    }
     
     if (mounted) {
       Navigator.of(context).pop();
-      _showSuccess('Host updated successfully');
+      _showSuccess('Host updated. Posts will reload from the new server.');
     }
   }
 
