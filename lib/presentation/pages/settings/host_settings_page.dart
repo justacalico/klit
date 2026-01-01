@@ -1,9 +1,13 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Divider;
 import 'package:provider/provider.dart';
 import '../../../core/constants/constants.dart';
 import '../../../core/utils/helpers.dart';
 import '../../providers/providers.dart';
+
+/// Design constants for the purple/indigo mobile theme
+class _ThemeColors {
+  static const Color primaryPurple = Color(0xFF8B5CF6);
+}
 
 /// Host settings page
 class HostSettingsPage extends StatefulWidget {
@@ -100,10 +104,27 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
 
     return CupertinoPageScaffold(
       backgroundColor: isDark
-          ? AppColors.darkGroupedBackground
-          : AppColors.lightGroupedBackground,
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Server Configuration'),
+          ? const Color(0xFF000000)
+          : CupertinoColors.systemGroupedBackground,
+      navigationBar: CupertinoNavigationBar(
+        backgroundColor: isDark
+            ? const Color(0xFF1C1C1E).withValues(alpha: 0.9)
+            : CupertinoColors.white.withValues(alpha: 0.9),
+        border: Border(
+          bottom: BorderSide(
+            color: isDark
+                ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
+                : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+            width: 0.5,
+          ),
+        ),
+        middle: Text(
+          'Server Configuration',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: isDark ? CupertinoColors.white : CupertinoColors.black,
+          ),
+        ),
       ),
       child: SafeArea(
         child: ListView(
@@ -116,7 +137,7 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
             _buildSectionHeader('CUSTOM SERVER'),
             const SizedBox(height: 8),
             _buildCustomHost(context, isDark),
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
             _buildInfoCard(context, isDark),
           ],
         ),
@@ -126,11 +147,13 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
 
   Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4),
+      padding: const EdgeInsets.only(left: 16, bottom: 4),
       child: Text(
         title,
         style: TextStyle(
           fontSize: 13,
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0.5,
           color: CupertinoColors.secondaryLabel.resolveFrom(context),
         ),
       ),
@@ -140,8 +163,14 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
   Widget _buildPresetHosts(BuildContext context, bool isDark) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
+        color: isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark
+              ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
+              : CupertinoColors.systemGrey5,
+          width: 0.5,
+        ),
       ),
       child: Column(
         children: _presetHosts.asMap().entries.map((entry) {
@@ -152,41 +181,85 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
 
           return Column(
             children: [
-              CupertinoListTile(
-                leading: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.primaryBlue
-                        : CupertinoColors.systemGrey4,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    CupertinoIcons.globe,
-                    size: 20,
-                    color: isSelected
-                        ? CupertinoColors.white
-                        : CupertinoColors.secondaryLabel,
-                  ),
-                ),
-                title: Text(host['name']!),
-                subtitle: Text(host['description']!),
-                trailing: isSelected
-                    ? const Icon(
-                        CupertinoIcons.checkmark_circle_fill,
-                        color: AppColors.primaryBlue,
-                      )
-                    : null,
+              GestureDetector(
                 onTap: () {
+                  HapticUtils.selectionClick();
                   setState(() => _selectedHost = host['url']!);
                   _saveHost(host['url']!);
                 },
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  color: CupertinoColors.transparent,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          gradient: isSelected
+                              ? LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    _ThemeColors.primaryPurple,
+                                    _ThemeColors.primaryPurple.withValues(alpha: 0.8),
+                                  ],
+                                )
+                              : null,
+                          color: isSelected ? null : (isDark ? const Color(0xFF2C2C2E) : CupertinoColors.systemGrey5),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          CupertinoIcons.globe,
+                          size: 20,
+                          color: isSelected
+                              ? CupertinoColors.white
+                              : CupertinoColors.secondaryLabel.resolveFrom(context),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              host['name']!,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              host['description']!,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (isSelected)
+                        Icon(
+                          CupertinoIcons.checkmark_circle_fill,
+                          color: _ThemeColors.primaryPurple,
+                          size: 24,
+                        ),
+                    ],
+                  ),
+                ),
               ),
               if (!isLast)
-                const Padding(
-                  padding: EdgeInsets.only(left: 54),
-                  child: Divider(height: 1),
+                Padding(
+                  padding: const EdgeInsets.only(left: 70),
+                  child: Container(
+                    height: 0.5,
+                    color: isDark
+                        ? CupertinoColors.white.withValues(alpha: 0.1)
+                        : CupertinoColors.systemGrey4,
+                  ),
                 ),
             ],
           );
@@ -201,20 +274,26 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
+        color: isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white,
         borderRadius: BorderRadius.circular(12),
-        border: isCustom
-            ? Border.all(color: AppColors.primaryBlue, width: 2)
-            : null,
+        border: Border.all(
+          color: isCustom
+              ? _ThemeColors.primaryPurple
+              : (isDark
+                  ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
+                  : CupertinoColors.systemGrey5),
+          width: isCustom ? 2 : 0.5,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Custom Host URL',
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
+              color: isDark ? CupertinoColors.white : CupertinoColors.black,
             ),
           ),
           const SizedBox(height: 12),
@@ -223,33 +302,41 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
             placeholder: 'https://example.com',
             keyboardType: TextInputType.url,
             padding: const EdgeInsets.all(14),
+            style: TextStyle(
+              color: isDark ? CupertinoColors.white : CupertinoColors.black,
+            ),
+            placeholderStyle: TextStyle(
+              color: CupertinoColors.placeholderText.resolveFrom(context),
+            ),
             decoration: BoxDecoration(
-              color: CupertinoColors.systemGrey6.resolveFrom(context),
+              color: isDark ? const Color(0xFF2C2C2E) : CupertinoColors.systemGrey6,
               borderRadius: BorderRadius.circular(10),
             ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: CupertinoButton(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  color: AppColors.primaryBlue,
-                  borderRadius: BorderRadius.circular(10),
-                  onPressed: () {
-                    final url = _customHostController.text.trim();
-                    if (url.isNotEmpty) {
-                      setState(() => _selectedHost = url);
-                      _saveHost(url);
-                    }
-                  },
-                  child: const Text(
-                    'Use Custom Host',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: CupertinoButton(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              color: _ThemeColors.primaryPurple,
+              borderRadius: BorderRadius.circular(10),
+              onPressed: () {
+                HapticUtils.selectionClick();
+                final url = _customHostController.text.trim();
+                if (url.isNotEmpty) {
+                  setState(() => _selectedHost = url);
+                  _saveHost(url);
+                }
+              },
+              child: const Text(
+                'Use Custom Host',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  color: CupertinoColors.white,
                 ),
               ),
-            ],
+            ),
           ),
         ],
       ),
@@ -260,22 +347,31 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.primaryBlue.withValues(alpha: 0.1),
+        color: _ThemeColors.primaryPurple.withValues(alpha: isDark ? 0.15 : 0.1),
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: _ThemeColors.primaryPurple.withValues(alpha: 0.2),
+          width: 0.5,
+        ),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
-            CupertinoIcons.info_circle,
-            color: AppColors.primaryBlue,
+          Icon(
+            CupertinoIcons.info_circle_fill,
+            color: _ThemeColors.primaryPurple,
+            size: 22,
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Custom hosts must be compatible with the e926 API. Changing the host will affect all new requests.',
+              'Custom hosts must be compatible with the e621 API. Changing the host will affect all new requests.',
               style: TextStyle(
-                fontSize: 13,
-                color: CupertinoColors.label.resolveFrom(context),
+                fontSize: 14,
+                height: 1.4,
+                color: isDark
+                    ? CupertinoColors.white.withValues(alpha: 0.9)
+                    : CupertinoColors.black.withValues(alpha: 0.8),
               ),
             ),
           ),
