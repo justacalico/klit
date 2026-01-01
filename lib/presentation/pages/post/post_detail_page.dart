@@ -311,6 +311,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   void _openFullMedia() {
     if (_currentPost == null) return;
 
+    // Handle videos with the video viewer
     if (_currentPost!.isVideo) {
       if (_currentPost!.file.url == null) return;
       Navigator.of(context).push(
@@ -705,6 +706,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   Widget _buildImage(Post post) {
+    // Handle videos with the video player
     if (post.isVideo && post.file.url != null) {
       return AspectRatio(
         aspectRatio: post.file.aspectRatio.clamp(0.5, 2.0),
@@ -720,7 +722,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
       );
     }
 
-    final imageUrl = post.sample.has ? post.sample.url : post.preview.url;
+    // For GIFs, use the full file URL to preserve animation
+    // For other images, use sample if available
+    final imageUrl = post.isGif 
+        ? post.file.url 
+        : (post.sample.has ? post.sample.url : post.preview.url);
 
     if (imageUrl == null) {
       return AspectRatio(
