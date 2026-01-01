@@ -245,15 +245,16 @@ class AccountManagementPage extends StatelessWidget {
           CupertinoDialogAction(
             isDestructiveAction: true,
             onPressed: () async {
-              Navigator.of(dialogContext).pop();
+              // Get references BEFORE popping the dialog
               final auth = context.read<AuthProvider>();
+              final navigator = Navigator.of(context);
+              
+              Navigator.of(dialogContext).pop();
               final noAccountsLeft = await auth.removeAccount(accountId);
 
-              if (noAccountsLeft && context.mounted) {
+              if (noAccountsLeft) {
                 // No accounts left, go to login page
-                Navigator.of(
-                  context,
-                ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+                navigator.pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
               }
             },
             child: const Text('Remove'),

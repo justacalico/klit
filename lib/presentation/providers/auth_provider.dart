@@ -116,7 +116,16 @@ class AuthProvider extends ChangeNotifier {
     _accounts = await _authService.getAccounts();
 
     if (_currentAccount?.id == accountId) {
-      _currentAccount = _accounts.isNotEmpty ? _accounts.first : null;
+      // Current account was removed, switch to another if available
+      if (_accounts.isNotEmpty) {
+        _currentAccount = _accounts.first;
+        // Update API service with new account's credentials
+        _apiService?.setBaseUrl(_currentAccount!.host);
+        _apiService?.setAuth(_currentAccount!.username, _currentAccount!.apiKey);
+      } else {
+        _currentAccount = null;
+        _apiService?.clearAuth();
+      }
     }
 
     _isLoading = false;

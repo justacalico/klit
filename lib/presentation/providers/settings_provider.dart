@@ -7,6 +7,9 @@ import '../../data/services/services.dart';
 /// Callback type for when proxy configuration changes
 typedef ProxyChangeCallback = void Function(ProxyConfig config);
 
+/// Callback type for when host changes
+typedef HostChangeCallback = void Function(String host);
+
 /// Provider for app settings
 class SettingsProvider extends ChangeNotifier {
   final StorageService _storageService;
@@ -28,6 +31,9 @@ class SettingsProvider extends ChangeNotifier {
 
   /// Callback to notify when proxy configuration changes
   ProxyChangeCallback? onProxyChanged;
+  
+  /// Callback to notify when host changes
+  HostChangeCallback? onHostChanged;
 
   SettingsProvider({required StorageService storageService})
       : _storageService = storageService;
@@ -150,6 +156,7 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> setHost(String host) async {
     _host = host;
     await _storageService.setHost(host);
+    onHostChanged?.call(host);
     notifyListeners();
   }
 

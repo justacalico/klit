@@ -19,8 +19,9 @@ void main() async {
   final settingsProvider = SettingsProvider(storageService: storageService);
   await settingsProvider.initialize();
 
-  // Create API service with proxy configuration
+  // Create API service with proxy configuration and initial host
   final apiService = ApiService(
+    baseUrl: settingsProvider.host,
     proxyConfig: settingsProvider.proxyConfig,
   );
   
@@ -39,6 +40,12 @@ void main() async {
   authProvider.setApiService(apiService);
   await authProvider.initialize();
   final postsProvider = PostsProvider(apiService: apiService);
+  
+  // Listen for host changes - update API service and clear cached posts
+  settingsProvider.onHostChanged = (host) {
+    apiService.setBaseUrl(host);
+    postsProvider.clearAllPosts();
+  };
   
   // Sync blacklist from settings to posts provider
   postsProvider.updateBlacklist(
