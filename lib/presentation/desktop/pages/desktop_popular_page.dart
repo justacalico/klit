@@ -107,9 +107,14 @@ class _DesktopPopularPageState extends State<DesktopPopularPage> {
                     child: TimeRangeSelector(
                       selected: postsProvider.popularTimeRange,
                       options: const ['day', 'week', 'month'],
+                      customDate: postsProvider.popularCustomDate,
                       onChanged: (range) {
-                        postsProvider.setPopularTimeRange(range);
-                        _loadPosts(refresh: true);
+                        final settingsProvider = context.read<SettingsProvider>();
+                        postsProvider.setPopularTimeRange(range, safeMode: settingsProvider.safeMode);
+                      },
+                      onDateSelected: (date) {
+                        final settingsProvider = context.read<SettingsProvider>();
+                        postsProvider.setPopularCustomDate(date, safeMode: settingsProvider.safeMode);
                       },
                     ),
                   ),

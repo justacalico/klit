@@ -41,6 +41,8 @@ class PostsProvider extends ChangeNotifier {
   String _currentSearchQuery = '';
   String _hotTimeRange = 'day';
   String _popularTimeRange = 'day';
+  DateTime? _hotCustomDate;
+  DateTime? _popularCustomDate;
 
   // Blacklist
   List<String> _blacklistLines = [];
@@ -72,6 +74,8 @@ class PostsProvider extends ChangeNotifier {
   String get currentSearchQuery => _currentSearchQuery;
   String get hotTimeRange => _hotTimeRange;
   String get popularTimeRange => _popularTimeRange;
+  DateTime? get hotCustomDate => _hotCustomDate;
+  DateTime? get popularCustomDate => _popularCustomDate;
 
   /// Update blacklist settings
   void updateBlacklist(List<String> blacklistLines, bool enabled) {
@@ -220,15 +224,35 @@ class PostsProvider extends ChangeNotifier {
 
     // Hot posts are sorted by score with a time range
     String timeTag;
-    switch (_hotTimeRange) {
-      case 'week':
-        timeTag = 'date:week';
-        break;
-      case 'month':
-        timeTag = 'date:month';
-        break;
-      default:
-        timeTag = 'date:day';
+    if (_hotCustomDate != null) {
+      // Use custom date - show posts from that specific day/week/month
+      final date = _hotCustomDate!;
+      final dateStr = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      switch (_hotTimeRange) {
+        case 'week':
+          final endDate = date.add(const Duration(days: 7));
+          final endStr = '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}';
+          timeTag = 'date:>=$dateStr date:<$endStr';
+          break;
+        case 'month':
+          final endDate = DateTime(date.year, date.month + 1, date.day);
+          final endStr = '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}';
+          timeTag = 'date:>=$dateStr date:<$endStr';
+          break;
+        default:
+          timeTag = 'date:$dateStr';
+      }
+    } else {
+      switch (_hotTimeRange) {
+        case 'week':
+          timeTag = 'date:week';
+          break;
+        case 'month':
+          timeTag = 'date:month';
+          break;
+        default:
+          timeTag = 'date:day';
+      }
     }
 
     final result = await _apiService.getPosts(
@@ -263,8 +287,15 @@ class PostsProvider extends ChangeNotifier {
   void setHotTimeRange(String range, {bool safeMode = false}) {
     if (_hotTimeRange != range) {
       _hotTimeRange = range;
+      _hotCustomDate = null; // Clear custom date when changing range
       loadHotPosts(refresh: true, safeMode: safeMode);
     }
+  }
+
+  /// Set hot custom date and refresh
+  void setHotCustomDate(DateTime? date, {bool safeMode = false}) {
+    _hotCustomDate = date;
+    loadHotPosts(refresh: true, safeMode: safeMode);
   }
 
   /// Load popular posts
@@ -286,6 +317,7 @@ class PostsProvider extends ChangeNotifier {
       scale: _popularTimeRange,
       page: _popularPage,
       safeMode: safeMode,
+      customDate: _popularCustomDate,
     );
 
     result.when(
@@ -312,8 +344,15 @@ class PostsProvider extends ChangeNotifier {
   void setPopularTimeRange(String range, {bool safeMode = false}) {
     if (_popularTimeRange != range) {
       _popularTimeRange = range;
+      _popularCustomDate = null; // Clear custom date when changing range
       loadPopularPosts(refresh: true, safeMode: safeMode);
     }
+  }
+
+  /// Set popular custom date and refresh
+  void setPopularCustomDate(DateTime? date, {bool safeMode = false}) {
+    _popularCustomDate = date;
+    loadPopularPosts(refresh: true, safeMode: safeMode);
   }
 
   /// Search posts

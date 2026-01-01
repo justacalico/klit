@@ -368,33 +368,57 @@ class ApiService {
 
   /// Get popular posts - uses posts endpoint with order:score and date range
   /// If [safeMode] is true, only safe-rated posts will be returned
+  /// If [customDate] is provided, uses that as the starting date instead of now
   Future<ApiResult<List<Post>>> getPopularPosts({
     String scale = 'day',
     int page = 1,
     bool safeMode = false,
+    DateTime? customDate,
   }) async {
     try {
       // Build date range tags based on scale
-      final now = DateTime.now();
+      final baseDate = customDate ?? DateTime.now();
       String dateTags;
 
-      switch (scale) {
-        case 'week':
-          final weekAgo = now.subtract(const Duration(days: 7));
-          dateTags =
-              'date:>=${weekAgo.year}-${weekAgo.month.toString().padLeft(2, '0')}-${weekAgo.day.toString().padLeft(2, '0')}';
-          break;
-        case 'month':
-          final monthAgo = now.subtract(const Duration(days: 30));
-          dateTags =
-              'date:>=${monthAgo.year}-${monthAgo.month.toString().padLeft(2, '0')}-${monthAgo.day.toString().padLeft(2, '0')}';
-          break;
-        case 'day':
-        default:
-          final yesterday = now.subtract(const Duration(days: 1));
-          dateTags =
-              'date:>=${yesterday.year}-${yesterday.month.toString().padLeft(2, '0')}-${yesterday.day.toString().padLeft(2, '0')}';
-          break;
+      if (customDate != null) {
+        // Custom date mode - show posts from that specific period
+        final dateStr = '${baseDate.year}-${baseDate.month.toString().padLeft(2, '0')}-${baseDate.day.toString().padLeft(2, '0')}';
+        switch (scale) {
+          case 'week':
+            final endDate = baseDate.add(const Duration(days: 7));
+            final endStr = '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}';
+            dateTags = 'date:>=$dateStr date:<$endStr';
+            break;
+          case 'month':
+            final endDate = DateTime(baseDate.year, baseDate.month + 1, baseDate.day);
+            final endStr = '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}';
+            dateTags = 'date:>=$dateStr date:<$endStr';
+            break;
+          case 'day':
+          default:
+            dateTags = 'date:$dateStr';
+            break;
+        }
+      } else {
+        // Normal mode - show posts from now going back
+        switch (scale) {
+          case 'week':
+            final weekAgo = baseDate.subtract(const Duration(days: 7));
+            dateTags =
+                'date:>=${weekAgo.year}-${weekAgo.month.toString().padLeft(2, '0')}-${weekAgo.day.toString().padLeft(2, '0')}';
+            break;
+          case 'month':
+            final monthAgo = baseDate.subtract(const Duration(days: 30));
+            dateTags =
+                'date:>=${monthAgo.year}-${monthAgo.month.toString().padLeft(2, '0')}-${monthAgo.day.toString().padLeft(2, '0')}';
+            break;
+          case 'day':
+          default:
+            final yesterday = baseDate.subtract(const Duration(days: 1));
+            dateTags =
+                'date:>=${yesterday.year}-${yesterday.month.toString().padLeft(2, '0')}-${yesterday.day.toString().padLeft(2, '0')}';
+            break;
+        }
       }
 
       // Add rating:safe tag if safe mode is enabled

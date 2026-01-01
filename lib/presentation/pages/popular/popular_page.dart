@@ -97,8 +97,12 @@ class _PopularPageState extends State<PopularPage> {
                 return TimeRangeSelector(
                   selected: postsProvider.popularTimeRange,
                   options: const ['day', 'week', 'month'],
+                  customDate: postsProvider.popularCustomDate,
                   onChanged: (range) {
-                    postsProvider.setPopularTimeRange(range);
+                    postsProvider.setPopularTimeRange(range, safeMode: _shouldEnforceSafeMode(context));
+                  },
+                  onDateSelected: (date) {
+                    postsProvider.setPopularCustomDate(date, safeMode: _shouldEnforceSafeMode(context));
                   },
                 );
               },

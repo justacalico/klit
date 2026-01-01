@@ -97,8 +97,12 @@ class _HotPageState extends State<HotPage> {
                 return TimeRangeSelector(
                   selected: postsProvider.hotTimeRange,
                   options: const ['day', 'week', 'month'],
+                  customDate: postsProvider.hotCustomDate,
                   onChanged: (range) {
-                    postsProvider.setHotTimeRange(range);
+                    postsProvider.setHotTimeRange(range, safeMode: _shouldEnforceSafeMode(context));
+                  },
+                  onDateSelected: (date) {
+                    postsProvider.setHotCustomDate(date, safeMode: _shouldEnforceSafeMode(context));
                   },
                 );
               },

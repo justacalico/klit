@@ -107,9 +107,14 @@ class _DesktopHotPageState extends State<DesktopHotPage> {
                     child: TimeRangeSelector(
                       selected: postsProvider.hotTimeRange,
                       options: const ['day', 'week', 'month'],
+                      customDate: postsProvider.hotCustomDate,
                       onChanged: (range) {
-                        postsProvider.setHotTimeRange(range);
-                        _loadPosts(refresh: true);
+                        final settingsProvider = context.read<SettingsProvider>();
+                        postsProvider.setHotTimeRange(range, safeMode: settingsProvider.safeMode);
+                      },
+                      onDateSelected: (date) {
+                        final settingsProvider = context.read<SettingsProvider>();
+                        postsProvider.setHotCustomDate(date, safeMode: settingsProvider.safeMode);
                       },
                     ),
                   ),
