@@ -541,6 +541,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
   Widget _buildActionBar(int index, Post post, bool isDark, bool isOled) {
     final authProvider = context.watch<AuthProvider>();
     final isGuest = authProvider.isGuest;
+    
+    // Don't show action bar for guest users
+    if (isGuest) {
+      return const SizedBox.shrink();
+    }
+    
     final isFav = _isFavorited[index] ?? post.isFavorited;
     final userVote = _userVote[index];
     final isVoting = _isVoting[index] == true;
@@ -558,19 +564,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
       isDark: isDark,
       onTap: () => _showComments(index),
     );
-
-    // Guest users only see comment button
-    if (isGuest) {
-      return _buildLiquidGlassContainer(
-        isDark: isDark,
-        isOled: isOled,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [commentButton],
-        ),
-      );
-    }
 
     final upvoteButton = _buildGlassActionButton(
       icon: CupertinoIcons.arrow_up_circle,
