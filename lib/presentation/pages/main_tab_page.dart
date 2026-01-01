@@ -101,8 +101,13 @@ class _MainTabPageState extends State<MainTabPage> {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
     final isGuest = context.watch<AuthProvider>().isGuest;
-    final navOrder = context.watch<SettingsProvider>().mobileNavOrder;
+    final rawNavOrder = context.watch<SettingsProvider>().mobileNavOrder;
     final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
+
+    // Filter out Profile (id 3) when in guest mode
+    final navOrder = isGuest
+        ? rawNavOrder.where((id) => id != 3).toList()
+        : rawNavOrder;
 
     // Build pages list based on custom order
     final orderedPages = navOrder.map((id) => _allPages[id]!).toList();
