@@ -76,13 +76,16 @@ class _MainTabPageState extends State<MainTabPage> {
         actions: [
           CupertinoDialogAction(
             isDestructiveAction: true,
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(dialogContext).pop();
               final authProvider = context.read<AuthProvider>();
-              authProvider.logout();
-              Navigator.of(
-                context,
-              ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+              await authProvider.logout();
+              if (context.mounted) {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  AppRoutes.login,
+                  (route) => false,
+                );
+              }
             },
             child: const Text('Sign Out'),
           ),
