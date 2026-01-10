@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import '../models/models.dart';
 import 'api_service.dart';
 import 'storage_service.dart';
@@ -10,8 +11,8 @@ class AuthService {
   AuthService({
     required ApiService apiService,
     required StorageService storageService,
-  })  : _apiService = apiService,
-        _storageService = storageService;
+  }) : _apiService = apiService,
+       _storageService = storageService;
 
   /// Check if user is logged in
   Future<bool> isLoggedIn() async {
@@ -35,11 +36,21 @@ class AuthService {
     required String apiKey,
     String? host,
   }) async {
-    // Set the host if provided
-    final targetHost = host ?? _storageService.getHost();
+    // Use provided host, or default to e926.net for new account logins
+    final targetHost = host ?? 'https://e926.net';
+    if (kDebugMode) {
+      print('AuthService.login: username=$username');
+      print(
+        'AuthService.login: apiKey=${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}',
+      );
+      print('AuthService.login: host=$host, targetHost=$targetHost');
+    }
     _apiService.setBaseUrl(targetHost);
 
     // Verify credentials
+    if (kDebugMode) {
+      print('AuthService.login: Calling verifyCredentials...');
+    }
     final result = await _apiService.verifyCredentials(username, apiKey);
 
     return result.when(

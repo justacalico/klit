@@ -129,10 +129,18 @@ class AccountManagementPage extends StatelessWidget {
                     onTap: isActive
                         ? null
                         : () async {
+                            final auth = context.read<AuthProvider>();
+                            final posts = context.read<PostsProvider>();
+                            final settings = context.read<SettingsProvider>();
+
                             final success = await auth.switchAccount(
                               account.id,
                             );
                             if (success && context.mounted) {
+                              // Clear all cached posts
+                              posts.clearAllPosts();
+                              // Update settings host to match the account's host
+                              await settings.setHost(account.host);
                               // Navigate to main and clear stack to refresh the app
                               Navigator.of(context).pushNamedAndRemoveUntil(
                                 AppRoutes.main,
@@ -204,8 +212,20 @@ class AccountManagementPage extends StatelessWidget {
               onPressed: () async {
                 Navigator.of(context).pop();
                 final auth = context.read<AuthProvider>();
+                final posts = context.read<PostsProvider>();
+                final settings = context.read<SettingsProvider>();
+
+                // Get the account before switching to access its host
+                final account = auth.accounts.firstWhere(
+                  (a) => a.id == accountId,
+                );
+
                 final success = await auth.switchAccount(accountId);
                 if (success && context.mounted) {
+                  // Clear all cached posts
+                  posts.clearAllPosts();
+                  // Update settings host to match the account's host
+                  await settings.setHost(account.host);
                   // Navigate to main and clear stack to refresh the app
                   Navigator.of(
                     context,
@@ -248,13 +268,16 @@ class AccountManagementPage extends StatelessWidget {
               // Get references BEFORE popping the dialog
               final auth = context.read<AuthProvider>();
               final navigator = Navigator.of(context);
-              
+
               Navigator.of(dialogContext).pop();
               final noAccountsLeft = await auth.removeAccount(accountId);
 
               if (noAccountsLeft) {
                 // No accounts left, go to login page
-                navigator.pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+                navigator.pushNamedAndRemoveUntil(
+                  AppRoutes.login,
+                  (route) => false,
+                );
               }
             },
             child: const Text('Remove'),
@@ -293,24 +316,83 @@ class _AddAccountSheetState extends State<_AddAccountSheet> {
     super.dispose();
   }
 
+  void _showValidationError(String message) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('Validation Error'),
+        content: Text(message),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('OK'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _addAccount() async {
-    if (_usernameController.text.isEmpty || _apiKeyController.text.isEmpty) {
+    final username = _usernameController.text.trim();
+    final apiKey = _apiKeyController.text.trim();
+    final host = _useCustomHost ? _hostController.text.trim() : null;
+
+    // Validate username
+    if (username.isEmpty) {
+      _showValidationError('Username is required');
       return;
+    }
+    if (username.length < 3) {
+      _showValidationError('Username must be at least 3 characters');
+      return;
+    }
+
+    // Validate API key
+    if (apiKey.isEmpty) {
+      _showValidationError('API key is required');
+      return;
+    }
+    if (apiKey.length < 24) {
+      _showValidationError('API key is too short');
+      return;
+    }
+
+    // Validate host if custom
+    if (_useCustomHost && host != null) {
+      final urlPattern = RegExp(
+        r'^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$',
+      );
+      if (!urlPattern.hasMatch(host)) {
+        _showValidationError('Please enter a valid URL');
+        return;
+      }
     }
 
     setState(() => _isLoading = true);
 
     final auth = context.read<AuthProvider>();
+    final posts = context.read<PostsProvider>();
+    final settings = context.read<SettingsProvider>();
+
     final success = await auth.login(
-      username: _usernameController.text.trim(),
-      apiKey: _apiKeyController.text.trim(),
-      host: _useCustomHost ? _hostController.text.trim() : null,
+      username: username,
+      apiKey: apiKey,
+      host: host,
     );
 
     setState(() => _isLoading = false);
 
     if (success && mounted) {
+      // Clear all cached posts since we have a new account
+      posts.clearAllPosts();
+      // Update settings host to match the new account's host
+      final newHost = host ?? 'https://e926.net';
+      await settings.setHost(newHost);
+      // Pop the sheet and navigate to main to refresh everything
       Navigator.of(context).pop();
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.main, (route) => false);
     } else if (auth.error != null && mounted) {
       showCupertinoDialog(
         context: context,

@@ -150,15 +150,14 @@ class StorageService {
       apiKey: apiKey,
       host: host,
       createdAt: DateTime.now(),
-      isActive: accounts.isEmpty,
+      isActive: true,
     );
 
     accounts.add(account);
     await saveAccounts(accounts);
 
-    if (accounts.length == 1) {
-      await setActiveAccountId(account.id);
-    }
+    // Always set new account as active
+    await setActiveAccountId(account.id);
 
     return account;
   }

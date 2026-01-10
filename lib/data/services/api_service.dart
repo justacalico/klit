@@ -38,7 +38,9 @@ class ApiService {
       InterceptorsWrapper(
         onRequest: (options, handler) async {
           await _enforceRateLimit();
-          if (_authHeader != null) {
+          // Only set auth header if not already explicitly provided in the request
+          if (_authHeader != null &&
+              !options.headers.containsKey('Authorization')) {
             options.headers['Authorization'] = _authHeader;
           }
           handler.next(options);
@@ -79,10 +81,10 @@ class ApiService {
         createHttpClient: () {
           final client = HttpClient();
           client.findProxy = (uri) => _proxyConfig.findProxyString;
-          
+
           // Set up proxy authentication if enabled
-          if (_proxyConfig.useAuthentication && 
-              _proxyConfig.username != null && 
+          if (_proxyConfig.useAuthentication &&
+              _proxyConfig.username != null &&
               _proxyConfig.username!.isNotEmpty) {
             client.addProxyCredentials(
               _proxyConfig.host,
@@ -94,11 +96,11 @@ class ApiService {
               ),
             );
           }
-          
+
           // Allow bad certificates for proxy servers (common for local proxies)
           // In production, you might want to make this configurable
           client.badCertificateCallback = (cert, host, port) => true;
-          
+
           return client;
         },
       );
@@ -233,21 +235,60 @@ class ApiService {
         createdAt: DateTime.now(),
       ).basicAuthHeader;
 
+      if (kDebugMode) {
+        print('ApiService.verifyCredentials: username=$username');
+        print('ApiService.verifyCredentials: baseUrl=$_baseUrl');
+        print('ApiService.verifyCredentials: endpoint=/users/$username.json');
+        print(
+          'ApiService.verifyCredentials: authHeader=${tempAuth.substring(0, 10)}...',
+        );
+      }
+
       final response = await _dio.get(
         '/users/$username.json',
         options: Options(headers: {'Authorization': tempAuth}),
       );
 
+      if (kDebugMode) {
+        print(
+          'ApiService.verifyCredentials: statusCode=${response.statusCode}',
+        );
+        print(
+          'ApiService.verifyCredentials: response data type=${response.data?.runtimeType}',
+        );
+        print('ApiService.verifyCredentials: response data=${response.data}');
+      }
+
       if (response.statusCode == 200 && response.data != null) {
         return ApiResult.success(true);
       }
+      if (kDebugMode) {
+        print(
+          'ApiService.verifyCredentials: Failed - status not 200 or data null',
+        );
+      }
       return ApiResult.failure(ApiException.unauthorized());
     } on DioException catch (e) {
+      if (kDebugMode) {
+        print('ApiService.verifyCredentials: DioException caught');
+        print('ApiService.verifyCredentials: error type=${e.type}');
+        print('ApiService.verifyCredentials: error message=${e.message}');
+        print(
+          'ApiService.verifyCredentials: response statusCode=${e.response?.statusCode}',
+        );
+        print(
+          'ApiService.verifyCredentials: response data=${e.response?.data}',
+        );
+        print('ApiService.verifyCredentials: inner error=${e.error}');
+      }
       if (e.error is ApiException) {
         return ApiResult.failure(e.error as ApiException);
       }
       return ApiResult.failure(ApiException.unknown(e));
     } catch (e) {
+      if (kDebugMode) {
+        print('ApiService.verifyCredentials: Generic exception: $e');
+      }
       return ApiResult.failure(ApiException.unknown(e));
     }
   }
@@ -382,16 +423,23 @@ class ApiService {
 
       if (customDate != null) {
         // Custom date mode - show posts from that specific period
-        final dateStr = '${baseDate.year}-${baseDate.month.toString().padLeft(2, '0')}-${baseDate.day.toString().padLeft(2, '0')}';
+        final dateStr =
+            '${baseDate.year}-${baseDate.month.toString().padLeft(2, '0')}-${baseDate.day.toString().padLeft(2, '0')}';
         switch (scale) {
           case 'week':
             final endDate = baseDate.add(const Duration(days: 7));
-            final endStr = '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}';
+            final endStr =
+                '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}';
             dateTags = 'date:>=$dateStr date:<$endStr';
             break;
           case 'month':
-            final endDate = DateTime(baseDate.year, baseDate.month + 1, baseDate.day);
-            final endStr = '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}';
+            final endDate = DateTime(
+              baseDate.year,
+              baseDate.month + 1,
+              baseDate.day,
+            );
+            final endStr =
+                '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}';
             dateTags = 'date:>=$dateStr date:<$endStr';
             break;
           case 'day':
