@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
+import '../../core/input/input.dart';
 import '../../core/theme/ui_style_manager.dart';
 import '../pages/post/post_detail_page.dart';
 import 'pages/desktop_favorites_page.dart';
@@ -20,6 +22,7 @@ class _ShellColors {
 }
 
 /// Desktop shell with macOS-style sidebar navigation and modern design
+/// Includes full gamepad/controller support for SteamOS and Steam Deck
 class DesktopShell extends StatefulWidget {
   const DesktopShell({super.key});
 
@@ -28,7 +31,7 @@ class DesktopShell extends StatefulWidget {
 }
 
 class _DesktopShellState extends State<DesktopShell>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, GamepadInputMixin {
   int _selectedIndex = 0;
   bool _sidebarCollapsed = false;
 
@@ -39,6 +42,20 @@ class _DesktopShellState extends State<DesktopShell>
   // Background animation
   late AnimationController _bgAnimationController;
 
+  // Controller state
+  bool _showControllerMode = false;
+
+  // Navigation indices for sidebar (for controller navigation)
+  static const List<int> _sidebarNavOrder = [
+    0,
+    1,
+    2,
+    6,
+    4,
+    5,
+    3,
+  ]; // Home, Hot, Popular, Favorites, Search, Profile, Settings
+
   @override
   void initState() {
     super.initState();
@@ -46,12 +63,77 @@ class _DesktopShellState extends State<DesktopShell>
       vsync: this,
       duration: const Duration(seconds: 15),
     )..repeat();
+
+    // Check if controller is connected
+    _showControllerMode = gamepad.isConnected;
+
+    // Listen for controller connection changes
+    gamepad.stateChanges.listen((state) {
+      if (mounted && state.isConnected != _showControllerMode) {
+        setState(() => _showControllerMode = state.isConnected);
+      }
+    });
   }
 
   @override
   void dispose() {
     _bgAnimationController.dispose();
     super.dispose();
+  }
+
+  /// Handle gamepad D-pad navigation for sidebar
+  /// Up/Down navigates sidebar items when no post detail is open
+  @override
+  void onGamepadDirection(GamepadDirection direction) {
+    if (!mounted) return;
+
+    // Don't handle if post detail is open (it handles its own navigation)
+    if (_postDetailArgs != null) return;
+
+    final currentNavIndex = _sidebarNavOrder.indexOf(_selectedIndex);
+
+    switch (direction) {
+      case GamepadDirection.up:
+        // Navigate to previous sidebar item
+        if (currentNavIndex > 0) {
+          _onNavItemSelected(_sidebarNavOrder[currentNavIndex - 1]);
+          HapticFeedback.selectionClick();
+        }
+
+      case GamepadDirection.down:
+        // Navigate to next sidebar item
+        if (currentNavIndex < _sidebarNavOrder.length - 1) {
+          _onNavItemSelected(_sidebarNavOrder[currentNavIndex + 1]);
+          HapticFeedback.selectionClick();
+        }
+
+      default:
+        break;
+    }
+  }
+
+  /// Handle gamepad button presses
+  @override
+  void onGamepadButton(GamepadButton button) {
+    if (!mounted) return;
+
+    // Don't handle if post detail is open (it handles its own buttons)
+    if (_postDetailArgs != null) return;
+
+    switch (button) {
+      case GamepadButton.start:
+        // Toggle sidebar collapse
+        _toggleSidebar();
+        HapticFeedback.mediumImpact();
+
+      case GamepadButton.select:
+        // Open search
+        _openSearch();
+        HapticFeedback.mediumImpact();
+
+      default:
+        break;
+    }
   }
 
   void _onNavItemSelected(int index) {
@@ -124,11 +206,7 @@ class _DesktopShellState extends State<DesktopShell>
                   onToggleCollapse: _toggleSidebar,
                 ),
                 // Main content area
-                Expanded(
-                  child: ClipRect(
-                    child: _buildMainContent(),
-                  ),
-                ),
+                Expanded(child: ClipRect(child: _buildMainContent())),
               ],
             ),
             // Full-screen post detail overlay
@@ -174,9 +252,7 @@ class _DesktopShellState extends State<DesktopShell>
           },
         );
       case 6:
-        return DesktopFavoritesPage(
-          onPostTap: _openPostDetail,
-        );
+        return DesktopFavoritesPage(onPostTap: _openPostDetail);
       default:
         return DesktopHomePage(
           onPostTap: _openPostDetail,
@@ -208,10 +284,7 @@ class _ShellBackgroundPainter extends CustomPainter {
   final bool isDark;
   final double animationValue;
 
-  _ShellBackgroundPainter({
-    required this.isDark,
-    required this.animationValue,
-  });
+  _ShellBackgroundPainter({required this.isDark, required this.animationValue});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -229,17 +302,18 @@ class _ShellBackgroundPainter extends CustomPainter {
           ];
 
     // Top right orb
-    paint.shader = RadialGradient(
-      colors: [colors[0], colors[0].withValues(alpha: 0)],
-    ).createShader(
-      Rect.fromCircle(
-        center: Offset(
-          size.width * 0.85 + math.sin(animationValue * math.pi * 2) * 30,
-          size.height * 0.15 + math.cos(animationValue * math.pi * 2) * 25,
-        ),
-        radius: size.width * 0.4,
-      ),
-    );
+    paint.shader =
+        RadialGradient(
+          colors: [colors[0], colors[0].withValues(alpha: 0)],
+        ).createShader(
+          Rect.fromCircle(
+            center: Offset(
+              size.width * 0.85 + math.sin(animationValue * math.pi * 2) * 30,
+              size.height * 0.15 + math.cos(animationValue * math.pi * 2) * 25,
+            ),
+            radius: size.width * 0.4,
+          ),
+        );
     canvas.drawCircle(
       Offset(
         size.width * 0.85 + math.sin(animationValue * math.pi * 2) * 30,
@@ -250,17 +324,18 @@ class _ShellBackgroundPainter extends CustomPainter {
     );
 
     // Bottom left orb
-    paint.shader = RadialGradient(
-      colors: [colors[1], colors[1].withValues(alpha: 0)],
-    ).createShader(
-      Rect.fromCircle(
-        center: Offset(
-          size.width * 0.2 + math.cos(animationValue * math.pi * 2) * 20,
-          size.height * 0.8 + math.sin(animationValue * math.pi * 2) * 30,
-        ),
-        radius: size.width * 0.35,
-      ),
-    );
+    paint.shader =
+        RadialGradient(
+          colors: [colors[1], colors[1].withValues(alpha: 0)],
+        ).createShader(
+          Rect.fromCircle(
+            center: Offset(
+              size.width * 0.2 + math.cos(animationValue * math.pi * 2) * 20,
+              size.height * 0.8 + math.sin(animationValue * math.pi * 2) * 30,
+            ),
+            radius: size.width * 0.35,
+          ),
+        );
     canvas.drawCircle(
       Offset(
         size.width * 0.2 + math.cos(animationValue * math.pi * 2) * 20,
@@ -271,17 +346,20 @@ class _ShellBackgroundPainter extends CustomPainter {
     );
 
     // Center right orb
-    paint.shader = RadialGradient(
-      colors: [colors[2], colors[2].withValues(alpha: 0)],
-    ).createShader(
-      Rect.fromCircle(
-        center: Offset(
-          size.width * 0.7 + math.sin(animationValue * math.pi * 2 + 1) * 25,
-          size.height * 0.5 + math.cos(animationValue * math.pi * 2 + 1) * 35,
-        ),
-        radius: size.width * 0.3,
-      ),
-    );
+    paint.shader =
+        RadialGradient(
+          colors: [colors[2], colors[2].withValues(alpha: 0)],
+        ).createShader(
+          Rect.fromCircle(
+            center: Offset(
+              size.width * 0.7 +
+                  math.sin(animationValue * math.pi * 2 + 1) * 25,
+              size.height * 0.5 +
+                  math.cos(animationValue * math.pi * 2 + 1) * 35,
+            ),
+            radius: size.width * 0.3,
+          ),
+        );
     canvas.drawCircle(
       Offset(
         size.width * 0.7 + math.sin(animationValue * math.pi * 2 + 1) * 25,
@@ -292,17 +370,20 @@ class _ShellBackgroundPainter extends CustomPainter {
     );
 
     // Extra small accent orb
-    paint.shader = RadialGradient(
-      colors: [colors[0], colors[0].withValues(alpha: 0)],
-    ).createShader(
-      Rect.fromCircle(
-        center: Offset(
-          size.width * 0.4 + math.cos(animationValue * math.pi * 2 + 2) * 15,
-          size.height * 0.3 + math.sin(animationValue * math.pi * 2 + 2) * 20,
-        ),
-        radius: size.width * 0.2,
-      ),
-    );
+    paint.shader =
+        RadialGradient(
+          colors: [colors[0], colors[0].withValues(alpha: 0)],
+        ).createShader(
+          Rect.fromCircle(
+            center: Offset(
+              size.width * 0.4 +
+                  math.cos(animationValue * math.pi * 2 + 2) * 15,
+              size.height * 0.3 +
+                  math.sin(animationValue * math.pi * 2 + 2) * 20,
+            ),
+            radius: size.width * 0.2,
+          ),
+        );
     canvas.drawCircle(
       Offset(
         size.width * 0.4 + math.cos(animationValue * math.pi * 2 + 2) * 15,

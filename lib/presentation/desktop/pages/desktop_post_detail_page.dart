@@ -2,15 +2,17 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/extensions/extensions.dart';
+import '../../../core/input/input.dart';
 import '../../../data/models/models.dart';
 import '../../../data/services/services.dart';
 import '../../providers/settings_provider.dart';
-import '../../widgets/widgets.dart';
+import '../../widgets/widgets.dart' hide Colors;
 import '../widgets/desktop_toolbar.dart';
 
 /// Design constants for the purple/indigo theme
@@ -47,7 +49,8 @@ class DesktopPostDetailPage extends StatefulWidget {
   State<DesktopPostDetailPage> createState() => _DesktopPostDetailPageState();
 }
 
-class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
+class _DesktopPostDetailPageState extends State<DesktopPostDetailPage>
+    with GamepadInputMixin {
   late int _currentIndex;
   late List<int> _postIds;
   late bool _hasMore;
@@ -70,6 +73,9 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
   // Confetti controller for favorite animation
   late ConfettiController _confettiController;
 
+  // Controller state for visual feedback
+  bool _showControllerHints = false;
+
   @override
   void initState() {
     super.initState();
@@ -77,14 +83,107 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
     _postIds = List.from(widget.postIds);
     _hasMore = widget.hasMore;
     _focusNode = FocusNode();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 1));
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 1),
+    );
     _loadPost(_currentIndex);
     _preloadAdjacentPosts();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _focusNode.requestFocus();
     });
+
+    // Show controller hints if gamepad is connected
+    if (gamepad.isConnected) {
+      _showControllerHints = true;
+    }
+
+    // Listen for controller connection
+    gamepad.stateChanges.listen((state) {
+      if (mounted && state.isConnected != _showControllerHints) {
+        setState(() => _showControllerHints = state.isConnected);
+      }
+    });
   }
 
+  /// Handle gamepad button presses
+  /// Button mapping:
+  /// - LB: Previous post
+  /// - RB: Next post
+  /// - Y: Toggle favorite
+  /// - RT: Upvote
+  /// - X: Downvote
+  /// - B: Close/Back
+  @override
+  void onGamepadButton(GamepadButton button) {
+    if (!mounted) return;
+
+    switch (button) {
+      case GamepadButton.leftBumper:
+        // Previous post
+        _navigatePost(-1);
+        HapticFeedback.mediumImpact();
+
+      case GamepadButton.rightBumper:
+        // Next post
+        _navigatePost(1);
+        HapticFeedback.mediumImpact();
+
+      case GamepadButton.y:
+        // Toggle favorite
+        _toggleFavorite();
+        HapticFeedback.heavyImpact();
+
+      case GamepadButton.rightTrigger:
+        // Upvote
+        final currentVote = _userVote[_currentIndex];
+        _vote(currentVote == 1 ? 0 : 1);
+        HapticFeedback.mediumImpact();
+
+      case GamepadButton.x:
+        // Downvote
+        final currentVote = _userVote[_currentIndex];
+        _vote(currentVote == -1 ? 0 : -1);
+        HapticFeedback.mediumImpact();
+
+      case GamepadButton.b:
+        // Close/Back
+        if (_isFullScreen) {
+          setState(() => _isFullScreen = false);
+        } else {
+          widget.onClose?.call();
+        }
+        HapticFeedback.lightImpact();
+
+      case GamepadButton.a:
+        // Toggle fullscreen for images
+        final post = _currentPost;
+        if (post != null && !post.isVideo) {
+          setState(() => _isFullScreen = !_isFullScreen);
+          HapticFeedback.lightImpact();
+        }
+
+      default:
+        break;
+    }
+  }
+
+  /// Handle thumbstick for scrolling
+  @override
+  void onGamepadDirection(GamepadDirection direction) {
+    if (!mounted) return;
+
+    switch (direction) {
+      case GamepadDirection.left:
+        _navigatePost(-1);
+      case GamepadDirection.right:
+        _navigatePost(1);
+      default:
+        // Up/Down could be used for scrolling info panel
+        break;
+    }
+  }
+
+  @override
   @override
   void dispose() {
     _focusNode.dispose();
@@ -318,7 +417,9 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
       child: Stack(
         children: [
           Container(
-            color: isDark ? AppColors.darkBackground : AppColors.lightBackground,
+            color: isDark
+                ? AppColors.darkBackground
+                : AppColors.lightBackground,
             child: Column(
               children: [
                 _buildTopBar(isDark),
@@ -347,8 +448,136 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
               ],
             ),
           ),
+          // Controller hints overlay
+          if (_showControllerHints)
+            Positioned(
+              bottom: 16,
+              left: 0,
+              right: 0,
+              child: _buildControllerHints(isDark),
+            ),
         ],
       ),
+    );
+  }
+
+  /// Builds the controller button hints overlay
+  Widget _buildControllerHints(bool isDark) {
+    final currentVote = _userVote[_currentIndex];
+    final isFavorited = _isFavorited[_currentIndex] ?? false;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          decoration: BoxDecoration(
+            color: (isDark ? const Color(0xFF18181B) : const Color(0xFFFFFFFF))
+                .withValues(alpha: 0.85),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildHintButton('LB', 'Previous', isDark),
+              const SizedBox(width: 16),
+              _buildHintButton('RB', 'Next', isDark),
+              _buildHintDivider(isDark),
+              _buildHintButton(
+                'Y',
+                isFavorited ? 'Unfavorite' : 'Favorite',
+                isDark,
+                color: isFavorited ? const Color(0xFFFF6B9D) : null,
+              ),
+              const SizedBox(width: 16),
+              _buildHintButton(
+                'RT',
+                currentVote == 1 ? 'Remove Vote' : 'Upvote',
+                isDark,
+                color: currentVote == 1 ? const Color(0xFF22C55E) : null,
+              ),
+              const SizedBox(width: 16),
+              _buildHintButton(
+                'X',
+                currentVote == -1 ? 'Remove Vote' : 'Downvote',
+                isDark,
+                color: currentVote == -1 ? const Color(0xFFEF4444) : null,
+              ),
+              _buildHintDivider(isDark),
+              _buildHintButton('B', 'Close', isDark),
+              const SizedBox(width: 16),
+              _buildHintButton('A', 'Fullscreen', isDark),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHintButton(
+    String button,
+    String label,
+    bool isDark, {
+    Color? color,
+  }) {
+    final buttonColor =
+        color ?? (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A));
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: buttonColor.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(
+              color: buttonColor.withValues(alpha: 0.4),
+              width: 1,
+            ),
+          ),
+          child: Text(
+            button,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: buttonColor,
+            ),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF3F3F46),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHintDivider(bool isDark) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      width: 1,
+      height: 20,
+      color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFD4D4D8),
     );
   }
 
@@ -546,7 +775,9 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: _ThemeColors.primaryPurple.withValues(alpha: 0.4),
+                        color: _ThemeColors.primaryPurple.withValues(
+                          alpha: 0.4,
+                        ),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -1368,5 +1599,4 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage> {
       ),
     );
   }
-
 }
