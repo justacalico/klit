@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:confetti/confetti.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/services.dart';
@@ -65,6 +67,8 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage>
   final Map<int, PostScore?> _updatedScores = {};
   final Map<int, bool> _isVoting = {};
   final Map<int, bool> _isTogglingFavorite = {};
+  final Map<int, bool> _isDownloading = {};
+  final Map<int, double> _downloadProgress = {};
 
   // For full screen image view
   bool _isFullScreen = false;
@@ -348,6 +352,132 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage>
           _showError(error.message);
         },
       );
+    }
+  }
+
+  /// Download the current post's file to the user's Downloads folder
+  Future<void> _downloadPost() async {
+    final post = _currentPost;
+    if (post == null || _isDownloading[_currentIndex] == true) return;
+
+    final fileUrl = post.file.url;
+    if (fileUrl == null) {
+      _showError('No file URL available for download');
+      return;
+    }
+
+    setState(() {
+      _isDownloading[_currentIndex] = true;
+      _downloadProgress[_currentIndex] = 0;
+    });
+
+    try {
+      // Get Downloads directory
+      final downloadsDir = await _getDownloadsDirectory();
+      if (downloadsDir == null) {
+        throw Exception('Could not find Downloads directory');
+      }
+
+      // Create filename from post ID and extension
+      final extension = post.file.ext.isNotEmpty ? post.file.ext : 'png';
+      final filename = 'e926_${post.id}.$extension';
+      final filePath = '${downloadsDir.path}/$filename';
+
+      // Check if file already exists
+      final file = File(filePath);
+      if (await file.exists()) {
+        if (mounted) {
+          setState(() => _isDownloading[_currentIndex] = false);
+          _showDownloadComplete(filePath, alreadyExists: true);
+        }
+        return;
+      }
+
+      // Download the file using Dio
+      final dio = Dio();
+      await dio.download(
+        fileUrl,
+        filePath,
+        onReceiveProgress: (received, total) {
+          if (total > 0 && mounted) {
+            setState(() {
+              _downloadProgress[_currentIndex] = received / total;
+            });
+          }
+        },
+      );
+
+      if (mounted) {
+        setState(() => _isDownloading[_currentIndex] = false);
+        _showDownloadComplete(filePath);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isDownloading[_currentIndex] = false);
+        _showError('Download failed: ${e.toString()}');
+      }
+    }
+  }
+
+  /// Get the Downloads directory based on platform
+  Future<Directory?> _getDownloadsDirectory() async {
+    if (Platform.isLinux || Platform.isMacOS) {
+      final home = Platform.environment['HOME'];
+      if (home != null) {
+        return Directory('$home/Downloads');
+      }
+    } else if (Platform.isWindows) {
+      final userProfile = Platform.environment['USERPROFILE'];
+      if (userProfile != null) {
+        return Directory('$userProfile\\Downloads');
+      }
+    }
+    return null;
+  }
+
+  /// Show download complete notification
+  void _showDownloadComplete(String filePath, {bool alreadyExists = false}) {
+    final fileName = filePath.split('/').last.split('\\').last;
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: Text(alreadyExists ? 'File Exists' : 'Download Complete'),
+        content: Text(
+          alreadyExists
+              ? 'File already exists:\n$fileName'
+              : 'Saved to Downloads:\n$fileName',
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('Open Folder'),
+            onPressed: () {
+              Navigator.of(context).pop();
+              _openDownloadsFolder(filePath);
+            },
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            child: const Text('OK'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Open the Downloads folder in the system file manager
+  Future<void> _openDownloadsFolder(String filePath) async {
+    try {
+      final directory = File(filePath).parent.path;
+      if (Platform.isLinux) {
+        await Process.run('xdg-open', [directory]);
+      } else if (Platform.isMacOS) {
+        await Process.run('open', [directory]);
+      } else if (Platform.isWindows) {
+        await Process.run('explorer', [directory]);
+      }
+    } catch (e) {
+      // Silently fail if we can't open the folder
     }
   }
 
@@ -990,15 +1120,13 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage>
                   icon: CupertinoIcons.square_arrow_down,
                   activeIcon: CupertinoIcons.square_arrow_down_fill,
                   isActive: false,
-                  isLoading: false,
+                  isLoading: _isDownloading[_currentIndex] == true,
                   activeGradient: [
                     _ThemeColors.primaryIndigo,
                     _ThemeColors.primaryPurple,
                   ],
                   isDark: isDark,
-                  onTap: () {
-                    // TODO: Implement download
-                  },
+                  onTap: _downloadPost,
                 ),
               ),
             ],
