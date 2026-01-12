@@ -141,6 +141,7 @@ class AccountManagementPage extends StatelessWidget {
                               posts.clearAllPosts();
                               // Update settings host to match the account's host
                               await settings.setHost(account.host);
+                              if (!context.mounted) return;
                               // Navigate to main and clear stack to refresh the app
                               Navigator.of(context).pushNamedAndRemoveUntil(
                                 AppRoutes.main,
@@ -226,6 +227,7 @@ class AccountManagementPage extends StatelessWidget {
                   posts.clearAllPosts();
                   // Update settings host to match the account's host
                   await settings.setHost(account.host);
+                  if (!context.mounted) return;
                   // Navigate to main and clear stack to refresh the app
                   Navigator.of(
                     context,
@@ -388,6 +390,7 @@ class _AddAccountSheetState extends State<_AddAccountSheet> {
       // Update settings host to match the new account's host
       final newHost = host ?? 'https://e926.net';
       await settings.setHost(newHost);
+      if (!mounted) return;
       // Pop the sheet and navigate to main to refresh everything
       Navigator.of(context).pop();
       Navigator.of(
