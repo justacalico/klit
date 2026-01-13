@@ -1,8 +1,10 @@
 import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../app/routes.dart';
 import '../../../core/constants/constants.dart';
+import '../../../core/input/input.dart';
 import '../../../core/utils/helpers.dart';
 import '../../providers/providers.dart';
 
@@ -15,10 +17,20 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, GamepadInputMixin {
   final _usernameController = TextEditingController();
   final _apiKeyController = TextEditingController();
   final _hostController = TextEditingController();
+
+  // Focus nodes for controller navigation
+  final _usernameFocusNode = FocusNode();
+  final _apiKeyFocusNode = FocusNode();
+  final _hostFocusNode = FocusNode();
+
+  // Controller navigation state
+  int _focusedIndex =
+      0; // 0: username, 1: apiKey, 2: customHost toggle, 3: host field, 4: login, 5: guest
+  bool _showControllerHints = false;
 
   bool _useCustomHost = false;
   bool _obscureApiKey = true;
@@ -59,6 +71,16 @@ class _LoginPageState extends State<LoginPage>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkExistingSession();
     });
+
+    // Check if controller is connected
+    _showControllerHints = gamepad.isConnected;
+
+    // Listen for controller connection changes
+    gamepad.stateChanges.listen((state) {
+      if (mounted && state.isConnected != _showControllerHints) {
+        setState(() => _showControllerHints = state.isConnected);
+      }
+    });
   }
 
   Future<void> _checkExistingSession() async {
@@ -73,11 +95,119 @@ class _LoginPageState extends State<LoginPage>
     }
   }
 
+  /// Get the maximum focusable index based on custom host state
+  int get _maxFocusIndex => _useCustomHost ? 5 : 4;
+
+  /// Handle gamepad D-pad navigation
+  @override
+  void onGamepadDirection(GamepadDirection direction) {
+    if (!mounted) return;
+
+    switch (direction) {
+      case GamepadDirection.up:
+        _moveFocus(-1);
+      case GamepadDirection.down:
+        _moveFocus(1);
+      default:
+        break;
+    }
+  }
+
+  /// Handle gamepad button presses
+  @override
+  void onGamepadButton(GamepadButton button) {
+    if (!mounted) return;
+
+    switch (button) {
+      case GamepadButton.a:
+        // Activate/select the focused item
+        _activateFocusedItem();
+        HapticFeedback.mediumImpact();
+
+      case GamepadButton.b:
+        // Toggle API key visibility when on API key field
+        if (_focusedIndex == 1) {
+          setState(() => _obscureApiKey = !_obscureApiKey);
+          HapticFeedback.lightImpact();
+        }
+
+      case GamepadButton.y:
+        // Quick action: Continue as guest
+        _continueAsGuest();
+        HapticFeedback.mediumImpact();
+
+      case GamepadButton.x:
+        // Toggle custom host
+        setState(() => _useCustomHost = !_useCustomHost);
+        HapticFeedback.lightImpact();
+
+      default:
+        break;
+    }
+  }
+
+  /// Move focus up or down
+  void _moveFocus(int delta) {
+    setState(() {
+      _focusedIndex = (_focusedIndex + delta).clamp(0, _maxFocusIndex);
+    });
+    HapticFeedback.selectionClick();
+    _updateTextFieldFocus();
+  }
+
+  /// Update text field focus based on focused index
+  void _updateTextFieldFocus() {
+    // Unfocus all first
+    _usernameFocusNode.unfocus();
+    _apiKeyFocusNode.unfocus();
+    _hostFocusNode.unfocus();
+
+    // Focus the appropriate field
+    switch (_focusedIndex) {
+      case 0:
+        _usernameFocusNode.requestFocus();
+      case 1:
+        _apiKeyFocusNode.requestFocus();
+      case 3 when _useCustomHost:
+        _hostFocusNode.requestFocus();
+    }
+  }
+
+  /// Activate the currently focused item
+  void _activateFocusedItem() {
+    switch (_focusedIndex) {
+      case 0:
+        _usernameFocusNode.requestFocus();
+      case 1:
+        _apiKeyFocusNode.requestFocus();
+      case 2:
+        // Toggle custom host
+        setState(() => _useCustomHost = !_useCustomHost);
+      case 3 when _useCustomHost:
+        _hostFocusNode.requestFocus();
+      case 3 when !_useCustomHost:
+        // This is the login button when custom host is disabled
+        _login();
+      case 4 when _useCustomHost:
+        // Login button when custom host is enabled
+        _login();
+      case 4 when !_useCustomHost:
+        // Guest button when custom host is disabled
+        _continueAsGuest();
+      case 5:
+        // Guest button when custom host is enabled
+        _continueAsGuest();
+    }
+  }
+
   @override
   void dispose() {
     _usernameController.dispose();
     _apiKeyController.dispose();
     _hostController.dispose();
+    _usernameFocusNode.dispose();
+    _apiKeyFocusNode.dispose();
+    _hostFocusNode.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -178,8 +308,113 @@ class _LoginPageState extends State<LoginPage>
               ),
             ),
           ),
+
+          // Controller hints overlay
+          if (_showControllerHints)
+            Positioned(
+              bottom: 24,
+              left: 0,
+              right: 0,
+              child: _buildControllerHints(isDark),
+            ),
         ],
       ),
+    );
+  }
+
+  /// Builds the controller button hints overlay
+  Widget _buildControllerHints(bool isDark) {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: (isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white)
+              .withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E7EB),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: CupertinoColors.black.withValues(alpha: 0.2),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildHintItem('D-Pad', 'Navigate', isDark),
+            const SizedBox(width: 20),
+            _buildHintItem(
+              'A',
+              'Select',
+              isDark,
+              color: const Color(0xFF22C55E),
+            ),
+            const SizedBox(width: 20),
+            _buildHintItem(
+              'Y',
+              'Guest',
+              isDark,
+              color: const Color(0xFFEAB308),
+            ),
+            const SizedBox(width: 20),
+            _buildHintItem(
+              'X',
+              'Custom Host',
+              isDark,
+              color: const Color(0xFF3B82F6),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHintItem(
+    String button,
+    String label,
+    bool isDark, {
+    Color? color,
+  }) {
+    final buttonColor =
+        color ?? (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A));
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: buttonColor.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(
+              color: buttonColor.withValues(alpha: 0.4),
+              width: 1,
+            ),
+          ),
+          child: Text(
+            button,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: buttonColor,
+            ),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF3F3F46),
+          ),
+        ),
+      ],
     );
   }
 
@@ -336,31 +571,58 @@ class _LoginPageState extends State<LoginPage>
   }
 
   Widget _buildGuestButton(bool isDark) {
-    return CupertinoButton(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      onPressed: _continueAsGuest,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            CupertinoIcons.arrow_right_circle,
-            size: 18,
-            color: isDark
-                ? CupertinoColors.systemGrey
-                : CupertinoColors.systemGrey,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            'Continue as Guest',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: isDark
-                  ? CupertinoColors.systemGrey
-                  : CupertinoColors.systemGrey,
+    // Guest button focus index depends on custom host state
+    final guestFocusIndex = _useCustomHost ? 5 : 4;
+    final isGuestFocused =
+        _showControllerHints && _focusedIndex == guestFocusIndex;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        border: isGuestFocused
+            ? Border.all(color: const Color(0xFF8B5CF6), width: 2)
+            : null,
+        boxShadow: isGuestFocused
+            ? [
+                BoxShadow(
+                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                  blurRadius: 12,
+                  spreadRadius: 0,
+                ),
+              ]
+            : null,
+      ),
+      child: CupertinoButton(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        onPressed: _continueAsGuest,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              CupertinoIcons.arrow_right_circle,
+              size: 18,
+              color: isGuestFocused
+                  ? const Color(0xFF8B5CF6)
+                  : (isDark
+                        ? CupertinoColors.systemGrey
+                        : CupertinoColors.systemGrey),
             ),
-          ),
-        ],
+            const SizedBox(width: 8),
+            Text(
+              'Continue as Guest',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: isGuestFocused
+                    ? const Color(0xFF8B5CF6)
+                    : (isDark
+                          ? CupertinoColors.systemGrey
+                          : CupertinoColors.systemGrey),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -393,23 +655,28 @@ class _LoginPageState extends State<LoginPage>
         children: [
           _buildSectionHeader('Account', CupertinoIcons.person_circle, isDark),
           const SizedBox(height: 16),
-          _buildTextField(
+          _buildFocusableTextField(
             controller: _usernameController,
+            focusNode: _usernameFocusNode,
             placeholder: 'Username',
             icon: CupertinoIcons.person,
             textInputAction: TextInputAction.next,
             isDark: isDark,
+            isFocused: _showControllerHints && _focusedIndex == 0,
           ),
           const SizedBox(height: 12),
-          _buildTextField(
+          _buildFocusableTextField(
             controller: _apiKeyController,
+            focusNode: _apiKeyFocusNode,
             placeholder: 'API Key',
             icon: CupertinoIcons.lock,
             obscureText: _obscureApiKey,
             isDark: isDark,
+            isFocused: _showControllerHints && _focusedIndex == 1,
             suffix: CupertinoButton(
               padding: EdgeInsets.zero,
-              onPressed: () => setState(() => _obscureApiKey = !_obscureApiKey), minimumSize: Size(0, 0),
+              onPressed: () => setState(() => _obscureApiKey = !_obscureApiKey),
+              minimumSize: Size(0, 0),
               child: Icon(
                 _obscureApiKey ? CupertinoIcons.eye : CupertinoIcons.eye_slash,
                 size: 20,
@@ -448,29 +715,42 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  Widget _buildTextField({
+  Widget _buildFocusableTextField({
     required TextEditingController controller,
+    required FocusNode focusNode,
     required String placeholder,
     required IconData icon,
     required bool isDark,
+    required bool isFocused,
     bool obscureText = false,
     Widget? suffix,
     TextInputType? keyboardType,
     TextInputAction? textInputAction,
   }) {
     final bgColor = isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF3F4F6);
-    final borderColor = isDark
-        ? const Color(0xFF3A3A3C)
-        : const Color(0xFFE5E7EB);
+    final borderColor = isFocused
+        ? const Color(0xFF8B5CF6)
+        : (isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E7EB));
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderColor, width: 1),
+        border: Border.all(color: borderColor, width: isFocused ? 2 : 1),
+        boxShadow: isFocused
+            ? [
+                BoxShadow(
+                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                  blurRadius: 12,
+                  spreadRadius: 0,
+                ),
+              ]
+            : null,
       ),
       child: CupertinoTextField(
         controller: controller,
+        focusNode: focusNode,
         placeholder: placeholder,
         obscureText: obscureText,
         keyboardType: keyboardType,
@@ -491,9 +771,11 @@ class _LoginPageState extends State<LoginPage>
           child: Icon(
             icon,
             size: 20,
-            color: isDark
-                ? CupertinoColors.systemGrey
-                : CupertinoColors.systemGrey,
+            color: isFocused
+                ? const Color(0xFF8B5CF6)
+                : (isDark
+                      ? CupertinoColors.systemGrey
+                      : CupertinoColors.systemGrey),
           ),
         ),
         suffix: suffix != null
@@ -505,23 +787,39 @@ class _LoginPageState extends State<LoginPage>
   }
 
   Widget _buildCustomHostSection(bool isDark) {
+    final isToggleFocused = _showControllerHints && _focusedIndex == 2;
+    final isHostFieldFocused =
+        _showControllerHints && _focusedIndex == 3 && _useCustomHost;
+
     return Column(
       children: [
         GestureDetector(
           onTap: () => setState(() => _useCustomHost = !_useCustomHost),
-          child: Container(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF3F4F6),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: _useCustomHost
-                    ? const Color(0xFF8B5CF6).withValues(alpha: 0.5)
-                    : (isDark
-                          ? const Color(0xFF3A3A3C)
-                          : const Color(0xFFE5E7EB)),
-                width: 1,
+                color: isToggleFocused
+                    ? const Color(0xFF8B5CF6)
+                    : (_useCustomHost
+                          ? const Color(0xFF8B5CF6).withValues(alpha: 0.5)
+                          : (isDark
+                                ? const Color(0xFF3A3A3C)
+                                : const Color(0xFFE5E7EB))),
+                width: isToggleFocused ? 2 : 1,
               ),
+              boxShadow: isToggleFocused
+                  ? [
+                      BoxShadow(
+                        color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                        blurRadius: 12,
+                        spreadRadius: 0,
+                      ),
+                    ]
+                  : null,
             ),
             child: Row(
               children: [
@@ -593,12 +891,14 @@ class _LoginPageState extends State<LoginPage>
           firstChild: const SizedBox.shrink(),
           secondChild: Padding(
             padding: const EdgeInsets.only(top: 12),
-            child: _buildTextField(
+            child: _buildFocusableTextField(
               controller: _hostController,
+              focusNode: _hostFocusNode,
               placeholder: 'API Host URL',
               icon: CupertinoIcons.globe,
               keyboardType: TextInputType.url,
               isDark: isDark,
+              isFocused: isHostFieldFocused,
             ),
           ),
         ),
@@ -607,9 +907,15 @@ class _LoginPageState extends State<LoginPage>
   }
 
   Widget _buildLoginButton() {
+    // Login button focus index depends on custom host state
+    final loginFocusIndex = _useCustomHost ? 4 : 3;
+    final isLoginFocused =
+        _showControllerHints && _focusedIndex == loginFocusIndex;
+
     return Consumer<AuthProvider>(
       builder: (context, auth, _) {
-        return Container(
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
             gradient: const LinearGradient(
@@ -619,11 +925,20 @@ class _LoginPageState extends State<LoginPage>
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF6366F1).withValues(alpha: 0.4),
-                blurRadius: 16,
+                color: const Color(
+                  0xFF6366F1,
+                ).withValues(alpha: isLoginFocused ? 0.6 : 0.4),
+                blurRadius: isLoginFocused ? 24 : 16,
                 offset: const Offset(0, 6),
+                spreadRadius: isLoginFocused ? 2 : 0,
               ),
             ],
+            border: isLoginFocused
+                ? Border.all(
+                    color: CupertinoColors.white.withValues(alpha: 0.5),
+                    width: 2,
+                  )
+                : null,
           ),
           child: CupertinoButton(
             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -668,7 +983,8 @@ class _LoginPageState extends State<LoginPage>
           const SizedBox(height: 4),
           CupertinoButton(
             padding: EdgeInsets.zero,
-            onPressed: _showApiKeyHelp, minimumSize: Size(0, 0),
+            onPressed: _showApiKeyHelp,
+            minimumSize: Size(0, 0),
             child: const Text(
               'Learn how to get one',
               style: TextStyle(
