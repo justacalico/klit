@@ -59,17 +59,17 @@ class _DesktopHotPageState extends State<DesktopHotPage> {
     final posts = postsProvider.hotPosts;
     final index = posts.indexWhere((p) => p.id == post.id);
 
-    widget.onPostTap(PostDetailArguments(
-      postIds: posts.map((p) => p.id).toList(),
-      initialIndex: index >= 0 ? index : 0,
-      hasMore: postsProvider.hasMoreHot,
-      onLoadMore: () async {
-        await postsProvider.loadHotPosts(
-          safeMode: settingsProvider.safeMode,
-        );
-        return postsProvider.hotPosts.map((p) => p.id).toList();
-      },
-    ));
+    widget.onPostTap(
+      PostDetailArguments(
+        postIds: posts.map((p) => p.id).toList(),
+        initialIndex: index >= 0 ? index : 0,
+        hasMore: postsProvider.hasMoreHot,
+        onLoadMore: () async {
+          await postsProvider.loadHotPosts(safeMode: settingsProvider.safeMode);
+          return postsProvider.hotPosts.map((p) => p.id).toList();
+        },
+      ),
+    );
   }
 
   @override
@@ -103,18 +103,29 @@ class _DesktopHotPageState extends State<DesktopHotPage> {
                 children: [
                   // Time range selector
                   Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: TimeRangeSelector(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    child: DesktopTimeRangeSelector(
                       selected: postsProvider.hotTimeRange,
                       options: const ['day', 'week', 'month'],
                       customDate: postsProvider.hotCustomDate,
                       onChanged: (range) {
-                        final settingsProvider = context.read<SettingsProvider>();
-                        postsProvider.setHotTimeRange(range, safeMode: settingsProvider.safeMode);
+                        final settingsProvider = context
+                            .read<SettingsProvider>();
+                        postsProvider.setHotTimeRange(
+                          range,
+                          safeMode: settingsProvider.safeMode,
+                        );
                       },
                       onDateSelected: (date) {
-                        final settingsProvider = context.read<SettingsProvider>();
-                        postsProvider.setHotCustomDate(date, safeMode: settingsProvider.safeMode);
+                        final settingsProvider = context
+                            .read<SettingsProvider>();
+                        postsProvider.setHotCustomDate(
+                          date,
+                          safeMode: settingsProvider.safeMode,
+                        );
                       },
                     ),
                   ),

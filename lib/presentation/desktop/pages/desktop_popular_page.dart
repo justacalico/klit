@@ -59,17 +59,19 @@ class _DesktopPopularPageState extends State<DesktopPopularPage> {
     final posts = postsProvider.popularPosts;
     final index = posts.indexWhere((p) => p.id == post.id);
 
-    widget.onPostTap(PostDetailArguments(
-      postIds: posts.map((p) => p.id).toList(),
-      initialIndex: index >= 0 ? index : 0,
-      hasMore: postsProvider.hasMorePopular,
-      onLoadMore: () async {
-        await postsProvider.loadPopularPosts(
-          safeMode: settingsProvider.safeMode,
-        );
-        return postsProvider.popularPosts.map((p) => p.id).toList();
-      },
-    ));
+    widget.onPostTap(
+      PostDetailArguments(
+        postIds: posts.map((p) => p.id).toList(),
+        initialIndex: index >= 0 ? index : 0,
+        hasMore: postsProvider.hasMorePopular,
+        onLoadMore: () async {
+          await postsProvider.loadPopularPosts(
+            safeMode: settingsProvider.safeMode,
+          );
+          return postsProvider.popularPosts.map((p) => p.id).toList();
+        },
+      ),
+    );
   }
 
   @override
@@ -103,18 +105,29 @@ class _DesktopPopularPageState extends State<DesktopPopularPage> {
                 children: [
                   // Time range selector
                   Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: TimeRangeSelector(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    child: DesktopTimeRangeSelector(
                       selected: postsProvider.popularTimeRange,
                       options: const ['day', 'week', 'month'],
                       customDate: postsProvider.popularCustomDate,
                       onChanged: (range) {
-                        final settingsProvider = context.read<SettingsProvider>();
-                        postsProvider.setPopularTimeRange(range, safeMode: settingsProvider.safeMode);
+                        final settingsProvider = context
+                            .read<SettingsProvider>();
+                        postsProvider.setPopularTimeRange(
+                          range,
+                          safeMode: settingsProvider.safeMode,
+                        );
                       },
                       onDateSelected: (date) {
-                        final settingsProvider = context.read<SettingsProvider>();
-                        postsProvider.setPopularCustomDate(date, safeMode: settingsProvider.safeMode);
+                        final settingsProvider = context
+                            .read<SettingsProvider>();
+                        postsProvider.setPopularCustomDate(
+                          date,
+                          safeMode: settingsProvider.safeMode,
+                        );
                       },
                     ),
                   ),
