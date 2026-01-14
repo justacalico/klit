@@ -31,7 +31,6 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
   final _tagDebouncer = Debouncer(delay: const Duration(milliseconds: 300));
   final _focusNode = FocusNode();
 
-  bool _isGridView = true;
   bool _showHistory = true;
   bool _showTagSuggestions = false;
   List<Tag> _tagSuggestions = [];
@@ -569,11 +568,6 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
               () => _showOrderPicker(),
             ),
           ),
-          const SizedBox(width: 8),
-          ViewToggleButton(
-            isGrid: _isGridView,
-            onToggle: () => setState(() => _isGridView = !_isGridView),
-          ),
         ],
       ),
     );
@@ -738,24 +732,9 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
     return Consumer<PostsProvider>(
       builder: (context, postsProvider, _) {
         final settingsProvider = context.read<SettingsProvider>();
-        return _isGridView
-            ? PostsGrid(
+        return PostsGrid(
                 posts: postsProvider.searchResults,
                 columns: gridSize,
-                isLoading: postsProvider.isLoadingSearch,
-                hasMore: postsProvider.hasMoreSearch,
-                error: postsProvider.searchError,
-                onPostTap: _onPostTap,
-                onLoadMore: () {
-                  postsProvider.searchPosts(
-                    query: _searchController.text.trim(),
-                    safeMode: settingsProvider.safeMode,
-                  );
-                },
-                onRetry: _performSearch,
-              )
-            : PostsList(
-                posts: postsProvider.searchResults,
                 isLoading: postsProvider.isLoadingSearch,
                 hasMore: postsProvider.hasMoreSearch,
                 error: postsProvider.searchError,

@@ -22,7 +22,6 @@ class PopularPage extends StatefulWidget {
 
 class _PopularPageState extends State<PopularPage> {
   final RefreshController _refreshController = RefreshController();
-  bool _isGridView = true;
 
   /// Check if safe mode should be enforced (guest mode OR safe mode setting)
   bool _shouldEnforceSafeMode(BuildContext context) {
@@ -117,19 +116,9 @@ class _PopularPageState extends State<PopularPage> {
                   enablePullUp: postsProvider.hasMorePopular,
                   onRefresh: () => _loadPosts(refresh: true),
                   onLoading: () => _loadPosts(),
-                  child: _isGridView
-                      ? PostsGrid(
+                  child: PostsGrid(
                           posts: postsProvider.popularPosts,
                           columns: gridSize,
-                          isLoading: postsProvider.isLoadingPopular,
-                          hasMore: postsProvider.hasMorePopular,
-                          error: postsProvider.popularError,
-                          onPostTap: _onPostTap,
-                          onLoadMore: () => _loadPosts(),
-                          onRetry: () => _loadPosts(refresh: true),
-                        )
-                      : PostsList(
-                          posts: postsProvider.popularPosts,
                           isLoading: postsProvider.isLoadingPopular,
                           hasMore: postsProvider.hasMorePopular,
                           error: postsProvider.popularError,
@@ -172,9 +161,9 @@ class _PopularPageState extends State<PopularPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildToolbarButton(
-              icon: _isGridView ? CupertinoIcons.list_bullet : CupertinoIcons.square_grid_2x2,
+              icon: CupertinoIcons.square_grid_2x2,
               isDark: isDark,
-              onTap: () => setState(() => _isGridView = !_isGridView),
+              onTap: () {},
             ),
             const SizedBox(width: 8),
             _buildToolbarButton(

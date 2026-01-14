@@ -747,30 +747,6 @@ class _DesktopTimeRangeSelectorState extends State<DesktopTimeRangeSelector> {
   }
 }
 
-/// View toggle button (grid/list)
-class ViewToggleButton extends StatelessWidget {
-  final bool isGrid;
-  final VoidCallback onToggle;
-
-  const ViewToggleButton({
-    super.key,
-    required this.isGrid,
-    required this.onToggle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoButton(
-      padding: const EdgeInsets.all(12),
-      onPressed: onToggle,
-      child: Icon(
-        isGrid ? CupertinoIcons.list_bullet : CupertinoIcons.square_grid_2x2,
-        size: 22,
-      ),
-    );
-  }
-}
-
 /// Segmented control wrapper
 class SegmentedSelector<T extends Object> extends StatelessWidget {
   final Map<T, String> segments;

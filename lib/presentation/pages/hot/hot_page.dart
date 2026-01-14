@@ -22,7 +22,6 @@ class HotPage extends StatefulWidget {
 
 class _HotPageState extends State<HotPage> {
   final RefreshController _refreshController = RefreshController();
-  bool _isGridView = true;
 
   /// Check if safe mode should be enforced (guest mode OR safe mode setting)
   bool _shouldEnforceSafeMode(BuildContext context) {
@@ -117,19 +116,9 @@ class _HotPageState extends State<HotPage> {
                   enablePullUp: postsProvider.hasMoreHot,
                   onRefresh: () => _loadPosts(refresh: true),
                   onLoading: () => _loadPosts(),
-                  child: _isGridView
-                      ? PostsGrid(
+                  child: PostsGrid(
                           posts: postsProvider.hotPosts,
                           columns: gridSize,
-                          isLoading: postsProvider.isLoadingHot,
-                          hasMore: postsProvider.hasMoreHot,
-                          error: postsProvider.hotError,
-                          onPostTap: _onPostTap,
-                          onLoadMore: () => _loadPosts(),
-                          onRetry: () => _loadPosts(refresh: true),
-                        )
-                      : PostsList(
-                          posts: postsProvider.hotPosts,
                           isLoading: postsProvider.isLoadingHot,
                           hasMore: postsProvider.hasMoreHot,
                           error: postsProvider.hotError,
@@ -172,9 +161,9 @@ class _HotPageState extends State<HotPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildToolbarButton(
-              icon: _isGridView ? CupertinoIcons.list_bullet : CupertinoIcons.square_grid_2x2,
+              icon: CupertinoIcons.square_grid_2x2,
               isDark: isDark,
-              onTap: () => setState(() => _isGridView = !_isGridView),
+              onTap: () {},
             ),
             const SizedBox(width: 8),
             _buildToolbarButton(

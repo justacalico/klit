@@ -22,7 +22,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final RefreshController _refreshController = RefreshController();
-  bool _isGridView = true;
 
   /// Check if safe mode should be enforced (guest mode OR safe mode setting)
   bool _shouldEnforceSafeMode(BuildContext context) {
@@ -105,19 +104,9 @@ class _HomePageState extends State<HomePage> {
                       enablePullUp: postsProvider.hasMoreLatest,
                       onRefresh: () => _loadPosts(refresh: true),
                       onLoading: () => _loadPosts(),
-                      child: _isGridView
-                          ? PostsGrid(
+                      child: PostsGrid(
                               posts: postsProvider.latestPosts,
                               columns: gridSize,
-                              isLoading: postsProvider.isLoadingLatest,
-                              hasMore: postsProvider.hasMoreLatest,
-                              error: postsProvider.latestError,
-                              onPostTap: _onPostTap,
-                              onLoadMore: () => _loadPosts(),
-                              onRetry: () => _loadPosts(refresh: true),
-                            )
-                          : PostsList(
-                              posts: postsProvider.latestPosts,
                               isLoading: postsProvider.isLoadingLatest,
                               hasMore: postsProvider.hasMoreLatest,
                               error: postsProvider.latestError,
@@ -162,9 +151,9 @@ class _HomePageState extends State<HomePage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildToolbarButton(
-              icon: _isGridView ? CupertinoIcons.list_bullet : CupertinoIcons.square_grid_2x2,
+              icon: CupertinoIcons.square_grid_2x2,
               isDark: isDark,
-              onTap: () => setState(() => _isGridView = !_isGridView),
+              onTap: () {}, // Grid view indicator only
             ),
             const SizedBox(width: 8),
             _buildToolbarButton(
