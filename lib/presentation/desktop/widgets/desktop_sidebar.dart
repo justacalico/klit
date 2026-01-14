@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Tooltip;
 import 'package:provider/provider.dart';
 import '../../../app/routes.dart';
 import '../../../core/theme/ui_style_manager.dart';
@@ -26,12 +27,36 @@ class _NavItemDef {
   });
 
   static const Map<int, _NavItemDef> items = {
-    0: _NavItemDef(icon: CupertinoIcons.house_fill, label: 'Home', section: 'browse'),
-    1: _NavItemDef(icon: CupertinoIcons.flame_fill, label: 'Hot', section: 'browse'),
-    2: _NavItemDef(icon: CupertinoIcons.star_fill, label: 'Popular', section: 'browse'),
-    4: _NavItemDef(icon: CupertinoIcons.search, label: 'Search', section: 'tools'),
-    5: _NavItemDef(icon: CupertinoIcons.person_fill, label: 'Profile', section: 'account'),
-    6: _NavItemDef(icon: CupertinoIcons.heart_fill, label: 'Favorites', section: 'account'),
+    0: _NavItemDef(
+      icon: CupertinoIcons.house_fill,
+      label: 'Home',
+      section: 'browse',
+    ),
+    1: _NavItemDef(
+      icon: CupertinoIcons.flame_fill,
+      label: 'Hot',
+      section: 'browse',
+    ),
+    2: _NavItemDef(
+      icon: CupertinoIcons.star_fill,
+      label: 'Popular',
+      section: 'browse',
+    ),
+    4: _NavItemDef(
+      icon: CupertinoIcons.search,
+      label: 'Search',
+      section: 'tools',
+    ),
+    5: _NavItemDef(
+      icon: CupertinoIcons.person_fill,
+      label: 'Profile',
+      section: 'account',
+    ),
+    6: _NavItemDef(
+      icon: CupertinoIcons.heart_fill,
+      label: 'Favorites',
+      section: 'account',
+    ),
   };
 }
 
@@ -136,8 +161,22 @@ class _DesktopSidebarState extends State<DesktopSidebar>
       duration: const Duration(milliseconds: 200),
       width: widget.isCollapsed ? 72 : 240,
       child: isLiquidGlass
-          ? _buildLiquidGlassSidebar(context, isDark, isGuest, browseItems, toolsItems, accountItems)
-          : _buildMaterialSidebar(context, isDark, isGuest, browseItems, toolsItems, accountItems),
+          ? _buildLiquidGlassSidebar(
+              context,
+              isDark,
+              isGuest,
+              browseItems,
+              toolsItems,
+              accountItems,
+            )
+          : _buildMaterialSidebar(
+              context,
+              isDark,
+              isGuest,
+              browseItems,
+              toolsItems,
+              accountItems,
+            ),
     );
   }
 
@@ -195,7 +234,14 @@ class _DesktopSidebarState extends State<DesktopSidebar>
                 },
               ),
               // Main content
-              _buildSidebarContent(context, isDark, isGuest, browseItems, toolsItems, accountItems),
+              _buildSidebarContent(
+                context,
+                isDark,
+                isGuest,
+                browseItems,
+                toolsItems,
+                accountItems,
+              ),
             ],
           ),
         ),
@@ -216,14 +262,19 @@ class _DesktopSidebarState extends State<DesktopSidebar>
         color: isDark ? const Color(0xFF18181B) : const Color(0xFFF5F5F7),
         border: Border(
           right: BorderSide(
-            color: isDark
-                ? const Color(0xFF3A3A3C)
-                : const Color(0xFFE5E5E7),
+            color: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E5E7),
             width: 1,
           ),
         ),
       ),
-      child: _buildSidebarContent(context, isDark, isGuest, browseItems, toolsItems, accountItems),
+      child: _buildSidebarContent(
+        context,
+        isDark,
+        isGuest,
+        browseItems,
+        toolsItems,
+        accountItems,
+      ),
     );
   }
 
@@ -424,17 +475,18 @@ class _SidebarBackgroundPainter extends CustomPainter {
           ];
 
     // Top orb
-    paint.shader = RadialGradient(
-      colors: [colors[0], colors[0].withValues(alpha: 0)],
-    ).createShader(
-      Rect.fromCircle(
-        center: Offset(
-          size.width * 0.8 + math.sin(animationValue * math.pi * 2) * 10,
-          size.height * 0.15 + math.cos(animationValue * math.pi * 2) * 15,
-        ),
-        radius: size.width * 0.8,
-      ),
-    );
+    paint.shader =
+        RadialGradient(
+          colors: [colors[0], colors[0].withValues(alpha: 0)],
+        ).createShader(
+          Rect.fromCircle(
+            center: Offset(
+              size.width * 0.8 + math.sin(animationValue * math.pi * 2) * 10,
+              size.height * 0.15 + math.cos(animationValue * math.pi * 2) * 15,
+            ),
+            radius: size.width * 0.8,
+          ),
+        );
     canvas.drawCircle(
       Offset(
         size.width * 0.8 + math.sin(animationValue * math.pi * 2) * 10,
@@ -445,17 +497,19 @@ class _SidebarBackgroundPainter extends CustomPainter {
     );
 
     // Middle orb
-    paint.shader = RadialGradient(
-      colors: [colors[1], colors[1].withValues(alpha: 0)],
-    ).createShader(
-      Rect.fromCircle(
-        center: Offset(
-          size.width * 0.2 + math.cos(animationValue * math.pi * 2 + 1) * 8,
-          size.height * 0.5 + math.sin(animationValue * math.pi * 2 + 1) * 20,
-        ),
-        radius: size.width * 0.6,
-      ),
-    );
+    paint.shader =
+        RadialGradient(
+          colors: [colors[1], colors[1].withValues(alpha: 0)],
+        ).createShader(
+          Rect.fromCircle(
+            center: Offset(
+              size.width * 0.2 + math.cos(animationValue * math.pi * 2 + 1) * 8,
+              size.height * 0.5 +
+                  math.sin(animationValue * math.pi * 2 + 1) * 20,
+            ),
+            radius: size.width * 0.6,
+          ),
+        );
     canvas.drawCircle(
       Offset(
         size.width * 0.2 + math.cos(animationValue * math.pi * 2 + 1) * 8,
@@ -466,17 +520,20 @@ class _SidebarBackgroundPainter extends CustomPainter {
     );
 
     // Bottom orb
-    paint.shader = RadialGradient(
-      colors: [colors[2], colors[2].withValues(alpha: 0)],
-    ).createShader(
-      Rect.fromCircle(
-        center: Offset(
-          size.width * 0.7 + math.sin(animationValue * math.pi * 2 + 2) * 12,
-          size.height * 0.85 + math.cos(animationValue * math.pi * 2 + 2) * 10,
-        ),
-        radius: size.width * 0.7,
-      ),
-    );
+    paint.shader =
+        RadialGradient(
+          colors: [colors[2], colors[2].withValues(alpha: 0)],
+        ).createShader(
+          Rect.fromCircle(
+            center: Offset(
+              size.width * 0.7 +
+                  math.sin(animationValue * math.pi * 2 + 2) * 12,
+              size.height * 0.85 +
+                  math.cos(animationValue * math.pi * 2 + 2) * 10,
+            ),
+            radius: size.width * 0.7,
+          ),
+        );
     canvas.drawCircle(
       Offset(
         size.width * 0.7 + math.sin(animationValue * math.pi * 2 + 2) * 12,
@@ -568,9 +625,10 @@ class _SidebarItemState extends State<_SidebarItem>
       duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.98).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.98,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
   }
 
   @override
@@ -625,26 +683,27 @@ class _SidebarItemState extends State<_SidebarItem>
                           ],
                         )
                       : _isHovered
-                          ? LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                (isDark
-                                        ? const Color(0xFF2C2C2E)
-                                        : const Color(0xFFE5E5EA))
-                                    .withValues(alpha: 0.6),
-                                (isDark
-                                        ? const Color(0xFF2C2C2E)
-                                        : const Color(0xFFE5E5EA))
-                                    .withValues(alpha: 0.4),
-                              ],
-                            )
-                          : null,
+                      ? LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            (isDark
+                                    ? const Color(0xFF2C2C2E)
+                                    : const Color(0xFFE5E5EA))
+                                .withValues(alpha: 0.6),
+                            (isDark
+                                    ? const Color(0xFF2C2C2E)
+                                    : const Color(0xFFE5E5EA))
+                                .withValues(alpha: 0.4),
+                          ],
+                        )
+                      : null,
                   borderRadius: BorderRadius.circular(12),
                   border: widget.isSelected
                       ? Border.all(
-                          color:
-                              _DesignColors.primaryPurple.withValues(alpha: 0.3),
+                          color: _DesignColors.primaryPurple.withValues(
+                            alpha: 0.3,
+                          ),
                           width: 1,
                         )
                       : null,
@@ -661,9 +720,7 @@ class _SidebarItemState extends State<_SidebarItem>
                       : null,
                 ),
                 child: widget.isCollapsed
-                    ? Center(
-                        child: _buildIcon(isDark),
-                      )
+                    ? Center(child: _buildIcon(isDark))
                     : Row(
                         children: [
                           _buildIcon(isDark),
@@ -679,8 +736,8 @@ class _SidebarItemState extends State<_SidebarItem>
                                 color: widget.isSelected
                                     ? _DesignColors.primaryPurple
                                     : isDark
-                                        ? CupertinoColors.white
-                                        : const Color(0xFF374151),
+                                    ? CupertinoColors.white
+                                    : const Color(0xFF374151),
                               ),
                             ),
                           ),
@@ -703,10 +760,7 @@ class _SidebarItemState extends State<_SidebarItem>
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF6366F1),
-                  Color(0xFF8B5CF6),
-                ],
+                colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
               ),
               borderRadius: BorderRadius.circular(8),
               boxShadow: [
@@ -724,8 +778,8 @@ class _SidebarItemState extends State<_SidebarItem>
         color: widget.isSelected
             ? CupertinoColors.white
             : isDark
-                ? CupertinoColors.systemGrey
-                : CupertinoColors.systemGrey,
+            ? CupertinoColors.systemGrey
+            : CupertinoColors.systemGrey,
       ),
     );
   }
@@ -736,10 +790,7 @@ class _GlassCollapseButton extends StatefulWidget {
   final bool isCollapsed;
   final VoidCallback onTap;
 
-  const _GlassCollapseButton({
-    required this.isCollapsed,
-    required this.onTap,
-  });
+  const _GlassCollapseButton({required this.isCollapsed, required this.onTap});
 
   @override
   State<_GlassCollapseButton> createState() => _GlassCollapseButtonState();
@@ -753,55 +804,123 @@ class _GlassCollapseButtonState extends State<_GlassCollapseButton> {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            gradient: _isHovered
-                ? LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      _DesignColors.primaryIndigo.withValues(alpha: 0.15),
-                      _DesignColors.primaryPurple.withValues(alpha: 0.1),
-                    ],
-                  )
-                : LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: isDark
-                        ? [
-                            const Color(0xFF2C2C2E).withValues(alpha: 0.5),
-                            const Color(0xFF1C1C1E).withValues(alpha: 0.4),
-                          ]
-                        : [
-                            const Color(0xFFF2F2F7).withValues(alpha: 0.6),
-                            const Color(0xFFFFFFFF).withValues(alpha: 0.5),
-                          ],
-                  ),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: _isHovered
-                  ? _DesignColors.primaryPurple.withValues(alpha: 0.3)
-                  : isDark
-                      ? const Color(0xFF3A3A3C).withValues(alpha: 0.3)
-                      : const Color(0xFFD1D1D6).withValues(alpha: 0.4),
-              width: 1,
+    return Tooltip(
+      message: widget.isCollapsed ? 'Expand sidebar' : 'Collapse sidebar',
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: widget.isCollapsed ? 12 : 14,
+              vertical: 12,
             ),
-          ),
-          child: Icon(
-            widget.isCollapsed
-                ? CupertinoIcons.sidebar_right
-                : CupertinoIcons.sidebar_left,
-            size: 18,
-            color: _isHovered
-                ? _DesignColors.primaryPurple
-                : CupertinoColors.systemGrey,
+            decoration: BoxDecoration(
+              gradient: _isHovered
+                  ? LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        _DesignColors.primaryIndigo.withValues(alpha: 0.2),
+                        _DesignColors.primaryPurple.withValues(alpha: 0.15),
+                      ],
+                    )
+                  : LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: isDark
+                          ? [
+                              const Color(0xFF2C2C2E).withValues(alpha: 0.6),
+                              const Color(0xFF1C1C1E).withValues(alpha: 0.5),
+                            ]
+                          : [
+                              const Color(0xFFF2F2F7).withValues(alpha: 0.8),
+                              const Color(0xFFFFFFFF).withValues(alpha: 0.7),
+                            ],
+                    ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: _isHovered
+                    ? _DesignColors.primaryPurple.withValues(alpha: 0.4)
+                    : isDark
+                    ? const Color(0xFF3A3A3C).withValues(alpha: 0.4)
+                    : const Color(0xFFD1D1D6).withValues(alpha: 0.5),
+                width: 1,
+              ),
+              boxShadow: _isHovered
+                  ? [
+                      BoxShadow(
+                        color: _DesignColors.primaryPurple.withValues(
+                          alpha: 0.15,
+                        ),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: widget.isCollapsed
+                ? Center(
+                    child: AnimatedRotation(
+                      turns: widget.isCollapsed ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOutCubic,
+                      child: Icon(
+                        CupertinoIcons.sidebar_left,
+                        size: 18,
+                        color: _isHovered
+                            ? _DesignColors.primaryPurple
+                            : isDark
+                            ? CupertinoColors.systemGrey
+                            : CupertinoColors.systemGrey2,
+                      ),
+                    ),
+                  )
+                : Row(
+                    children: [
+                      AnimatedRotation(
+                        turns: widget.isCollapsed ? 0.5 : 0,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOutCubic,
+                        child: Icon(
+                          CupertinoIcons.sidebar_left,
+                          size: 18,
+                          color: _isHovered
+                              ? _DesignColors.primaryPurple
+                              : isDark
+                              ? CupertinoColors.systemGrey
+                              : CupertinoColors.systemGrey2,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Collapse',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: _isHovered
+                                ? _DesignColors.primaryPurple
+                                : isDark
+                                ? CupertinoColors.systemGrey
+                                : CupertinoColors.systemGrey2,
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        CupertinoIcons.chevron_left,
+                        size: 14,
+                        color: _isHovered
+                            ? _DesignColors.primaryPurple.withValues(alpha: 0.7)
+                            : isDark
+                            ? CupertinoColors.systemGrey.withValues(alpha: 0.5)
+                            : CupertinoColors.systemGrey2.withValues(
+                                alpha: 0.5,
+                              ),
+                      ),
+                    ],
+                  ),
           ),
         ),
       ),
