@@ -120,6 +120,15 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
 
   /// Fetch tag suggestions from the API
   Future<void> _fetchTagSuggestions(String query) async {
+    // Don't fetch or show suggestions if not focused
+    if (!_focusNode.hasFocus) {
+      setState(() {
+        _tagSuggestions = [];
+        _showTagSuggestions = false;
+      });
+      return;
+    }
+
     if (query.isEmpty || query.length < 2) {
       setState(() {
         _tagSuggestions = [];
@@ -133,12 +142,12 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
     final apiService = context.read<ApiService>();
     final result = await apiService.searchTags(query: query, limit: 10);
 
-    if (mounted) {
+    if (mounted && _focusNode.hasFocus) {
       result.when(
         success: (tags) {
           setState(() {
             _tagSuggestions = tags;
-            _showTagSuggestions = tags.isNotEmpty;
+            _showTagSuggestions = tags.isNotEmpty && _focusNode.hasFocus;
             _isLoadingTags = false;
           });
         },
@@ -150,6 +159,12 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
           });
         },
       );
+    } else if (mounted) {
+      setState(() {
+        _tagSuggestions = [];
+        _showTagSuggestions = false;
+        _isLoadingTags = false;
+      });
     }
   }
 
@@ -335,7 +350,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
               ],
             ),
             // Tag suggestions overlay - adjusted position
-            if (_showTagSuggestions && _tagSuggestions.isNotEmpty)
+            if (_showTagSuggestions && _tagSuggestions.isNotEmpty && _focusNode.hasFocus)
               Positioned(
                 top: 56, // Below search field
                 left: 0,
@@ -537,10 +552,15 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
         });
       },
       onSubmitted: (_) {
+        // Cancel any pending tag fetches
+        _tagDebouncer.cancel();
         setState(() {
           _showTagSuggestions = false;
           _tagSuggestions = [];
+          _isLoadingTags = false;
         });
+        // Unfocus to ensure suggestions stay closed
+        _focusNode.unfocus();
         _performSearch();
       },
     );

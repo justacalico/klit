@@ -78,13 +78,27 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
       _searchController.text = widget.initialQuery!;
       _performSearch();
     }
+
+    // Listen for focus changes to close tag suggestions
+    _focusNode.addListener(_onFocusChanged);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
   }
 
+  void _onFocusChanged() {
+    if (!_focusNode.hasFocus && _showTagSuggestions) {
+      setState(() {
+        _showTagSuggestions = false;
+        _tagSuggestions = [];
+      });
+    }
+  }
+
   @override
   void dispose() {
+    _focusNode.removeListener(_onFocusChanged);
     _filterAnimationController.dispose();
     _searchController.dispose();
     _focusNode.dispose();
@@ -105,6 +119,15 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
 
   /// Fetch tag suggestions from the API
   Future<void> _fetchTagSuggestions(String query) async {
+    // Don't fetch or show suggestions if not focused
+    if (!_focusNode.hasFocus) {
+      setState(() {
+        _tagSuggestions = [];
+        _showTagSuggestions = false;
+      });
+      return;
+    }
+
     if (query.isEmpty || query.length < 2) {
       setState(() {
         _tagSuggestions = [];
@@ -118,12 +141,12 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
     final apiService = context.read<ApiService>();
     final result = await apiService.searchTags(query: query, limit: 10);
 
-    if (mounted) {
+    if (mounted && _focusNode.hasFocus) {
       result.when(
         success: (tags) {
           setState(() {
             _tagSuggestions = tags;
-            _showTagSuggestions = tags.isNotEmpty;
+            _showTagSuggestions = tags.isNotEmpty && _focusNode.hasFocus;
             _isLoadingTags = false;
           });
         },
@@ -135,6 +158,12 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
           });
         },
       );
+    } else if (mounted) {
+      setState(() {
+        _tagSuggestions = [];
+        _showTagSuggestions = false;
+        _isLoadingTags = false;
+      });
     }
   }
 
@@ -288,7 +317,7 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
             },
           ),
         // Tag suggestions overlay
-        if (_showTagSuggestions && _tagSuggestions.isNotEmpty)
+        if (_showTagSuggestions && _tagSuggestions.isNotEmpty && _focusNode.hasFocus)
           Positioned(
             top: 52, // Below toolbar
             left: 48, // Aligned with search field
@@ -563,10 +592,15 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
                     });
                   },
                   onSubmitted: (_) {
+                    // Cancel any pending tag fetches
+                    _tagDebouncer.cancel();
                     setState(() {
                       _showTagSuggestions = false;
                       _tagSuggestions = [];
+                      _isLoadingTags = false;
                     });
+                    // Unfocus to ensure suggestions stay closed
+                    _focusNode.unfocus();
                     _performSearch();
                   },
                 ),
@@ -576,10 +610,14 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
                 icon: CupertinoIcons.search,
                 tooltip: 'Search',
                 onPressed: () {
+                  // Cancel any pending tag fetches
+                  _tagDebouncer.cancel();
                   setState(() {
                     _showTagSuggestions = false;
                     _tagSuggestions = [];
+                    _isLoadingTags = false;
                   });
+                  _focusNode.unfocus();
                   _performSearch();
                 },
               ),
