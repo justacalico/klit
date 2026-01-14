@@ -64,6 +64,8 @@ class SettingsPage extends StatelessWidget {
                 const SizedBox(height: 24),
                 _buildCustomizationSection(context, isDark),
                 const SizedBox(height: 24),
+                _buildVideoSection(context, isDark),
+                const SizedBox(height: 24),
                 _buildNetworkSection(context, isDark),
                 const SizedBox(height: 24),
                 _buildCacheSection(context, isDark),
@@ -521,6 +523,51 @@ class SettingsPage extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildVideoSection(BuildContext context, bool isDark) {
+    return _buildLiquidGlassSection(
+      context,
+      isDark: isDark,
+      title: 'VIDEO',
+      children: [
+        Consumer<SettingsProvider>(
+          builder: (context, settings, _) {
+            return _buildLiquidGlassTile(
+              context,
+              isDark: isDark,
+              icon: CupertinoIcons.play_circle_fill,
+              iconColor: AppColors.primaryBlue,
+              title: 'Auto Play',
+              subtitle: 'Automatically play videos when viewing',
+              trailing: CupertinoSwitch(
+                value: settings.videoAutoPlay,
+                activeTrackColor: AppColors.primaryGreen,
+                onChanged: (value) => settings.setVideoAutoPlay(value),
+              ),
+            );
+          },
+        ),
+        _buildLiquidGlassDivider(isDark),
+        Consumer<SettingsProvider>(
+          builder: (context, settings, _) {
+            return _buildLiquidGlassTile(
+              context,
+              isDark: isDark,
+              icon: CupertinoIcons.speaker_slash_fill,
+              iconColor: AppColors.primaryOrange,
+              title: 'Mute by Default',
+              subtitle: 'Start videos muted',
+              trailing: CupertinoSwitch(
+                value: settings.videoMuteByDefault,
+                activeTrackColor: AppColors.primaryGreen,
+                onChanged: (value) => settings.setVideoMuteByDefault(value),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 

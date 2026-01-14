@@ -27,6 +27,8 @@ class AppConstants {
   static const String blacklistKey = 'user_blacklist';
   static const String blacklistEnabledKey = 'blacklist_enabled';
   static const String uiStyleKey = 'ui_style';
+  static const String videoAutoPlayKey = 'video_auto_play';
+  static const String videoMuteByDefaultKey = 'video_mute_by_default';
 
   /// Default grid columns
   static const int defaultGridColumns = 2;

@@ -386,6 +386,26 @@ class StorageService {
     await _prefs.setBool(AppConstants.blacklistEnabledKey, enabled);
   }
 
+  /// Get video auto play setting
+  bool getVideoAutoPlay() {
+    return _prefs.getBool(AppConstants.videoAutoPlayKey) ?? true;
+  }
+
+  /// Set video auto play setting
+  Future<void> setVideoAutoPlay(bool enabled) async {
+    await _prefs.setBool(AppConstants.videoAutoPlayKey, enabled);
+  }
+
+  /// Get video mute by default setting
+  bool getVideoMuteByDefault() {
+    return _prefs.getBool(AppConstants.videoMuteByDefaultKey) ?? true;
+  }
+
+  /// Set video mute by default setting
+  Future<void> setVideoMuteByDefault(bool enabled) async {
+    await _prefs.setBool(AppConstants.videoMuteByDefaultKey, enabled);
+  }
+
   // ==================== Cache Management ====================
 
   /// Clear all preferences (not secure storage)

@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart'
-    show Material, ListTile, ReorderableListView;
+    show Material, ListTile, ReorderableListView, Divider;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import '../../../app/routes.dart';
@@ -77,6 +77,12 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
       title: 'Behavior',
       icon: CupertinoIcons.sparkles,
       color: _DesignColors.accentOrange,
+    ),
+    _SettingsCategory(
+      id: 'video',
+      title: 'Video',
+      icon: CupertinoIcons.play_rectangle_fill,
+      color: _DesignColors.primaryIndigo,
     ),
     _SettingsCategory(
       id: 'customization',
@@ -427,6 +433,8 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
         return 'Configure content display options';
       case 'behavior':
         return 'Adjust app behavior and animations';
+      case 'video':
+        return 'Video playback settings';
       case 'customization':
         return 'Personalize your experience';
       case 'network':
@@ -448,6 +456,8 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
         return _buildContentSettings(isDark);
       case 'behavior':
         return _buildBehaviorContent(isDark);
+      case 'video':
+        return _buildVideoContent(isDark);
       case 'customization':
         return _buildCustomizationContent(isDark);
       case 'network':
@@ -1110,6 +1120,58 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                   activeTrackColor: _DesignColors.accentOrange,
                   onChanged: (value) => settings.setConfettiOnFavorite(value),
                 ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // ============================================
+  // Video Content
+  // ============================================
+  Widget _buildVideoContent(bool isDark) {
+    return Consumer<SettingsProvider>(
+      builder: (context, settings, _) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSettingsCard(
+              isDark: isDark,
+              child: Column(
+                children: [
+                  _buildSettingRow(
+                    isDark: isDark,
+                    icon: CupertinoIcons.play_circle_fill,
+                    iconColor: _DesignColors.primaryIndigo,
+                    title: 'Auto Play',
+                    subtitle: 'Automatically play videos when viewing',
+                    trailing: CupertinoSwitch(
+                      value: settings.videoAutoPlay,
+                      activeTrackColor: _DesignColors.primaryIndigo,
+                      onChanged: (value) => settings.setVideoAutoPlay(value),
+                    ),
+                  ),
+                  Divider(
+                    height: 1,
+                    color: isDark
+                        ? CupertinoColors.white.withValues(alpha: 0.1)
+                        : CupertinoColors.black.withValues(alpha: 0.05),
+                  ),
+                  _buildSettingRow(
+                    isDark: isDark,
+                    icon: CupertinoIcons.speaker_slash_fill,
+                    iconColor: _DesignColors.accentOrange,
+                    title: 'Mute by Default',
+                    subtitle: 'Start videos muted',
+                    trailing: CupertinoSwitch(
+                      value: settings.videoMuteByDefault,
+                      activeTrackColor: _DesignColors.accentOrange,
+                      onChanged: (value) => settings.setVideoMuteByDefault(value),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

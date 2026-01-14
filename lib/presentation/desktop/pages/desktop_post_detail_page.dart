@@ -928,14 +928,16 @@ class _DesktopPostDetailPageState extends State<DesktopPostDetailPage>
 
   Widget _buildMedia(Post post) {
     if (post.isVideo && post.file.url != null) {
+      final settings = context.read<SettingsProvider>();
       return VideoPlayerWidget(
         key: ValueKey('video_${post.id}_${post.file.url}'),
         videoUrl: post.file.url!,
         thumbnailUrl: post.preview.url,
-        autoPlay: true,
+        autoPlay: settings.videoAutoPlay,
         looping: true,
         showControls: true,
         aspectRatio: post.file.aspectRatio,
+        muteByDefault: settings.videoMuteByDefault,
       );
     }
 

@@ -28,6 +28,8 @@ class SettingsProvider extends ChangeNotifier {
   String _blacklist = '';
   bool _blacklistEnabled = true;
   UIStyle _uiStyle = UIStyle.liquidGlass;
+  bool _videoAutoPlay = true;
+  bool _videoMuteByDefault = true;
 
   /// Callback to notify when proxy configuration changes
   ProxyChangeCallback? onProxyChanged;
@@ -53,6 +55,8 @@ class SettingsProvider extends ChangeNotifier {
   String get blacklist => _blacklist;
   bool get blacklistEnabled => _blacklistEnabled;
   UIStyle get uiStyle => _uiStyle;
+  bool get videoAutoPlay => _videoAutoPlay;
+  bool get videoMuteByDefault => _videoMuteByDefault;
 
   /// Get blacklist as a list of tag queries (each line is a filter)
   List<String> get blacklistLines {
@@ -80,6 +84,8 @@ class SettingsProvider extends ChangeNotifier {
     _blacklist = _storageService.getBlacklist();
     _blacklistEnabled = _storageService.getBlacklistEnabled();
     _uiStyle = UIStyle.values[_storageService.getUIStyle().clamp(0, UIStyle.values.length - 1)];
+    _videoAutoPlay = _storageService.getVideoAutoPlay();
+    _videoMuteByDefault = _storageService.getVideoMuteByDefault();
     notifyListeners();
   }
 
@@ -228,6 +234,20 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> setUIStyle(UIStyle style) async {
     _uiStyle = style;
     await _storageService.setUIStyle(style.index);
+    notifyListeners();
+  }
+
+  /// Set video auto play
+  Future<void> setVideoAutoPlay(bool enabled) async {
+    _videoAutoPlay = enabled;
+    await _storageService.setVideoAutoPlay(enabled);
+    notifyListeners();
+  }
+
+  /// Set video mute by default
+  Future<void> setVideoMuteByDefault(bool enabled) async {
+    _videoMuteByDefault = enabled;
+    await _storageService.setVideoMuteByDefault(enabled);
     notifyListeners();
   }
 

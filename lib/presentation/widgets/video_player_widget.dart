@@ -22,6 +22,7 @@ class VideoPlayerWidget extends StatefulWidget {
   final bool looping;
   final bool showControls;
   final double? aspectRatio;
+  final bool muteByDefault;
 
   const VideoPlayerWidget({
     super.key,
@@ -31,6 +32,7 @@ class VideoPlayerWidget extends StatefulWidget {
     this.looping = false,
     this.showControls = true,
     this.aspectRatio,
+    this.muteByDefault = true,
   });
 
   @override
@@ -116,6 +118,11 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       _player!.setPlaylistMode(PlaylistMode.single);
     }
 
+    // Set volume based on mute setting
+    if (widget.muteByDefault) {
+      await _player!.setVolume(0);
+    }
+
     // Open the video
     await _player!.open(Media(widget.videoUrl), play: widget.autoPlay);
 
@@ -132,6 +139,11 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     );
 
     await _videoController!.initialize();
+
+    // Set volume based on mute setting
+    if (widget.muteByDefault) {
+      await _videoController!.setVolume(0);
+    }
 
     _chewieController = ChewieController(
       videoPlayerController: _videoController!,
@@ -291,11 +303,13 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 class FullScreenVideoViewer extends StatefulWidget {
   final String videoUrl;
   final String? thumbnailUrl;
+  final bool muteByDefault;
 
   const FullScreenVideoViewer({
     super.key,
     required this.videoUrl,
     this.thumbnailUrl,
+    this.muteByDefault = true,
   });
 
   @override
@@ -344,6 +358,11 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
     // Loop videos by default in fullscreen
     _player!.setPlaylistMode(PlaylistMode.single);
 
+    // Set volume based on mute setting
+    if (widget.muteByDefault) {
+      await _player!.setVolume(0);
+    }
+
     // Open the video and autoplay
     await _player!.open(Media(widget.videoUrl), play: true);
 
@@ -360,6 +379,11 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
     );
 
     await _videoController!.initialize();
+
+    // Set volume based on mute setting
+    if (widget.muteByDefault) {
+      await _videoController!.setVolume(0);
+    }
 
     _chewieController = ChewieController(
       videoPlayerController: _videoController!,
