@@ -27,8 +27,6 @@ class MainTabPage extends StatefulWidget {
 }
 
 class _MainTabPageState extends State<MainTabPage> {
-  int _currentIndex = 0;
-
   // All available pages mapped by their ID
   static const Map<int, Widget> _allPages = {
     0: HomePage(),
@@ -66,6 +64,22 @@ class _MainTabPageState extends State<MainTabPage> {
       'label': 'Settings',
     },
   };
+
+  /// Get the current index from navigation provider, converted for mobile
+  int _getCurrentIndex(NavigationProvider navProvider, List<int> navOrder) {
+    final mobileIndex = navProvider.getMobileIndex();
+    // Find the position in the ordered nav list
+    final position = navOrder.indexOf(mobileIndex);
+    return position >= 0 ? position : 0;
+  }
+
+  /// Set the index in navigation provider from mobile index
+  void _setIndex(NavigationProvider navProvider, List<int> navOrder, int position) {
+    if (position >= 0 && position < navOrder.length) {
+      final mobileIndex = navOrder[position];
+      navProvider.setFromMobileIndex(mobileIndex);
+    }
+  }
 
   void _handleLogout(BuildContext context) {
     showCupertinoDialog(
@@ -105,6 +119,7 @@ class _MainTabPageState extends State<MainTabPage> {
     final isDark = brightness == Brightness.dark;
     final isGuest = context.watch<AuthProvider>().isGuest;
     final rawNavOrder = context.watch<SettingsProvider>().mobileNavOrder;
+    final navProvider = context.watch<NavigationProvider>();
     final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
 
     // Filter out Profile (id 3) when in guest mode
@@ -114,6 +129,9 @@ class _MainTabPageState extends State<MainTabPage> {
 
     // Build pages list based on custom order
     final orderedPages = navOrder.map((id) => _allPages[id]!).toList();
+    
+    // Get current index from navigation provider
+    final currentIndex = _getCurrentIndex(navProvider, navOrder);
 
     return PopScope(
       canPop: false,
@@ -121,15 +139,15 @@ class _MainTabPageState extends State<MainTabPage> {
         child: Stack(
           children: [
             // Page content based on custom order
-            IndexedStack(index: _currentIndex, children: orderedPages),
+            IndexedStack(index: currentIndex, children: orderedPages),
             // Modern gradient navigation bar
             Positioned(
               left: 16,
               right: 16,
               bottom: MediaQuery.of(context).padding.bottom + 16,
               child: isLiquidGlass
-                  ? _buildLiquidGlassNavBar(isDark, isGuest, navOrder)
-                  : _buildMaterialNavBar(isDark, isGuest, navOrder),
+                  ? _buildLiquidGlassNavBar(isDark, isGuest, navOrder, navProvider, currentIndex)
+                  : _buildMaterialNavBar(isDark, isGuest, navOrder, navProvider, currentIndex),
             ),
           ],
         ),
@@ -137,7 +155,7 @@ class _MainTabPageState extends State<MainTabPage> {
     );
   }
 
-  Widget _buildLiquidGlassNavBar(bool isDark, bool isGuest, List<int> navOrder) {
+  Widget _buildLiquidGlassNavBar(bool isDark, bool isGuest, List<int> navOrder, NavigationProvider navProvider, int currentIndex) {
     return Container(
       height: 68,
       decoration: BoxDecoration(
@@ -188,14 +206,14 @@ class _MainTabPageState extends State<MainTabPage> {
                 width: 1,
               ),
             ),
-            child: _buildNavBarContent(isDark, isGuest, navOrder),
+            child: _buildNavBarContent(isDark, isGuest, navOrder, navProvider, currentIndex),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildMaterialNavBar(bool isDark, bool isGuest, List<int> navOrder) {
+  Widget _buildMaterialNavBar(bool isDark, bool isGuest, List<int> navOrder, NavigationProvider navProvider, int currentIndex) {
     return Container(
       height: 68,
       decoration: BoxDecoration(
@@ -216,11 +234,11 @@ class _MainTabPageState extends State<MainTabPage> {
           width: 1,
         ),
       ),
-      child: _buildNavBarContent(isDark, isGuest, navOrder),
+      child: _buildNavBarContent(isDark, isGuest, navOrder, navProvider, currentIndex),
     );
   }
 
-  Widget _buildNavBarContent(bool isDark, bool isGuest, List<int> navOrder) {
+  Widget _buildNavBarContent(bool isDark, bool isGuest, List<int> navOrder, NavigationProvider navProvider, int currentIndex) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -232,6 +250,9 @@ class _MainTabPageState extends State<MainTabPage> {
           else
             _buildModernNavItem(
               index: i,
+              currentIndex: currentIndex,
+              navOrder: navOrder,
+              navProvider: navProvider,
               icon: _navItemDefs[navOrder[i]]!['icon'] as IconData,
               activeIcon: _navItemDefs[navOrder[i]]!['activeIcon'] as IconData,
               label: _navItemDefs[navOrder[i]]!['label'] as String,
@@ -278,12 +299,15 @@ class _MainTabPageState extends State<MainTabPage> {
 
   Widget _buildModernNavItem({
     required int index,
+    required int currentIndex,
+    required List<int> navOrder,
+    required NavigationProvider navProvider,
     required IconData icon,
     required IconData activeIcon,
     required String label,
     required bool isDark,
   }) {
-    final isSelected = _currentIndex == index;
+    final isSelected = currentIndex == index;
 
     // Purple gradient for selected items
     final selectedColor = MobileThemeColors.primaryPurple;
@@ -294,7 +318,7 @@ class _MainTabPageState extends State<MainTabPage> {
     return GestureDetector(
       onTap: () {
         HapticUtils.selectionClick();
-        setState(() => _currentIndex = index);
+        _setIndex(navProvider, navOrder, index);
       },
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(

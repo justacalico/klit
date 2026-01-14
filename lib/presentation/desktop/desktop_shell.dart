@@ -1,9 +1,11 @@
 import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import '../../core/input/input.dart';
 import '../../core/theme/ui_style_manager.dart';
 import '../pages/post/post_detail_page.dart';
+import '../providers/navigation_provider.dart';
 import 'pages/desktop_favorites_page.dart';
 import 'pages/desktop_home_page.dart';
 import 'pages/desktop_hot_page.dart';
@@ -32,7 +34,6 @@ class DesktopShell extends StatefulWidget {
 
 class _DesktopShellState extends State<DesktopShell>
     with SingleTickerProviderStateMixin, GamepadInputMixin {
-  int _selectedIndex = 0;
   bool _sidebarCollapsed = false;
 
   // For post detail view
@@ -90,7 +91,9 @@ class _DesktopShellState extends State<DesktopShell>
     // Don't handle if post detail is open (it handles its own navigation)
     if (_postDetailArgs != null) return;
 
-    final currentNavIndex = _sidebarNavOrder.indexOf(_selectedIndex);
+    final navProvider = context.read<NavigationProvider>();
+    final selectedIndex = navProvider.getDesktopIndex();
+    final currentNavIndex = _sidebarNavOrder.indexOf(selectedIndex);
 
     switch (direction) {
       case GamepadDirection.up:
@@ -137,8 +140,9 @@ class _DesktopShellState extends State<DesktopShell>
   }
 
   void _onNavItemSelected(int index) {
+    final navProvider = context.read<NavigationProvider>();
+    navProvider.setFromDesktopIndex(index);
     setState(() {
-      _selectedIndex = index;
       _searchQuery = null;
     });
   }
@@ -156,8 +160,9 @@ class _DesktopShellState extends State<DesktopShell>
   }
 
   void _openSearch([String? query]) {
+    final navProvider = context.read<NavigationProvider>();
+    navProvider.setFromDesktopIndex(4); // Search tab
     setState(() {
-      _selectedIndex = 4; // Search tab
       _searchQuery = query;
       _postDetailArgs = null;
     });
@@ -174,6 +179,8 @@ class _DesktopShellState extends State<DesktopShell>
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
     final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
+    final navProvider = context.watch<NavigationProvider>();
+    final selectedIndex = navProvider.getDesktopIndex();
 
     return CupertinoPageScaffold(
       child: Container(
@@ -200,13 +207,13 @@ class _DesktopShellState extends State<DesktopShell>
               children: [
                 // Sidebar
                 DesktopSidebar(
-                  selectedIndex: _selectedIndex,
+                  selectedIndex: selectedIndex,
                   onItemSelected: _onNavItemSelected,
                   isCollapsed: _sidebarCollapsed,
                   onToggleCollapse: _toggleSidebar,
                 ),
                 // Main content area
-                Expanded(child: ClipRect(child: _buildMainContent())),
+                Expanded(child: ClipRect(child: _buildMainContent(selectedIndex))),
               ],
             ),
             // Full-screen post detail overlay
@@ -217,8 +224,8 @@ class _DesktopShellState extends State<DesktopShell>
     );
   }
 
-  Widget _buildMainContent() {
-    switch (_selectedIndex) {
+  Widget _buildMainContent(int selectedIndex) {
+    switch (selectedIndex) {
       case 0:
         return DesktopHomePage(
           onPostTap: _openPostDetail,

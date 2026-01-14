@@ -61,6 +61,9 @@ void main() async {
     );
   });
 
+  // Create navigation provider for shared navigation state
+  final navigationProvider = NavigationProvider();
+
   runApp(
     MultiProvider(
       providers: [
@@ -70,6 +73,7 @@ void main() async {
         ChangeNotifierProvider<SettingsProvider>.value(value: settingsProvider),
         ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
         ChangeNotifierProvider<PostsProvider>.value(value: postsProvider),
+        ChangeNotifierProvider<NavigationProvider>.value(value: navigationProvider),
       ],
       child: const KlitApp(),
     ),
