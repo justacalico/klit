@@ -939,6 +939,24 @@ class SettingsPage extends StatelessWidget {
               icon: CupertinoIcons.clock_fill,
               iconColor: AppColors.primaryTeal,
               title: 'Search History',
+              subtitle: settings.searchHistoryEnabled ? 'Enabled' : 'Disabled',
+              trailing: CupertinoSwitch(
+                value: settings.searchHistoryEnabled,
+                activeTrackColor: AppColors.primaryGreen,
+                onChanged: (value) => settings.setSearchHistoryEnabled(value),
+              ),
+            );
+          },
+        ),
+        _buildLiquidGlassDivider(isDark),
+        Consumer<SettingsProvider>(
+          builder: (context, settings, _) {
+            return _buildLiquidGlassTile(
+              context,
+              isDark: isDark,
+              icon: CupertinoIcons.trash_circle_fill,
+              iconColor: CupertinoColors.destructiveRed,
+              title: 'Clear Search History',
               subtitle: '${settings.searchHistory.length} items',
               trailing: GestureDetector(
                 onTap: settings.searchHistory.isEmpty

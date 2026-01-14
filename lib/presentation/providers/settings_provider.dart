@@ -30,6 +30,7 @@ class SettingsProvider extends ChangeNotifier {
   UIStyle _uiStyle = UIStyle.liquidGlass;
   bool _videoAutoPlay = true;
   bool _videoMuteByDefault = true;
+  bool _searchHistoryEnabled = true;
 
   /// Callback to notify when proxy configuration changes
   ProxyChangeCallback? onProxyChanged;
@@ -57,6 +58,7 @@ class SettingsProvider extends ChangeNotifier {
   UIStyle get uiStyle => _uiStyle;
   bool get videoAutoPlay => _videoAutoPlay;
   bool get videoMuteByDefault => _videoMuteByDefault;
+  bool get searchHistoryEnabled => _searchHistoryEnabled;
 
   /// Get blacklist as a list of tag queries (each line is a filter)
   List<String> get blacklistLines {
@@ -86,6 +88,7 @@ class SettingsProvider extends ChangeNotifier {
     _uiStyle = UIStyle.values[_storageService.getUIStyle().clamp(0, UIStyle.values.length - 1)];
     _videoAutoPlay = _storageService.getVideoAutoPlay();
     _videoMuteByDefault = _storageService.getVideoMuteByDefault();
+    _searchHistoryEnabled = _storageService.getSearchHistoryEnabled();
     notifyListeners();
   }
 
@@ -168,6 +171,7 @@ class SettingsProvider extends ChangeNotifier {
 
   /// Add to search history
   Future<void> addToSearchHistory(String query) async {
+    if (!_searchHistoryEnabled) return;
     await _storageService.addToSearchHistory(query);
     _searchHistory = _storageService.getSearchHistory();
     notifyListeners();
@@ -177,6 +181,13 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> clearSearchHistory() async {
     await _storageService.clearSearchHistory();
     _searchHistory = [];
+    notifyListeners();
+  }
+
+  /// Set search history enabled
+  Future<void> setSearchHistoryEnabled(bool enabled) async {
+    _searchHistoryEnabled = enabled;
+    await _storageService.setSearchHistoryEnabled(enabled);
     notifyListeners();
   }
 

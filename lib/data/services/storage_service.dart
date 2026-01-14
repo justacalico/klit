@@ -346,6 +346,16 @@ class StorageService {
     await _prefs.remove(AppConstants.searchHistoryKey);
   }
 
+  /// Get search history enabled
+  bool getSearchHistoryEnabled() {
+    return _prefs.getBool(AppConstants.searchHistoryEnabledKey) ?? true;
+  }
+
+  /// Set search history enabled
+  Future<void> setSearchHistoryEnabled(bool enabled) async {
+    await _prefs.setBool(AppConstants.searchHistoryEnabledKey, enabled);
+  }
+
   // ==================== Proxy Configuration ====================
 
   /// Get proxy configuration

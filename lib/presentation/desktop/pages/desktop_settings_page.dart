@@ -93,6 +93,12 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
       color: _DesignColors.accentTeal,
     ),
     _SettingsCategory(
+      id: 'data',
+      title: 'Data',
+      icon: CupertinoIcons.tray_full_fill,
+      color: CupertinoColors.systemBlue,
+    ),
+    _SettingsCategory(
       id: 'network',
       title: 'Network',
       icon: CupertinoIcons.globe,
@@ -439,6 +445,8 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
         return 'Video playback settings';
       case 'customization':
         return 'Personalize your experience';
+      case 'data':
+        return 'Manage search history and cache';
       case 'network':
         return 'Network and proxy settings';
       case 'about':
@@ -462,6 +470,8 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
         return _buildVideoContent(isDark);
       case 'customization':
         return _buildCustomizationContent(isDark);
+      case 'data':
+        return _buildDataContent(isDark);
       case 'network':
         return _buildNetworkContent(isDark);
       case 'about':
@@ -1333,6 +1343,112 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
             ],
           );
         },
+      ),
+    );
+  }
+
+  // ============================================
+  // Data Content
+  // ============================================
+  Widget _buildDataContent(bool isDark) {
+    return Consumer<SettingsProvider>(
+      builder: (context, settings, _) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSettingsCard(
+              isDark: isDark,
+              child: Column(
+                children: [
+                  _buildSettingRow(
+                    isDark: isDark,
+                    icon: CupertinoIcons.clock_fill,
+                    iconColor: CupertinoColors.systemBlue,
+                    title: 'Search History',
+                    subtitle: settings.searchHistoryEnabled
+                        ? 'Save recent searches'
+                        : 'History disabled',
+                    trailing: CupertinoSwitch(
+                      value: settings.searchHistoryEnabled,
+                      activeTrackColor: CupertinoColors.systemBlue,
+                      onChanged: (value) =>
+                          settings.setSearchHistoryEnabled(value),
+                    ),
+                  ),
+                  Divider(
+                    height: 1,
+                    color: isDark
+                        ? CupertinoColors.white.withValues(alpha: 0.1)
+                        : CupertinoColors.black.withValues(alpha: 0.05),
+                  ),
+                  _buildSettingRow(
+                    isDark: isDark,
+                    icon: CupertinoIcons.trash_circle_fill,
+                    iconColor: CupertinoColors.destructiveRed,
+                    title: 'Clear Search History',
+                    subtitle: '${settings.searchHistory.length} items stored',
+                    trailing: CupertinoButton(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      color: settings.searchHistory.isEmpty
+                          ? CupertinoColors.systemGrey.withValues(alpha: 0.2)
+                          : CupertinoColors.destructiveRed.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(8),
+                      onPressed: settings.searchHistory.isEmpty
+                          ? null
+                          : () => _confirmClearSearchHistory(context, settings, isDark),
+                      child: Text(
+                        'Clear',
+                        style: TextStyle(
+                          color: settings.searchHistory.isEmpty
+                              ? CupertinoColors.systemGrey
+                              : CupertinoColors.destructiveRed,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _confirmClearSearchHistory(
+    BuildContext context,
+    SettingsProvider settings,
+    bool isDark,
+  ) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('Clear Search History'),
+        content: const Padding(
+          padding: EdgeInsets.only(top: 8),
+          child: Text(
+            'Are you sure you want to clear your search history? This cannot be undone.',
+          ),
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.pop(context),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              settings.clearSearchHistory();
+              Navigator.pop(context);
+            },
+            child: const Text('Clear'),
+          ),
+        ],
       ),
     );
   }

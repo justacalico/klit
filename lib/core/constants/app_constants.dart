@@ -29,6 +29,7 @@ class AppConstants {
   static const String uiStyleKey = 'ui_style';
   static const String videoAutoPlayKey = 'video_auto_play';
   static const String videoMuteByDefaultKey = 'video_mute_by_default';
+  static const String searchHistoryEnabledKey = 'search_history_enabled';
 
   /// Default grid columns
   static const int defaultGridColumns = 2;
