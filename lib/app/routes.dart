@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import '../presentation/desktop/responsive_layout.dart';
 import '../presentation/pages/auth/login_page.dart';
-import '../presentation/pages/favorites/favorites_page.dart';
+import '../presentation/pages/favorites/responsive_favorites_page.dart';
 import '../presentation/pages/post/post_detail_page.dart';
-import '../presentation/pages/profile/profile_page.dart';
-import '../presentation/pages/search/search_page.dart';
+import '../presentation/pages/post/responsive_post_detail_page.dart';
+import '../presentation/pages/profile/responsive_profile_page.dart';
+import '../presentation/pages/search/responsive_search_page.dart';
 import '../presentation/pages/settings/account_management_page.dart';
 import '../presentation/pages/settings/host_settings_page.dart';
 
@@ -44,7 +45,7 @@ class AppRouter {
       case AppRoutes.postDetail:
         final args = settings.arguments as PostDetailArguments;
         return CupertinoPageRoute(
-          builder: (_) => PostDetailPage(
+          builder: (_) => ResponsivePostDetailPage(
             postIds: args.postIds,
             initialIndex: args.initialIndex,
             onLoadMore: args.onLoadMore,
@@ -56,19 +57,19 @@ class AppRouter {
       case AppRoutes.search:
         final initialQuery = settings.arguments as String?;
         return CupertinoPageRoute(
-          builder: (_) => SearchPage(initialQuery: initialQuery),
+          builder: (_) => ResponsiveSearchPage(initialQuery: initialQuery),
           settings: settings,
         );
 
       case AppRoutes.profile:
         return CupertinoPageRoute(
-          builder: (_) => const ProfilePage(),
+          builder: (_) => const ResponsiveProfilePage(),
           settings: settings,
         );
 
       case AppRoutes.favorites:
         return CupertinoPageRoute(
-          builder: (_) => const FavoritesPage(),
+          builder: (_) => const ResponsiveFavoritesPage(),
           settings: settings,
         );
 
