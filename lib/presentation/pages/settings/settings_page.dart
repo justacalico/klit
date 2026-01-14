@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../app/routes.dart';
 import '../../../core/constants/constants.dart';
 import '../../../core/theme/ui_style_manager.dart';
+import '../../../data/services/update_service.dart';
 import '../../providers/providers.dart';
 
 /// Design constants for the purple/indigo mobile theme
@@ -1002,6 +1003,17 @@ class SettingsPage extends StatelessWidget {
         _buildLiquidGlassTile(
           context,
           isDark: isDark,
+          icon: CupertinoIcons.arrow_clockwise_circle_fill,
+          iconColor: _ThemeColors.primaryIndigo,
+          title: 'Check for Updates',
+          subtitle: 'Check if a new version is available',
+          showChevron: true,
+          onTap: () => _checkForUpdates(context, isDark),
+        ),
+        _buildLiquidGlassDivider(isDark),
+        _buildLiquidGlassTile(
+          context,
+          isDark: isDark,
           icon: CupertinoIcons.globe,
           iconColor: AppColors.primaryOrange,
           title: 'Website',
@@ -1037,6 +1049,146 @@ class SettingsPage extends StatelessWidget {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
+  }
+
+  Future<void> _checkForUpdates(BuildContext context, bool isDark) async {
+    // Show loading dialog
+    showCupertinoDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF2C2C2E) : CupertinoColors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CupertinoActivityIndicator(radius: 14),
+              const SizedBox(height: 16),
+              Text(
+                'Checking for updates...',
+                style: TextStyle(
+                  fontSize: 15,
+                  color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                  decoration: TextDecoration.none,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      final updateService = UpdateService();
+      final result = await updateService.checkForUpdate(packageInfo.version);
+      
+      if (!context.mounted) return;
+      
+      // Dismiss loading dialog
+      Navigator.of(context).pop();
+      
+      // Show result dialog
+      _showUpdateResultDialog(context, isDark, result);
+    } catch (e) {
+      if (!context.mounted) return;
+      Navigator.of(context).pop();
+      
+      _showUpdateResultDialog(
+        context,
+        isDark,
+        UpdateCheckResult(
+          updateAvailable: false,
+          currentVersion: '',
+          error: 'Failed to check for updates: $e',
+        ),
+      );
+    }
+  }
+
+  void _showUpdateResultDialog(
+    BuildContext context,
+    bool isDark,
+    UpdateCheckResult result,
+  ) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: Text(
+          result.error != null
+              ? 'Error'
+              : result.updateAvailable
+                  ? 'Update Available'
+                  : 'Up to Date',
+        ),
+        content: Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: result.error != null
+              ? Text(result.error!)
+              : result.updateAvailable
+                  ? Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'A new version is available!',
+                          style: TextStyle(
+                            color: isDark
+                                ? CupertinoColors.white
+                                : CupertinoColors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Current: ${result.currentVersion}\nLatest: ${result.latestVersion}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isDark
+                                ? CupertinoColors.systemGrey
+                                : CupertinoColors.systemGrey2,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Text(
+                      'You are running the latest version (${result.currentVersion}).',
+                      style: TextStyle(
+                        color: isDark
+                            ? CupertinoColors.white
+                            : CupertinoColors.black,
+                      ),
+                    ),
+        ),
+        actions: [
+          if (result.updateAvailable) ...[
+            CupertinoDialogAction(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Later'),
+            ),
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              onPressed: () async {
+                Navigator.pop(context);
+                final uri = Uri.parse('https://openlyst.ink/apps/klit');
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
+              },
+              child: const Text('Download'),
+            ),
+          ] else
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+        ],
+      ),
+    );
   }
 
   void _showTermsOfService(BuildContext context, bool isDark) {

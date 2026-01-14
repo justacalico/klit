@@ -5,10 +5,12 @@ import 'package:flutter/material.dart'
     show Material, ListTile, ReorderableListView, Divider;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../app/routes.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/ui_style_manager.dart';
 import '../../../data/models/proxy_config.dart';
+import '../../../data/services/update_service.dart';
 import '../../providers/providers.dart';
 
 /// Design constants for the settings page
@@ -1652,7 +1654,437 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                   ),
                 ],
               ),
+              const SizedBox(height: 24),
+              _buildCheckForUpdatesButton(isDark),
             ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCheckForUpdatesButton(bool isDark) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => _checkForUpdates(isDark),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [
+                _DesignColors.primaryIndigo,
+                _DesignColors.primaryPurple,
+              ],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: _DesignColors.primaryPurple.withValues(alpha: 0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                CupertinoIcons.arrow_clockwise_circle_fill,
+                size: 18,
+                color: CupertinoColors.white,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Check for Updates',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: CupertinoColors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _checkForUpdates(bool isDark) async {
+    // Show loading dialog
+    showCupertinoDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDark
+                      ? [
+                          const Color(0xFF1C1C1E).withValues(alpha: 0.9),
+                          const Color(0xFF2C2C2E).withValues(alpha: 0.8),
+                        ]
+                      : [
+                          CupertinoColors.white.withValues(alpha: 0.95),
+                          const Color(0xFFF8F8FA).withValues(alpha: 0.9),
+                        ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isDark
+                      ? _DesignColors.primaryPurple.withValues(alpha: 0.2)
+                      : const Color(0xFFE5E5E7),
+                  width: 1,
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CupertinoActivityIndicator(radius: 14),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Checking for updates...',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                      decoration: TextDecoration.none,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    try {
+      final updateService = UpdateService();
+      final result = await updateService.checkForUpdate(_appVersion);
+      
+      if (!mounted) return;
+      
+      // Dismiss loading dialog
+      Navigator.of(context).pop();
+      
+      // Show result dialog
+      _showUpdateResultDialog(isDark, result);
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      
+      _showUpdateResultDialog(
+        isDark,
+        UpdateCheckResult(
+          updateAvailable: false,
+          currentVersion: _appVersion,
+          error: 'Failed to check for updates: $e',
+        ),
+      );
+    }
+  }
+
+  void _showUpdateResultDialog(bool isDark, UpdateCheckResult result) {
+    showCupertinoDialog(
+      context: context,
+      builder: (dialogContext) => Center(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+            child: Container(
+              width: 400,
+              padding: const EdgeInsets.all(28),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDark
+                      ? [
+                          const Color(0xFF1C1C1E).withValues(alpha: 0.95),
+                          const Color(0xFF2C2C2E).withValues(alpha: 0.9),
+                        ]
+                      : [
+                          CupertinoColors.white.withValues(alpha: 0.98),
+                          const Color(0xFFF8F8FA).withValues(alpha: 0.95),
+                        ],
+                ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isDark
+                      ? _DesignColors.primaryPurple.withValues(alpha: 0.25)
+                      : const Color(0xFFE5E5E7),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: CupertinoColors.black.withValues(alpha: 0.2),
+                    blurRadius: 40,
+                    offset: const Offset(0, 16),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Icon
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: result.error != null
+                            ? [
+                                CupertinoColors.systemRed,
+                                CupertinoColors.systemRed.withValues(alpha: 0.8),
+                              ]
+                            : result.updateAvailable
+                                ? [
+                                    _DesignColors.primaryIndigo,
+                                    _DesignColors.primaryPurple,
+                                  ]
+                                : [
+                                    _DesignColors.accentGreen,
+                                    _DesignColors.accentGreen.withValues(alpha: 0.8),
+                                  ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Icon(
+                      result.error != null
+                          ? CupertinoIcons.exclamationmark_triangle_fill
+                          : result.updateAvailable
+                              ? CupertinoIcons.arrow_down_circle_fill
+                              : CupertinoIcons.checkmark_circle_fill,
+                      color: CupertinoColors.white,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Title
+                  Text(
+                    result.error != null
+                        ? 'Error'
+                        : result.updateAvailable
+                            ? 'Update Available'
+                            : 'Up to Date',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Content
+                  if (result.error != null)
+                    Text(
+                      result.error!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark
+                            ? CupertinoColors.systemGrey
+                            : CupertinoColors.systemGrey2,
+                        decoration: TextDecoration.none,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    )
+                  else if (result.updateAvailable)
+                    Column(
+                      children: [
+                        Text(
+                          'A new version is available!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isDark
+                                ? CupertinoColors.white.withValues(alpha: 0.8)
+                                : CupertinoColors.black.withValues(alpha: 0.7),
+                            decoration: TextDecoration.none,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? CupertinoColors.white.withValues(alpha: 0.05)
+                                : CupertinoColors.black.withValues(alpha: 0.03),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _buildVersionBadge(
+                                isDark: isDark,
+                                label: 'Current',
+                                version: result.currentVersion,
+                                color: CupertinoColors.systemGrey,
+                              ),
+                              Icon(
+                                CupertinoIcons.arrow_right,
+                                color: isDark
+                                    ? CupertinoColors.systemGrey
+                                    : CupertinoColors.systemGrey2,
+                                size: 20,
+                              ),
+                              _buildVersionBadge(
+                                isDark: isDark,
+                                label: 'Latest',
+                                version: result.latestVersion ?? '',
+                                color: _DesignColors.primaryIndigo,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    Text(
+                      'You are running the latest version (${result.currentVersion}).',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark
+                            ? CupertinoColors.white.withValues(alpha: 0.8)
+                            : CupertinoColors.black.withValues(alpha: 0.7),
+                        decoration: TextDecoration.none,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  const SizedBox(height: 24),
+                  // Actions
+                  if (result.updateAvailable)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CupertinoButton(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            color: isDark
+                                ? CupertinoColors.white.withValues(alpha: 0.1)
+                                : CupertinoColors.black.withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(12),
+                            onPressed: () => Navigator.pop(dialogContext),
+                            child: Text(
+                              'Later',
+                              style: TextStyle(
+                                color: isDark
+                                    ? CupertinoColors.white
+                                    : CupertinoColors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  _DesignColors.primaryIndigo,
+                                  _DesignColors.primaryPurple,
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: CupertinoButton(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              borderRadius: BorderRadius.circular(12),
+                              onPressed: () async {
+                                Navigator.pop(dialogContext);
+                                final uri = Uri.parse('https://openlyst.ink/apps/klit');
+                                if (await canLaunchUrl(uri)) {
+                                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                }
+                              },
+                              child: const Text(
+                                'Download',
+                                style: TextStyle(
+                                  color: CupertinoColors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    SizedBox(
+                      width: double.infinity,
+                      child: CupertinoButton(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        color: _DesignColors.primaryIndigo,
+                        borderRadius: BorderRadius.circular(12),
+                        onPressed: () => Navigator.pop(dialogContext),
+                        child: const Text(
+                          'OK',
+                          style: TextStyle(
+                            color: CupertinoColors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVersionBadge({
+    required bool isDark,
+    required String label,
+    required String version,
+    required Color color,
+  }) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            color: isDark
+                ? CupertinoColors.systemGrey
+                : CupertinoColors.systemGrey2,
+            decoration: TextDecoration.none,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+          ),
+          child: Text(
+            version,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: color,
+              decoration: TextDecoration.none,
+            ),
           ),
         ),
       ],

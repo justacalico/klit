@@ -1,7 +1,7 @@
 name: klit
 description: "Advanced E926 client"
 publish_to: 'none'
-version: 7.0.0
+version: 6.0.0
 
 environment:
   sdk: ^3.10.1
