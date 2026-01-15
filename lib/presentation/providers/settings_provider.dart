@@ -34,15 +34,16 @@ class SettingsProvider extends ChangeNotifier {
   bool _videoAutoPlay = true;
   bool _videoMuteByDefault = true;
   bool _searchHistoryEnabled = true;
+  int _scoreThreshold = AppConstants.defaultScoreThreshold;
 
   /// Callback to notify when proxy configuration changes
   ProxyChangeCallback? onProxyChanged;
-  
+
   /// Callback to notify when host changes
   HostChangeCallback? onHostChanged;
 
   SettingsProvider({required StorageService storageService})
-      : _storageService = storageService;
+    : _storageService = storageService;
 
   // Getters
   int get themeMode => _themeMode;
@@ -65,6 +66,7 @@ class SettingsProvider extends ChangeNotifier {
   bool get videoAutoPlay => _videoAutoPlay;
   bool get videoMuteByDefault => _videoMuteByDefault;
   bool get searchHistoryEnabled => _searchHistoryEnabled;
+  int get scoreThreshold => _scoreThreshold;
 
   /// Get blacklist as a list of tag queries (each line is a filter)
   List<String> get blacklistLines {
@@ -94,10 +96,15 @@ class SettingsProvider extends ChangeNotifier {
     _proxyConfig = _storageService.getProxyConfig();
     _blacklist = _storageService.getBlacklist();
     _blacklistEnabled = _storageService.getBlacklistEnabled();
-    _uiStyle = UIStyle.values[_storageService.getUIStyle().clamp(0, UIStyle.values.length - 1)];
+    _uiStyle =
+        UIStyle.values[_storageService.getUIStyle().clamp(
+          0,
+          UIStyle.values.length - 1,
+        )];
     _videoAutoPlay = _storageService.getVideoAutoPlay();
     _videoMuteByDefault = _storageService.getVideoMuteByDefault();
     _searchHistoryEnabled = _storageService.getSearchHistoryEnabled();
+    _scoreThreshold = _storageService.getScoreThreshold();
     notifyListeners();
   }
 
@@ -294,11 +301,13 @@ class SettingsProvider extends ChangeNotifier {
     String? username,
     String? password,
   }) async {
-    await setProxyConfig(_proxyConfig.copyWith(
-      useAuthentication: useAuthentication,
-      username: username,
-      password: password,
-    ));
+    await setProxyConfig(
+      _proxyConfig.copyWith(
+        useAuthentication: useAuthentication,
+        username: username,
+        password: password,
+      ),
+    );
   }
 
   /// Set blacklist (raw string with newlines)
@@ -333,6 +342,16 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> setVideoMuteByDefault(bool enabled) async {
     _videoMuteByDefault = enabled;
     await _storageService.setVideoMuteByDefault(enabled);
+    notifyListeners();
+  }
+
+  /// Set score threshold for latest posts
+  Future<void> setScoreThreshold(int threshold) async {
+    _scoreThreshold = threshold.clamp(
+      AppConstants.minScoreThreshold,
+      AppConstants.maxScoreThreshold,
+    );
+    await _storageService.setScoreThreshold(_scoreThreshold);
     notifyListeners();
   }
 

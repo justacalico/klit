@@ -30,6 +30,12 @@ class AppConstants {
   static const String videoAutoPlayKey = 'video_auto_play';
   static const String videoMuteByDefaultKey = 'video_mute_by_default';
   static const String searchHistoryEnabledKey = 'search_history_enabled';
+  static const String scoreThresholdKey = 'score_threshold';
+
+  /// Score threshold defaults
+  static const int defaultScoreThreshold = 20;
+  static const int minScoreThreshold = 0;
+  static const int maxScoreThreshold = 100;
 
   /// Default grid columns
   static const int defaultGridColumns = 2;

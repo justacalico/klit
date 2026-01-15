@@ -45,6 +45,7 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
     await postsProvider.loadLatestPosts(
       refresh: refresh,
       safeMode: settingsProvider.safeMode,
+      scoreThreshold: settingsProvider.scoreThreshold,
     );
 
     if (refresh) {
@@ -58,17 +59,20 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
     final posts = postsProvider.latestPosts;
     final index = posts.indexWhere((p) => p.id == post.id);
 
-    widget.onPostTap(PostDetailArguments(
-      postIds: posts.map((p) => p.id).toList(),
-      initialIndex: index >= 0 ? index : 0,
-      hasMore: postsProvider.hasMoreLatest,
-      onLoadMore: () async {
-        await postsProvider.loadLatestPosts(
-          safeMode: settingsProvider.safeMode,
-        );
-        return postsProvider.latestPosts.map((p) => p.id).toList();
-      },
-    ));
+    widget.onPostTap(
+      PostDetailArguments(
+        postIds: posts.map((p) => p.id).toList(),
+        initialIndex: index >= 0 ? index : 0,
+        hasMore: postsProvider.hasMoreLatest,
+        onLoadMore: () async {
+          await postsProvider.loadLatestPosts(
+            safeMode: settingsProvider.safeMode,
+            scoreThreshold: settingsProvider.scoreThreshold,
+          );
+          return postsProvider.latestPosts.map((p) => p.id).toList();
+        },
+      ),
+    );
   }
 
   @override

@@ -83,25 +83,25 @@ class PostsProvider extends ChangeNotifier {
     _hotPosts = [];
     _popularPosts = [];
     _searchResults = [];
-    
+
     _latestPage = 1;
     _hotPage = 1;
     _popularPage = 1;
     _searchPage = 1;
-    
+
     _hasMoreLatest = true;
     _hasMoreHot = true;
     _hasMorePopular = true;
     _hasMoreSearch = true;
-    
+
     _latestError = null;
     _hotError = null;
     _popularError = null;
     _searchError = null;
-    
+
     _hotCustomDate = null;
     _popularCustomDate = null;
-    
+
     notifyListeners();
   }
 
@@ -114,10 +114,10 @@ class PostsProvider extends ChangeNotifier {
   /// Check if a post matches any blacklist entry
   bool _isPostBlacklisted(Post post) {
     if (!_blacklistEnabled || _blacklistLines.isEmpty) return false;
-    
+
     // Get all tags from the post
     final postTags = post.tags.all.map((t) => t.toLowerCase()).toSet();
-    
+
     for (final line in _blacklistLines) {
       if (_matchesBlacklistLine(post, postTags, line)) {
         return true;
@@ -131,10 +131,10 @@ class PostsProvider extends ChangeNotifier {
   bool _matchesBlacklistLine(Post post, Set<String> postTags, String line) {
     final parts = line.toLowerCase().split(RegExp(r'\s+'));
     if (parts.isEmpty) return false;
-    
+
     for (final part in parts) {
       if (part.isEmpty) continue;
-      
+
       // Handle negation
       if (part.startsWith('-')) {
         final tag = part.substring(1);
@@ -149,7 +149,7 @@ class PostsProvider extends ChangeNotifier {
         }
       }
     }
-    
+
     // All conditions in the line matched
     return true;
   }
@@ -161,7 +161,7 @@ class PostsProvider extends ChangeNotifier {
       final rating = condition.substring(7);
       return post.rating.toLowerCase() == rating;
     }
-    
+
     // Handle type: prefix
     if (condition.startsWith('type:')) {
       final type = condition.substring(5);
@@ -170,19 +170,19 @@ class PostsProvider extends ChangeNotifier {
       }
       return post.file.ext.toLowerCase() == type;
     }
-    
+
     // Handle user: prefix (uploader)
     if (condition.startsWith('user:')) {
       final uploader = condition.substring(5);
       return post.uploaderId.toString() == uploader;
     }
-    
+
     // Regular tag match (with wildcard support)
     if (condition.contains('*')) {
       final pattern = RegExp('^${condition.replaceAll('*', '.*')}\$');
       return postTags.any((tag) => pattern.hasMatch(tag));
     }
-    
+
     return postTags.contains(condition);
   }
 
@@ -194,7 +194,12 @@ class PostsProvider extends ChangeNotifier {
 
   /// Load latest posts
   /// If [safeMode] is true, only safe-rated posts will be returned
-  Future<void> loadLatestPosts({bool refresh = false, bool safeMode = false}) async {
+  /// [scoreThreshold] filters posts with score greater than this value (default: 20)
+  Future<void> loadLatestPosts({
+    bool refresh = false,
+    bool safeMode = false,
+    int scoreThreshold = 20,
+  }) async {
     if (_isLoadingLatest) return;
     if (!refresh && !_hasMoreLatest) return;
 
@@ -210,7 +215,7 @@ class PostsProvider extends ChangeNotifier {
     final result = await _apiService.getPosts(
       page: _latestPage,
       limit: ApiConstants.defaultPageSize,
-      tags: 'score:>20',
+      tags: 'score:>$scoreThreshold',
       order: 'id_desc',
       safeMode: safeMode,
     );
@@ -237,7 +242,10 @@ class PostsProvider extends ChangeNotifier {
 
   /// Load hot posts (high score recent posts)
   /// If [safeMode] is true, only safe-rated posts will be returned
-  Future<void> loadHotPosts({bool refresh = false, bool safeMode = false}) async {
+  Future<void> loadHotPosts({
+    bool refresh = false,
+    bool safeMode = false,
+  }) async {
     if (_isLoadingHot) return;
     if (!refresh && !_hasMoreHot) return;
 
@@ -255,16 +263,19 @@ class PostsProvider extends ChangeNotifier {
     if (_hotCustomDate != null) {
       // Use custom date - show posts from that specific day/week/month
       final date = _hotCustomDate!;
-      final dateStr = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      final dateStr =
+          '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
       switch (_hotTimeRange) {
         case 'week':
           final endDate = date.add(const Duration(days: 7));
-          final endStr = '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}';
+          final endStr =
+              '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}';
           timeTag = 'date:>=$dateStr date:<$endStr';
           break;
         case 'month':
           final endDate = DateTime(date.year, date.month + 1, date.day);
-          final endStr = '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}';
+          final endStr =
+              '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}';
           timeTag = 'date:>=$dateStr date:<$endStr';
           break;
         default:
@@ -328,7 +339,10 @@ class PostsProvider extends ChangeNotifier {
 
   /// Load popular posts
   /// If [safeMode] is true, only safe-rated posts will be returned
-  Future<void> loadPopularPosts({bool refresh = false, bool safeMode = false}) async {
+  Future<void> loadPopularPosts({
+    bool refresh = false,
+    bool safeMode = false,
+  }) async {
     if (_isLoadingPopular) return;
     if (!refresh && !_hasMorePopular) return;
 

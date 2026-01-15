@@ -46,9 +46,11 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadPosts({bool refresh = false}) async {
     final postsProvider = context.read<PostsProvider>();
+    final settingsProvider = context.read<SettingsProvider>();
     await postsProvider.loadLatestPosts(
       refresh: refresh,
       safeMode: _shouldEnforceSafeMode(context),
+      scoreThreshold: settingsProvider.scoreThreshold,
     );
 
     if (refresh) {
@@ -58,6 +60,7 @@ class _HomePageState extends State<HomePage> {
 
   void _onPostTap(Post post) {
     final postsProvider = context.read<PostsProvider>();
+    final settingsProvider = context.read<SettingsProvider>();
     final posts = postsProvider.latestPosts;
     final index = posts.indexWhere((p) => p.id == post.id);
     final safeMode = _shouldEnforceSafeMode(context);
@@ -69,7 +72,10 @@ class _HomePageState extends State<HomePage> {
         initialIndex: index >= 0 ? index : 0,
         hasMore: postsProvider.hasMoreLatest,
         onLoadMore: () async {
-          await postsProvider.loadLatestPosts(safeMode: safeMode);
+          await postsProvider.loadLatestPosts(
+            safeMode: safeMode,
+            scoreThreshold: settingsProvider.scoreThreshold,
+          );
           return postsProvider.latestPosts.map((p) => p.id).toList();
         },
       ),
@@ -104,14 +110,14 @@ class _HomePageState extends State<HomePage> {
                       onRefresh: () => _loadPosts(refresh: true),
                       onLoading: () => _loadPosts(),
                       child: PostsGrid(
-                              posts: postsProvider.latestPosts,
-                              isLoading: postsProvider.isLoadingLatest,
-                              hasMore: postsProvider.hasMoreLatest,
-                              error: postsProvider.latestError,
-                              onPostTap: _onPostTap,
-                              onLoadMore: () => _loadPosts(),
-                              onRetry: () => _loadPosts(refresh: true),
-                            ),
+                        posts: postsProvider.latestPosts,
+                        isLoading: postsProvider.isLoadingLatest,
+                        hasMore: postsProvider.hasMoreLatest,
+                        error: postsProvider.latestError,
+                        onPostTap: _onPostTap,
+                        onLoadMore: () => _loadPosts(),
+                        onRetry: () => _loadPosts(refresh: true),
+                      ),
                     );
                   },
                 ),

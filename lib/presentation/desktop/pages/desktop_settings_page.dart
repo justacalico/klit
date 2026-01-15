@@ -898,10 +898,7 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
           decoration: BoxDecoration(
             gradient: isSelected
                 ? const LinearGradient(
-                    colors: [
-                      _DesignColors.accentTeal,
-                      Color(0xFF0D9488),
-                    ],
+                    colors: [_DesignColors.accentTeal, Color(0xFF0D9488)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   )
@@ -1085,15 +1082,20 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                       icon: CupertinoIcons.square_grid_2x2_fill,
                       iconColor: _DesignColors.accentPink,
                       title: 'Grid Size',
-                      subtitle: isAutoMode ? 'Controlled by Auto Mode' : 'Number of columns in grid view',
+                      subtitle: isAutoMode
+                          ? 'Controlled by Auto Mode'
+                          : 'Number of columns in grid view',
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           CupertinoButton(
                             padding: EdgeInsets.zero,
                             onPressed: !isAutoMode && settings.gridSize > 2
-                                ? () => settings.setGridSize(settings.gridSize - 1)
-                                : null, minimumSize: Size(32, 32),
+                                ? () => settings.setGridSize(
+                                    settings.gridSize - 1,
+                                  )
+                                : null,
+                            minimumSize: Size(32, 32),
                             child: Icon(
                               CupertinoIcons.minus_circle_fill,
                               size: 24,
@@ -1119,8 +1121,11 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                           CupertinoButton(
                             padding: EdgeInsets.zero,
                             onPressed: !isAutoMode && settings.gridSize < 8
-                                ? () => settings.setGridSize(settings.gridSize + 1)
-                                : null, minimumSize: Size(32, 32),
+                                ? () => settings.setGridSize(
+                                    settings.gridSize + 1,
+                                  )
+                                : null,
+                            minimumSize: Size(32, 32),
                             child: Icon(
                               CupertinoIcons.plus_circle_fill,
                               size: 24,
@@ -1171,6 +1176,74 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                       ),
                     ),
                   ),
+                  _buildDivider(isDark),
+                  _buildSettingRow(
+                    isDark: isDark,
+                    icon: CupertinoIcons.star_fill,
+                    iconColor: _DesignColors.accentOrange,
+                    title: 'Score Threshold',
+                    subtitle:
+                        'Minimum score for latest posts (>${settings.scoreThreshold})',
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          onPressed:
+                              settings.scoreThreshold >
+                                  AppConstants.minScoreThreshold
+                              ? () => settings.setScoreThreshold(
+                                  settings.scoreThreshold - 5,
+                                )
+                              : null,
+                          minimumSize: Size(32, 32),
+                          child: Icon(
+                            CupertinoIcons.minus_circle_fill,
+                            size: 24,
+                            color:
+                                settings.scoreThreshold >
+                                    AppConstants.minScoreThreshold
+                                ? _DesignColors.accentOrange
+                                : CupertinoColors.systemGrey,
+                          ),
+                        ),
+                        Container(
+                          width: 40,
+                          alignment: Alignment.center,
+                          child: Text(
+                            '${settings.scoreThreshold}',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: isDark
+                                  ? CupertinoColors.white
+                                  : CupertinoColors.black,
+                            ),
+                          ),
+                        ),
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          onPressed:
+                              settings.scoreThreshold <
+                                  AppConstants.maxScoreThreshold
+                              ? () => settings.setScoreThreshold(
+                                  settings.scoreThreshold + 5,
+                                )
+                              : null,
+                          minimumSize: Size(32, 32),
+                          child: Icon(
+                            CupertinoIcons.plus_circle_fill,
+                            size: 24,
+                            color:
+                                settings.scoreThreshold <
+                                    AppConstants.maxScoreThreshold
+                                ? _DesignColors.accentOrange
+                                : CupertinoColors.systemGrey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -1219,7 +1292,8 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                     icon: CupertinoIcons.pencil_ellipsis_rectangle,
                     iconColor: _DesignColors.accentOrange,
                     title: 'Manage Blacklist',
-                    subtitle: '${settings.blacklistLines.length} ${settings.blacklistLines.length == 1 ? 'rule' : 'rules'} configured',
+                    subtitle:
+                        '${settings.blacklistLines.length} ${settings.blacklistLines.length == 1 ? 'rule' : 'rules'} configured',
                     trailing: CupertinoButton(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -1227,7 +1301,9 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                       ),
                       color: _DesignColors.accentOrange.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
-                      onPressed: () => Navigator.of(context).pushNamed(AppRoutes.blacklistSettings),
+                      onPressed: () => Navigator.of(
+                        context,
+                      ).pushNamed(AppRoutes.blacklistSettings),
                       child: const Text(
                         'Manage',
                         style: TextStyle(
@@ -1334,7 +1410,8 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                     trailing: CupertinoSwitch(
                       value: settings.videoMuteByDefault,
                       activeTrackColor: _DesignColors.accentOrange,
-                      onChanged: (value) => settings.setVideoMuteByDefault(value),
+                      onChanged: (value) =>
+                          settings.setVideoMuteByDefault(value),
                     ),
                   ),
                 ],
@@ -1548,11 +1625,17 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                       ),
                       color: settings.searchHistory.isEmpty
                           ? CupertinoColors.systemGrey.withValues(alpha: 0.2)
-                          : CupertinoColors.destructiveRed.withValues(alpha: 0.2),
+                          : CupertinoColors.destructiveRed.withValues(
+                              alpha: 0.2,
+                            ),
                       borderRadius: BorderRadius.circular(8),
                       onPressed: settings.searchHistory.isEmpty
                           ? null
-                          : () => _confirmClearSearchHistory(context, settings, isDark),
+                          : () => _confirmClearSearchHistory(
+                              context,
+                              settings,
+                              isDark,
+                            ),
                       child: Text(
                         'Clear',
                         style: TextStyle(
@@ -2025,7 +2108,9 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                     'Checking for updates...',
                     style: TextStyle(
                       fontSize: 15,
-                      color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                      color: isDark
+                          ? CupertinoColors.white
+                          : CupertinoColors.black,
                       decoration: TextDecoration.none,
                       fontWeight: FontWeight.w500,
                     ),
@@ -2041,18 +2126,18 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
     try {
       final updateService = UpdateService();
       final result = await updateService.checkForUpdate(_appVersion);
-      
+
       if (!mounted) return;
-      
+
       // Dismiss loading dialog
       Navigator.of(context).pop();
-      
+
       // Show result dialog
       _showUpdateResultDialog(isDark, result);
     } catch (e) {
       if (!mounted) return;
       Navigator.of(context).pop();
-      
+
       _showUpdateResultDialog(
         isDark,
         UpdateCheckResult(
@@ -2116,17 +2201,21 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                         colors: result.error != null
                             ? [
                                 CupertinoColors.systemRed,
-                                CupertinoColors.systemRed.withValues(alpha: 0.8),
+                                CupertinoColors.systemRed.withValues(
+                                  alpha: 0.8,
+                                ),
                               ]
                             : result.updateAvailable
-                                ? [
-                                    _DesignColors.primaryIndigo,
-                                    _DesignColors.primaryPurple,
-                                  ]
-                                : [
-                                    _DesignColors.accentGreen,
-                                    _DesignColors.accentGreen.withValues(alpha: 0.8),
-                                  ],
+                            ? [
+                                _DesignColors.primaryIndigo,
+                                _DesignColors.primaryPurple,
+                              ]
+                            : [
+                                _DesignColors.accentGreen,
+                                _DesignColors.accentGreen.withValues(
+                                  alpha: 0.8,
+                                ),
+                              ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -2136,8 +2225,8 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                       result.error != null
                           ? CupertinoIcons.exclamationmark_triangle_fill
                           : result.updateAvailable
-                              ? CupertinoIcons.arrow_down_circle_fill
-                              : CupertinoIcons.checkmark_circle_fill,
+                          ? CupertinoIcons.arrow_down_circle_fill
+                          : CupertinoIcons.checkmark_circle_fill,
                       color: CupertinoColors.white,
                       size: 28,
                     ),
@@ -2148,12 +2237,14 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                     result.error != null
                         ? 'Error'
                         : result.updateAvailable
-                            ? 'Update Available'
-                            : 'Up to Date',
+                        ? 'Update Available'
+                        : 'Up to Date',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                      color: isDark
+                          ? CupertinoColors.white
+                          : CupertinoColors.black,
                       decoration: TextDecoration.none,
                     ),
                   ),
@@ -2277,9 +2368,14 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                               borderRadius: BorderRadius.circular(12),
                               onPressed: () async {
                                 Navigator.pop(dialogContext);
-                                final uri = Uri.parse('https://openlyst.ink/apps/klit');
+                                final uri = Uri.parse(
+                                  'https://openlyst.ink/apps/klit',
+                                );
                                 if (await canLaunchUrl(uri)) {
-                                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                  await launchUrl(
+                                    uri,
+                                    mode: LaunchMode.externalApplication,
+                                  );
                                 }
                               },
                               child: const Text(

@@ -448,6 +448,17 @@ class StorageService {
     await _prefs.setBool(AppConstants.videoMuteByDefaultKey, enabled);
   }
 
+  /// Get score threshold for latest posts
+  int getScoreThreshold() {
+    return _prefs.getInt(AppConstants.scoreThresholdKey) ??
+        AppConstants.defaultScoreThreshold;
+  }
+
+  /// Set score threshold for latest posts
+  Future<void> setScoreThreshold(int threshold) async {
+    await _prefs.setInt(AppConstants.scoreThresholdKey, threshold);
+  }
+
   // ==================== Cache Management ====================
 
   /// Clear all preferences (not secure storage)

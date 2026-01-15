@@ -377,7 +377,9 @@ class SettingsPage extends StatelessWidget {
                     _buildGlassButton(
                       isDark: isDark,
                       icon: CupertinoIcons.minus,
-                      onTap: !isDisabled && settings.gridSize > AppConstants.minGridColumns
+                      onTap:
+                          !isDisabled &&
+                              settings.gridSize > AppConstants.minGridColumns
                           ? () => settings.setGridSize(settings.gridSize - 1)
                           : null,
                     ),
@@ -398,7 +400,9 @@ class SettingsPage extends StatelessWidget {
                     _buildGlassButton(
                       isDark: isDark,
                       icon: CupertinoIcons.plus,
-                      onTap: !isDisabled && settings.gridSize < AppConstants.maxGridColumns
+                      onTap:
+                          !isDisabled &&
+                              settings.gridSize < AppConstants.maxGridColumns
                           ? () => settings.setGridSize(settings.gridSize + 1)
                           : null,
                     ),
@@ -425,7 +429,11 @@ class SettingsPage extends StatelessWidget {
                   value: settings.gridSpacing,
                   min: AppConstants.minGridSpacing,
                   max: AppConstants.maxGridSpacing,
-                  divisions: ((AppConstants.maxGridSpacing - AppConstants.minGridSpacing) / 2).round(),
+                  divisions:
+                      ((AppConstants.maxGridSpacing -
+                                  AppConstants.minGridSpacing) /
+                              2)
+                          .round(),
                   activeColor: AppColors.primaryBlue,
                   onChanged: (value) => settings.setGridSpacing(value),
                 ),
@@ -450,10 +458,68 @@ class SettingsPage extends StatelessWidget {
                   value: settings.gridPadding,
                   min: AppConstants.minGridPadding,
                   max: AppConstants.maxGridPadding,
-                  divisions: ((AppConstants.maxGridPadding - AppConstants.minGridPadding) / 2).round(),
+                  divisions:
+                      ((AppConstants.maxGridPadding -
+                                  AppConstants.minGridPadding) /
+                              2)
+                          .round(),
                   activeColor: AppColors.primaryGreen,
                   onChanged: (value) => settings.setGridPadding(value),
                 ),
+              ),
+            );
+          },
+        ),
+        _buildDivider(isDark, isLiquidGlass),
+        Consumer<SettingsProvider>(
+          builder: (context, settings, _) {
+            return _buildTile(
+              context,
+              isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
+              icon: CupertinoIcons.star_fill,
+              iconColor: AppColors.primaryOrange,
+              title: 'Score Threshold',
+              subtitle:
+                  'Minimum score for latest posts (>${settings.scoreThreshold})',
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildGlassButton(
+                    isDark: isDark,
+                    icon: CupertinoIcons.minus,
+                    onTap:
+                        settings.scoreThreshold > AppConstants.minScoreThreshold
+                        ? () => settings.setScoreThreshold(
+                            settings.scoreThreshold - 5,
+                          )
+                        : null,
+                  ),
+                  Container(
+                    width: 40,
+                    alignment: Alignment.center,
+                    child: Text(
+                      '${settings.scoreThreshold}',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? CupertinoColors.white
+                            : CupertinoColors.black,
+                      ),
+                    ),
+                  ),
+                  _buildGlassButton(
+                    isDark: isDark,
+                    icon: CupertinoIcons.plus,
+                    onTap:
+                        settings.scoreThreshold < AppConstants.maxScoreThreshold
+                        ? () => settings.setScoreThreshold(
+                            settings.scoreThreshold + 5,
+                          )
+                        : null,
+                  ),
+                ],
               ),
             );
           },
@@ -502,9 +568,11 @@ class SettingsPage extends StatelessWidget {
               icon: CupertinoIcons.pencil_ellipsis_rectangle,
               iconColor: AppColors.primaryOrange,
               title: 'Manage Blacklist',
-              subtitle: '$lineCount ${lineCount == 1 ? 'rule' : 'rules'} configured',
+              subtitle:
+                  '$lineCount ${lineCount == 1 ? 'rule' : 'rules'} configured',
               showChevron: true,
-              onTap: () => Navigator.of(context).pushNamed(AppRoutes.blacklistSettings),
+              onTap: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.blacklistSettings),
             );
           },
         ),
