@@ -158,8 +158,15 @@ class SettingsProvider extends ChangeNotifier {
   int getEffectiveGridSize(double screenWidth) {
     if (!_gridAutoMode) return _gridSize;
     // Auto calculate based on screen width
-    if (screenWidth >= 1200) return 4;
+    // Large desktop monitors
+    if (screenWidth >= 2400) return 8;
+    if (screenWidth >= 2000) return 7;
+    if (screenWidth >= 1800) return 6;
+    if (screenWidth >= 1400) return 5;
+    if (screenWidth >= 1100) return 4;
+    // Tablets and small desktops
     if (screenWidth >= 800) return 3;
+    // Phones
     if (screenWidth >= 500) return 2;
     return 2;
   }

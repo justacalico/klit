@@ -75,6 +75,8 @@ class SettingsPage extends StatelessWidget {
                 const SizedBox(height: 24),
                 _buildPostGridSection(context, isDark, isLiquidGlass),
                 const SizedBox(height: 24),
+                _buildBlacklistSection(context, isDark, isLiquidGlass),
+                const SizedBox(height: 24),
                 _buildCustomizationSection(context, isDark, isLiquidGlass),
                 const SizedBox(height: 24),
                 _buildVideoSection(context, isDark, isLiquidGlass),
@@ -453,6 +455,56 @@ class SettingsPage extends StatelessWidget {
                   onChanged: (value) => settings.setGridPadding(value),
                 ),
               ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBlacklistSection(
+    BuildContext context,
+    bool isDark,
+    bool isLiquidGlass,
+  ) {
+    return _buildSection(
+      context,
+      isDark: isDark,
+      isLiquidGlass: isLiquidGlass,
+      title: 'BLACKLIST',
+      children: [
+        Consumer<SettingsProvider>(
+          builder: (context, settings, _) {
+            return _buildTile(
+              context,
+              isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
+              icon: CupertinoIcons.eye_slash_fill,
+              iconColor: AppColors.explicitColor,
+              title: 'Enable Blacklist',
+              subtitle: 'Hide posts matching blacklisted tags',
+              trailing: CupertinoSwitch(
+                value: settings.blacklistEnabled,
+                activeTrackColor: AppColors.explicitColor,
+                onChanged: (value) => settings.setBlacklistEnabled(value),
+              ),
+            );
+          },
+        ),
+        _buildDivider(isDark, isLiquidGlass),
+        Consumer<SettingsProvider>(
+          builder: (context, settings, _) {
+            final lineCount = settings.blacklistLines.length;
+            return _buildTile(
+              context,
+              isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
+              icon: CupertinoIcons.pencil_ellipsis_rectangle,
+              iconColor: AppColors.primaryOrange,
+              title: 'Manage Blacklist',
+              subtitle: '$lineCount ${lineCount == 1 ? 'rule' : 'rules'} configured',
+              showChevron: true,
+              onTap: () => Navigator.of(context).pushNamed(AppRoutes.blacklistSettings),
             );
           },
         ),

@@ -7,6 +7,7 @@ import '../presentation/pages/post/responsive_post_detail_page.dart';
 import '../presentation/pages/profile/responsive_profile_page.dart';
 import '../presentation/pages/search/responsive_search_page.dart';
 import '../presentation/pages/settings/account_management_page.dart';
+import '../presentation/pages/settings/blacklist_settings_page.dart';
 import '../presentation/pages/settings/host_settings_page.dart';
 
 /// App route names
@@ -21,6 +22,7 @@ class AppRoutes {
   static const String favorites = '/favorites';
   static const String accountManagement = '/settings/accounts';
   static const String hostSettings = '/settings/host';
+  static const String blacklistSettings = '/settings/blacklist';
 }
 
 /// App router configuration
@@ -82,6 +84,12 @@ class AppRouter {
       case AppRoutes.hostSettings:
         return CupertinoPageRoute(
           builder: (_) => const HostSettingsPage(),
+          settings: settings,
+        );
+
+      case AppRoutes.blacklistSettings:
+        return CupertinoPageRoute(
+          builder: (_) => const BlacklistSettingsPage(),
           settings: settings,
         );
 

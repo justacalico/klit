@@ -1054,59 +1054,167 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
   Widget _buildContentSettings(bool isDark) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
+        final isAutoMode = settings.gridAutoMode;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Post Grid Settings Card
+            _buildSectionHeader('Post Grid', isDark),
+            const SizedBox(height: 12),
             _buildSettingsCard(
               isDark: isDark,
               child: Column(
                 children: [
                   _buildSettingRow(
                     isDark: isDark,
-                    icon: CupertinoIcons.square_grid_2x2_fill,
-                    iconColor: _DesignColors.accentPink,
-                    title: 'Grid Size',
-                    subtitle: 'Number of columns in grid view',
-                    trailing: CupertinoSlidingSegmentedControl<int>(
-                      groupValue: settings.gridSize,
-                      children: const {
-                        2: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: Text('2', style: TextStyle(fontSize: 13)),
-                        ),
-                        3: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: Text('3', style: TextStyle(fontSize: 13)),
-                        ),
-                        4: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: Text('4', style: TextStyle(fontSize: 13)),
-                        ),
-                      },
-                      onValueChanged: (value) {
-                        if (value != null) settings.setGridSize(value);
-                      },
+                    icon: CupertinoIcons.sparkles,
+                    iconColor: _DesignColors.primaryPurple,
+                    title: 'Auto Mode',
+                    subtitle: 'Automatically adjust grid based on screen size',
+                    trailing: CupertinoSwitch(
+                      value: settings.gridAutoMode,
+                      activeTrackColor: _DesignColors.primaryPurple,
+                      onChanged: (value) => settings.setGridAutoMode(value),
+                    ),
+                  ),
+                  _buildDivider(isDark),
+                  Opacity(
+                    opacity: isAutoMode ? 0.5 : 1.0,
+                    child: _buildSettingRow(
+                      isDark: isDark,
+                      icon: CupertinoIcons.square_grid_2x2_fill,
+                      iconColor: _DesignColors.accentPink,
+                      title: 'Grid Size',
+                      subtitle: isAutoMode ? 'Controlled by Auto Mode' : 'Number of columns in grid view',
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            minSize: 32,
+                            onPressed: !isAutoMode && settings.gridSize > 2
+                                ? () => settings.setGridSize(settings.gridSize - 1)
+                                : null,
+                            child: Icon(
+                              CupertinoIcons.minus_circle_fill,
+                              size: 24,
+                              color: !isAutoMode && settings.gridSize > 2
+                                  ? _DesignColors.accentPink
+                                  : CupertinoColors.systemGrey,
+                            ),
+                          ),
+                          Container(
+                            width: 40,
+                            alignment: Alignment.center,
+                            child: Text(
+                              '${settings.gridSize}',
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                                color: isDark
+                                    ? CupertinoColors.white
+                                    : CupertinoColors.black,
+                              ),
+                            ),
+                          ),
+                          CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            minSize: 32,
+                            onPressed: !isAutoMode && settings.gridSize < 8
+                                ? () => settings.setGridSize(settings.gridSize + 1)
+                                : null,
+                            child: Icon(
+                              CupertinoIcons.plus_circle_fill,
+                              size: 24,
+                              color: !isAutoMode && settings.gridSize < 8
+                                  ? _DesignColors.accentPink
+                                  : CupertinoColors.systemGrey,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   _buildDivider(isDark),
                   _buildSettingRow(
                     isDark: isDark,
-                    icon: CupertinoIcons.shield_fill,
+                    icon: CupertinoIcons.arrow_left_right,
+                    iconColor: _DesignColors.primaryIndigo,
+                    title: 'Spacing',
+                    subtitle: '${settings.gridSpacing.toInt()} pt',
+                    trailing: SizedBox(
+                      width: 200,
+                      child: CupertinoSlider(
+                        value: settings.gridSpacing,
+                        min: 0,
+                        max: 16,
+                        divisions: 8,
+                        activeColor: _DesignColors.primaryIndigo,
+                        onChanged: (value) => settings.setGridSpacing(value),
+                      ),
+                    ),
+                  ),
+                  _buildDivider(isDark),
+                  _buildSettingRow(
+                    isDark: isDark,
+                    icon: CupertinoIcons.square_fill_on_square_fill,
                     iconColor: _DesignColors.accentGreen,
-                    title: 'Safe Mode',
-                    subtitle: 'Only show safe-rated content',
-                    trailing: CupertinoSwitch(
-                      value: settings.safeMode,
-                      activeTrackColor: _DesignColors.accentGreen,
-                      onChanged: (value) => settings.setSafeMode(value),
+                    title: 'Padding',
+                    subtitle: '${settings.gridPadding.toInt()} pt',
+                    trailing: SizedBox(
+                      width: 200,
+                      child: CupertinoSlider(
+                        value: settings.gridPadding,
+                        min: 0,
+                        max: 24,
+                        divisions: 12,
+                        activeColor: _DesignColors.accentGreen,
+                        onChanged: (value) => settings.setGridPadding(value),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
+            const SizedBox(height: 24),
+            // Content Safety Card
+            _buildSectionHeader('Content', isDark),
+            const SizedBox(height: 12),
+            _buildSettingsCard(
+              isDark: isDark,
+              child: _buildSettingRow(
+                isDark: isDark,
+                icon: CupertinoIcons.shield_fill,
+                iconColor: _DesignColors.accentGreen,
+                title: 'Safe Mode',
+                subtitle: 'Only show safe-rated content',
+                trailing: CupertinoSwitch(
+                  value: settings.safeMode,
+                  activeTrackColor: _DesignColors.accentGreen,
+                  onChanged: (value) => settings.setSafeMode(value),
+                ),
+              ),
+            ),
           ],
         );
       },
+    );
+  }
+
+  Widget _buildSectionHeader(String title, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4),
+      child: Text(
+        title.toUpperCase(),
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.8,
+          color: isDark
+              ? CupertinoColors.systemGrey
+              : CupertinoColors.systemGrey2,
+        ),
+      ),
     );
   }
 
