@@ -74,7 +74,11 @@ class _MainTabPageState extends State<MainTabPage> {
   }
 
   /// Set the index in navigation provider from mobile index
-  void _setIndex(NavigationProvider navProvider, List<int> navOrder, int position) {
+  void _setIndex(
+    NavigationProvider navProvider,
+    List<int> navOrder,
+    int position,
+  ) {
     if (position >= 0 && position < navOrder.length) {
       final mobileIndex = navOrder[position];
       navProvider.setFromMobileIndex(mobileIndex);
@@ -95,10 +99,9 @@ class _MainTabPageState extends State<MainTabPage> {
               final authProvider = context.read<AuthProvider>();
               await authProvider.logout();
               if (context.mounted) {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  AppRoutes.login,
-                  (route) => false,
-                );
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
               }
             },
             child: const Text('Sign Out'),
@@ -129,7 +132,7 @@ class _MainTabPageState extends State<MainTabPage> {
 
     // Build pages list based on custom order
     final orderedPages = navOrder.map((id) => _allPages[id]!).toList();
-    
+
     // Get current index from navigation provider
     final currentIndex = _getCurrentIndex(navProvider, navOrder);
 
@@ -141,21 +144,45 @@ class _MainTabPageState extends State<MainTabPage> {
             // Page content based on custom order
             IndexedStack(index: currentIndex, children: orderedPages),
             // Modern gradient navigation bar
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: MediaQuery.of(context).padding.bottom + 16,
-              child: isLiquidGlass
-                  ? _buildLiquidGlassNavBar(isDark, isGuest, navOrder, navProvider, currentIndex)
-                  : _buildMaterialNavBar(isDark, isGuest, navOrder, navProvider, currentIndex),
-            ),
+            if (isLiquidGlass)
+              Positioned(
+                left: 16,
+                right: 16,
+                bottom: MediaQuery.of(context).padding.bottom + 16,
+                child: _buildLiquidGlassNavBar(
+                  isDark,
+                  isGuest,
+                  navOrder,
+                  navProvider,
+                  currentIndex,
+                ),
+              )
+            else
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: _buildMaterialNavBar(
+                  isDark,
+                  isGuest,
+                  navOrder,
+                  navProvider,
+                  currentIndex,
+                ),
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildLiquidGlassNavBar(bool isDark, bool isGuest, List<int> navOrder, NavigationProvider navProvider, int currentIndex) {
+  Widget _buildLiquidGlassNavBar(
+    bool isDark,
+    bool isGuest,
+    List<int> navOrder,
+    NavigationProvider navProvider,
+    int currentIndex,
+  ) {
     return Container(
       height: 68,
       decoration: BoxDecoration(
@@ -163,7 +190,9 @@ class _MainTabPageState extends State<MainTabPage> {
         boxShadow: [
           // Purple glow effect
           BoxShadow(
-            color: MobileThemeColors.primaryPurple.withValues(alpha: isDark ? 0.3 : 0.15),
+            color: MobileThemeColors.primaryPurple.withValues(
+              alpha: isDark ? 0.3 : 0.15,
+            ),
             blurRadius: 20,
             spreadRadius: -2,
             offset: const Offset(0, 8),
@@ -206,39 +235,163 @@ class _MainTabPageState extends State<MainTabPage> {
                 width: 1,
               ),
             ),
-            child: _buildNavBarContent(isDark, isGuest, navOrder, navProvider, currentIndex),
+            child: _buildNavBarContent(
+              isDark,
+              isGuest,
+              navOrder,
+              navProvider,
+              currentIndex,
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildMaterialNavBar(bool isDark, bool isGuest, List<int> navOrder, NavigationProvider navProvider, int currentIndex) {
+  Widget _buildMaterialNavBar(
+    bool isDark,
+    bool isGuest,
+    List<int> navOrder,
+    NavigationProvider navProvider,
+    int currentIndex,
+  ) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     return Container(
-      height: 68,
+      padding: EdgeInsets.only(bottom: bottomPadding),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
         color: isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white,
-        boxShadow: [
-          BoxShadow(
-            color: CupertinoColors.black.withValues(alpha: isDark ? 0.3 : 0.08),
-            blurRadius: 16,
-            spreadRadius: 0,
-            offset: const Offset(0, 4),
+        border: Border(
+          top: BorderSide(
+            color: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E5E7),
+            width: 0.5,
           ),
-        ],
-        border: Border.all(
-          color: isDark
-              ? const Color(0xFF3A3A3C)
-              : const Color(0xFFE5E5E7),
-          width: 1,
         ),
       ),
-      child: _buildNavBarContent(isDark, isGuest, navOrder, navProvider, currentIndex),
+      child: SizedBox(
+        height: 56,
+        child: _buildMaterialNavBarContent(
+          isDark,
+          isGuest,
+          navOrder,
+          navProvider,
+          currentIndex,
+        ),
+      ),
     );
   }
 
-  Widget _buildNavBarContent(bool isDark, bool isGuest, List<int> navOrder, NavigationProvider navProvider, int currentIndex) {
+  Widget _buildMaterialNavBarContent(
+    bool isDark,
+    bool isGuest,
+    List<int> navOrder,
+    NavigationProvider navProvider,
+    int currentIndex,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        for (int i = 0; i < navOrder.length; i++)
+          if (isGuest && navOrder[i] == 4)
+            _buildMaterialLogoutNavItem(isDark)
+          else
+            _buildMaterialNavItem(
+              index: i,
+              currentIndex: currentIndex,
+              navOrder: navOrder,
+              navProvider: navProvider,
+              icon: _navItemDefs[navOrder[i]]!['icon'] as IconData,
+              activeIcon: _navItemDefs[navOrder[i]]!['activeIcon'] as IconData,
+              label: _navItemDefs[navOrder[i]]!['label'] as String,
+              isDark: isDark,
+            ),
+      ],
+    );
+  }
+
+  Widget _buildMaterialLogoutNavItem(bool isDark) {
+    final color = isDark
+        ? CupertinoColors.white.withValues(alpha: 0.6)
+        : CupertinoColors.black.withValues(alpha: 0.6);
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          HapticUtils.selectionClick();
+          _handleLogout(context);
+        },
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(CupertinoIcons.square_arrow_right, color: color, size: 24),
+            const SizedBox(height: 4),
+            Text(
+              'Sign Out',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMaterialNavItem({
+    required int index,
+    required int currentIndex,
+    required List<int> navOrder,
+    required NavigationProvider navProvider,
+    required IconData icon,
+    required IconData activeIcon,
+    required String label,
+    required bool isDark,
+  }) {
+    final isSelected = currentIndex == index;
+    final selectedColor = MobileThemeColors.primaryPurple;
+    final unselectedColor = isDark
+        ? CupertinoColors.white.withValues(alpha: 0.6)
+        : CupertinoColors.black.withValues(alpha: 0.6);
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          HapticUtils.selectionClick();
+          _setIndex(navProvider, navOrder, index);
+        },
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              isSelected ? activeIcon : icon,
+              color: isSelected ? selectedColor : unselectedColor,
+              size: 24,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? selectedColor : unselectedColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavBarContent(
+    bool isDark,
+    bool isGuest,
+    List<int> navOrder,
+    NavigationProvider navProvider,
+    int currentIndex,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
