@@ -84,7 +84,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
-    final gridSize = context.watch<SettingsProvider>().gridSize;
 
     return CupertinoPageScaffold(
       child: Stack(
@@ -106,7 +105,6 @@ class _HomePageState extends State<HomePage> {
                       onLoading: () => _loadPosts(),
                       child: PostsGrid(
                               posts: postsProvider.latestPosts,
-                              columns: gridSize,
                               isLoading: postsProvider.isLoadingLatest,
                               hasMore: postsProvider.hasMoreLatest,
                               error: postsProvider.latestError,

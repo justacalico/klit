@@ -25,7 +25,6 @@ class _DesktopFavoritesPageState extends State<DesktopFavoritesPage> {
   String? _error;
   int _currentPage = 1;
   bool _hasMore = true;
-  int _gridColumns = 4;
 
   @override
   void initState() {
@@ -140,11 +139,6 @@ class _DesktopFavoritesPageState extends State<DesktopFavoritesPage> {
       title: 'Favorites',
       icon: CupertinoIcons.heart_fill,
       actions: [
-        DesktopGridSizeSelector(
-          value: _gridColumns,
-          onChanged: (value) => setState(() => _gridColumns = value),
-        ),
-        const SizedBox(width: 12),
         DesktopToolbarButton(
           icon: CupertinoIcons.refresh,
           tooltip: 'Refresh',
@@ -211,7 +205,6 @@ class _DesktopFavoritesPageState extends State<DesktopFavoritesPage> {
 
     return PostsGrid(
       posts: _favorites,
-      columns: _gridColumns,
       isLoading: _isLoadingMore,
       hasMore: _hasMore,
       onPostTap: _onPostTap,

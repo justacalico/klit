@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 import '../../data/models/models.dart';
+import '../providers/settings_provider.dart';
 import 'post_card.dart';
 import 'loading_shimmer.dart';
 import 'loading_indicator.dart';
@@ -7,7 +9,9 @@ import 'loading_indicator.dart';
 /// Grid view for posts with infinite scroll support
 class PostsGrid extends StatelessWidget {
   final List<Post> posts;
-  final int columns;
+  final int? columns; // Optional - if null, uses settings
+  final double? spacing; // Optional - if null, uses settings
+  final double? padding; // Optional - if null, uses settings
   final bool isLoading;
   final bool hasMore;
   final String? error;
@@ -20,7 +24,9 @@ class PostsGrid extends StatelessWidget {
     super.key,
     required this.posts,
     required this.onPostTap,
-    this.columns = 2,
+    this.columns,
+    this.spacing,
+    this.padding,
     this.isLoading = false,
     this.hasMore = true,
     this.error,
@@ -31,8 +37,16 @@ class PostsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settings = context.watch<SettingsProvider>();
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    // Use provided values or fall back to settings
+    final effectiveColumns = columns ?? settings.getEffectiveGridSize(screenWidth);
+    final effectiveSpacing = spacing ?? settings.getEffectiveGridSpacing();
+    final effectivePadding = padding ?? settings.getEffectiveGridPadding();
+
     if (posts.isEmpty && isLoading) {
-      return PostGridShimmer(columns: columns);
+      return PostGridShimmer(columns: effectiveColumns);
     }
 
     if (posts.isEmpty && error != null) {
@@ -62,12 +76,12 @@ class PostsGrid extends StatelessWidget {
         controller: scrollController,
         slivers: [
           SliverPadding(
-            padding: const EdgeInsets.all(4),
+            padding: EdgeInsets.all(effectivePadding),
             sliver: SliverGrid(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: columns,
-                mainAxisSpacing: 4,
-                crossAxisSpacing: 4,
+                crossAxisCount: effectiveColumns,
+                mainAxisSpacing: effectiveSpacing,
+                crossAxisSpacing: effectiveSpacing,
                 childAspectRatio: 1,
               ),
               delegate: SliverChildBuilderDelegate(

@@ -24,7 +24,6 @@ class DesktopPopularPage extends StatefulWidget {
 
 class _DesktopPopularPageState extends State<DesktopPopularPage> {
   final RefreshController _refreshController = RefreshController();
-  int _gridColumns = 4;
 
   @override
   void initState() {
@@ -82,11 +81,6 @@ class _DesktopPopularPageState extends State<DesktopPopularPage> {
           title: 'Popular Posts',
           icon: CupertinoIcons.star_fill,
           actions: [
-            DesktopGridSizeSelector(
-              value: _gridColumns,
-              onChanged: (val) => setState(() => _gridColumns = val),
-            ),
-            const SizedBox(width: 16),
             DesktopToolbarButton(
               icon: CupertinoIcons.search,
               onPressed: () => widget.onSearchTap(),
@@ -140,7 +134,6 @@ class _DesktopPopularPageState extends State<DesktopPopularPage> {
                       onLoading: () => _loadPosts(),
                       child: PostsGrid(
                         posts: postsProvider.popularPosts,
-                        columns: _gridColumns,
                         isLoading: postsProvider.isLoadingPopular,
                         hasMore: postsProvider.hasMorePopular,
                         error: postsProvider.popularError,

@@ -84,7 +84,6 @@ class _HotPageState extends State<HotPage> {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
-    final gridSize = context.watch<SettingsProvider>().gridSize;
 
     return CupertinoPageScaffold(
       child: CustomScrollView(
@@ -118,7 +117,6 @@ class _HotPageState extends State<HotPage> {
                   onLoading: () => _loadPosts(),
                   child: PostsGrid(
                           posts: postsProvider.hotPosts,
-                          columns: gridSize,
                           isLoading: postsProvider.isLoadingHot,
                           hasMore: postsProvider.hasMoreHot,
                           error: postsProvider.hotError,

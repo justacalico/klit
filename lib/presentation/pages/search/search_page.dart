@@ -270,7 +270,6 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
-    final gridSize = context.watch<SettingsProvider>().gridSize;
     final isDark = CupertinoTheme.of(context).brightness == Brightness.dark;
 
     return CupertinoPageScaffold(
@@ -345,7 +344,7 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
                 Expanded(
                   child: _showHistory
                       ? _buildSearchHistory()
-                      : _buildSearchResults(gridSize),
+                      : _buildSearchResults(),
                 ),
               ],
             ),
@@ -748,13 +747,12 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
     );
   }
 
-  Widget _buildSearchResults(int gridSize) {
+  Widget _buildSearchResults() {
     return Consumer<PostsProvider>(
       builder: (context, postsProvider, _) {
         final settingsProvider = context.read<SettingsProvider>();
         return PostsGrid(
                 posts: postsProvider.searchResults,
-                columns: gridSize,
                 isLoading: postsProvider.isLoadingSearch,
                 hasMore: postsProvider.hasMoreSearch,
                 error: postsProvider.searchError,

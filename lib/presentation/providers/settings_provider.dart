@@ -16,6 +16,9 @@ class SettingsProvider extends ChangeNotifier {
 
   int _themeMode = 0; // 0 = system, 1 = light, 2 = dark
   int _gridSize = AppConstants.defaultGridColumns;
+  double _gridSpacing = AppConstants.defaultGridSpacing;
+  double _gridPadding = AppConstants.defaultGridPadding;
+  bool _gridAutoMode = true;
   bool _safeMode = false;
   bool _leftHandedMode = false;
   bool _upvoteWhenFavorited = true;
@@ -44,6 +47,9 @@ class SettingsProvider extends ChangeNotifier {
   // Getters
   int get themeMode => _themeMode;
   int get gridSize => _gridSize;
+  double get gridSpacing => _gridSpacing;
+  double get gridPadding => _gridPadding;
+  bool get gridAutoMode => _gridAutoMode;
   bool get safeMode => _safeMode;
   bool get leftHandedMode => _leftHandedMode;
   bool get upvoteWhenFavorited => _upvoteWhenFavorited;
@@ -74,6 +80,9 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> initialize() async {
     _themeMode = _storageService.getThemeMode();
     _gridSize = _storageService.getGridSize();
+    _gridSpacing = _storageService.getGridSpacing();
+    _gridPadding = _storageService.getGridPadding();
+    _gridAutoMode = _storageService.getGridAutoMode();
     _safeMode = _storageService.getSafeMode();
     _leftHandedMode = _storageService.getLeftHandedMode();
     _upvoteWhenFavorited = _storageService.getUpvoteWhenFavorited();
@@ -107,6 +116,64 @@ class SettingsProvider extends ChangeNotifier {
     );
     await _storageService.setGridSize(_gridSize);
     notifyListeners();
+  }
+
+  /// Set grid spacing
+  Future<void> setGridSpacing(double spacing) async {
+    _gridSpacing = spacing.clamp(
+      AppConstants.minGridSpacing,
+      AppConstants.maxGridSpacing,
+    );
+    await _storageService.setGridSpacing(_gridSpacing);
+    notifyListeners();
+  }
+
+  /// Set grid padding
+  Future<void> setGridPadding(double padding) async {
+    _gridPadding = padding.clamp(
+      AppConstants.minGridPadding,
+      AppConstants.maxGridPadding,
+    );
+    await _storageService.setGridPadding(_gridPadding);
+    notifyListeners();
+  }
+
+  /// Set grid auto mode
+  Future<void> setGridAutoMode(bool enabled) async {
+    _gridAutoMode = enabled;
+    await _storageService.setGridAutoMode(enabled);
+    // Reset to defaults when enabling auto mode
+    if (enabled) {
+      _gridSize = AppConstants.defaultGridColumns;
+      _gridSpacing = AppConstants.defaultGridSpacing;
+      _gridPadding = AppConstants.defaultGridPadding;
+      await _storageService.setGridSize(_gridSize);
+      await _storageService.setGridSpacing(_gridSpacing);
+      await _storageService.setGridPadding(_gridPadding);
+    }
+    notifyListeners();
+  }
+
+  /// Get effective grid size (auto-calculated based on screen width if auto mode)
+  int getEffectiveGridSize(double screenWidth) {
+    if (!_gridAutoMode) return _gridSize;
+    // Auto calculate based on screen width
+    if (screenWidth >= 1200) return 4;
+    if (screenWidth >= 800) return 3;
+    if (screenWidth >= 500) return 2;
+    return 2;
+  }
+
+  /// Get effective grid spacing
+  double getEffectiveGridSpacing() {
+    if (!_gridAutoMode) return _gridSpacing;
+    return AppConstants.defaultGridSpacing;
+  }
+
+  /// Get effective grid padding
+  double getEffectiveGridPadding() {
+    if (!_gridAutoMode) return _gridPadding;
+    return AppConstants.defaultGridPadding;
   }
 
   /// Toggle safe mode

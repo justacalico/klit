@@ -24,7 +24,6 @@ class DesktopHomePage extends StatefulWidget {
 
 class _DesktopHomePageState extends State<DesktopHomePage> {
   final RefreshController _refreshController = RefreshController();
-  int _gridColumns = 4;
 
   @override
   void initState() {
@@ -81,11 +80,6 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
           title: 'Latest Posts',
           icon: CupertinoIcons.house_fill,
           actions: [
-            DesktopGridSizeSelector(
-              value: _gridColumns,
-              onChanged: (val) => setState(() => _gridColumns = val),
-            ),
-            const SizedBox(width: 16),
             DesktopToolbarButton(
               icon: CupertinoIcons.search,
               onPressed: () => widget.onSearchTap(),
@@ -109,7 +103,6 @@ class _DesktopHomePageState extends State<DesktopHomePage> {
                 onLoading: () => _loadPosts(),
                 child: PostsGrid(
                   posts: postsProvider.latestPosts,
-                  columns: _gridColumns,
                   isLoading: postsProvider.isLoadingLatest,
                   hasMore: postsProvider.hasMoreLatest,
                   error: postsProvider.latestError,

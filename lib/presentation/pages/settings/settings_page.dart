@@ -73,6 +73,8 @@ class SettingsPage extends StatelessWidget {
                 const SizedBox(height: 24),
                 _buildAppearanceSection(context, isDark, isLiquidGlass),
                 const SizedBox(height: 24),
+                _buildPostGridSection(context, isDark, isLiquidGlass),
+                const SizedBox(height: 24),
                 _buildCustomizationSection(context, isDark, isLiquidGlass),
                 const SizedBox(height: 24),
                 _buildVideoSection(context, isDark, isLiquidGlass),
@@ -251,52 +253,6 @@ class SettingsPage extends StatelessWidget {
               context,
               isDark: isDark,
               isLiquidGlass: isLiquidGlass,
-              icon: CupertinoIcons.square_grid_2x2_fill,
-              iconColor: AppColors.primaryOrange,
-              title: 'Grid Size',
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildGlassButton(
-                    isDark: isDark,
-                    icon: CupertinoIcons.minus,
-                    onTap: settings.gridSize > AppConstants.minGridColumns
-                        ? () => settings.setGridSize(settings.gridSize - 1)
-                        : null,
-                  ),
-                  Container(
-                    width: 40,
-                    alignment: Alignment.center,
-                    child: Text(
-                      '${settings.gridSize}',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                        color: isDark
-                            ? CupertinoColors.white
-                            : CupertinoColors.black,
-                      ),
-                    ),
-                  ),
-                  _buildGlassButton(
-                    isDark: isDark,
-                    icon: CupertinoIcons.plus,
-                    onTap: settings.gridSize < AppConstants.maxGridColumns
-                        ? () => settings.setGridSize(settings.gridSize + 1)
-                        : null,
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-        _buildDivider(isDark, isLiquidGlass),
-        Consumer<SettingsProvider>(
-          builder: (context, settings, _) {
-            return _buildTile(
-              context,
-              isDark: isDark,
-              isLiquidGlass: isLiquidGlass,
               icon: CupertinoIcons.shield_fill,
               iconColor: AppColors.safeColor,
               title: 'Safe Mode',
@@ -362,6 +318,140 @@ class SettingsPage extends StatelessWidget {
                 value: settings.confettiOnFavorite,
                 activeTrackColor: AppColors.primaryGreen,
                 onChanged: (value) => settings.setConfettiOnFavorite(value),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPostGridSection(
+    BuildContext context,
+    bool isDark,
+    bool isLiquidGlass,
+  ) {
+    return _buildSection(
+      context,
+      isDark: isDark,
+      isLiquidGlass: isLiquidGlass,
+      title: 'POST GRID',
+      children: [
+        Consumer<SettingsProvider>(
+          builder: (context, settings, _) {
+            return _buildTile(
+              context,
+              isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
+              icon: CupertinoIcons.sparkles,
+              iconColor: AppColors.primaryPurple,
+              title: 'Auto Mode',
+              subtitle: 'Automatically adjust grid based on screen size',
+              trailing: CupertinoSwitch(
+                value: settings.gridAutoMode,
+                activeTrackColor: AppColors.primaryPurple,
+                onChanged: (value) => settings.setGridAutoMode(value),
+              ),
+            );
+          },
+        ),
+        _buildDivider(isDark, isLiquidGlass),
+        Consumer<SettingsProvider>(
+          builder: (context, settings, _) {
+            final isDisabled = settings.gridAutoMode;
+            return Opacity(
+              opacity: isDisabled ? 0.5 : 1.0,
+              child: _buildTile(
+                context,
+                isDark: isDark,
+                isLiquidGlass: isLiquidGlass,
+                icon: CupertinoIcons.square_grid_2x2_fill,
+                iconColor: AppColors.primaryOrange,
+                title: 'Grid Size',
+                subtitle: isDisabled ? 'Controlled by Auto Mode' : null,
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildGlassButton(
+                      isDark: isDark,
+                      icon: CupertinoIcons.minus,
+                      onTap: !isDisabled && settings.gridSize > AppConstants.minGridColumns
+                          ? () => settings.setGridSize(settings.gridSize - 1)
+                          : null,
+                    ),
+                    Container(
+                      width: 40,
+                      alignment: Alignment.center,
+                      child: Text(
+                        '${settings.gridSize}',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? CupertinoColors.white
+                              : CupertinoColors.black,
+                        ),
+                      ),
+                    ),
+                    _buildGlassButton(
+                      isDark: isDark,
+                      icon: CupertinoIcons.plus,
+                      onTap: !isDisabled && settings.gridSize < AppConstants.maxGridColumns
+                          ? () => settings.setGridSize(settings.gridSize + 1)
+                          : null,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        _buildDivider(isDark, isLiquidGlass),
+        Consumer<SettingsProvider>(
+          builder: (context, settings, _) {
+            return _buildTile(
+              context,
+              isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
+              icon: CupertinoIcons.arrow_left_right,
+              iconColor: AppColors.primaryBlue,
+              title: 'Spacing',
+              subtitle: '${settings.gridSpacing.toInt()} pt',
+              trailing: SizedBox(
+                width: 150,
+                child: CupertinoSlider(
+                  value: settings.gridSpacing,
+                  min: AppConstants.minGridSpacing,
+                  max: AppConstants.maxGridSpacing,
+                  divisions: ((AppConstants.maxGridSpacing - AppConstants.minGridSpacing) / 2).round(),
+                  activeColor: AppColors.primaryBlue,
+                  onChanged: (value) => settings.setGridSpacing(value),
+                ),
+              ),
+            );
+          },
+        ),
+        _buildDivider(isDark, isLiquidGlass),
+        Consumer<SettingsProvider>(
+          builder: (context, settings, _) {
+            return _buildTile(
+              context,
+              isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
+              icon: CupertinoIcons.square_fill_on_square_fill,
+              iconColor: AppColors.primaryGreen,
+              title: 'Padding',
+              subtitle: '${settings.gridPadding.toInt()} pt',
+              trailing: SizedBox(
+                width: 150,
+                child: CupertinoSlider(
+                  value: settings.gridPadding,
+                  min: AppConstants.minGridPadding,
+                  max: AppConstants.maxGridPadding,
+                  divisions: ((AppConstants.maxGridPadding - AppConstants.minGridPadding) / 2).round(),
+                  activeColor: AppColors.primaryGreen,
+                  onChanged: (value) => settings.setGridPadding(value),
+                ),
               ),
             );
           },

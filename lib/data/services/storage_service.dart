@@ -220,6 +220,38 @@ class StorageService {
     await _prefs.setInt(AppConstants.gridSizeKey, size);
   }
 
+  /// Get grid spacing
+  double getGridSpacing() {
+    return _prefs.getDouble(AppConstants.gridSpacingKey) ??
+        AppConstants.defaultGridSpacing;
+  }
+
+  /// Set grid spacing
+  Future<void> setGridSpacing(double spacing) async {
+    await _prefs.setDouble(AppConstants.gridSpacingKey, spacing);
+  }
+
+  /// Get grid padding
+  double getGridPadding() {
+    return _prefs.getDouble(AppConstants.gridPaddingKey) ??
+        AppConstants.defaultGridPadding;
+  }
+
+  /// Set grid padding
+  Future<void> setGridPadding(double padding) async {
+    await _prefs.setDouble(AppConstants.gridPaddingKey, padding);
+  }
+
+  /// Get grid auto mode
+  bool getGridAutoMode() {
+    return _prefs.getBool(AppConstants.gridAutoModeKey) ?? true;
+  }
+
+  /// Set grid auto mode
+  Future<void> setGridAutoMode(bool enabled) async {
+    await _prefs.setBool(AppConstants.gridAutoModeKey, enabled);
+  }
+
   /// Get safe mode setting
   bool getSafeMode() {
     return _prefs.getBool(AppConstants.safeModeKey) ?? false;

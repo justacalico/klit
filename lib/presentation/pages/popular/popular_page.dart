@@ -84,7 +84,6 @@ class _PopularPageState extends State<PopularPage> {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
-    final gridSize = context.watch<SettingsProvider>().gridSize;
 
     return CupertinoPageScaffold(
       child: CustomScrollView(
@@ -118,7 +117,6 @@ class _PopularPageState extends State<PopularPage> {
                   onLoading: () => _loadPosts(),
                   child: PostsGrid(
                           posts: postsProvider.popularPosts,
-                          columns: gridSize,
                           isLoading: postsProvider.isLoadingPopular,
                           hasMore: postsProvider.hasMorePopular,
                           error: postsProvider.popularError,

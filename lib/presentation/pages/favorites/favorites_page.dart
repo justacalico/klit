@@ -127,14 +127,13 @@ class _FavoritesPageState extends State<FavoritesPage> {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
-    final gridSize = context.watch<SettingsProvider>().gridSize;
 
     return CupertinoPageScaffold(
       child: CustomScrollView(
         slivers: [
           _buildNavigationBar(isDark),
           SliverFillRemaining(
-            child: _buildContent(isDark, gridSize),
+            child: _buildContent(isDark),
           ),
         ],
       ),
@@ -167,7 +166,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
     );
   }
 
-  Widget _buildContent(bool isDark, int gridSize) {
+  Widget _buildContent(bool isDark) {
     if (_isLoading && _favorites.isEmpty) {
       return const Center(child: CupertinoActivityIndicator(radius: 16));
     }
@@ -224,7 +223,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
     return PostsGrid(
       posts: _favorites,
-      columns: gridSize,
       isLoading: _isLoadingMore,
       hasMore: _hasMore,
       onPostTap: _onPostTap,

@@ -36,6 +36,19 @@ class AppConstants {
   static const int maxGridColumns = 4;
   static const int minGridColumns = 1;
 
+  /// Grid spacing and padding
+  static const double defaultGridSpacing = 4.0;
+  static const double minGridSpacing = 0.0;
+  static const double maxGridSpacing = 16.0;
+  static const double defaultGridPadding = 4.0;
+  static const double minGridPadding = 0.0;
+  static const double maxGridPadding = 24.0;
+
+  /// Storage keys for grid settings
+  static const String gridSpacingKey = 'grid_spacing';
+  static const String gridPaddingKey = 'grid_padding';
+  static const String gridAutoModeKey = 'grid_auto_mode';
+
   /// Animation durations
   static const Duration shortAnimation = Duration(milliseconds: 200);
   static const Duration mediumAnimation = Duration(milliseconds: 300);

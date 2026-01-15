@@ -24,7 +24,6 @@ class DesktopHotPage extends StatefulWidget {
 
 class _DesktopHotPageState extends State<DesktopHotPage> {
   final RefreshController _refreshController = RefreshController();
-  int _gridColumns = 4;
 
   @override
   void initState() {
@@ -80,11 +79,6 @@ class _DesktopHotPageState extends State<DesktopHotPage> {
           title: 'Hot Posts',
           icon: CupertinoIcons.flame_fill,
           actions: [
-            DesktopGridSizeSelector(
-              value: _gridColumns,
-              onChanged: (val) => setState(() => _gridColumns = val),
-            ),
-            const SizedBox(width: 16),
             DesktopToolbarButton(
               icon: CupertinoIcons.search,
               onPressed: () => widget.onSearchTap(),
@@ -138,7 +132,6 @@ class _DesktopHotPageState extends State<DesktopHotPage> {
                       onLoading: () => _loadPosts(),
                       child: PostsGrid(
                         posts: postsProvider.hotPosts,
-                        columns: _gridColumns,
                         isLoading: postsProvider.isLoadingHot,
                         hasMore: postsProvider.hasMoreHot,
                         error: postsProvider.hotError,

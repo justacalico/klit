@@ -30,7 +30,6 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
   final _searchController = TextEditingController();
   final _focusNode = FocusNode();
   final _tagDebouncer = Debouncer(delay: const Duration(milliseconds: 300));
-  int _gridColumns = 4;
   String? _selectedRating;
   String _selectedOrder = 'id_desc';
   bool _showFilters = false;
@@ -757,9 +756,6 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
                     },
                   ),
                 ),
-                const SizedBox(width: 24),
-                // Grid size
-                _buildGridSizeSelector(isDark),
               ],
             ),
           ),
@@ -913,7 +909,6 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
           },
           child: PostsGrid(
             posts: postsProvider.searchResults,
-            columns: _gridColumns,
             isLoading: postsProvider.isLoadingSearch,
             hasMore: postsProvider.hasMoreSearch,
             error: postsProvider.searchError,
@@ -923,46 +918,6 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
           ),
         );
       },
-    );
-  }
-
-  Widget _buildGridSizeSelector(bool isDark) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Icon(
-          CupertinoIcons.square_grid_2x2,
-          size: 16,
-          color: CupertinoColors.secondaryLabel,
-        ),
-        const SizedBox(width: 8),
-        CupertinoSlidingSegmentedControl<int>(
-          groupValue: _gridColumns,
-          children: const {
-            2: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 6),
-              child: Text('2', style: TextStyle(fontSize: 12)),
-            ),
-            3: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 6),
-              child: Text('3', style: TextStyle(fontSize: 12)),
-            ),
-            4: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 6),
-              child: Text('4', style: TextStyle(fontSize: 12)),
-            ),
-            5: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 6),
-              child: Text('5', style: TextStyle(fontSize: 12)),
-            ),
-          },
-          onValueChanged: (value) {
-            if (value != null) {
-              setState(() => _gridColumns = value);
-            }
-          },
-        ),
-      ],
     );
   }
 }
