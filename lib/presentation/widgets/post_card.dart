@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/extensions/extensions.dart';
+import '../../core/theme/ui_style_manager.dart';
 import '../../data/models/models.dart';
 import 'loading_shimmer.dart';
 
@@ -36,6 +37,7 @@ class PostCard extends StatelessWidget {
   Widget _buildGridCard(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final ratingColor = post.ratingColor;
 
     return GestureDetector(
       onTap: onTap,
@@ -43,7 +45,18 @@ class PostCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
           borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: ratingColor.withValues(alpha: 0.6),
+            width: 2,
+          ),
           boxShadow: [
+            // Rating color aura/glow
+            BoxShadow(
+              color: ratingColor.withValues(alpha: isDark ? 0.4 : 0.3),
+              blurRadius: 8,
+              spreadRadius: 1,
+            ),
+            // Standard shadow
             BoxShadow(
               color: CupertinoColors.black.withValues(alpha: isDark ? 0.3 : 0.08),
               blurRadius: 4,
@@ -190,12 +203,11 @@ class PostCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            _buildRatingBadge(),
-            const Spacer(),
             if (post.isVideo) ...[
               _buildVideoBadge(),
               const SizedBox(width: 4),
             ],
+            const Spacer(),
             _buildScoreBadge(),
           ],
         ),
