@@ -37,6 +37,7 @@ class PostCard extends StatelessWidget {
   Widget _buildGridCard(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
     final ratingColor = post.ratingColor;
 
     return GestureDetector(
@@ -44,25 +45,53 @@ class PostCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(isLiquidGlass ? 12 : 8),
           border: Border.all(
-            color: ratingColor.withValues(alpha: 0.6),
-            width: 2,
+            color: ratingColor.withValues(alpha: isLiquidGlass ? 0.7 : 0.6),
+            width: isLiquidGlass ? 1.5 : 2,
           ),
-          boxShadow: [
-            // Rating color aura/glow
-            BoxShadow(
-              color: ratingColor.withValues(alpha: isDark ? 0.4 : 0.3),
-              blurRadius: 8,
-              spreadRadius: 1,
-            ),
-            // Standard shadow
-            BoxShadow(
-              color: CupertinoColors.black.withValues(alpha: isDark ? 0.3 : 0.08),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          boxShadow: isLiquidGlass
+              ? [
+                  // Outer soft glow
+                  BoxShadow(
+                    color: ratingColor.withValues(alpha: isDark ? 0.5 : 0.35),
+                    blurRadius: 16,
+                    spreadRadius: 2,
+                  ),
+                  // Inner bright glow for glass effect
+                  BoxShadow(
+                    color: ratingColor.withValues(alpha: isDark ? 0.3 : 0.2),
+                    blurRadius: 6,
+                    spreadRadius: 0,
+                  ),
+                  // Subtle white highlight for glass reflection
+                  BoxShadow(
+                    color: CupertinoColors.white.withValues(alpha: isDark ? 0.08 : 0.15),
+                    blurRadius: 2,
+                    spreadRadius: 0,
+                    offset: const Offset(0, -1),
+                  ),
+                  // Standard shadow for depth
+                  BoxShadow(
+                    color: CupertinoColors.black.withValues(alpha: isDark ? 0.4 : 0.12),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : [
+                  // Simple aura for Material mode
+                  BoxShadow(
+                    color: ratingColor.withValues(alpha: isDark ? 0.4 : 0.3),
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                  ),
+                  // Standard shadow
+                  BoxShadow(
+                    color: CupertinoColors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
         ),
         clipBehavior: Clip.antiAlias,
         child: Stack(
