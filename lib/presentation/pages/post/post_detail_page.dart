@@ -85,6 +85,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
   // Confetti controller for favorite animation
   late ConfettiController _confettiController;
 
+  // Focus node for keyboard controls
+  late FocusNode _focusNode;
+
   @override
   void initState() {
     super.initState();
@@ -92,15 +95,22 @@ class _PostDetailPageState extends State<PostDetailPage> {
     _postIds = List.from(widget.postIds);
     _hasMore = widget.hasMore;
     _pageController = PageController(initialPage: _currentIndex);
-    _confettiController = ConfettiController(duration: const Duration(seconds: 1));
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 1),
+    );
+    _focusNode = FocusNode();
     _loadPost(_currentIndex);
     _preloadAdjacentPosts();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _focusNode.requestFocus();
+    });
   }
 
   @override
   void dispose() {
     _pageController.dispose();
     _confettiController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -193,6 +203,18 @@ class _PostDetailPageState extends State<PostDetailPage> {
     });
     _loadPost(index);
     _preloadAdjacentPosts();
+  }
+
+  /// Navigate to next (+1) or previous (-1) post via keyboard
+  void _navigatePost(int direction) {
+    final newIndex = _currentIndex + direction;
+    if (newIndex >= 0 && newIndex < _postIds.length) {
+      _pageController.animateToPage(
+        newIndex,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   int get _currentPostId => _postIds[_currentIndex];
@@ -356,83 +378,116 @@ class _PostDetailPageState extends State<PostDetailPage> {
     final isOled = settingsProvider.themeMode == 3;
     final hasMultiplePosts = _postIds.length > 1;
 
-    return CupertinoPageScaffold(
-      backgroundColor: isOled
-          ? CupertinoColors.black
-          : isDark
-          ? AppColors.darkBackground
-          : AppColors.lightSecondaryBackground,
-      navigationBar: CupertinoNavigationBar(
+    return KeyboardListener(
+      focusNode: _focusNode,
+      autofocus: true,
+      onKeyEvent: (event) {
+        if (event is KeyDownEvent) {
+          final key = event.logicalKey.keyLabel.toLowerCase();
+          // Navigation
+          if (key == 'd' || event.logicalKey == LogicalKeyboardKey.arrowRight) {
+            _navigatePost(1);
+            return;
+          }
+          if (key == 'a' || event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+            _navigatePost(-1);
+            return;
+          }
+          // Actions
+          if (key == 'f') {
+            _toggleFavorite(_currentIndex);
+            return;
+          }
+          if (key == 'w' || event.logicalKey == LogicalKeyboardKey.arrowUp) {
+            final currentVote = _userVote[_currentIndex];
+            _vote(_currentIndex, currentVote == 1 ? 0 : 1);
+            return;
+          }
+          if (key == 's' || event.logicalKey == LogicalKeyboardKey.arrowDown) {
+            final currentVote = _userVote[_currentIndex];
+            _vote(_currentIndex, currentVote == -1 ? 0 : -1);
+            return;
+          }
+        }
+      },
+      child: CupertinoPageScaffold(
         backgroundColor: isOled
-            ? CupertinoColors.black.withValues(alpha: 0.8)
+            ? CupertinoColors.black
             : isDark
-            ? CupertinoColors.darkBackgroundGray.withValues(alpha: 0.8)
-            : CupertinoColors.systemBackground.withValues(alpha: 0.8),
-        middle: Text(
-          hasMultiplePosts
-              ? 'Post #$_currentPostId (${_currentIndex + 1}/${_postIds.length})'
-              : 'Post #$_currentPostId',
-        ),
-        trailing: _currentPost != null
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: _loadingStates[_currentIndex] == true
-                        ? null
-                        : _refreshCurrentPost,
-                    child: Icon(
-                      CupertinoIcons.refresh,
-                      color: _loadingStates[_currentIndex] == true
-                          ? CupertinoColors.systemGrey
-                          : null,
+            ? AppColors.darkBackground
+            : AppColors.lightSecondaryBackground,
+        navigationBar: CupertinoNavigationBar(
+          backgroundColor: isOled
+              ? CupertinoColors.black.withValues(alpha: 0.8)
+              : isDark
+              ? CupertinoColors.darkBackgroundGray.withValues(alpha: 0.8)
+              : CupertinoColors.systemBackground.withValues(alpha: 0.8),
+          middle: Text(
+            hasMultiplePosts
+                ? 'Post #$_currentPostId (${_currentIndex + 1}/${_postIds.length})'
+                : 'Post #$_currentPostId',
+          ),
+          trailing: _currentPost != null
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: _loadingStates[_currentIndex] == true
+                          ? null
+                          : _refreshCurrentPost,
+                      child: Icon(
+                        CupertinoIcons.refresh,
+                        color: _loadingStates[_currentIndex] == true
+                            ? CupertinoColors.systemGrey
+                            : null,
+                      ),
                     ),
-                  ),
-                  CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () => _showMoreOptions(),
-                    child: const Icon(CupertinoIcons.ellipsis),
-                  ),
-                ],
-              )
-            : null,
-      ),
-      child: Stack(
-        children: [
-          SafeArea(
-            child: hasMultiplePosts
-                ? PageView.builder(
-                    controller: _pageController,
-                    itemCount: _postIds.length,
-                    onPageChanged: _onPageChanged,
-                    itemBuilder: (context, index) =>
-                        _buildPageContent(index, isDark, isOled),
-                  )
-                : _buildPageContent(0, isDark, isOled),
-          ),
-          // Confetti overlay - positioned near the favorite button area
-          Align(
-            alignment: const Alignment(0.3, 0.45),
-            child: ConfettiWidget(
-              confettiController: _confettiController,
-              blastDirectionality: BlastDirectionality.explosive,
-              maxBlastForce: 20,
-              minBlastForce: 8,
-              emissionFrequency: 0.05,
-              numberOfParticles: 25,
-              gravity: 0.3,
-              colors: const [
-                Color(0xFFFF6B9D), // Pink
-                Color(0xFFFF8E53), // Orange
-                Color(0xFFFFD93D), // Yellow
-                Color(0xFF6BCB77), // Green
-                Color(0xFF4D96FF), // Blue
-                Color(0xFFC9B1FF), // Purple
-              ],
+                    CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => _showMoreOptions(),
+                      child: const Icon(CupertinoIcons.ellipsis),
+                    ),
+                  ],
+                )
+              : null,
+        ),
+        child: Stack(
+          children: [
+            SafeArea(
+              child: hasMultiplePosts
+                  ? PageView.builder(
+                      controller: _pageController,
+                      itemCount: _postIds.length,
+                      onPageChanged: _onPageChanged,
+                      itemBuilder: (context, index) =>
+                          _buildPageContent(index, isDark, isOled),
+                    )
+                  : _buildPageContent(0, isDark, isOled),
             ),
-          ),
-        ],
+            // Confetti overlay - positioned near the favorite button area
+            Align(
+              alignment: const Alignment(0.3, 0.45),
+              child: ConfettiWidget(
+                confettiController: _confettiController,
+                blastDirectionality: BlastDirectionality.explosive,
+                maxBlastForce: 20,
+                minBlastForce: 8,
+                emissionFrequency: 0.05,
+                numberOfParticles: 25,
+                gravity: 0.3,
+                colors: const [
+                  Color(0xFFFF6B9D), // Pink
+                  Color(0xFFFF8E53), // Orange
+                  Color(0xFFFFD93D), // Yellow
+                  Color(0xFF6BCB77), // Green
+                  Color(0xFF4D96FF), // Blue
+                  Color(0xFFC9B1FF), // Purple
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -541,12 +596,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
   Widget _buildActionBar(int index, Post post, bool isDark, bool isOled) {
     final authProvider = context.watch<AuthProvider>();
     final isGuest = authProvider.isGuest;
-    
+
     // Don't show action bar for guest users
     if (isGuest) {
       return const SizedBox.shrink();
     }
-    
+
     final isFav = _isFavorited[index] ?? post.isFavorited;
     final userVote = _userVote[index];
     final isVoting = _isVoting[index] == true;
@@ -719,8 +774,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
     // For GIFs, use the full file URL to preserve animation
     // For other images, use sample if available
-    final imageUrl = post.isGif 
-        ? post.file.url 
+    final imageUrl = post.isGif
+        ? post.file.url
         : (post.sample.has ? post.sample.url : post.preview.url);
 
     if (imageUrl == null) {
