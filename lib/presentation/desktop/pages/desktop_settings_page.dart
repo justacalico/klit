@@ -1195,6 +1195,54 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                 ),
               ),
             ),
+            const SizedBox(height: 24),
+            // Blacklist Card
+            _buildSectionHeader('Blacklist', isDark),
+            const SizedBox(height: 12),
+            _buildSettingsCard(
+              isDark: isDark,
+              child: Column(
+                children: [
+                  _buildSettingRow(
+                    isDark: isDark,
+                    icon: CupertinoIcons.eye_slash_fill,
+                    iconColor: const Color(0xFFEF4444),
+                    title: 'Enable Blacklist',
+                    subtitle: 'Hide posts matching blacklisted tags',
+                    trailing: CupertinoSwitch(
+                      value: settings.blacklistEnabled,
+                      activeTrackColor: const Color(0xFFEF4444),
+                      onChanged: (value) => settings.setBlacklistEnabled(value),
+                    ),
+                  ),
+                  _buildDivider(isDark),
+                  _buildSettingRow(
+                    isDark: isDark,
+                    icon: CupertinoIcons.pencil_ellipsis_rectangle,
+                    iconColor: _DesignColors.accentOrange,
+                    title: 'Manage Blacklist',
+                    subtitle: '${settings.blacklistLines.length} ${settings.blacklistLines.length == 1 ? 'rule' : 'rules'} configured',
+                    trailing: CupertinoButton(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      color: _DesignColors.accentOrange.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(8),
+                      onPressed: () => Navigator.of(context).pushNamed(AppRoutes.blacklistSettings),
+                      child: const Text(
+                        'Manage',
+                        style: TextStyle(
+                          color: _DesignColors.accentOrange,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         );
       },
