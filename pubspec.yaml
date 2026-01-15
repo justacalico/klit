@@ -1,5 +1,5 @@
 name: klit
-description: "Advanced E926 client"
+description: "E926 API client"
 publish_to: 'none'
 version: 7.0.0
 
