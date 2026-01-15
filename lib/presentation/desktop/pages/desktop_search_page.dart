@@ -33,6 +33,7 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
   String? _selectedRating;
   String _selectedOrder = 'id_desc';
   bool _showFilters = false;
+  String _currentTagPrefix = ''; // Track if current word has - or ~ prefix
 
   // Animation for filters
   late AnimationController _filterAnimationController;
@@ -42,7 +43,6 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
   // Tag suggestions
   List<Tag> _tagSuggestions = [];
   bool _showTagSuggestions = false;
-  bool _isLoadingTags = false;
 
   final Map<String, String> _orderOptions = {
     'id_desc': 'Newest',
@@ -78,26 +78,13 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
       _performSearch();
     }
 
-    // Listen for focus changes to close tag suggestions
-    _focusNode.addListener(_onFocusChanged);
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
   }
 
-  void _onFocusChanged() {
-    if (!_focusNode.hasFocus && _showTagSuggestions) {
-      setState(() {
-        _showTagSuggestions = false;
-        _tagSuggestions = [];
-      });
-    }
-  }
-
   @override
   void dispose() {
-    _focusNode.removeListener(_onFocusChanged);
     _filterAnimationController.dispose();
     _searchController.dispose();
     _focusNode.dispose();
@@ -106,87 +93,106 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
   }
 
   /// Get the current word being typed (after the last space)
+  /// Returns the word without any prefix (like - or ~)
   String _getCurrentWord() {
     final text = _searchController.text;
     final cursorPos = _searchController.selection.baseOffset;
-    if (cursorPos < 0) return text.split(' ').last;
-
-    final textBeforeCursor = text.substring(0, cursorPos);
-    final words = textBeforeCursor.split(' ');
-    return words.isNotEmpty ? words.last : '';
+    
+    String rawWord;
+    if (cursorPos < 0 || cursorPos > text.length) {
+      rawWord = text.split(' ').last;
+    } else {
+      final textBeforeCursor = text.substring(0, cursorPos);
+      final words = textBeforeCursor.split(' ');
+      rawWord = words.isNotEmpty ? words.last : '';
+    }
+    
+    // Strip prefix and store it for later use when inserting
+    if (rawWord.startsWith('-')) {
+      _currentTagPrefix = '-';
+      return rawWord.substring(1);
+    } else if (rawWord.startsWith('~')) {
+      _currentTagPrefix = '~';
+      return rawWord.substring(1);
+    } else {
+      _currentTagPrefix = '';
+      return rawWord;
+    }
   }
 
   /// Fetch tag suggestions from the API
   Future<void> _fetchTagSuggestions(String query) async {
-    // Don't fetch or show suggestions if not focused
-    if (!_focusNode.hasFocus) {
-      setState(() {
-        _tagSuggestions = [];
-        _showTagSuggestions = false;
-      });
-      return;
-    }
-
+    // Don't fetch for empty/short queries
     if (query.isEmpty || query.length < 2) {
-      setState(() {
-        _tagSuggestions = [];
-        _showTagSuggestions = false;
-      });
+      if (_showTagSuggestions) {
+        setState(() {
+          _tagSuggestions = [];
+          _showTagSuggestions = false;
+        });
+      }
       return;
     }
 
-    setState(() => _isLoadingTags = true);
 
     final apiService = context.read<ApiService>();
     final result = await apiService.searchTags(query: query, limit: 10);
 
-    if (mounted && _focusNode.hasFocus) {
+    if (mounted) {
       result.when(
         success: (tags) {
           setState(() {
             _tagSuggestions = tags;
-            _showTagSuggestions = tags.isNotEmpty && _focusNode.hasFocus;
-            _isLoadingTags = false;
+            _showTagSuggestions = tags.isNotEmpty;
           });
         },
         failure: (_) {
           setState(() {
             _tagSuggestions = [];
             _showTagSuggestions = false;
-            _isLoadingTags = false;
           });
         },
       );
-    } else if (mounted) {
+    }
+  }
+
+  /// Close tag suggestions
+  void _closeTagSuggestions() {
+    if (_showTagSuggestions || _tagSuggestions.isNotEmpty) {
       setState(() {
-        _tagSuggestions = [];
         _showTagSuggestions = false;
-        _isLoadingTags = false;
+        _tagSuggestions = [];
       });
     }
+    _tagDebouncer.cancel();
   }
 
   /// Insert a tag suggestion into the search field
   void _insertTagSuggestion(String tagName) {
     final text = _searchController.text;
     final cursorPos = _searchController.selection.baseOffset;
+    
+    // Prepend the stored prefix (- or ~) if any
+    final tagWithPrefix = '$_currentTagPrefix$tagName';
 
-    if (cursorPos < 0) {
+    if (cursorPos < 0 || cursorPos > text.length) {
       final words = text.split(' ');
       if (words.isNotEmpty) {
-        words[words.length - 1] = tagName;
+        words[words.length - 1] = tagWithPrefix;
       } else {
-        words.add(tagName);
+        words.add(tagWithPrefix);
       }
       _searchController.text = '${words.join(' ')} ';
+      _searchController.selection = TextSelection.collapsed(
+        offset: _searchController.text.length,
+      );
     } else {
       final textBeforeCursor = text.substring(0, cursorPos);
       final textAfterCursor = text.substring(cursorPos);
 
       final lastSpaceIndex = textBeforeCursor.lastIndexOf(' ');
       final newTextBeforeCursor = lastSpaceIndex >= 0
-          ? '${textBeforeCursor.substring(0, lastSpaceIndex + 1)}$tagName '
-          : '$tagName ';
+          ? '${textBeforeCursor.substring(0, lastSpaceIndex + 1)}$tagWithPrefix '
+          : '$tagWithPrefix ';
 
       _searchController.text = newTextBeforeCursor + textAfterCursor;
       _searchController.selection = TextSelection.collapsed(
@@ -194,11 +200,8 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
       );
     }
 
-    setState(() {
-      _showTagSuggestions = false;
-      _tagSuggestions = [];
-    });
-
+    _closeTagSuggestions();
+    _currentTagPrefix = '';
     _focusNode.requestFocus();
   }
 
@@ -207,10 +210,7 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
     if (query.isEmpty) return;
 
     // Close tag suggestions when searching
-    setState(() {
-      _showTagSuggestions = false;
-      _tagSuggestions = [];
-    });
+    _closeTagSuggestions();
 
     final settingsProvider = context.read<SettingsProvider>();
     context.read<PostsProvider>().searchPosts(
@@ -315,40 +315,24 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
               );
             },
           ),
-        // Tag suggestions overlay
-        if (_showTagSuggestions && _tagSuggestions.isNotEmpty && _focusNode.hasFocus)
-          Positioned(
-            top: 52, // Below toolbar
-            left: 48, // Aligned with search field
-            right: 150, // Leave space for buttons
-            child: _buildTagSuggestions(isDark),
-          ),
-        // Loading indicator
-        if (_isLoadingTags && !_showTagSuggestions)
-          Positioned(
-            top: 56,
-            left: 48,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? CupertinoColors.black.withValues(alpha: 0.8)
-                    : CupertinoColors.white.withValues(alpha: 0.95),
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: CupertinoColors.black.withValues(alpha: 0.1),
-                    blurRadius: 8,
-                  ),
-                ],
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CupertinoActivityIndicator(radius: 8),
-                  SizedBox(width: 8),
-                  Text('Loading...', style: TextStyle(fontSize: 12)),
-                ],
+        // Tag suggestions overlay with click-outside-to-close
+        if (_showTagSuggestions && _tagSuggestions.isNotEmpty)
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: _closeTagSuggestions,
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                color: const Color(0x00000000),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: 52, // Below toolbar
+                      left: 48, // Aligned with search field
+                      right: 150, // Leave space for buttons
+                      child: _buildTagSuggestions(isDark),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -577,29 +561,29 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
                     ),
                   ),
                   onChanged: (value) {
-                    if (value.endsWith(' ')) {
-                      setState(() {
-                        _showTagSuggestions = false;
-                        _tagSuggestions = [];
-                      });
+                    // If field is empty, close suggestions
+                    if (value.isEmpty) {
+                      _closeTagSuggestions();
                       return;
                     }
 
-                    final currentWord = _getCurrentWord();
-                    _tagDebouncer.run(() {
-                      _fetchTagSuggestions(currentWord);
-                    });
+                    // Close suggestions if user typed a space (completed a tag)
+                    if (value.endsWith(' ')) {
+                      _closeTagSuggestions();
+                    } else {
+                      // Fetch tag suggestions for the current word (strips - prefix internally)
+                      final currentWord = _getCurrentWord();
+                      if (currentWord.length >= 2) {
+                        _tagDebouncer.run(() {
+                          _fetchTagSuggestions(currentWord);
+                        });
+                      } else {
+                        _closeTagSuggestions();
+                      }
+                    }
                   },
                   onSubmitted: (_) {
-                    // Cancel any pending tag fetches
-                    _tagDebouncer.cancel();
-                    setState(() {
-                      _showTagSuggestions = false;
-                      _tagSuggestions = [];
-                      _isLoadingTags = false;
-                    });
-                    // Unfocus to ensure suggestions stay closed
-                    _focusNode.unfocus();
+                    _closeTagSuggestions();
                     _performSearch();
                   },
                 ),
@@ -609,14 +593,7 @@ class _DesktopSearchPageState extends State<DesktopSearchPage>
                 icon: CupertinoIcons.search,
                 tooltip: 'Search',
                 onPressed: () {
-                  // Cancel any pending tag fetches
-                  _tagDebouncer.cancel();
-                  setState(() {
-                    _showTagSuggestions = false;
-                    _tagSuggestions = [];
-                    _isLoadingTags = false;
-                  });
-                  _focusNode.unfocus();
+                  _closeTagSuggestions();
                   _performSearch();
                 },
               ),

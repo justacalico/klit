@@ -34,9 +34,9 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
   bool _showHistory = true;
   bool _showTagSuggestions = false;
   List<Tag> _tagSuggestions = [];
-  bool _isLoadingTags = false;
   String? _selectedRating;
   String _selectedOrder = 'id_desc';
+  String _currentTagPrefix = ''; // Track if current word has - prefix
 
   // Route observer for detecting navigation events
   static final RouteObserver<ModalRoute<void>> routeObserver =
@@ -58,20 +58,9 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
       _showHistory = false;
       _performSearch();
     }
-    // Listen for focus changes to close tag suggestions
-    _focusNode.addListener(_onFocusChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
-  }
-
-  void _onFocusChanged() {
-    if (!_focusNode.hasFocus && _showTagSuggestions) {
-      setState(() {
-        _showTagSuggestions = false;
-        _tagSuggestions = [];
-      });
-    }
   }
 
   @override
@@ -87,7 +76,6 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
   @override
   void dispose() {
     routeObserver.unsubscribe(this);
-    _focusNode.removeListener(_onFocusChanged);
     _searchController.dispose();
     _debouncer.dispose();
     _tagDebouncer.dispose();
@@ -98,99 +86,118 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
   @override
   void didPopNext() {
     // Called when returning to this page from another page
-    // Re-enable the search field by requesting focus after a short delay
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (mounted && !_focusNode.hasFocus) {
-        // Don't auto-focus, just ensure the field is interactive
-        // User can tap to focus if they want
-      }
-    });
+    // Close tag suggestions when returning
+    if (_showTagSuggestions) {
+      setState(() {
+        _showTagSuggestions = false;
+        _tagSuggestions = [];
+      });
+    }
   }
 
   /// Get the current word being typed (after the last space)
+  /// Returns the word without any prefix (like -)
   String _getCurrentWord() {
     final text = _searchController.text;
     final cursorPos = _searchController.selection.baseOffset;
-    if (cursorPos < 0) return text.split(' ').last;
-
-    final textBeforeCursor = text.substring(0, cursorPos);
-    final words = textBeforeCursor.split(' ');
-    return words.isNotEmpty ? words.last : '';
+    
+    String rawWord;
+    if (cursorPos < 0 || cursorPos > text.length) {
+      rawWord = text.split(' ').last;
+    } else {
+      final textBeforeCursor = text.substring(0, cursorPos);
+      final words = textBeforeCursor.split(' ');
+      rawWord = words.isNotEmpty ? words.last : '';
+    }
+    
+    // Strip prefix and store it for later use when inserting
+    if (rawWord.startsWith('-')) {
+      _currentTagPrefix = '-';
+      return rawWord.substring(1);
+    } else if (rawWord.startsWith('~')) {
+      _currentTagPrefix = '~';
+      return rawWord.substring(1);
+    } else {
+      _currentTagPrefix = '';
+      return rawWord;
+    }
   }
 
   /// Fetch tag suggestions from the API
   Future<void> _fetchTagSuggestions(String query) async {
-    // Don't fetch or show suggestions if not focused
-    if (!_focusNode.hasFocus) {
-      setState(() {
-        _tagSuggestions = [];
-        _showTagSuggestions = false;
-      });
-      return;
-    }
-
+    // Don't fetch for empty/short queries
     if (query.isEmpty || query.length < 2) {
-      setState(() {
-        _tagSuggestions = [];
-        _showTagSuggestions = false;
-      });
+      if (_showTagSuggestions) {
+        setState(() {
+          _tagSuggestions = [];
+          _showTagSuggestions = false;
+        });
+      }
       return;
     }
 
-    setState(() => _isLoadingTags = true);
 
     final apiService = context.read<ApiService>();
     final result = await apiService.searchTags(query: query, limit: 10);
 
-    if (mounted && _focusNode.hasFocus) {
+    if (mounted) {
       result.when(
         success: (tags) {
           setState(() {
             _tagSuggestions = tags;
-            _showTagSuggestions = tags.isNotEmpty && _focusNode.hasFocus;
-            _isLoadingTags = false;
+            _showTagSuggestions = tags.isNotEmpty;
           });
         },
         failure: (_) {
           setState(() {
             _tagSuggestions = [];
             _showTagSuggestions = false;
-            _isLoadingTags = false;
           });
         },
       );
-    } else if (mounted) {
+    }
+  }
+
+  /// Close tag suggestions
+  void _closeTagSuggestions() {
+    if (_showTagSuggestions || _tagSuggestions.isNotEmpty) {
       setState(() {
-        _tagSuggestions = [];
         _showTagSuggestions = false;
-        _isLoadingTags = false;
+        _tagSuggestions = [];
       });
     }
+    _tagDebouncer.cancel();
   }
 
   /// Insert a tag suggestion into the search field
   void _insertTagSuggestion(String tagName) {
     final text = _searchController.text;
     final cursorPos = _searchController.selection.baseOffset;
+    
+    // Prepend the stored prefix (- or ~) if any
+    final tagWithPrefix = '$_currentTagPrefix$tagName';
 
-    if (cursorPos < 0) {
-      // Simple case: just append
+    if (cursorPos < 0 || cursorPos > text.length) {
+      // Simple case: replace last word
       final words = text.split(' ');
       if (words.isNotEmpty) {
-        words[words.length - 1] = tagName;
+        words[words.length - 1] = tagWithPrefix;
       } else {
-        words.add(tagName);
+        words.add(tagWithPrefix);
       }
       _searchController.text = '${words.join(' ')} ';
+      _searchController.selection = TextSelection.collapsed(
+        offset: _searchController.text.length,
+      );
     } else {
-      // Replace the current word being typed
+      // Replace the current word being typed (including any prefix)
       final textBeforeCursor = text.substring(0, cursorPos);
       final textAfterCursor = text.substring(cursorPos);
 
       final lastSpaceIndex = textBeforeCursor.lastIndexOf(' ');
       final newTextBeforeCursor = lastSpaceIndex >= 0
-          ? '${textBeforeCursor.substring(0, lastSpaceIndex + 1)}$tagName '
-          : '$tagName ';
+          ? '${textBeforeCursor.substring(0, lastSpaceIndex + 1)}$tagWithPrefix '
+          : '$tagWithPrefix ';
 
       _searchController.text = newTextBeforeCursor + textAfterCursor;
       _searchController.selection = TextSelection.collapsed(
@@ -198,10 +205,8 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
       );
     }
 
-    setState(() {
-      _showTagSuggestions = false;
-      _tagSuggestions = [];
-    });
+    _closeTagSuggestions();
+    _currentTagPrefix = '';
   }
 
   /// Check if safe mode should be enforced (guest mode OR safe mode setting)
@@ -218,12 +223,9 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
       return;
     }
 
-    // Close tag suggestions and history when searching
-    setState(() {
-      _showHistory = false;
-      _showTagSuggestions = false;
-      _tagSuggestions = [];
-    });
+    // Close tag suggestions when searching
+    _closeTagSuggestions();
+    setState(() => _showHistory = false);
 
     final settingsProvider = context.read<SettingsProvider>();
     final safeMode = _shouldEnforceSafeMode(context);
@@ -349,42 +351,19 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
               ],
             ),
             // Tag suggestions overlay - adjusted position
-            if (_showTagSuggestions && _tagSuggestions.isNotEmpty && _focusNode.hasFocus)
+            if (_showTagSuggestions && _tagSuggestions.isNotEmpty)
               Positioned(
                 top: 56, // Below search field
                 left: 0,
                 right: 0,
-                child: _buildTagSuggestions(),
-              ),
-            // Loading indicator for tags
-            if (_isLoadingTags && !_showTagSuggestions)
-              Positioned(
-                top: 64,
-                left: 0,
-                right: 0,
-                child: Center(
+                bottom: 0,
+                child: GestureDetector(
+                  onTap: _closeTagSuggestions,
+                  behavior: HitTestBehavior.opaque,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? CupertinoColors.black.withValues(alpha: 0.7)
-                          : CupertinoColors.white.withValues(alpha: 0.9),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CupertinoActivityIndicator(),
-                        SizedBox(width: 8),
-                        Text(
-                          'Loading suggestions...',
-                          style: TextStyle(fontSize: 13),
-                        ),
-                      ],
-                    ),
+                    color: const Color(0x00000000),
+                    alignment: Alignment.topCenter,
+                    child: _buildTagSuggestions(),
                   ),
                 ),
               ),
@@ -526,40 +505,38 @@ class _SearchPageState extends State<SearchPage> with RouteAware {
       focusNode: _focusNode,
       placeholder: 'Search tags...',
       onChanged: (value) {
-        // Close suggestions if user typed a space (completed a tag)
-        if (value.endsWith(' ')) {
-          setState(() {
-            _showTagSuggestions = false;
-            _tagSuggestions = [];
-          });
+        // If field is empty, show history and close suggestions
+        if (value.isEmpty) {
+          _closeTagSuggestions();
+          setState(() => _showHistory = true);
+          _debouncer.cancel();
           return;
         }
 
-        // Fetch tag suggestions for the current word
-        final currentWord = _getCurrentWord();
-        _tagDebouncer.run(() {
-          _fetchTagSuggestions(currentWord);
-        });
-
-        // Perform search after debounce
-        _debouncer.run(() {
-          if (value.isNotEmpty) {
-            _performSearch();
+        // Close suggestions if user typed a space (completed a tag)
+        if (value.endsWith(' ')) {
+          _closeTagSuggestions();
+        } else {
+          // Fetch tag suggestions for the current word (strips - prefix internally)
+          final currentWord = _getCurrentWord();
+          if (currentWord.length >= 2) {
+            _tagDebouncer.run(() {
+              _fetchTagSuggestions(currentWord);
+            });
           } else {
-            setState(() => _showHistory = true);
+            _closeTagSuggestions();
+          }
+        }
+
+        // Perform search after debounce (only if not just typing tags)
+        _debouncer.run(() {
+          if (value.isNotEmpty && value.endsWith(' ')) {
+            _performSearch();
           }
         });
       },
       onSubmitted: (_) {
-        // Cancel any pending tag fetches
-        _tagDebouncer.cancel();
-        setState(() {
-          _showTagSuggestions = false;
-          _tagSuggestions = [];
-          _isLoadingTags = false;
-        });
-        // Unfocus to ensure suggestions stay closed
-        _focusNode.unfocus();
+        _closeTagSuggestions();
         _performSearch();
       },
     );
