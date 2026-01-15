@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show ListTile, Material, ReorderableListView;
+import 'package:flutter/material.dart'
+    show ListTile, Material, ReorderableListView;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -24,6 +25,7 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
 
     return CupertinoPageScaffold(
       backgroundColor: isDark
@@ -35,13 +37,21 @@ class SettingsPage extends StatelessWidget {
             child: CupertinoNavigationBar(
               transitionBetweenRoutes: false,
               backgroundColor: isDark
-                  ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
-                  : CupertinoColors.white.withValues(alpha: 0.85),
+                  ? const Color(
+                      0xFF1C1C1E,
+                    ).withValues(alpha: isLiquidGlass ? 0.85 : 1.0)
+                  : CupertinoColors.white.withValues(
+                      alpha: isLiquidGlass ? 0.85 : 1.0,
+                    ),
               border: Border(
                 bottom: BorderSide(
                   color: isDark
-                      ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
-                      : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+                      ? (isLiquidGlass
+                            ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
+                            : const Color(0xFF3A3A3C))
+                      : (isLiquidGlass
+                            ? _ThemeColors.primaryPurple.withValues(alpha: 0.1)
+                            : const Color(0xFFE5E5E7)),
                   width: 0.5,
                 ),
               ),
@@ -59,19 +69,19 @@ class SettingsPage extends StatelessWidget {
             sliver: SliverList(
               delegate: SliverChildListDelegate([
                 const SizedBox(height: 20),
-                _buildAccountSection(context, isDark),
+                _buildAccountSection(context, isDark, isLiquidGlass),
                 const SizedBox(height: 24),
-                _buildAppearanceSection(context, isDark),
+                _buildAppearanceSection(context, isDark, isLiquidGlass),
                 const SizedBox(height: 24),
-                _buildCustomizationSection(context, isDark),
+                _buildCustomizationSection(context, isDark, isLiquidGlass),
                 const SizedBox(height: 24),
-                _buildVideoSection(context, isDark),
+                _buildVideoSection(context, isDark, isLiquidGlass),
                 const SizedBox(height: 24),
-                _buildNetworkSection(context, isDark),
+                _buildNetworkSection(context, isDark, isLiquidGlass),
                 const SizedBox(height: 24),
-                _buildCacheSection(context, isDark),
+                _buildCacheSection(context, isDark, isLiquidGlass),
                 const SizedBox(height: 24),
-                _buildAboutSection(context, isDark),
+                _buildAboutSection(context, isDark, isLiquidGlass),
                 const SizedBox(height: 40),
               ]),
             ),
@@ -81,19 +91,25 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAccountSection(BuildContext context, bool isDark) {
+  Widget _buildAccountSection(
+    BuildContext context,
+    bool isDark,
+    bool isLiquidGlass,
+  ) {
     return Consumer<AuthProvider>(
       builder: (context, auth, _) {
         // Guest mode - show login prompt
         if (auth.isGuest) {
-          return _buildLiquidGlassSection(
+          return _buildSection(
             context,
             isDark: isDark,
+            isLiquidGlass: isLiquidGlass,
             title: 'ACCOUNT',
             children: [
-              _buildLiquidGlassTile(
+              _buildTile(
                 context,
                 isDark: isDark,
+                isLiquidGlass: isLiquidGlass,
                 icon: CupertinoIcons.person_badge_plus,
                 iconColor: AppColors.primaryBlue,
                 title: 'Sign In',
@@ -111,14 +127,16 @@ class SettingsPage extends StatelessWidget {
         }
 
         // Logged in - show account management
-        return _buildLiquidGlassSection(
+        return _buildSection(
           context,
           isDark: isDark,
+          isLiquidGlass: isLiquidGlass,
           title: 'ACCOUNT',
           children: [
-            _buildLiquidGlassTile(
+            _buildTile(
               context,
               isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
               icon: CupertinoIcons.person_circle,
               iconColor: AppColors.primaryBlue,
               title: auth.currentAccount?.username ?? 'Not logged in',
@@ -127,10 +145,11 @@ class SettingsPage extends StatelessWidget {
               onTap: () =>
                   Navigator.of(context).pushNamed(AppRoutes.accountManagement),
             ),
-            _buildLiquidGlassDivider(isDark),
-            _buildLiquidGlassTile(
+            _buildDivider(isDark, isLiquidGlass),
+            _buildTile(
               context,
               isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
               icon: CupertinoIcons.globe,
               iconColor: AppColors.primaryGreen,
               title: 'Server Configuration',
@@ -144,18 +163,24 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAppearanceSection(BuildContext context, bool isDark) {
-    return _buildLiquidGlassSection(
+  Widget _buildAppearanceSection(
+    BuildContext context,
+    bool isDark,
+    bool isLiquidGlass,
+  ) {
+    return _buildSection(
       context,
       isDark: isDark,
+      isLiquidGlass: isLiquidGlass,
       title: 'APPEARANCE',
       children: [
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
             final themeNames = ['Auto', 'Light', 'Dark', 'OLED'];
-            return _buildLiquidGlassTile(
+            return _buildTile(
               context,
               isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
               icon: CupertinoIcons.moon_fill,
               iconColor: AppColors.primaryPurple,
               title: 'Theme',
@@ -184,12 +209,13 @@ class SettingsPage extends StatelessWidget {
             );
           },
         ),
-        _buildLiquidGlassDivider(isDark),
+        _buildDivider(isDark, isLiquidGlass),
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
-            return _buildLiquidGlassTile(
+            return _buildTile(
               context,
               isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
               icon: settings.uiStyle.icon,
               iconColor: AppColors.primaryTeal,
               title: 'UI Style',
@@ -218,12 +244,13 @@ class SettingsPage extends StatelessWidget {
             );
           },
         ),
-        _buildLiquidGlassDivider(isDark),
+        _buildDivider(isDark, isLiquidGlass),
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
-            return _buildLiquidGlassTile(
+            return _buildTile(
               context,
               isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
               icon: CupertinoIcons.square_grid_2x2_fill,
               iconColor: AppColors.primaryOrange,
               title: 'Grid Size',
@@ -263,12 +290,13 @@ class SettingsPage extends StatelessWidget {
             );
           },
         ),
-        _buildLiquidGlassDivider(isDark),
+        _buildDivider(isDark, isLiquidGlass),
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
-            return _buildLiquidGlassTile(
+            return _buildTile(
               context,
               isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
               icon: CupertinoIcons.shield_fill,
               iconColor: AppColors.safeColor,
               title: 'Safe Mode',
@@ -281,12 +309,13 @@ class SettingsPage extends StatelessWidget {
             );
           },
         ),
-        _buildLiquidGlassDivider(isDark),
+        _buildDivider(isDark, isLiquidGlass),
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
-            return _buildLiquidGlassTile(
+            return _buildTile(
               context,
               isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
               icon: CupertinoIcons.hand_draw_fill,
               iconColor: AppColors.primaryPink,
               title: 'Left Handed Mode',
@@ -299,12 +328,13 @@ class SettingsPage extends StatelessWidget {
             );
           },
         ),
-        _buildLiquidGlassDivider(isDark),
+        _buildDivider(isDark, isLiquidGlass),
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
-            return _buildLiquidGlassTile(
+            return _buildTile(
               context,
               isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
               icon: CupertinoIcons.heart_fill,
               iconColor: AppColors.primaryRed,
               title: 'Upvote When Favorited',
@@ -317,12 +347,13 @@ class SettingsPage extends StatelessWidget {
             );
           },
         ),
-        _buildLiquidGlassDivider(isDark),
+        _buildDivider(isDark, isLiquidGlass),
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
-            return _buildLiquidGlassTile(
+            return _buildTile(
               context,
               isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
               icon: CupertinoIcons.sparkles,
               iconColor: AppColors.primaryPink,
               title: 'Confetti on Favorite',
@@ -339,17 +370,23 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCustomizationSection(BuildContext context, bool isDark) {
-    return _buildLiquidGlassSection(
+  Widget _buildCustomizationSection(
+    BuildContext context,
+    bool isDark,
+    bool isLiquidGlass,
+  ) {
+    return _buildSection(
       context,
       isDark: isDark,
+      isLiquidGlass: isLiquidGlass,
       title: 'CUSTOMIZATION',
       children: [
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
-            return _buildLiquidGlassTile(
+            return _buildTile(
               context,
               isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
               icon: CupertinoIcons.square_stack_3d_up,
               iconColor: _ThemeColors.primaryIndigo,
               title: 'Navigation Order',
@@ -387,7 +424,9 @@ class SettingsPage extends StatelessWidget {
             height: MediaQuery.of(context).size.height * 0.6,
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
             ),
             child: Column(
               children: [
@@ -527,17 +566,23 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildVideoSection(BuildContext context, bool isDark) {
-    return _buildLiquidGlassSection(
+  Widget _buildVideoSection(
+    BuildContext context,
+    bool isDark,
+    bool isLiquidGlass,
+  ) {
+    return _buildSection(
       context,
       isDark: isDark,
+      isLiquidGlass: isLiquidGlass,
       title: 'VIDEO',
       children: [
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
-            return _buildLiquidGlassTile(
+            return _buildTile(
               context,
               isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
               icon: CupertinoIcons.play_circle_fill,
               iconColor: AppColors.primaryBlue,
               title: 'Auto Play',
@@ -550,12 +595,13 @@ class SettingsPage extends StatelessWidget {
             );
           },
         ),
-        _buildLiquidGlassDivider(isDark),
+        _buildDivider(isDark, isLiquidGlass),
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
-            return _buildLiquidGlassTile(
+            return _buildTile(
               context,
               isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
               icon: CupertinoIcons.speaker_slash_fill,
               iconColor: AppColors.primaryOrange,
               title: 'Mute by Default',
@@ -572,17 +618,23 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildNetworkSection(BuildContext context, bool isDark) {
-    return _buildLiquidGlassSection(
+  Widget _buildNetworkSection(
+    BuildContext context,
+    bool isDark,
+    bool isLiquidGlass,
+  ) {
+    return _buildSection(
       context,
       isDark: isDark,
+      isLiquidGlass: isLiquidGlass,
       title: 'NETWORK',
       children: [
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
-            return _buildLiquidGlassTile(
+            return _buildTile(
               context,
               isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
               icon: CupertinoIcons.globe,
               iconColor: AppColors.primaryTeal,
               title: 'HTTP Proxy',
@@ -597,12 +649,13 @@ class SettingsPage extends StatelessWidget {
             );
           },
         ),
-        _buildLiquidGlassDivider(isDark),
+        _buildDivider(isDark, isLiquidGlass),
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
-            return _buildLiquidGlassTile(
+            return _buildTile(
               context,
               isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
               icon: CupertinoIcons.gear_alt_fill,
               iconColor: AppColors.primaryOrange,
               title: 'Proxy Settings',
@@ -703,7 +756,8 @@ class SettingsPage extends StatelessWidget {
                             ),
                           ),
                           onPressed: () {
-                            final port = int.tryParse(portController.text) ?? 8080;
+                            final port =
+                                int.tryParse(portController.text) ?? 8080;
                             settings.setProxyConfig(
                               settings.proxyConfig.copyWith(
                                 host: hostController.text.trim(),
@@ -761,7 +815,9 @@ class SettingsPage extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: isDark
                                   ? CupertinoColors.white.withValues(alpha: 0.1)
-                                  : CupertinoColors.black.withValues(alpha: 0.05),
+                                  : CupertinoColors.black.withValues(
+                                      alpha: 0.05,
+                                    ),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
@@ -786,8 +842,12 @@ class SettingsPage extends StatelessWidget {
                                       style: TextStyle(
                                         fontSize: 13,
                                         color: isDark
-                                            ? CupertinoColors.white.withValues(alpha: 0.5)
-                                            : CupertinoColors.black.withValues(alpha: 0.5),
+                                            ? CupertinoColors.white.withValues(
+                                                alpha: 0.5,
+                                              )
+                                            : CupertinoColors.black.withValues(
+                                                alpha: 0.5,
+                                              ),
                                       ),
                                     ),
                                   ],
@@ -826,10 +886,14 @@ class SettingsPage extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+                              color: _ThemeColors.primaryPurple.withValues(
+                                alpha: 0.1,
+                              ),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: _ThemeColors.primaryPurple.withValues(alpha: 0.2),
+                                color: _ThemeColors.primaryPurple.withValues(
+                                  alpha: 0.2,
+                                ),
                                 width: 1,
                               ),
                             ),
@@ -849,8 +913,12 @@ class SettingsPage extends StatelessWidget {
                                       fontSize: 13,
                                       height: 1.4,
                                       color: isDark
-                                          ? CupertinoColors.white.withValues(alpha: 0.7)
-                                          : CupertinoColors.black.withValues(alpha: 0.7),
+                                          ? CupertinoColors.white.withValues(
+                                              alpha: 0.7,
+                                            )
+                                          : CupertinoColors.black.withValues(
+                                              alpha: 0.7,
+                                            ),
                                     ),
                                   ),
                                 ),
@@ -925,17 +993,23 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCacheSection(BuildContext context, bool isDark) {
-    return _buildLiquidGlassSection(
+  Widget _buildCacheSection(
+    BuildContext context,
+    bool isDark,
+    bool isLiquidGlass,
+  ) {
+    return _buildSection(
       context,
       isDark: isDark,
+      isLiquidGlass: isLiquidGlass,
       title: 'DATA',
       children: [
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
-            return _buildLiquidGlassTile(
+            return _buildTile(
               context,
               isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
               icon: CupertinoIcons.clock_fill,
               iconColor: AppColors.primaryTeal,
               title: 'Search History',
@@ -948,12 +1022,13 @@ class SettingsPage extends StatelessWidget {
             );
           },
         ),
-        _buildLiquidGlassDivider(isDark),
+        _buildDivider(isDark, isLiquidGlass),
         Consumer<SettingsProvider>(
           builder: (context, settings, _) {
-            return _buildLiquidGlassTile(
+            return _buildTile(
               context,
               isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
               icon: CupertinoIcons.trash_circle_fill,
               iconColor: CupertinoColors.destructiveRed,
               title: 'Clear Search History',
@@ -975,10 +1050,11 @@ class SettingsPage extends StatelessWidget {
             );
           },
         ),
-        _buildLiquidGlassDivider(isDark),
-        _buildLiquidGlassTile(
+        _buildDivider(isDark, isLiquidGlass),
+        _buildTile(
           context,
           isDark: isDark,
+          isLiquidGlass: isLiquidGlass,
           icon: CupertinoIcons.trash_fill,
           iconColor: CupertinoColors.destructiveRed,
           title: 'Clear Image Cache',
@@ -989,19 +1065,25 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAboutSection(BuildContext context, bool isDark) {
-    return _buildLiquidGlassSection(
+  Widget _buildAboutSection(
+    BuildContext context,
+    bool isDark,
+    bool isLiquidGlass,
+  ) {
+    return _buildSection(
       context,
       isDark: isDark,
+      isLiquidGlass: isLiquidGlass,
       title: 'ABOUT',
       children: [
         FutureBuilder<PackageInfo>(
           future: PackageInfo.fromPlatform(),
           builder: (context, snapshot) {
             final version = snapshot.data?.version ?? '...';
-            return _buildLiquidGlassTile(
+            return _buildTile(
               context,
               isDark: isDark,
+              isLiquidGlass: isLiquidGlass,
               icon: CupertinoIcons.info_circle_fill,
               iconColor: AppColors.primaryBlue,
               title: 'Version',
@@ -1017,10 +1099,11 @@ class SettingsPage extends StatelessWidget {
             );
           },
         ),
-        _buildLiquidGlassDivider(isDark),
-        _buildLiquidGlassTile(
+        _buildDivider(isDark, isLiquidGlass),
+        _buildTile(
           context,
           isDark: isDark,
+          isLiquidGlass: isLiquidGlass,
           icon: CupertinoIcons.arrow_clockwise_circle_fill,
           iconColor: _ThemeColors.primaryIndigo,
           title: 'Check for Updates',
@@ -1028,30 +1111,33 @@ class SettingsPage extends StatelessWidget {
           showChevron: true,
           onTap: () => _checkForUpdates(context, isDark),
         ),
-        _buildLiquidGlassDivider(isDark),
-        _buildLiquidGlassTile(
+        _buildDivider(isDark, isLiquidGlass),
+        _buildTile(
           context,
           isDark: isDark,
+          isLiquidGlass: isLiquidGlass,
           icon: CupertinoIcons.globe,
           iconColor: AppColors.primaryOrange,
           title: 'Website',
           showChevron: true,
           onTap: () => _openWebsite(),
         ),
-        _buildLiquidGlassDivider(isDark),
-        _buildLiquidGlassTile(
+        _buildDivider(isDark, isLiquidGlass),
+        _buildTile(
           context,
           isDark: isDark,
+          isLiquidGlass: isLiquidGlass,
           icon: CupertinoIcons.doc_text_fill,
           iconColor: AppColors.primaryGreen,
           title: 'Terms of Service',
           showChevron: true,
           onTap: () => _showTermsOfService(context, isDark),
         ),
-        _buildLiquidGlassDivider(isDark),
-        _buildLiquidGlassTile(
+        _buildDivider(isDark, isLiquidGlass),
+        _buildTile(
           context,
           isDark: isDark,
+          isLiquidGlass: isLiquidGlass,
           icon: CupertinoIcons.lock_shield_fill,
           iconColor: AppColors.primaryPurple,
           title: 'Privacy Policy',
@@ -1105,18 +1191,18 @@ class SettingsPage extends StatelessWidget {
       final packageInfo = await PackageInfo.fromPlatform();
       final updateService = UpdateService();
       final result = await updateService.checkForUpdate(packageInfo.version);
-      
+
       if (!context.mounted) return;
-      
+
       // Dismiss loading dialog
       Navigator.of(context).pop();
-      
+
       // Show result dialog
       _showUpdateResultDialog(context, isDark, result);
     } catch (e) {
       if (!context.mounted) return;
       Navigator.of(context).pop();
-      
+
       _showUpdateResultDialog(
         context,
         isDark,
@@ -1141,45 +1227,45 @@ class SettingsPage extends StatelessWidget {
           result.error != null
               ? 'Error'
               : result.updateAvailable
-                  ? 'Update Available'
-                  : 'Up to Date',
+              ? 'Update Available'
+              : 'Up to Date',
         ),
         content: Padding(
           padding: const EdgeInsets.only(top: 12),
           child: result.error != null
               ? Text(result.error!)
               : result.updateAvailable
-                  ? Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'A new version is available!',
-                          style: TextStyle(
-                            color: isDark
-                                ? CupertinoColors.white
-                                : CupertinoColors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Current: ${result.currentVersion}\nLatest: ${result.latestVersion}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: isDark
-                                ? CupertinoColors.systemGrey
-                                : CupertinoColors.systemGrey2,
-                          ),
-                        ),
-                      ],
-                    )
-                  : Text(
-                      'You are running the latest version (${result.currentVersion}).',
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'A new version is available!',
                       style: TextStyle(
                         color: isDark
                             ? CupertinoColors.white
                             : CupertinoColors.black,
                       ),
                     ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Current: ${result.currentVersion}\nLatest: ${result.latestVersion}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark
+                            ? CupertinoColors.systemGrey
+                            : CupertinoColors.systemGrey2,
+                      ),
+                    ),
+                  ],
+                )
+              : Text(
+                  'You are running the latest version (${result.currentVersion}).',
+                  style: TextStyle(
+                    color: isDark
+                        ? CupertinoColors.white
+                        : CupertinoColors.black,
+                  ),
+                ),
         ),
         actions: [
           if (result.updateAvailable) ...[
@@ -1548,6 +1634,193 @@ Your Privacy is Protected - Everything Stays on Your Device.
     );
   }
 
+  // Material style builders
+  Widget _buildMaterialSection(
+    BuildContext context, {
+    required bool isDark,
+    required String title,
+    required List<Widget> children,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 20, bottom: 8),
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+              color: isDark
+                  ? CupertinoColors.white.withValues(alpha: 0.5)
+                  : CupertinoColors.black.withValues(alpha: 0.4),
+            ),
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white,
+            border: Border.all(
+              color: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E5E7),
+              width: 0.5,
+            ),
+          ),
+          child: Column(children: children),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMaterialTile(
+    BuildContext context, {
+    required bool isDark,
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    String? subtitle,
+    Widget? trailing,
+    bool showChevron = false,
+    VoidCallback? onTap,
+  }) {
+    final textColor = isDark ? CupertinoColors.white : CupertinoColors.black;
+    final subtitleColor = isDark
+        ? CupertinoColors.white.withValues(alpha: 0.5)
+        : CupertinoColors.black.withValues(alpha: 0.5);
+
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            // Simple colored icon container (no glow/shadow)
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: iconColor,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, size: 18, color: CupertinoColors.white),
+            ),
+            const SizedBox(width: 14),
+            // Title and subtitle
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: textColor,
+                    ),
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: TextStyle(fontSize: 13, color: subtitleColor),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            // Trailing widget
+            if (trailing != null) trailing,
+            if (showChevron)
+              Icon(
+                CupertinoIcons.chevron_right,
+                size: 16,
+                color: isDark
+                    ? CupertinoColors.white.withValues(alpha: 0.3)
+                    : CupertinoColors.black.withValues(alpha: 0.25),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMaterialDivider(bool isDark) {
+    return Container(
+      margin: const EdgeInsets.only(left: 62),
+      height: 0.5,
+      color: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E5E7),
+    );
+  }
+
+  // Adaptive builders that choose between liquid glass and material
+  Widget _buildSection(
+    BuildContext context, {
+    required bool isDark,
+    required bool isLiquidGlass,
+    required String title,
+    required List<Widget> children,
+  }) {
+    return isLiquidGlass
+        ? _buildLiquidGlassSection(
+            context,
+            isDark: isDark,
+            title: title,
+            children: children,
+          )
+        : _buildMaterialSection(
+            context,
+            isDark: isDark,
+            title: title,
+            children: children,
+          );
+  }
+
+  Widget _buildTile(
+    BuildContext context, {
+    required bool isDark,
+    required bool isLiquidGlass,
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    String? subtitle,
+    Widget? trailing,
+    bool showChevron = false,
+    VoidCallback? onTap,
+  }) {
+    return isLiquidGlass
+        ? _buildLiquidGlassTile(
+            context,
+            isDark: isDark,
+            icon: icon,
+            iconColor: iconColor,
+            title: title,
+            subtitle: subtitle,
+            trailing: trailing,
+            showChevron: showChevron,
+            onTap: onTap,
+          )
+        : _buildMaterialTile(
+            context,
+            isDark: isDark,
+            icon: icon,
+            iconColor: iconColor,
+            title: title,
+            subtitle: subtitle,
+            trailing: trailing,
+            showChevron: showChevron,
+            onTap: onTap,
+          );
+  }
+
+  Widget _buildDivider(bool isDark, bool isLiquidGlass) {
+    return isLiquidGlass
+        ? _buildLiquidGlassDivider(isDark)
+        : _buildMaterialDivider(isDark);
+  }
+
   Widget _buildGlassButton({
     required bool isDark,
     required IconData icon,
@@ -1825,8 +2098,18 @@ Your Privacy is Protected - Everything Stays on Your Device.
     bool isDark,
   ) {
     final styles = [
-      (UIStyle.liquidGlass, 'Liquid Glass', 'Beautiful frosted glass effects with blur', CupertinoIcons.sparkles),
-      (UIStyle.material, 'Material', 'Performance-focused with solid colors', CupertinoIcons.bolt_fill),
+      (
+        UIStyle.liquidGlass,
+        'Liquid Glass',
+        'Beautiful frosted glass effects with blur',
+        CupertinoIcons.sparkles,
+      ),
+      (
+        UIStyle.material,
+        'Material',
+        'Performance-focused with solid colors',
+        CupertinoIcons.bolt_fill,
+      ),
     ];
 
     showCupertinoModalPopup(
