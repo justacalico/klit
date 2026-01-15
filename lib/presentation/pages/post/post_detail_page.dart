@@ -377,6 +377,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
             MediaQuery.platformBrightnessOf(context) == Brightness.dark);
     final isOled = settingsProvider.themeMode == 3;
     final hasMultiplePosts = _postIds.length > 1;
+    final leftHandedMode = settingsProvider.leftHandedMode;
 
     return KeyboardListener(
       focusNode: _focusNode,
@@ -467,7 +468,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ),
             // Confetti overlay - positioned near the favorite button area
             Align(
-              alignment: const Alignment(0.3, 0.45),
+              alignment: Alignment(leftHandedMode ? -0.3 : 0.3, 0.45),
               child: ConfettiWidget(
                 confettiController: _confettiController,
                 blastDirectionality: BlastDirectionality.explosive,
