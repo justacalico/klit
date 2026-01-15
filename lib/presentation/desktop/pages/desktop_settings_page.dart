@@ -1091,10 +1091,9 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                         children: [
                           CupertinoButton(
                             padding: EdgeInsets.zero,
-                            minSize: 32,
                             onPressed: !isAutoMode && settings.gridSize > 2
                                 ? () => settings.setGridSize(settings.gridSize - 1)
-                                : null,
+                                : null, minimumSize: Size(32, 32),
                             child: Icon(
                               CupertinoIcons.minus_circle_fill,
                               size: 24,
@@ -1119,10 +1118,9 @@ class _DesktopSettingsPageState extends State<DesktopSettingsPage>
                           ),
                           CupertinoButton(
                             padding: EdgeInsets.zero,
-                            minSize: 32,
                             onPressed: !isAutoMode && settings.gridSize < 8
                                 ? () => settings.setGridSize(settings.gridSize + 1)
-                                : null,
+                                : null, minimumSize: Size(32, 32),
                             child: Icon(
                               CupertinoIcons.plus_circle_fill,
                               size: 24,
