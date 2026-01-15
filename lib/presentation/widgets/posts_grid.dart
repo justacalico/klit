@@ -38,71 +38,77 @@ class PostsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
-    final screenWidth = MediaQuery.of(context).size.width;
     
-    // Use provided values or fall back to settings
-    final effectiveColumns = columns ?? settings.getEffectiveGridSize(screenWidth);
-    final effectiveSpacing = spacing ?? settings.getEffectiveGridSpacing();
-    final effectivePadding = padding ?? settings.getEffectiveGridPadding();
+    // Use LayoutBuilder to react to size changes reliably
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = constraints.maxWidth;
+        
+        // Use provided values or fall back to settings
+        final effectiveColumns = columns ?? settings.getEffectiveGridSize(screenWidth);
+        final effectiveSpacing = spacing ?? settings.getEffectiveGridSpacing();
+        final effectivePadding = padding ?? settings.getEffectiveGridPadding();
 
-    if (posts.isEmpty && isLoading) {
-      return PostGridShimmer(columns: effectiveColumns);
-    }
-
-    if (posts.isEmpty && error != null) {
-      return _buildErrorView(context);
-    }
-
-    if (posts.isEmpty) {
-      return _buildEmptyView(context);
-    }
-
-    return NotificationListener<ScrollNotification>(
-      onNotification: (notification) {
-        // Trigger load more when user is approaching the end (800 pixels threshold)
-        // Use ScrollUpdateNotification to catch scrolling as it happens
-        if (notification is ScrollUpdateNotification || 
-            notification is ScrollEndNotification) {
-          final metrics = notification.metrics;
-          if (metrics.pixels >= metrics.maxScrollExtent - 800) {
-            if (hasMore && !isLoading && onLoadMore != null) {
-              onLoadMore!();
-            }
-          }
+        if (posts.isEmpty && isLoading) {
+          return PostGridShimmer(columns: effectiveColumns);
         }
-        return false;
-      },
-      child: CustomScrollView(
-        controller: scrollController,
-        slivers: [
-          SliverPadding(
-            padding: EdgeInsets.all(effectivePadding),
-            sliver: SliverGrid(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: effectiveColumns,
-                mainAxisSpacing: effectiveSpacing,
-                crossAxisSpacing: effectiveSpacing,
-                childAspectRatio: 1,
+
+        if (posts.isEmpty && error != null) {
+          return _buildErrorView(context);
+        }
+
+        if (posts.isEmpty) {
+          return _buildEmptyView(context);
+        }
+
+        return NotificationListener<ScrollNotification>(
+          onNotification: (notification) {
+            // Trigger load more when user is approaching the end (800 pixels threshold)
+            // Use ScrollUpdateNotification to catch scrolling as it happens
+            if (notification is ScrollUpdateNotification || 
+                notification is ScrollEndNotification) {
+              final metrics = notification.metrics;
+              if (metrics.pixels >= metrics.maxScrollExtent - 800) {
+                if (hasMore && !isLoading && onLoadMore != null) {
+                  onLoadMore!();
+                }
+              }
+            }
+            return false;
+          },
+          child: CustomScrollView(
+            controller: scrollController,
+            slivers: [
+              SliverPadding(
+                padding: EdgeInsets.all(effectivePadding),
+                sliver: SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: effectiveColumns,
+                    mainAxisSpacing: effectiveSpacing,
+                    crossAxisSpacing: effectiveSpacing,
+                    childAspectRatio: 1,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final post = posts[index];
+                      return PostCard(
+                        post: post,
+                        onTap: () => onPostTap(post),
+                        style: PostCardStyle.grid,
+                      );
+                    },
+                    childCount: posts.length,
+                  ),
+                ),
               ),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final post = posts[index];
-                  return PostCard(
-                    post: post,
-                    onTap: () => onPostTap(post),
-                    style: PostCardStyle.grid,
-                  );
-                },
-                childCount: posts.length,
-              ),
-            ),
+              if (isLoading && hasMore)
+                const SliverToBoxAdapter(
+                  child: InfiniteScrollLoading(isLoading: true),
+                ),
+            ],
           ),
-          if (isLoading && hasMore)
-            const SliverToBoxAdapter(
-              child: InfiniteScrollLoading(isLoading: true),
-            ),
-        ],
-      ),
+        );
+      },
     );
   }
 
