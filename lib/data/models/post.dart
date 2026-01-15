@@ -62,7 +62,7 @@ class Post {
       if (value is String) return int.tryParse(value);
       return null;
     }
-    
+
     // Helper to safely parse required int
     int parseIntRequired(dynamic value, int defaultValue) {
       return parseInt(value) ?? defaultValue;
@@ -77,17 +77,21 @@ class Post {
       sample: PostSample.fromJson(json['sample'] as Map<String, dynamic>),
       score: PostScore.fromJson(json['score'] as Map<String, dynamic>),
       tags: PostTags.fromJson(json['tags'] as Map<String, dynamic>),
-      lockedTags: (json['locked_tags'] as List<dynamic>?)
-          ?.map((e) => e is int ? e : int.tryParse(e.toString()) ?? 0)
-          .toList() ?? [],
+      lockedTags:
+          (json['locked_tags'] as List<dynamic>?)
+              ?.map((e) => e is int ? e : int.tryParse(e.toString()) ?? 0)
+              .toList() ??
+          [],
       changeSeq: parseIntRequired(json['change_seq'], 0),
       flags: PostFlags.fromJson(json['flags'] as Map<String, dynamic>),
       rating: json['rating'] as String? ?? 's',
       favCount: parseIntRequired(json['fav_count'], 0),
       sources: List<String>.from(json['sources'] ?? []),
-      pools: (json['pools'] as List<dynamic>?)
-          ?.map((e) => e is int ? e : int.tryParse(e.toString()) ?? 0)
-          .toList() ?? [],
+      pools:
+          (json['pools'] as List<dynamic>?)
+              ?.map((e) => e is int ? e : int.tryParse(e.toString()) ?? 0)
+              .toList() ??
+          [],
       relationships: PostRelationships.fromJson(
         json['relationships'] as Map<String, dynamic>,
       ),
@@ -140,8 +144,8 @@ class Post {
   /// Check if post has sample
   bool get hasSample => sample.has;
 
-  /// Get display URL (sample if available, otherwise preview)
-  String? get displayUrl => sample.has ? sample.url : preview.url;
+  /// Get display URL (full resolution preferred, fallback to sample, then preview)
+  String? get displayUrl => file.url ?? sample.url ?? preview.url;
 }
 
 /// Post file information
@@ -182,11 +186,7 @@ class PostPreview {
   final int height;
   final String? url;
 
-  const PostPreview({
-    required this.width,
-    required this.height,
-    this.url,
-  });
+  const PostPreview({required this.width, required this.height, this.url});
 
   factory PostPreview.fromJson(Map<String, dynamic> json) {
     return PostPreview(
@@ -230,11 +230,7 @@ class PostScore {
   final int down;
   final int total;
 
-  const PostScore({
-    required this.up,
-    required this.down,
-    required this.total,
-  });
+  const PostScore({required this.up, required this.down, required this.total});
 
   factory PostScore.fromJson(Map<String, dynamic> json) {
     return PostScore(
@@ -282,14 +278,14 @@ class PostTags {
 
   /// Get all tags as a flat list
   List<String> get all => [
-        ...artist,
-        ...copyright,
-        ...character,
-        ...species,
-        ...general,
-        ...lore,
-        ...meta,
-      ];
+    ...artist,
+    ...copyright,
+    ...character,
+    ...species,
+    ...general,
+    ...lore,
+    ...meta,
+  ];
 
   /// Get tag color by category
   static Color getColorForCategory(String category) {
@@ -363,9 +359,11 @@ class PostRelationships {
       parentId: (json['parent_id'] as num?)?.toInt(),
       hasChildren: json['has_children'] as bool? ?? false,
       hasActiveChildren: json['has_active_children'] as bool? ?? false,
-      children: (json['children'] as List<dynamic>?)
-          ?.map((e) => e is int ? e : (e as num).toInt())
-          .toList() ?? [],
+      children:
+          (json['children'] as List<dynamic>?)
+              ?.map((e) => e is int ? e : (e as num).toInt())
+              .toList() ??
+          [],
     );
   }
 }

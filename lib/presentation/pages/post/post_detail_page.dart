@@ -774,10 +774,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
     }
 
     // For GIFs, use the full file URL to preserve animation
-    // For other images, use sample if available
+    // For other images, prefer full resolution, fallback to sample, then preview
     final imageUrl = post.isGif
         ? post.file.url
-        : (post.sample.has ? post.sample.url : post.preview.url);
+        : (post.file.url ?? post.sample.url ?? post.preview.url);
 
     if (imageUrl == null) {
       return AspectRatio(
