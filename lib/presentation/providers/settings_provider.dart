@@ -10,6 +10,9 @@ typedef ProxyChangeCallback = void Function(ProxyConfig config);
 /// Callback type for when host changes
 typedef HostChangeCallback = void Function(String host);
 
+/// Callback type for when score threshold changes
+typedef ScoreThresholdChangeCallback = void Function(int threshold);
+
 /// Provider for app settings
 class SettingsProvider extends ChangeNotifier {
   final StorageService _storageService;
@@ -41,6 +44,9 @@ class SettingsProvider extends ChangeNotifier {
 
   /// Callback to notify when host changes
   HostChangeCallback? onHostChanged;
+
+  /// Callback to notify when score threshold changes
+  ScoreThresholdChangeCallback? onScoreThresholdChanged;
 
   SettingsProvider({required StorageService storageService})
     : _storageService = storageService;
@@ -352,6 +358,7 @@ class SettingsProvider extends ChangeNotifier {
       AppConstants.maxScoreThreshold,
     );
     await _storageService.setScoreThreshold(_scoreThreshold);
+    onScoreThresholdChanged?.call(_scoreThreshold);
     notifyListeners();
   }
 

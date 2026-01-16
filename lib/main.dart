@@ -24,7 +24,7 @@ void main() async {
     baseUrl: settingsProvider.host,
     proxyConfig: settingsProvider.proxyConfig,
   );
-  
+
   // Listen for proxy changes and update API service
   settingsProvider.onProxyChanged = (config) {
     apiService.setProxyConfig(config);
@@ -40,19 +40,28 @@ void main() async {
   authProvider.setApiService(apiService);
   await authProvider.initialize();
   final postsProvider = PostsProvider(apiService: apiService);
-  
+
   // Listen for host changes - update API service and clear cached posts
   settingsProvider.onHostChanged = (host) {
     apiService.setBaseUrl(host);
     postsProvider.clearAllPosts();
   };
-  
+
+  // Listen for score threshold changes - reload latest posts with new threshold
+  settingsProvider.onScoreThresholdChanged = (threshold) {
+    postsProvider.loadLatestPosts(
+      refresh: true,
+      safeMode: settingsProvider.safeMode,
+      scoreThreshold: threshold,
+    );
+  };
+
   // Sync blacklist from settings to posts provider
   postsProvider.updateBlacklist(
     settingsProvider.blacklistLines,
     settingsProvider.blacklistEnabled,
   );
-  
+
   // Listen for settings changes to update blacklist in posts provider
   settingsProvider.addListener(() {
     postsProvider.updateBlacklist(
@@ -73,7 +82,9 @@ void main() async {
         ChangeNotifierProvider<SettingsProvider>.value(value: settingsProvider),
         ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
         ChangeNotifierProvider<PostsProvider>.value(value: postsProvider),
-        ChangeNotifierProvider<NavigationProvider>.value(value: navigationProvider),
+        ChangeNotifierProvider<NavigationProvider>.value(
+          value: navigationProvider,
+        ),
       ],
       child: const KlitApp(),
     ),
