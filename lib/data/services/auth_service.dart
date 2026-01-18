@@ -55,19 +55,62 @@ class AuthService {
 
     return result.when(
       success: (_) async {
+        if (kDebugMode) {
+          print('AuthService.login: Credentials verified successfully!');
+          print('AuthService.login: Adding account to storage...');
+        }
         // Add account to storage
-        final account = await _storageService.addAccount(
-          username: username,
-          apiKey: apiKey,
-          host: targetHost,
-        );
+        try {
+          final account = await _storageService.addAccount(
+            username: username,
+            apiKey: apiKey,
+            host: targetHost,
+          );
+          if (kDebugMode) {
+            print('AuthService.login: Account added to storage!');
+            print('AuthService.login: Account ID=${account.id}');
+            print('AuthService.login: Account username=${account.username}');
+            print('AuthService.login: Account host=${account.host}');
+          }
 
-        // Set up API service with auth
-        _apiService.setAuth(username, apiKey);
+          // Set up API service with auth
+          if (kDebugMode) {
+            print('AuthService.login: Setting up API service auth...');
+          }
+          _apiService.setAuth(username, apiKey);
+          if (kDebugMode) {
+            print('AuthService.login: API service auth set!');
+          }
 
-        return ApiResult.success(account);
+          // Verify account was actually saved
+          final savedAccounts = await _storageService.getAccounts();
+          if (kDebugMode) {
+            print('AuthService.login: Verification - Total accounts in storage=${savedAccounts.length}');
+            for (var i = 0; i < savedAccounts.length; i++) {
+              print('AuthService.login: Saved Account[$i]: id=${savedAccounts[i].id}, username=${savedAccounts[i].username}');
+            }
+            final activeAccount = await _storageService.getActiveAccount();
+            print('AuthService.login: Active account ID=${activeAccount?.id}');
+            print('AuthService.login: Active account username=${activeAccount?.username}');
+          }
+
+          return ApiResult.success(account);
+        } catch (e, stackTrace) {
+          if (kDebugMode) {
+            print('AuthService.login: ERROR adding account to storage!');
+            print('AuthService.login: Exception=$e');
+            print('AuthService.login: StackTrace=$stackTrace');
+          }
+          return ApiResult.failure(ApiException.unknown(e));
+        }
       },
-      failure: (error) => ApiResult.failure(error),
+      failure: (error) {
+        if (kDebugMode) {
+          print('AuthService.login: Credential verification FAILED!');
+          print('AuthService.login: Error=${error.message}');
+        }
+        return ApiResult.failure(error);
+      },
     );
   }
 

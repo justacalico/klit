@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -143,9 +144,27 @@ class StorageService {
     required String apiKey,
     required String host,
   }) async {
+    if (kDebugMode) {
+      print('\n---------- StorageService.addAccount START ----------');
+      print('StorageService.addAccount: username=$username');
+      print('StorageService.addAccount: host=$host');
+      print('StorageService.addAccount: Getting existing accounts...');
+    }
     final accounts = await getAccounts();
+    if (kDebugMode) {
+      print('StorageService.addAccount: Existing accounts count=${accounts.length}');
+      for (var i = 0; i < accounts.length; i++) {
+        print('StorageService.addAccount: Existing[$i]: id=${accounts[i].id}, username=${accounts[i].username}');
+      }
+    }
+
+    final newId = const Uuid().v4();
+    if (kDebugMode) {
+      print('StorageService.addAccount: Generated new account ID=$newId');
+    }
+
     final account = Account(
-      id: const Uuid().v4(),
+      id: newId,
       username: username,
       apiKey: apiKey,
       host: host,
@@ -154,10 +173,52 @@ class StorageService {
     );
 
     accounts.add(account);
-    await saveAccounts(accounts);
+    if (kDebugMode) {
+      print('StorageService.addAccount: Accounts list now has ${accounts.length} accounts');
+      print('StorageService.addAccount: Saving accounts to storage...');
+    }
+
+    try {
+      await saveAccounts(accounts);
+      if (kDebugMode) {
+        print('StorageService.addAccount: saveAccounts completed!');
+      }
+    } catch (e, stackTrace) {
+      if (kDebugMode) {
+        print('StorageService.addAccount: ERROR in saveAccounts!');
+        print('StorageService.addAccount: Exception=$e');
+        print('StorageService.addAccount: StackTrace=$stackTrace');
+      }
+      rethrow;
+    }
 
     // Always set new account as active
-    await setActiveAccountId(account.id);
+    if (kDebugMode) {
+      print('StorageService.addAccount: Setting active account ID=${account.id}');
+    }
+    try {
+      await setActiveAccountId(account.id);
+      if (kDebugMode) {
+        print('StorageService.addAccount: setActiveAccountId completed!');
+      }
+    } catch (e, stackTrace) {
+      if (kDebugMode) {
+        print('StorageService.addAccount: ERROR in setActiveAccountId!');
+        print('StorageService.addAccount: Exception=$e');
+        print('StorageService.addAccount: StackTrace=$stackTrace');
+      }
+      rethrow;
+    }
+
+    // Verify the save worked
+    if (kDebugMode) {
+      print('StorageService.addAccount: Verifying save...');
+      final verifyAccounts = await getAccounts();
+      print('StorageService.addAccount: Verified accounts count=${verifyAccounts.length}');
+      final verifyActiveId = await getActiveAccountId();
+      print('StorageService.addAccount: Verified active ID=$verifyActiveId');
+      print('---------- StorageService.addAccount END ----------\n');
+    }
 
     return account;
   }

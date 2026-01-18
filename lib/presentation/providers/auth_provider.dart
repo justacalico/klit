@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import '../../core/constants/constants.dart';
 import '../../data/models/models.dart';
 import '../../data/services/services.dart';
@@ -55,25 +56,61 @@ class AuthProvider extends ChangeNotifier {
     required String apiKey,
     String? host,
   }) async {
+    if (kDebugMode) {
+      print('\n========== AuthProvider.login START ==========');
+      print('AuthProvider.login: username=$username');
+      print('AuthProvider.login: apiKey=${apiKey.length > 8 ? "${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}" : "***"}');
+      print('AuthProvider.login: host=$host');
+      print('AuthProvider.login: Setting isLoading=true');
+    }
     _isLoading = true;
     _error = null;
     notifyListeners();
 
+    if (kDebugMode) {
+      print('AuthProvider.login: Calling _authService.login...');
+    }
     final result = await _authService.login(
       username: username,
       apiKey: apiKey,
       host: host,
     );
 
+    if (kDebugMode) {
+      print('AuthProvider.login: Got result from authService');
+    }
+
     return result.when(
       success: (account) async {
+        if (kDebugMode) {
+          print('AuthProvider.login: SUCCESS!');
+          print('AuthProvider.login: Account ID=${account.id}');
+          print('AuthProvider.login: Account username=${account.username}');
+          print('AuthProvider.login: Account host=${account.host}');
+          print('AuthProvider.login: Account isActive=${account.isActive}');
+        }
         _currentAccount = account;
         _accounts = await _authService.getAccounts();
+        if (kDebugMode) {
+          print('AuthProvider.login: Total accounts after login=${_accounts.length}');
+          for (var i = 0; i < _accounts.length; i++) {
+            print('AuthProvider.login: Account[$i]: id=${_accounts[i].id}, username=${_accounts[i].username}, host=${_accounts[i].host}');
+          }
+        }
         _isLoading = false;
         notifyListeners();
+        if (kDebugMode) {
+          print('========== AuthProvider.login END (SUCCESS) ==========\n');
+        }
         return true;
       },
       failure: (error) {
+        if (kDebugMode) {
+          print('AuthProvider.login: FAILURE!');
+          print('AuthProvider.login: Error message=${error.message}');
+          print('AuthProvider.login: Error type=${error.runtimeType}');
+          print('========== AuthProvider.login END (FAILURE) ==========\n');
+        }
         _error = error.message;
         _isLoading = false;
         notifyListeners();

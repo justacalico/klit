@@ -440,11 +440,12 @@ class _AddAccountSheetState extends State<_AddAccountSheet> {
 
     // Validate host if custom
     if (_useCustomHost && host != null) {
+      // Allow localhost, IP addresses, and regular domains
       final urlPattern = RegExp(
-        r'^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$',
+        r'^https?:\/\/(localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6})(:\d+)?(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?$',
       );
       if (!urlPattern.hasMatch(host)) {
-        _showValidationError('Please enter a valid URL');
+        _showValidationError('Please enter a valid URL (e.g., http://localhost:3000 or https://example.com)');
         return;
       }
     }
@@ -1216,11 +1217,12 @@ class _DesktopAddAccountDialogState extends State<_DesktopAddAccountDialog> {
       return;
     }
     if (_useCustomHost && host != null) {
+      // Allow localhost, IP addresses, and regular domains
       final urlPattern = RegExp(
-        r'^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$',
+        r'^https?:\/\/(localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6})(:\d+)?(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?$',
       );
       if (!urlPattern.hasMatch(host)) {
-        _showValidationError('Please enter a valid URL');
+        _showValidationError('Please enter a valid URL (e.g., http://localhost:3000 or https://example.com)');
         return;
       }
     }
