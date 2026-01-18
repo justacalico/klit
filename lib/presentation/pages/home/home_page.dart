@@ -92,46 +92,7 @@ class _HomePageState extends State<HomePage> {
     final isDark = brightness == Brightness.dark;
 
     return CupertinoPageScaffold(
-      child: Stack(
-        children: [
-          // Content with custom nav bar
-          CustomScrollView(
-            slivers: [
-              // Modern navigation bar
-              _buildNavigationBar(isDark),
-              // Content
-              SliverFillRemaining(
-                child: Consumer<PostsProvider>(
-                  builder: (context, postsProvider, _) {
-                    return SmartRefresher(
-                      controller: _refreshController,
-                      enablePullDown: true,
-                      enablePullUp: postsProvider.hasMoreLatest,
-                      onRefresh: () => _loadPosts(refresh: true),
-                      onLoading: () => _loadPosts(),
-                      child: PostsGrid(
-                        posts: postsProvider.latestPosts,
-                        isLoading: postsProvider.isLoadingLatest,
-                        hasMore: postsProvider.hasMoreLatest,
-                        error: postsProvider.latestError,
-                        onPostTap: _onPostTap,
-                        onLoadMore: () => _loadPosts(),
-                        onRetry: () => _loadPosts(refresh: true),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavigationBar(bool isDark) {
-    return SliverToBoxAdapter(
-      child: CupertinoNavigationBar(
+      navigationBar: CupertinoNavigationBar(
         transitionBetweenRoutes: false,
         backgroundColor: isDark
             ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
@@ -166,6 +127,28 @@ class _HomePageState extends State<HomePage> {
               onTap: _openSearch,
             ),
           ],
+        ),
+      ),
+      child: SafeArea(
+        child: Consumer<PostsProvider>(
+          builder: (context, postsProvider, _) {
+            return SmartRefresher(
+              controller: _refreshController,
+              enablePullDown: true,
+              enablePullUp: postsProvider.hasMoreLatest,
+              onRefresh: () => _loadPosts(refresh: true),
+              onLoading: () => _loadPosts(),
+              child: PostsGrid(
+                posts: postsProvider.latestPosts,
+                isLoading: postsProvider.isLoadingLatest,
+                hasMore: postsProvider.hasMoreLatest,
+                error: postsProvider.latestError,
+                onPostTap: _onPostTap,
+                onLoadMore: () => _loadPosts(),
+                onRetry: () => _loadPosts(refresh: true),
+              ),
+            );
+          },
         ),
       ),
     );
