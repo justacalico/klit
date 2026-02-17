@@ -23,7 +23,7 @@ class PageToolbar extends StatelessWidget {
 
     return ClipRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           height: 60,
           padding: const EdgeInsets.symmetric(horizontal: 20),

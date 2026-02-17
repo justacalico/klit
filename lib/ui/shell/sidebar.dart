@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Tooltip;
@@ -47,25 +46,7 @@ class AppSidebar extends StatefulWidget {
   State<AppSidebar> createState() => _AppSidebarState();
 }
 
-class _AppSidebarState extends State<AppSidebar>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _bgController;
-
-  @override
-  void initState() {
-    super.initState();
-    _bgController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 8),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _bgController.dispose();
-    super.dispose();
-  }
-
+class _AppSidebarState extends State<AppSidebar> {
   void _handleLogout(BuildContext context) {
     showCupertinoDialog(
       context: context,
@@ -134,7 +115,7 @@ class _AppSidebarState extends State<AppSidebar>
   ) {
     return ClipRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -160,18 +141,7 @@ class _AppSidebarState extends State<AppSidebar>
               ),
             ),
           ),
-          child: Stack(
-            children: [
-              AnimatedBuilder(
-                animation: _bgController,
-                builder: (_, __) => CustomPaint(
-                  painter: _SidebarBgPainter(isDark: isDark, t: _bgController.value),
-                  size: Size.infinite,
-                ),
-              ),
-              _buildContent(context, isDark, isGuest, browse, tools, account),
-            ],
-          ),
+          child: _buildContent(context, isDark, isGuest, browse, tools, account),
         ),
       ),
     );
@@ -587,35 +557,3 @@ class _CollapseButtonState extends State<_CollapseButton> {
   }
 }
 
-class _SidebarBgPainter extends CustomPainter {
-  final bool isDark;
-  final double t;
-
-  _SidebarBgPainter({required this.isDark, required this.t});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final colors = isDark
-        ? [UIColors.primaryIndigo.withValues(alpha: 0.08), UIColors.primaryPurple.withValues(alpha: 0.06), UIColors.primaryViolet.withValues(alpha: 0.05)]
-        : [UIColors.primaryIndigo.withValues(alpha: 0.05), UIColors.primaryPurple.withValues(alpha: 0.04), UIColors.primaryViolet.withValues(alpha: 0.03)];
-
-    void drawOrb(double cx, double cy, double r, double phase) {
-      final c = Offset(
-        size.width * cx + math.cos(t * math.pi * 2 + phase) * 10,
-        size.height * cy + math.sin(t * math.pi * 2 + phase) * 15,
-      );
-      final paint = Paint()
-        ..shader = RadialGradient(
-          colors: [colors[0], colors[0].withValues(alpha: 0)],
-        ).createShader(Rect.fromCircle(center: c, radius: size.width * r));
-      canvas.drawCircle(c, size.width * r, paint);
-    }
-
-    drawOrb(0.8, 0.15, 0.8, 0);
-    drawOrb(0.2, 0.5, 0.6, 1);
-    drawOrb(0.7, 0.85, 0.7, 2);
-  }
-
-  @override
-  bool shouldRepaint(covariant _SidebarBgPainter old) => old.t != t || old.isDark != isDark;
-}

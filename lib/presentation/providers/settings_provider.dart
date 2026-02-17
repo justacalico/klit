@@ -33,7 +33,7 @@ class SettingsProvider extends ChangeNotifier {
   ProxyConfig _proxyConfig = const ProxyConfig();
   String _blacklist = '';
   bool _blacklistEnabled = true;
-  UIStyle _uiStyle = UIStyle.liquidGlass;
+  UIStyle _uiStyle = UIStyle.material;
   bool _videoAutoPlay = true;
   bool _videoMuteByDefault = true;
   bool _searchHistoryEnabled = true;

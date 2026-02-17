@@ -1,4 +1,5 @@
-import 'dart:math' as math;
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +15,6 @@ import 'breakpoints.dart';
 import 'pages/pages.dart';
 import 'shell/nav_bar.dart';
 import 'shell/sidebar.dart';
-import 'theme.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -23,27 +23,20 @@ class AppShell extends StatefulWidget {
   State<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<AppShell>
-    with SingleTickerProviderStateMixin, GamepadInputMixin {
+class _AppShellState extends State<AppShell> with GamepadInputMixin {
   bool _sidebarCollapsed = false;
   bool _showControllerMode = false;
   PostDetailArguments? _postOverlay;
   String? _searchQuery;
-
-  late AnimationController _bgController;
+  StreamSubscription<GamepadState>? _gamepadStateSub;
 
   static const List<int> _desktopOrder = [0, 1, 2, 6, 4, 5, 3];
 
   @override
   void initState() {
     super.initState();
-    _bgController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 15),
-    )..repeat();
-
     _showControllerMode = gamepad.isConnected;
-    gamepad.stateChanges.listen((s) {
+    _gamepadStateSub = gamepad.stateChanges.listen((s) {
       if (mounted && s.isConnected != _showControllerMode) {
         setState(() => _showControllerMode = s.isConnected);
       }
@@ -52,7 +45,7 @@ class _AppShellState extends State<AppShell>
 
   @override
   void dispose() {
-    _bgController.dispose();
+    _gamepadStateSub?.cancel();
     super.dispose();
   }
 
@@ -153,7 +146,6 @@ class _AppShellState extends State<AppShell>
     final isDark = brightness == Brightness.dark;
     final nav = context.watch<NavigationProvider>();
     final selected = nav.getDesktopIndex();
-    final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
 
     return CupertinoPageScaffold(
       child: Container(
@@ -161,25 +153,6 @@ class _AppShellState extends State<AppShell>
         child: Stack(
           clipBehavior: Clip.hardEdge,
           children: [
-            if (isLiquidGlass && _isDesktop)
-              Positioned.fill(
-                child: AnimatedBuilder(
-                  animation: _bgController,
-                  builder: (context, child) {
-                    return LayoutBuilder(
-                      builder: (context, constraints) {
-                        return CustomPaint(
-                          painter: _ShellBgPainter(
-                            isDark: isDark,
-                            t: _bgController.value,
-                          ),
-                          size: Size(constraints.maxWidth, constraints.maxHeight),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
             if (_isDesktop) _buildDesktopLayout(selected, isDark) else _buildMobileLayout(isDark),
             if (_postOverlay != null && _isDesktop) _buildPostOverlay(),
           ],
@@ -198,8 +171,10 @@ class _AppShellState extends State<AppShell>
           onToggleCollapse: () => setState(() => _sidebarCollapsed = !_sidebarCollapsed),
         ),
         Expanded(
-          child: ClipRect(
-            child: _buildContent(selected),
+          child: RepaintBoundary(
+            child: ClipRect(
+              child: _buildContent(selected),
+            ),
           ),
         ),
       ],
@@ -216,8 +191,6 @@ class _AppShellState extends State<AppShell>
     final pos = navOrder.indexOf(mobileIdx);
     final currentIndex = pos >= 0 ? pos : 0;
 
-    final pages = navOrder.map((id) => _buildMobilePage(id)).toList();
-
     final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final navBarHeight = isLiquidGlass ? 68 + 16 + bottomPadding : 56 + bottomPadding;
@@ -230,7 +203,9 @@ class _AppShellState extends State<AppShell>
           Positioned.fill(
             child: Padding(
               padding: EdgeInsets.only(bottom: navBarHeight),
-              child: IndexedStack(index: currentIndex, children: pages),
+              child: RepaintBoundary(
+                child: _buildMobilePage(navOrder[currentIndex]),
+              ),
             ),
           ),
           AppNavBar(
@@ -298,37 +273,4 @@ class _AppShellState extends State<AppShell>
       hasMore: args.hasMore,
     );
   }
-}
-
-class _ShellBgPainter extends CustomPainter {
-  final bool isDark;
-  final double t;
-
-  _ShellBgPainter({required this.isDark, required this.t});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final colors = isDark
-        ? [UIColors.primaryIndigo.withValues(alpha: 0.06), UIColors.primaryPurple.withValues(alpha: 0.05), UIColors.primaryViolet.withValues(alpha: 0.04)]
-        : [UIColors.primaryIndigo.withValues(alpha: 0.04), UIColors.primaryPurple.withValues(alpha: 0.03), UIColors.primaryViolet.withValues(alpha: 0.025)];
-
-    void orb(double cx, double cy, double r, double phase) {
-      final c = Offset(
-        size.width * cx + math.sin(t * math.pi * 2 + phase) * 30,
-        size.height * cy + math.cos(t * math.pi * 2 + phase) * 25,
-      );
-      final paint = Paint()
-        ..shader = RadialGradient(
-          colors: [colors[0], colors[0].withValues(alpha: 0)],
-        ).createShader(Rect.fromCircle(center: c, radius: size.width * r));
-      canvas.drawCircle(c, size.width * r, paint);
-    }
-
-    orb(0.85, 0.15, 0.4, 0);
-    orb(0.2, 0.8, 0.35, 1);
-    orb(0.7, 0.5, 0.3, 2);
-  }
-
-  @override
-  bool shouldRepaint(covariant _ShellBgPainter old) => old.t != t || old.isDark != isDark;
 }

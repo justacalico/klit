@@ -91,13 +91,17 @@ class PostsGrid extends StatelessWidget {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final post = posts[index];
-                      return PostCard(
-                        post: post,
-                        onTap: () => onPostTap(post),
-                        style: PostCardStyle.grid,
+                      return RepaintBoundary(
+                        child: PostCard(
+                          post: post,
+                          onTap: () => onPostTap(post),
+                          style: PostCardStyle.grid,
+                        ),
                       );
                     },
                     childCount: posts.length,
+                    addAutomaticKeepAlives: false,
+                    addRepaintBoundaries: true,
                   ),
                 ),
               ),

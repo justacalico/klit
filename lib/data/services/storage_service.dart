@@ -393,7 +393,7 @@ class StorageService {
 
   /// Get UI style (0 = liquid glass, 1 = material)
   int getUIStyle() {
-    return _prefs.getInt(AppConstants.uiStyleKey) ?? 0;
+    return _prefs.getInt(AppConstants.uiStyleKey) ?? 1;
   }
 
   /// Set UI style
