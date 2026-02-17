@@ -140,8 +140,11 @@ class _UiSearchPageState extends State<UiSearchPage>
     final cursorPos = _searchController.selection.baseOffset;
     if (cursorPos < 0 || cursorPos > text.length) {
       final words = text.split(' ');
-      if (words.isNotEmpty) words[words.length - 1] = tagWithPrefix;
-      else words.add(tagWithPrefix);
+      if (words.isNotEmpty) {
+        words[words.length - 1] = tagWithPrefix;
+      } else {
+        words.add(tagWithPrefix);
+      }
       _searchController.text = '${words.join(' ')} ';
     } else {
       final before = text.substring(0, cursorPos);
@@ -210,8 +213,11 @@ class _UiSearchPageState extends State<UiSearchPage>
 
   void _toggleFilters() {
     setState(() => _showFilters = !_showFilters);
-    if (_showFilters) _filterCtrl.forward();
-    else _filterCtrl.reverse();
+    if (_showFilters) {
+      _filterCtrl.forward();
+    } else {
+      _filterCtrl.reverse();
+    }
   }
 
   @override
@@ -317,11 +323,15 @@ class _UiSearchPageState extends State<UiSearchPage>
                   _closeTagSuggestions();
                   return;
                 }
-                if (v.endsWith(' ')) _closeTagSuggestions();
-                else {
+                if (v.endsWith(' ')) {
+                  _closeTagSuggestions();
+                } else {
                   final w = _getCurrentWord();
-                  if (w.length >= 2) _tagDebouncer.run(() => _fetchTagSuggestions(w));
-                  else _closeTagSuggestions();
+                  if (w.length >= 2) {
+                    _tagDebouncer.run(() => _fetchTagSuggestions(w));
+                  } else {
+                    _closeTagSuggestions();
+                  }
                 }
               },
               onSubmitted: (_) {
