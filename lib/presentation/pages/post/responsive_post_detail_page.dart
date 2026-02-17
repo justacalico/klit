@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import '../../../ui/breakpoints.dart';
 import '../../desktop/pages/desktop_post_detail_page.dart';
-import '../../desktop/responsive_layout.dart';
 import 'post_detail_page.dart';
 
 /// Responsive wrapper that switches between mobile and desktop post detail views

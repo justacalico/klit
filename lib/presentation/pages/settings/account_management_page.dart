@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../../app/routes.dart';
 import '../../../core/constants/constants.dart';
-import '../../desktop/responsive_layout.dart';
+import '../../../ui/breakpoints.dart' as bp;
 import '../../providers/providers.dart';
 
 /// Design constants for account management
@@ -21,7 +21,7 @@ class AccountManagementPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
-    final isDesktop = ResponsiveLayout.isDesktop(context);
+    final isDesktop = bp.isDesktop(context);
 
     return CupertinoPageScaffold(
       backgroundColor: isDark
@@ -203,7 +203,7 @@ class AccountManagementPage extends StatelessWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    final isDesktop = ResponsiveLayout.isDesktop(context);
+    final isDesktop = bp.isDesktop(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

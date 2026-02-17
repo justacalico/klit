@@ -1,14 +1,12 @@
 import 'package:flutter/cupertino.dart';
-import '../presentation/desktop/responsive_layout.dart';
 import '../presentation/pages/auth/login_page.dart';
-import '../presentation/pages/favorites/responsive_favorites_page.dart';
 import '../presentation/pages/post/post_detail_page.dart';
 import '../presentation/pages/post/responsive_post_detail_page.dart';
-import '../presentation/pages/profile/responsive_profile_page.dart';
-import '../presentation/pages/search/responsive_search_page.dart';
 import '../presentation/pages/settings/account_management_page.dart';
 import '../presentation/pages/settings/blacklist_settings_page.dart';
 import '../presentation/pages/settings/host_settings_page.dart';
+import '../ui/app_shell.dart';
+import '../ui/pages/pages.dart';
 
 /// App route names
 class AppRoutes {
@@ -40,7 +38,7 @@ class AppRouter {
 
       case AppRoutes.main:
         return CupertinoPageRoute(
-          builder: (_) => const ResponsiveLayout(),
+          builder: (_) => const AppShell(),
           settings: settings,
         );
 
@@ -59,19 +57,19 @@ class AppRouter {
       case AppRoutes.search:
         final initialQuery = settings.arguments as String?;
         return CupertinoPageRoute(
-          builder: (_) => ResponsiveSearchPage(initialQuery: initialQuery),
+          builder: (_) => _SearchRoutePage(initialQuery: initialQuery),
           settings: settings,
         );
 
       case AppRoutes.profile:
         return CupertinoPageRoute(
-          builder: (_) => const ResponsiveProfilePage(),
+          builder: (_) => const _ProfileRoutePage(),
           settings: settings,
         );
 
       case AppRoutes.favorites:
         return CupertinoPageRoute(
-          builder: (_) => const ResponsiveFavoritesPage(),
+          builder: (_) => const _FavoritesRoutePage(),
           settings: settings,
         );
 
@@ -99,5 +97,52 @@ class AppRouter {
           settings: settings,
         );
     }
+  }
+}
+
+/// Full-page wrappers for routes pushed from shell (e.g. mobile).
+class _SearchRoutePage extends StatelessWidget {
+  final String? initialQuery;
+
+  const _SearchRoutePage({this.initialQuery});
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      child: SafeArea(
+        child: UiSearchPage(
+          initialQuery: initialQuery,
+          onPostTap: (args) => Navigator.of(context).pushNamed(
+            AppRoutes.postDetail,
+            arguments: args,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileRoutePage extends StatelessWidget {
+  const _ProfileRoutePage();
+
+  @override
+  Widget build(BuildContext context) {
+    return UiProfilePage(
+      onNavigate: (r) => Navigator.of(context).pushNamed(r),
+    );
+  }
+}
+
+class _FavoritesRoutePage extends StatelessWidget {
+  const _FavoritesRoutePage();
+
+  @override
+  Widget build(BuildContext context) {
+    return UiFavoritesPage(
+      onPostTap: (args) => Navigator.of(context).pushNamed(
+        AppRoutes.postDetail,
+        arguments: args,
+      ),
+    );
   }
 }
