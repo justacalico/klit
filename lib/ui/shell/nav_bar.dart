@@ -34,21 +34,15 @@ class AppNavBar extends StatelessWidget {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
     final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     if (isLiquidGlass) {
-      return Positioned(
-        left: 16,
-        right: 16,
-        bottom: MediaQuery.of(context).padding.bottom + 16,
+      return Padding(
+        padding: EdgeInsets.fromLTRB(16, 0, 16, bottomPadding + 16),
         child: _buildLiquidGlass(context, isDark),
       );
     }
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: 0,
-      child: _buildMaterial(context, isDark),
-    );
+    return _buildMaterial(context, isDark);
   }
 
   Widget _buildLiquidGlass(BuildContext context, bool isDark) {
