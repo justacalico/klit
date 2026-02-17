@@ -132,7 +132,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
-    final mode = LayoutScope.of(context); // Locked at startup - never changes on resize
+    final mode = LayoutScope.of(context); // Desktop (sidebar) vs mobile (navbar) by width
     final nav = context.watch<NavigationProvider>();
     final selected = nav.getDesktopIndex();
 

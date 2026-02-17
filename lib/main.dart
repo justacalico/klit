@@ -73,9 +73,6 @@ void main() async {
   // Create navigation provider for shared navigation state
   final navigationProvider = NavigationProvider();
 
-  // Layout mode locked at first render - resize only updates view, never state
-  final layoutProvider = LayoutProvider();
-
   runApp(
     MultiProvider(
       providers: [
@@ -88,7 +85,6 @@ void main() async {
         ChangeNotifierProvider<NavigationProvider>.value(
           value: navigationProvider,
         ),
-        ChangeNotifierProvider<LayoutProvider>.value(value: layoutProvider),
       ],
       child: const KlitApp(),
     ),
