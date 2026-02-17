@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Material, MaterialType;
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
@@ -178,8 +179,18 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
                     onToggleCollapse: nav.toggleSidebar,
                   ),
                 ),
-              // Mobile nav bar
-              if (!mode.isDesktop) _buildMobileNavBar(isDark),
+              // Mobile nav bar - Material ensures it renders above content (fixes z-order)
+              if (!mode.isDesktop)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Material(
+                    type: MaterialType.transparency,
+                    elevation: 12,
+                    child: _buildMobileNavBarContent(isDark),
+                  ),
+                ),
               if (_postOverlay != null && mode.isDesktop) _buildPostOverlay(),
             ],
           ),
@@ -194,7 +205,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
     return isLiquidGlass ? 68 + 16 + bottomPadding : 56 + bottomPadding;
   }
 
-  Widget _buildMobileNavBar(bool isDark) {
+  Widget _buildMobileNavBarContent(bool isDark) {
     final nav = context.watch<NavigationProvider>();
     final auth = context.watch<AuthProvider>();
     final settings = context.watch<SettingsProvider>();
@@ -204,20 +215,15 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
     final pos = navOrder.indexOf(mobileIdx);
     final currentIndex = pos >= 0 ? pos : 0;
 
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: 0,
-      child: AppNavBar(
-        navOrder: navOrder,
-        currentIndex: currentIndex,
-        onTap: (i) {
-          final id = navOrder[i];
-          nav.setFromMobileIndex(id);
-        },
-        isGuest: auth.isGuest,
-        onLogout: _handleLogout,
-      ),
+    return AppNavBar(
+      navOrder: navOrder,
+      currentIndex: currentIndex,
+      onTap: (i) {
+        final id = navOrder[i];
+        nav.setFromMobileIndex(id);
+      },
+      isGuest: auth.isGuest,
+      onLogout: _handleLogout,
     );
   }
 
