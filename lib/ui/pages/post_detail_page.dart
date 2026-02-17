@@ -799,31 +799,32 @@ class _MobilePostDetailContentBuilder {
     bool isOled,
     VoidCallback onTap,
   ) {
+    final displayColor = isActive ? color : (isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2);
     return CupertinoButton(
-      padding: EdgeInsets.zero,
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+      minSize: 0,
       onPressed: isLoading ? null : onTap,
-      child: _buildLiquidGlassContainer(
-        context, s,
-        isDark: isDark,
-        isOled: isOled,
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            isLoading
-                ? SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CupertinoActivityIndicator(color: color),
-                  )
-                : Icon(isActive ? activeIcon : icon, size: 24, color: isActive ? color : null),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(fontSize: 12, color: isActive ? color : CupertinoColors.systemGrey),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          isLoading
+              ? SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CupertinoActivityIndicator(color: color),
+                )
+              : Icon(isActive ? activeIcon : icon, size: 24, color: displayColor),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+              color: displayColor,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
