@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../app/routes.dart';
 import '../../core/constants/constants.dart';
+import '../layout/layout_scope.dart';
 import '../../core/theme/ui_style_manager.dart';
 import '../../data/models/proxy_config.dart';
 import '../../data/services/update_service.dart';
@@ -152,17 +153,82 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final mode = LayoutScope.of(context);
 
     return Container(
       color: isDark ? const Color(0xFF0D0D0F) : const Color(0xFFF5F5F7),
-      child: Row(
-        children: [
-          // Sidebar
-          _buildSidebar(isDark),
-          // Main content
-          Expanded(child: _buildMainContent(isDark)),
-        ],
-      ),
+      child: mode.isDesktop
+          ? Row(
+              children: [
+                _buildSidebar(isDark),
+                Expanded(child: _buildMainContent(isDark)),
+              ],
+            )
+          : _buildMobileLayout(context, isDark),
+    );
+  }
+
+  /// Mobile layout: category chips + content (fixes cramped layout when resizing)
+  Widget _buildMobileLayout(BuildContext context, bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Horizontal scrollable category picker
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Row(
+            children: _categories.map((category) {
+              final isSelected = _selectedCategory == category.id;
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: GestureDetector(
+                  onTap: () => _selectCategory(category.id),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? category.color.withValues(alpha: 0.2)
+                          : (isDark
+                                ? CupertinoColors.white.withValues(alpha: 0.08)
+                                : CupertinoColors.black.withValues(alpha: 0.05)),
+                      borderRadius: BorderRadius.circular(12),
+                      border: isSelected
+                          ? Border.all(color: category.color.withValues(alpha: 0.4), width: 1)
+                          : null,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          category.icon,
+                          size: 16,
+                          color: isSelected
+                              ? category.color
+                              : (isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          category.title,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                            color: isSelected
+                                ? category.color
+                                : (isDark ? CupertinoColors.white : CupertinoColors.black),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+        Expanded(child: _buildMainContent(isDark)),
+      ],
     );
   }
 
