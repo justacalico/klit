@@ -32,8 +32,11 @@ class KlitApp extends StatelessWidget {
               Locale('en', 'US'),
             ],
             builder: (context, child) {
-              final width = MediaQuery.sizeOf(context).width;
-              final mode = LayoutMode.fromWidth(width);
+              final layoutProvider = Provider.of<LayoutProvider>(context, listen: false);
+              if (!layoutProvider.isInitialized) {
+                layoutProvider.initialize(MediaQuery.sizeOf(context).width);
+              }
+              final mode = layoutProvider.mode;
 
               Widget result = LayoutScope(
                 mode: mode,

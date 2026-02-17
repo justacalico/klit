@@ -81,4 +81,12 @@ class NavigationProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  /// Clear search query (e.g. when switching nav tabs)
+  void clearSearch() {
+    if (_searchQuery != null) {
+      _searchQuery = null;
+      notifyListeners();
+    }
+  }
 }

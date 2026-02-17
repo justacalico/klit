@@ -22,10 +22,8 @@ class AppShell extends StatefulWidget {
 }
 
 class _AppShellState extends State<AppShell> with GamepadInputMixin {
-  bool _sidebarCollapsed = false;
   bool _showControllerMode = false;
   PostDetailArguments? _postOverlay;
-  String? _searchQuery;
   StreamSubscription<GamepadState>? _gamepadStateSub;
 
   static const List<int> _desktopOrder = [0, 1, 2, 6, 4, 5, 3];
@@ -66,7 +64,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
   void onGamepadButton(GamepadButton button) {
     if (!mounted || _postOverlay != null) return;
     if (button == GamepadButton.start) {
-      setState(() => _sidebarCollapsed = !_sidebarCollapsed);
+      context.read<NavigationProvider>().toggleSidebar();
       HapticFeedback.mediumImpact();
     } else if (button == GamepadButton.select) {
       _openSearch();
@@ -75,8 +73,9 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
   }
 
   void _onNav(int index) {
-    context.read<NavigationProvider>().setFromDesktopIndex(index);
-    setState(() => _searchQuery = null);
+    final nav = context.read<NavigationProvider>();
+    nav.setFromDesktopIndex(index);
+    nav.clearSearch();
   }
 
   void _openPostOverlay(PostDetailArguments args) {
@@ -88,11 +87,9 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
   }
 
   void _openSearch([String? query]) {
-    context.read<NavigationProvider>().setFromDesktopIndex(4);
-    setState(() {
-      _searchQuery = query;
-      _postOverlay = null;
-    });
+    final nav = context.read<NavigationProvider>();
+    nav.openSearch(query);
+    setState(() => _postOverlay = null);
   }
 
   void _onPostTap(PostDetailArguments args) {
@@ -135,11 +132,11 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
-    final mode = LayoutScope.of(context);
+    final mode = LayoutScope.of(context); // Locked at startup - never changes on resize
     final nav = context.watch<NavigationProvider>();
     final selected = nav.getDesktopIndex();
 
-    // Content with stable key - stays mounted when layout mode changes
+    // Content with stable key - stays mounted, layout mode is fixed for session
     final content = KeyedSubtree(
       key: ValueKey('shell-content-$selected'),
       child: RepaintBoundary(
@@ -150,7 +147,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
     );
 
     final navBarHeight = _getMobileNavBarHeight(context);
-    final sidebarWidth = _sidebarCollapsed ? 72.0 : 240.0;
+    final sidebarWidth = nav.sidebarCollapsed ? 72.0 : 240.0;
 
     return CupertinoPageScaffold(
       child: Container(
@@ -160,7 +157,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
           child: Stack(
             clipBehavior: Clip.hardEdge,
             children: [
-              // Content area - always present, insets change with layout (content stays mounted)
+              // Content area - layout mode fixed, resize only updates Positioned insets
               Positioned(
                 left: mode.isDesktop ? sidebarWidth : 0,
                 top: 0,
@@ -177,8 +174,8 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
                   child: AppSidebar(
                     selectedIndex: selected,
                     onItemSelected: _onNav,
-                    isCollapsed: _sidebarCollapsed,
-                    onToggleCollapse: () => setState(() => _sidebarCollapsed = !_sidebarCollapsed),
+                    isCollapsed: nav.sidebarCollapsed,
+                    onToggleCollapse: nav.toggleSidebar,
                   ),
                 ),
               // Mobile nav bar
@@ -225,6 +222,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
   }
 
   Widget _buildContent(int selected) {
+    final nav = context.watch<NavigationProvider>();
     switch (selected) {
       case 0:
         return UiHomePage(onPostTap: _onPostTap, onSearchTap: _openSearch);
@@ -235,7 +233,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
       case 3:
         return UiSettingsPage(onNavigate: (r) => Navigator.of(context).pushNamed(r));
       case 4:
-        return UiSearchPage(initialQuery: _searchQuery, onPostTap: _onPostTap);
+        return UiSearchPage(initialQuery: nav.searchQuery, onPostTap: _onPostTap);
       case 5:
         return UiProfilePage(onNavigate: (r) => Navigator.of(context).pushNamed(r));
       case 6:
