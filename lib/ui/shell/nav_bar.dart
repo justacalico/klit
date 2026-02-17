@@ -75,8 +75,8 @@ class AppNavBar extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: isDark
-                    ? [const Color(0xFF1C1C1E).withValues(alpha: 0.9), const Color(0xFF2C2C2E).withValues(alpha: 0.85)]
-                    : [CupertinoColors.white.withValues(alpha: 0.92), CupertinoColors.white.withValues(alpha: 0.85)],
+                    ? [const Color(0xFF1C1C1E), const Color(0xFF2C2C2E)]
+                    : [const Color(0xFFF5F5F7), const Color(0xFFEBEBEF)],
               ),
               border: Border.all(color: UIColors.primaryPurple.withValues(alpha: isDark ? 0.2 : 0.1), width: 1),
             ),

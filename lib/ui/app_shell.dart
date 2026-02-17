@@ -183,16 +183,22 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
                     ),
                   ),
                 ),
-              // Mobile nav bar - Material ensures it renders above content (fixes z-order)
+              // Mobile nav bar - opaque background + elevation so content never shows through
               if (!mode.isDesktop)
                 Positioned(
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  child: Material(
-                    type: MaterialType.transparency,
-                    elevation: 12,
-                    child: _buildMobileNavBarContent(isDark),
+                  child: ColoredBox(
+                    color: isDark ? const Color(0xFF0A0A0C) : const Color(0xFFF8F8FC),
+                    child: SizedBox(
+                      height: navBarHeight,
+                      child: Material(
+                        type: MaterialType.transparency,
+                        elevation: 12,
+                        child: _buildMobileNavBarContent(isDark),
+                      ),
+                    ),
                   ),
                 ),
               if (_postOverlay != null && mode.isDesktop)
