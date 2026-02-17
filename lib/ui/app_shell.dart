@@ -139,41 +139,65 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
     final nav = context.watch<NavigationProvider>();
     final selected = nav.getDesktopIndex();
 
+    // Content with stable key - stays mounted when layout mode changes
+    final content = KeyedSubtree(
+      key: ValueKey('shell-content-$selected'),
+      child: RepaintBoundary(
+        child: ClipRect(
+          child: _buildContent(selected),
+        ),
+      ),
+    );
+
+    final navBarHeight = _getMobileNavBarHeight(context);
+    final sidebarWidth = _sidebarCollapsed ? 72.0 : 240.0;
+
     return CupertinoPageScaffold(
       child: Container(
         color: isDark ? const Color(0xFF0A0A0C) : const Color(0xFFF8F8FC),
-        child: Stack(
-          clipBehavior: Clip.hardEdge,
-          children: [
-            if (mode.isDesktop) _buildDesktopLayout(selected, isDark) else _buildMobileLayout(isDark),
-            if (_postOverlay != null && mode.isDesktop) _buildPostOverlay(),
-          ],
+        child: PopScope(
+          canPop: false,
+          child: Stack(
+            clipBehavior: Clip.hardEdge,
+            children: [
+              // Content area - always present, insets change with layout (content stays mounted)
+              Positioned(
+                left: mode.isDesktop ? sidebarWidth : 0,
+                top: 0,
+                right: 0,
+                bottom: mode.isDesktop ? 0 : navBarHeight,
+                child: content,
+              ),
+              // Desktop sidebar
+              if (mode.isDesktop)
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: AppSidebar(
+                    selectedIndex: selected,
+                    onItemSelected: _onNav,
+                    isCollapsed: _sidebarCollapsed,
+                    onToggleCollapse: () => setState(() => _sidebarCollapsed = !_sidebarCollapsed),
+                  ),
+                ),
+              // Mobile nav bar
+              if (!mode.isDesktop) _buildMobileNavBar(isDark),
+              if (_postOverlay != null && mode.isDesktop) _buildPostOverlay(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildDesktopLayout(int selected, bool isDark) {
-    return Row(
-      children: [
-        AppSidebar(
-          selectedIndex: selected,
-          onItemSelected: _onNav,
-          isCollapsed: _sidebarCollapsed,
-          onToggleCollapse: () => setState(() => _sidebarCollapsed = !_sidebarCollapsed),
-        ),
-        Expanded(
-          child: RepaintBoundary(
-            child: ClipRect(
-              child: _buildContent(selected),
-            ),
-          ),
-        ),
-      ],
-    );
+  double _getMobileNavBarHeight(BuildContext context) {
+    final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    return isLiquidGlass ? 68 + 16 + bottomPadding : 56 + bottomPadding;
   }
 
-  Widget _buildMobileLayout(bool isDark) {
+  Widget _buildMobileNavBar(bool isDark) {
     final nav = context.watch<NavigationProvider>();
     final auth = context.watch<AuthProvider>();
     final settings = context.watch<SettingsProvider>();
@@ -183,53 +207,21 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
     final pos = navOrder.indexOf(mobileIdx);
     final currentIndex = pos >= 0 ? pos : 0;
 
-    final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final navBarHeight = isLiquidGlass ? 68 + 16 + bottomPadding : 56 + bottomPadding;
-
-    return PopScope(
-      canPop: false,
-      child: Stack(
-        clipBehavior: Clip.hardEdge,
-        children: [
-          Positioned.fill(
-            child: Padding(
-              padding: EdgeInsets.only(bottom: navBarHeight),
-              child: RepaintBoundary(
-                child: _buildMobilePage(navOrder[currentIndex]),
-              ),
-            ),
-          ),
-          AppNavBar(
-            navOrder: navOrder,
-            currentIndex: currentIndex,
-            onTap: (i) {
-              final id = navOrder[i];
-              nav.setFromMobileIndex(id);
-            },
-            isGuest: auth.isGuest,
-            onLogout: _handleLogout,
-          ),
-        ],
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: AppNavBar(
+        navOrder: navOrder,
+        currentIndex: currentIndex,
+        onTap: (i) {
+          final id = navOrder[i];
+          nav.setFromMobileIndex(id);
+        },
+        isGuest: auth.isGuest,
+        onLogout: _handleLogout,
       ),
     );
-  }
-
-  Widget _buildMobilePage(int pageId) {
-    switch (pageId) {
-      case 0:
-        return UiHomePage(onPostTap: _onPostTap, onSearchTap: () => Navigator.of(context).pushNamed(AppRoutes.search));
-      case 1:
-        return UiHotPage(onPostTap: _onPostTap, onSearchTap: () => Navigator.of(context).pushNamed(AppRoutes.search));
-      case 2:
-        return UiPopularPage(onPostTap: _onPostTap, onSearchTap: () => Navigator.of(context).pushNamed(AppRoutes.search));
-      case 3:
-        return const UiProfilePage();
-      case 4:
-        return UiSettingsPage(onNavigate: (r) => Navigator.of(context).pushNamed(r));
-      default:
-        return UiHomePage(onPostTap: _onPostTap, onSearchTap: () => Navigator.of(context).pushNamed(AppRoutes.search));
-    }
   }
 
   Widget _buildContent(int selected) {
