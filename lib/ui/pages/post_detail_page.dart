@@ -1182,13 +1182,35 @@ class _DesktopPostDetailContentBuilder {
     }
     if (post == null) return const Center(child: Text('Post not found'));
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(flex: 3, child: buildMediaPanel(context, s, post, isDark)),
-        Container(width: 1, color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator),
-        SizedBox(width: 380, child: buildInfoPanel(context, s, post, isDark)),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const narrowBreakpoint = 700.0;
+        final useNarrowLayout = constraints.maxWidth < narrowBreakpoint;
+
+        if (useNarrowLayout) {
+          // Vertical stack for smaller screens - image on top, info below
+          final imageHeight = (constraints.maxHeight * 0.45).clamp(200.0, 500.0);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                height: imageHeight,
+                child: buildMediaPanel(context, s, post, isDark),
+              ),
+              Expanded(child: buildInfoPanel(context, s, post, isDark)),
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(flex: 3, child: buildMediaPanel(context, s, post, isDark)),
+            Container(width: 1, color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator),
+            SizedBox(width: 380, child: buildInfoPanel(context, s, post, isDark)),
+          ],
+        );
+      },
     );
   }
 
