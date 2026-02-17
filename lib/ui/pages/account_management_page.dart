@@ -4,7 +4,7 @@ import 'package:flutter/material.dart' show Colors;
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';
 import '../../core/constants/constants.dart';
-import '../breakpoints.dart' as bp;
+import '../layout/layout_scope.dart';
 import '../../providers/providers.dart';
 
 /// Design constants for account management
@@ -22,25 +22,25 @@ class AccountManagementPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
-    final isDesktop = bp.isDesktop(context);
+    final mode = LayoutScope.of(context);
 
     return CupertinoPageScaffold(
       backgroundColor: isDark
           ? const Color(0xFF0A0A0C)
           : AppColors.lightGroupedBackground,
-      navigationBar: isDesktop
+      navigationBar: mode.isDesktop
           ? null
           : CupertinoNavigationBar(
               middle: const Text('Accounts'),
               trailing: CupertinoButton(
                 padding: EdgeInsets.zero,
-                onPressed: () => _showAddAccountSheet(context, isDesktop),
+                onPressed: () => _showAddAccountSheet(context, mode.isDesktop),
                 child: const Icon(CupertinoIcons.plus),
               ),
             ),
       child: SafeArea(
-        top: !isDesktop,
-        child: isDesktop
+        top: !mode.isDesktop,
+        child: mode.isDesktop
             ? _buildDesktopLayout(context, isDark)
             : _buildMobileLayout(context, isDark),
       ),
@@ -204,7 +204,7 @@ class AccountManagementPage extends StatelessWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    final isDesktop = bp.isDesktop(context);
+    final isDesktop = LayoutScope.of(context).isDesktop;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

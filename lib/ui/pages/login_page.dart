@@ -8,6 +8,7 @@ import '../../core/constants/constants.dart';
 import '../../core/input/input.dart';
 import '../../core/utils/helpers.dart';
 import '../../providers/providers.dart';
+import '../layout/layout_scope.dart';
 
 /// Login page for authentication
 class LoginPage extends StatefulWidget {
@@ -278,7 +279,7 @@ class _LoginPageState extends State<LoginPage>
     final isDark = brightness == Brightness.dark;
     final size = MediaQuery.of(context).size;
     final isLandscape = size.width > size.height;
-    final isDesktop = size.width > 800;
+    final mode = LayoutScope.of(context);
 
     return CupertinoPageScaffold(
       backgroundColor: isDark
@@ -286,22 +287,19 @@ class _LoginPageState extends State<LoginPage>
           : AppColors.lightBackground,
       child: Stack(
         children: [
-          // Animated background
           _buildAnimatedBackground(isDark),
-
-          // Main content
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
-                  horizontal: isDesktop ? size.width * 0.25 : 24,
+                  horizontal: mode.isDesktop ? size.width * 0.25 : 24,
                   vertical: 24,
                 ),
                 child: FadeTransition(
                   opacity: _fadeAnimation,
                   child: SlideTransition(
                     position: _slideAnimation,
-                    child: isLandscape && !isDesktop
+                    child: isLandscape && mode.isMobile
                         ? _buildLandscapeLayout(isDark)
                         : _buildPortraitLayout(isDark),
                   ),

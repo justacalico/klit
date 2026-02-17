@@ -5,6 +5,7 @@ import 'routes.dart';
 import 'theme.dart';
 import '../core/theme/ui_style_manager.dart';
 import '../providers/providers.dart';
+import '../ui/layout/layout_scope.dart';
 
 /// Main application widget
 class KlitApp extends StatelessWidget {
@@ -31,13 +32,17 @@ class KlitApp extends StatelessWidget {
               Locale('en', 'US'),
             ],
             builder: (context, child) {
-              // Wrap with UIStyleManager again for proper context inheritance
-              Widget result = UIStyleManager(
-                style: settings.uiStyle,
-                child: child!,
+              final width = MediaQuery.sizeOf(context).width;
+              final mode = LayoutMode.fromWidth(width);
+
+              Widget result = LayoutScope(
+                mode: mode,
+                child: UIStyleManager(
+                  style: settings.uiStyle,
+                  child: child!,
+                ),
               );
-              
-              // For system theme, we need to rebuild with actual brightness
+
               if (settings.themeMode == 0) {
                 final brightness = MediaQuery.platformBrightnessOf(context);
                 result = CupertinoTheme(

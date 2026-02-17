@@ -18,6 +18,7 @@ import '../../core/input/input.dart';
 import '../../data/models/models.dart';
 import '../../data/services/services.dart';
 import '../../providers/providers.dart';
+import '../layout/layout_scope.dart';
 import '../shell/toolbar.dart';
 import '../theme.dart';
 import '../widgets/widgets.dart' hide Colors;
@@ -62,26 +63,23 @@ class PostDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth >= 1024) {
-          return _DesktopPostDetailView(
-            postIds: postIds,
-            initialIndex: initialIndex,
-            onSearchTag: onSearchTag,
-            onLoadMore: onLoadMore,
-            hasMore: hasMore,
-            onClose: onClose ?? () => Navigator.of(context).pop(),
-          );
-        }
-        return _MobilePostDetailView(
-          postIds: postIds,
-          initialIndex: initialIndex,
-          onSearchTag: onSearchTag,
-          onLoadMore: onLoadMore,
-          hasMore: hasMore,
-        );
-      },
+    final mode = LayoutScope.of(context);
+    if (mode.isDesktop) {
+      return _DesktopPostDetailView(
+        postIds: postIds,
+        initialIndex: initialIndex,
+        onSearchTag: onSearchTag,
+        onLoadMore: onLoadMore,
+        hasMore: hasMore,
+        onClose: onClose ?? () => Navigator.of(context).pop(),
+      );
+    }
+    return _MobilePostDetailView(
+      postIds: postIds,
+      initialIndex: initialIndex,
+      onSearchTag: onSearchTag,
+      onLoadMore: onLoadMore,
+      hasMore: hasMore,
     );
   }
 }

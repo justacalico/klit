@@ -5,12 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../app/routes.dart';
-import '../core/constants/platform_config.dart';
 import '../core/input/input.dart';
 import '../core/theme/ui_style_manager.dart';
 import '../providers/providers.dart';
 
-import 'breakpoints.dart';
+import 'layout/layout_scope.dart';
 import 'pages/pages.dart';
 import 'shell/nav_bar.dart';
 import 'shell/sidebar.dart';
@@ -97,7 +96,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
   }
 
   void _onPostTap(PostDetailArguments args) {
-    if (_isDesktop) {
+    if (LayoutScope.of(context).isDesktop) {
       _openPostOverlay(args);
     } else {
       Navigator.of(context).pushNamed(AppRoutes.postDetail, arguments: args);
@@ -132,17 +131,11 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
     );
   }
 
-  bool get _isDesktop {
-    if (PlatformConfig.forceDesktop) return true;
-    if (PlatformConfig.forceMobile) return false;
-    final width = MediaQuery.sizeOf(context).width;
-    return width >= Breakpoints.desktop;
-  }
-
   @override
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final mode = LayoutScope.of(context);
     final nav = context.watch<NavigationProvider>();
     final selected = nav.getDesktopIndex();
 
@@ -152,8 +145,8 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
         child: Stack(
           clipBehavior: Clip.hardEdge,
           children: [
-            if (_isDesktop) _buildDesktopLayout(selected, isDark) else _buildMobileLayout(isDark),
-            if (_postOverlay != null && _isDesktop) _buildPostOverlay(),
+            if (mode.isDesktop) _buildDesktopLayout(selected, isDark) else _buildMobileLayout(isDark),
+            if (_postOverlay != null && mode.isDesktop) _buildPostOverlay(),
           ],
         ),
       ),
