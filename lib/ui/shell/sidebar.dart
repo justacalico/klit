@@ -4,7 +4,7 @@ import 'package:flutter/material.dart' show Tooltip;
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';
 import '../../core/theme/ui_style_manager.dart';
-import '../../presentation/providers/providers.dart';
+import '../../providers/providers.dart';
 import '../theme.dart';
 
 class _NavItemDef {

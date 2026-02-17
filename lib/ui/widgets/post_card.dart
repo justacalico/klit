@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
-import '../../core/constants/app_constants.dart';
+import '../../core/constants/constants.dart';
 import '../../core/extensions/extensions.dart';
 import '../../core/theme/ui_style_manager.dart';
 import '../../data/models/models.dart';

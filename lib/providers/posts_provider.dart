@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import '../../core/constants/constants.dart';
-import '../../data/models/models.dart';
-import '../../data/services/services.dart';
+import '../core/constants/constants.dart';
+import '../data/models/models.dart';
+import '../data/services/services.dart';
 
 /// Provider for posts data
 class PostsProvider extends ChangeNotifier {

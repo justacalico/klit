@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'routes.dart';
 import 'theme.dart';
 import '../core/theme/ui_style_manager.dart';
-import '../presentation/providers/providers.dart';
+import '../providers/providers.dart';
 
 /// Main application widget
 class KlitApp extends StatelessWidget {

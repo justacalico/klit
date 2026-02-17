@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import '../../../data/services/services.dart';
+import '../../data/services/services.dart';
 import '../../providers/providers.dart';
 
 /// Design constants for the purple/indigo mobile theme

@@ -3,9 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../data/models/models.dart';
-import '../../presentation/pages/post/post_detail_page.dart';
-import '../../presentation/providers/providers.dart';
-import '../../presentation/widgets/widgets.dart';
+import '../../providers/providers.dart';
+import '../widgets/widgets.dart';
+import 'post_detail_page.dart';
 import '../shell/toolbar.dart';
 
 class UiHomePage extends StatefulWidget {

@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
-
-import '../../presentation/desktop/pages/desktop_post_detail_page.dart';
+import 'post_detail_page.dart';
 
 /// Post detail overlay for desktop - full-screen overlay with close.
 class UiPostDetailOverlay extends StatelessWidget {
@@ -23,7 +22,7 @@ class UiPostDetailOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DesktopPostDetailPage(
+    return PostDetailPage(
       postIds: postIds,
       initialIndex: initialIndex,
       onSearchTag: onSearchTag,

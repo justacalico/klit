@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
-import '../../core/constants/app_constants.dart';
+import '../../core/constants/constants.dart';
 
 /// Custom iOS-style navigation bar with blur effect
 class CustomAppBar extends StatelessWidget implements ObstructingPreferredSizeWidget {

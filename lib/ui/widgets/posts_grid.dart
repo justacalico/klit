@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../data/models/models.dart';
-import '../providers/settings_provider.dart';
+import '../../providers/providers.dart';
 import 'post_card.dart';
 import 'loading_shimmer.dart';
 import 'loading_indicator.dart';

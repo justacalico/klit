@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constants/constants.dart';
-import '../../../core/utils/helpers.dart';
+import '../../core/constants/constants.dart';
+import '../../core/utils/helpers.dart';
 import '../../providers/providers.dart';
 
 /// Design constants for the purple/indigo mobile theme

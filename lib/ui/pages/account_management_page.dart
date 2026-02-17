@@ -1,9 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Colors;
 import 'package:provider/provider.dart';
-import '../../../app/routes.dart';
-import '../../../core/constants/constants.dart';
-import '../../../ui/breakpoints.dart' as bp;
+import '../../app/routes.dart';
+import '../../core/constants/constants.dart';
+import '../breakpoints.dart' as bp;
 import '../../providers/providers.dart';
 
 /// Design constants for account management
@@ -1515,7 +1516,3 @@ class _DesktopAddDialogButtonState extends State<_DesktopAddDialogButton> {
   }
 }
 
-// Import for Colors.transparent
-class Colors {
-  static const Color transparent = Color(0x00000000);
-}

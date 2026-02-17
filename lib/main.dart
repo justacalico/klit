@@ -3,7 +3,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:provider/provider.dart';
 import 'app/app.dart';
 import 'data/services/services.dart';
-import 'presentation/providers/providers.dart';
+import 'providers/providers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

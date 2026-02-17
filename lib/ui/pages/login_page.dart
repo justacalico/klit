@@ -1,11 +1,12 @@
 import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../../app/routes.dart';
-import '../../../core/constants/constants.dart';
-import '../../../core/input/input.dart';
-import '../../../core/utils/helpers.dart';
+import '../../app/routes.dart';
+import '../../core/constants/constants.dart';
+import '../../core/input/input.dart';
+import '../../core/utils/helpers.dart';
 import '../../providers/providers.dart';
 
 /// Login page for authentication
@@ -1099,11 +1100,6 @@ class _LoginPageState extends State<LoginPage>
       ),
     );
   }
-}
-
-/// Abstract Color class for compatibility
-class Colors {
-  static const Color transparent = Color(0x00000000);
 }
 
 /// Custom painter for animated background

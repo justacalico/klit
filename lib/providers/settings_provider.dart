@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import '../../core/constants/constants.dart';
-import '../../core/theme/ui_style_manager.dart';
-import '../../data/models/models.dart';
-import '../../data/services/services.dart';
+import '../core/constants/constants.dart';
+import '../core/theme/ui_style_manager.dart';
+import '../data/models/models.dart';
+import '../data/services/services.dart';
 
 /// Callback type for when proxy configuration changes
 typedef ProxyChangeCallback = void Function(ProxyConfig config);

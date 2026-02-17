@@ -1,10 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import '../presentation/pages/auth/login_page.dart';
-import '../presentation/pages/post/post_detail_page.dart';
-import '../presentation/pages/post/responsive_post_detail_page.dart';
-import '../presentation/pages/settings/account_management_page.dart';
-import '../presentation/pages/settings/blacklist_settings_page.dart';
-import '../presentation/pages/settings/host_settings_page.dart';
 import '../ui/app_shell.dart';
 import '../ui/pages/pages.dart';
 
@@ -45,7 +39,7 @@ class AppRouter {
       case AppRoutes.postDetail:
         final args = settings.arguments as PostDetailArguments;
         return CupertinoPageRoute(
-          builder: (_) => ResponsivePostDetailPage(
+          builder: (_) => PostDetailPage(
             postIds: args.postIds,
             initialIndex: args.initialIndex,
             onLoadMore: args.onLoadMore,

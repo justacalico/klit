@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:video_player/video_player.dart' as vp;
-import '../../core/constants/app_constants.dart';
+import '../../core/constants/constants.dart';
 
 /// Check if we're on a desktop platform
 bool get isDesktop {

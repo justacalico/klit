@@ -8,8 +8,7 @@ import '../app/routes.dart';
 import '../core/constants/platform_config.dart';
 import '../core/input/input.dart';
 import '../core/theme/ui_style_manager.dart';
-import '../presentation/pages/post/post_detail_page.dart';
-import '../presentation/providers/providers.dart';
+import '../providers/providers.dart';
 
 import 'breakpoints.dart';
 import 'pages/pages.dart';
@@ -234,7 +233,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
       case 3:
         return const UiProfilePage();
       case 4:
-        return const UiSettingsPage();
+        return UiSettingsPage(onNavigate: (r) => Navigator.of(context).pushNamed(r));
       default:
         return UiHomePage(onPostTap: _onPostTap, onSearchTap: () => Navigator.of(context).pushNamed(AppRoutes.search));
     }
