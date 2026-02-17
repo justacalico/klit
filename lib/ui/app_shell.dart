@@ -166,17 +166,21 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
                 bottom: mode.isDesktop ? 0 : navBarHeight,
                 child: content,
               ),
-              // Desktop sidebar
+              // Desktop sidebar - Material ensures it renders above content (fixes z-order)
               if (mode.isDesktop)
                 Positioned(
                   left: 0,
                   top: 0,
                   bottom: 0,
-                  child: AppSidebar(
-                    selectedIndex: selected,
-                    onItemSelected: _onNav,
-                    isCollapsed: nav.sidebarCollapsed,
-                    onToggleCollapse: nav.toggleSidebar,
+                  child: Material(
+                    type: MaterialType.transparency,
+                    elevation: 12,
+                    child: AppSidebar(
+                      selectedIndex: selected,
+                      onItemSelected: _onNav,
+                      isCollapsed: nav.sidebarCollapsed,
+                      onToggleCollapse: nav.toggleSidebar,
+                    ),
                   ),
                 ),
               // Mobile nav bar - Material ensures it renders above content (fixes z-order)
@@ -191,7 +195,12 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
                     child: _buildMobileNavBarContent(isDark),
                   ),
                 ),
-              if (_postOverlay != null && mode.isDesktop) _buildPostOverlay(),
+              if (_postOverlay != null && mode.isDesktop)
+                Material(
+                  type: MaterialType.transparency,
+                  elevation: 16,
+                  child: _buildPostOverlay(),
+                ),
             ],
           ),
         ),
