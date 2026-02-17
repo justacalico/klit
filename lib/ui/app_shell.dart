@@ -159,13 +159,25 @@ class _AppShellState extends State<AppShell>
       child: Container(
         color: isDark ? const Color(0xFF0A0A0C) : const Color(0xFFF8F8FC),
         child: Stack(
+          clipBehavior: Clip.hardEdge,
           children: [
             if (isLiquidGlass && _isDesktop)
-              AnimatedBuilder(
-                animation: _bgController,
-                builder: (_, __) => CustomPaint(
-                  painter: _ShellBgPainter(isDark: isDark, t: _bgController.value),
-                  size: Size.infinite,
+              Positioned.fill(
+                child: AnimatedBuilder(
+                  animation: _bgController,
+                  builder: (context, child) {
+                    return LayoutBuilder(
+                      builder: (context, constraints) {
+                        return CustomPaint(
+                          painter: _ShellBgPainter(
+                            isDark: isDark,
+                            t: _bgController.value,
+                          ),
+                          size: Size(constraints.maxWidth, constraints.maxHeight),
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
             if (_isDesktop) _buildDesktopLayout(selected, isDark) else _buildMobileLayout(isDark),
@@ -206,11 +218,21 @@ class _AppShellState extends State<AppShell>
 
     final pages = navOrder.map((id) => _buildMobilePage(id)).toList();
 
+    final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final navBarHeight = isLiquidGlass ? 68 + 16 + bottomPadding : 56 + bottomPadding;
+
     return PopScope(
       canPop: false,
       child: Stack(
+        clipBehavior: Clip.hardEdge,
         children: [
-          IndexedStack(index: currentIndex, children: pages),
+          Positioned.fill(
+            child: Padding(
+              padding: EdgeInsets.only(bottom: navBarHeight),
+              child: IndexedStack(index: currentIndex, children: pages),
+            ),
+          ),
           AppNavBar(
             navOrder: navOrder,
             currentIndex: currentIndex,
