@@ -708,15 +708,23 @@ class _MobilePostDetailContentBuilder {
   static Widget buildImage(BuildContext context, _PostDetailPageState s, Post post) {
     if (post.isVideo && post.file.url != null) {
       final settings = context.read<SettingsProvider>();
-      return VideoPlayerWidget(
-        key: ValueKey('video_${post.id}_${post.file.url}'),
-        videoUrl: post.file.url!,
-        thumbnailUrl: post.preview.url,
-        autoPlay: settings.videoAutoPlay,
-        looping: true,
-        showControls: true,
-        aspectRatio: post.file.aspectRatio,
-        muteByDefault: settings.videoMuteByDefault,
+      final aspectRatio = (post.file.height > 0)
+          ? (post.file.width / post.file.height).clamp(0.3, 3.0)
+          : 1.0;
+      return RepaintBoundary(
+        child: AspectRatio(
+          aspectRatio: aspectRatio,
+          child: VideoPlayerWidget(
+            key: ValueKey('video_${post.id}_${post.file.url}'),
+            videoUrl: post.file.url!,
+            thumbnailUrl: post.preview.url,
+            autoPlay: settings.videoAutoPlay,
+            looping: true,
+            showControls: true,
+            aspectRatio: aspectRatio,
+            muteByDefault: settings.videoMuteByDefault,
+          ),
+        ),
       );
     }
     final imageUrl = post.file.url ?? post.sample.url ?? post.preview.url;

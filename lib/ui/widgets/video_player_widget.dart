@@ -295,7 +295,9 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       return _buildErrorWidget('Failed to initialize video player');
     }
 
-    return Chewie(controller: _chewieController!);
+    return RepaintBoundary(
+      child: Chewie(controller: _chewieController!),
+    );
   }
 }
 
