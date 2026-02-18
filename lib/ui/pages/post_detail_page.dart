@@ -728,15 +728,15 @@ class _MobilePostDetailContentBuilder {
         child: CachedNetworkImage(
           imageUrl: imageUrl,
           fit: BoxFit.contain,
-          placeholder: (_, __) => post.preview.url != null
+          placeholder: (_, _) => post.preview.url != null
               ? CachedNetworkImage(
                   imageUrl: post.preview.url!,
                   fit: BoxFit.cover,
-                  placeholder: (_, __) => const CupertinoActivityIndicator(),
-                  errorWidget: (_, __, ___) => const CupertinoActivityIndicator(),
+                  placeholder: (_, _) => const CupertinoActivityIndicator(),
+                  errorWidget: (_, _, _) => const CupertinoActivityIndicator(),
                 )
               : const CupertinoActivityIndicator(),
-          errorWidget: (_, __, ___) => const Icon(CupertinoIcons.exclamationmark_triangle, size: 48),
+          errorWidget: (_, _, _) => const Icon(CupertinoIcons.exclamationmark_triangle, size: 48),
         ),
       ),
     );
@@ -802,8 +802,7 @@ class _MobilePostDetailContentBuilder {
     final displayColor = isActive ? color : (isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2);
     return CupertinoButton(
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-      minSize: 0,
-      onPressed: isLoading ? null : onTap,
+      onPressed: isLoading ? null : onTap, minimumSize: Size(0, 0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1269,10 +1268,10 @@ class _DesktopPostDetailContentBuilder {
         child: CachedNetworkImage(
           imageUrl: imageUrl,
           fit: BoxFit.contain,
-          placeholder: (_, __) => post.preview.url != null
+          placeholder: (_, _) => post.preview.url != null
               ? CachedNetworkImage(imageUrl: post.preview.url!, fit: BoxFit.contain)
               : const CupertinoActivityIndicator(),
-          errorWidget: (_, __, ___) => const Icon(CupertinoIcons.exclamationmark_triangle, size: 48),
+          errorWidget: (_, _, _) => const Icon(CupertinoIcons.exclamationmark_triangle, size: 48),
         ),
       ),
     );

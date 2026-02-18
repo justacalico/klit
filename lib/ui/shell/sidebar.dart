@@ -393,7 +393,7 @@ class _SidebarItemState extends State<_SidebarItem>
         onTapCancel: () => _ctrl.reverse(),
         child: AnimatedBuilder(
           animation: _ctrl,
-          builder: (_, __) => Transform.scale(
+          builder: (_, _) => Transform.scale(
             scale: _scale.value,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),

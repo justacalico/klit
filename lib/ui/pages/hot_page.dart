@@ -77,7 +77,7 @@ class _UiHotPageState extends State<UiHotPage> {
         ),
         Expanded(
           child: Consumer<PostsProvider>(
-            builder: (_, pp, __) => Column(
+            builder: (_, pp, _) => Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

@@ -86,7 +86,7 @@ class _UiHomePageState extends State<UiHomePage> {
         ),
         Expanded(
           child: Consumer<PostsProvider>(
-            builder: (_, pp, __) => SmartRefresher(
+            builder: (_, pp, _) => SmartRefresher(
               controller: _refresh,
               enablePullDown: true,
               enablePullUp: pp.hasMoreLatest,

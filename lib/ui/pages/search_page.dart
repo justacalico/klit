@@ -243,7 +243,7 @@ class _UiSearchPageState extends State<UiSearchPage>
         if (_showFilters || _filterCtrl.isAnimating)
           AnimatedBuilder(
             animation: _filterCtrl,
-            builder: (_, __) => Positioned(
+            builder: (_, _) => Positioned(
               top: 60 + _filterSlide.value,
               left: 220,
               right: 20,
@@ -472,7 +472,7 @@ class _UiSearchPageState extends State<UiSearchPage>
           ),
           Expanded(
             child: Consumer<SettingsProvider>(
-              builder: (_, sp, __) {
+              builder: (_, sp, _) {
                 final history = sp.searchHistory;
                 if (history.isEmpty) {
                   return Center(
@@ -509,7 +509,7 @@ class _UiSearchPageState extends State<UiSearchPage>
 
   Widget _buildResults(BuildContext context) {
     return Consumer<PostsProvider>(
-      builder: (_, pp, __) {
+      builder: (_, pp, _) {
         if (pp.searchResults.isEmpty && !pp.isLoadingSearch) {
           return Center(
             child: Column(
