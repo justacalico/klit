@@ -1484,6 +1484,61 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                 ],
               ),
             ),
+            const SizedBox(height: 24),
+            // Video Mode Card
+            _buildSectionHeader('Video Feed', isDark),
+            const SizedBox(height: 12),
+            _buildSettingsCard(
+              isDark: isDark,
+              child: Column(
+                children: [
+                  _buildSettingRow(
+                    isDark: isDark,
+                    icon: CupertinoIcons.sparkles,
+                    iconColor: _DesignColors.accentPink,
+                    title: 'Video Mode',
+                    subtitle: 'TikTok-style personalized video feed',
+                    trailing: CupertinoSwitch(
+                      value: settings.videoModeEnabled,
+                      activeTrackColor: _DesignColors.accentPink,
+                      onChanged: (value) => settings.setVideoModeEnabled(value),
+                    ),
+                  ),
+                  if (settings.videoModeEnabled) ...[
+                    Divider(
+                      height: 1,
+                      color: isDark
+                          ? CupertinoColors.white.withValues(alpha: 0.1)
+                          : CupertinoColors.black.withValues(alpha: 0.05),
+                    ),
+                    _buildSettingRow(
+                      isDark: isDark,
+                      icon: CupertinoIcons.play_rectangle_fill,
+                      iconColor: _DesignColors.primaryIndigo,
+                      title: 'Open Video Feed',
+                      subtitle: 'Browse personalized video recommendations',
+                      trailing: CupertinoButton(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        color: _DesignColors.primaryIndigo.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(8),
+                        onPressed: () => widget.onNavigate(AppRoutes.videoFeed),
+                        child: const Text(
+                          'Open',
+                          style: TextStyle(
+                            color: _DesignColors.primaryIndigo,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ],
         );
       },

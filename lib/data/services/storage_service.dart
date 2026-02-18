@@ -509,6 +509,16 @@ class StorageService {
     await _prefs.setBool(AppConstants.videoMuteByDefaultKey, enabled);
   }
 
+  /// Get video mode enabled setting
+  bool getVideoModeEnabled() {
+    return _prefs.getBool(AppConstants.videoModeEnabledKey) ?? false;
+  }
+
+  /// Set video mode enabled setting
+  Future<void> setVideoModeEnabled(bool enabled) async {
+    await _prefs.setBool(AppConstants.videoModeEnabledKey, enabled);
+  }
+
   /// Get score threshold for latest posts
   int getScoreThreshold() {
     return _prefs.getInt(AppConstants.scoreThresholdKey) ??

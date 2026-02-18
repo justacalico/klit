@@ -15,6 +15,7 @@ class AppRoutes {
   static const String accountManagement = '/settings/accounts';
   static const String hostSettings = '/settings/host';
   static const String blacklistSettings = '/settings/blacklist';
+  static const String videoFeed = '/video-feed';
 }
 
 /// App router configuration
@@ -85,6 +86,12 @@ class AppRouter {
           settings: settings,
         );
 
+      case AppRoutes.videoFeed:
+        return CupertinoPageRoute(
+          builder: (_) => const _VideoFeedRoutePage(),
+          settings: settings,
+        );
+
       default:
         return CupertinoPageRoute(
           builder: (_) => const LoginPage(),
@@ -133,6 +140,20 @@ class _FavoritesRoutePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return UiFavoritesPage(
+      onPostTap: (args) => Navigator.of(context).pushNamed(
+        AppRoutes.postDetail,
+        arguments: args,
+      ),
+    );
+  }
+}
+
+class _VideoFeedRoutePage extends StatelessWidget {
+  const _VideoFeedRoutePage();
+
+  @override
+  Widget build(BuildContext context) {
+    return VideoFeedPage(
       onPostTap: (args) => Navigator.of(context).pushNamed(
         AppRoutes.postDetail,
         arguments: args,
