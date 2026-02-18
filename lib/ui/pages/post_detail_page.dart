@@ -721,22 +721,27 @@ class _MobilePostDetailContentBuilder {
     }
     final imageUrl = post.file.url ?? post.sample.url ?? post.preview.url;
     if (imageUrl == null) return const Icon(CupertinoIcons.photo, size: 64);
+    final aspectRatio = post.file.aspectRatio.clamp(0.3, 3.0);
     return GestureDetector(
       onTap: () => s._openFullMedia(),
       child: Hero(
         tag: 'post_${post.id}',
-        child: CachedNetworkImage(
-          imageUrl: imageUrl,
-          fit: BoxFit.contain,
-          placeholder: (_, _) => post.preview.url != null
-              ? CachedNetworkImage(
-                  imageUrl: post.preview.url!,
-                  fit: BoxFit.cover,
-                  placeholder: (_, _) => const CupertinoActivityIndicator(),
-                  errorWidget: (_, _, _) => const CupertinoActivityIndicator(),
-                )
-              : const CupertinoActivityIndicator(),
-          errorWidget: (_, _, _) => const Icon(CupertinoIcons.exclamationmark_triangle, size: 48),
+        child: AspectRatio(
+          aspectRatio: aspectRatio,
+          key: ValueKey('post_image_${post.id}'),
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
+            fit: BoxFit.contain,
+            placeholder: (_, _) => post.preview.url != null
+                ? CachedNetworkImage(
+                    imageUrl: post.preview.url!,
+                    fit: BoxFit.contain,
+                    placeholder: (_, _) => const CupertinoActivityIndicator(),
+                    errorWidget: (_, _, _) => const CupertinoActivityIndicator(),
+                  )
+                : const CupertinoActivityIndicator(),
+            errorWidget: (_, _, _) => const Icon(CupertinoIcons.exclamationmark_triangle, size: 48),
+          ),
         ),
       ),
     );
