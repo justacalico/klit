@@ -180,7 +180,9 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
     final authProvider = context.watch<AuthProvider>();
     final isGuest = authProvider.isGuest;
 
-    return CupertinoPageScaffold(
+    return KeyedSubtree(
+      key: const ValueKey('blacklist-settings-page'),
+      child: CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         backgroundColor: isDark
             ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
@@ -240,6 +242,7 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
             _buildFooter(isDark),
           ],
         ),
+      ),
       ),
     );
   }

@@ -224,7 +224,9 @@ class _UiSearchPageState extends State<UiSearchPage>
   Widget build(BuildContext context) {
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
 
-    return Stack(
+    return KeyedSubtree(
+      key: const ValueKey('search-page'),
+      child: Stack(
       children: [
         Column(
           children: [
@@ -268,6 +270,7 @@ class _UiSearchPageState extends State<UiSearchPage>
             ),
           ),
       ],
+      ),
     );
   }
 

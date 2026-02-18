@@ -103,7 +103,9 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
 
-    return CupertinoPageScaffold(
+    return KeyedSubtree(
+      key: const ValueKey('host-settings-page'),
+      child: CupertinoPageScaffold(
       backgroundColor: isDark
           ? const Color(0xFF000000)
           : CupertinoColors.systemGroupedBackground,
@@ -142,6 +144,7 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
             _buildInfoCard(context, isDark),
           ],
         ),
+      ),
       ),
     );
   }

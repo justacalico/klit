@@ -73,7 +73,9 @@ class _UiHomePageState extends State<UiHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return KeyedSubtree(
+      key: const ValueKey('home-page'),
+      child: Column(
       children: [
         PageToolbar(
           title: 'Latest Posts',
@@ -105,6 +107,7 @@ class _UiHomePageState extends State<UiHomePage> {
           ),
         ),
       ],
+      ),
     );
   }
 }

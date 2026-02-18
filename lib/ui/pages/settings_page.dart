@@ -155,16 +155,19 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     final isDark = brightness == Brightness.dark;
     final mode = LayoutScope.of(context);
 
-    return Container(
-      color: isDark ? const Color(0xFF0D0D0F) : const Color(0xFFF5F5F7),
-      child: mode.isDesktop
-          ? Row(
-              children: [
-                _buildSidebar(isDark),
-                Expanded(child: _buildMainContent(isDark)),
-              ],
-            )
-          : _buildMobileLayout(context, isDark),
+    return KeyedSubtree(
+      key: const ValueKey('settings-page'),
+      child: Container(
+        color: isDark ? const Color(0xFF0D0D0F) : const Color(0xFFF5F5F7),
+        child: mode.isDesktop
+            ? Row(
+                children: [
+                  _buildSidebar(isDark),
+                  Expanded(child: _buildMainContent(isDark)),
+                ],
+              )
+            : _buildMobileLayout(context, isDark),
+      ),
     );
   }
 

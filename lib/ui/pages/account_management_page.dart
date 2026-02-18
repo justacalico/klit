@@ -14,7 +14,7 @@ class _AccountColors {
   static const Color primaryViolet = Color(0xFFA855F7);
 }
 
-/// Account management page with responsive desktop support
+/// Account management page - unified single file for desktop and mobile
 class AccountManagementPage extends StatelessWidget {
   const AccountManagementPage({super.key});
 
@@ -24,220 +24,31 @@ class AccountManagementPage extends StatelessWidget {
     final isDark = brightness == Brightness.dark;
     final mode = LayoutScope.of(context);
 
-    return CupertinoPageScaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF0A0A0C)
-          : AppColors.lightGroupedBackground,
-      navigationBar: mode.isDesktop
-          ? null
-          : CupertinoNavigationBar(
-              middle: const Text('Accounts'),
-              trailing: CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: () => _showAddAccountSheet(context, mode.isDesktop),
-                child: const Icon(CupertinoIcons.plus),
-              ),
-            ),
-      child: SafeArea(
-        top: !mode.isDesktop,
-        child: mode.isDesktop
-            ? _buildDesktopLayout(context, isDark)
-            : _buildMobileLayout(context, isDark),
-      ),
-    );
-  }
-
-  Widget _buildDesktopLayout(BuildContext context, bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header with back button and title
-          Row(
-            children: [
-              MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: GestureDetector(
-                  onTap: () => Navigator.of(context).pop(),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? CupertinoColors.white.withValues(alpha: 0.1)
-                          : CupertinoColors.black.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      CupertinoIcons.back,
-                      color: isDark
-                          ? CupertinoColors.white
-                          : CupertinoColors.black,
-                      size: 20,
-                    ),
-                  ),
+    return KeyedSubtree(
+      key: const ValueKey('account-management-page'),
+      child: CupertinoPageScaffold(
+        backgroundColor: isDark
+            ? const Color(0xFF0A0A0C)
+            : AppColors.lightGroupedBackground,
+        navigationBar: mode.isDesktop
+            ? null
+            : CupertinoNavigationBar(
+                middle: const Text('Accounts'),
+                trailing: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () => _showAddAccountSheet(context, mode.isDesktop),
+                  child: const Icon(CupertinoIcons.plus),
                 ),
               ),
-              const SizedBox(width: 16),
-              ShaderMask(
-                shaderCallback: (bounds) => const LinearGradient(
-                  colors: [
-                    _AccountColors.primaryIndigo,
-                    _AccountColors.primaryPurple,
-                  ],
-                ).createShader(bounds),
-                child: const Text(
-                  'Accounts',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: CupertinoColors.white,
-                  ),
-                ),
-              ),
-              const Spacer(),
-              _DesktopAddButton(
-                onPressed: () => _showAddAccountSheet(context, true),
-              ),
-            ],
-          ),
-          const SizedBox(height: 32),
-          // Account list
-          Expanded(
-            child: Consumer<AuthProvider>(
-              builder: (context, auth, _) {
-                if (auth.accounts.isEmpty) {
-                  return _buildEmptyState(context);
-                }
-                return _buildDesktopAccountList(context, auth, isDark);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDesktopAccountList(
-    BuildContext context,
-    AuthProvider auth,
-    bool isDark,
-  ) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 600),
-        child: ListView.builder(
-          itemCount: auth.accounts.length,
-          itemBuilder: (context, index) {
-            final account = auth.accounts[index];
-            final isActive = auth.currentAccount?.id == account.id;
-            return _DesktopAccountCard(
-              username: account.username,
-              host: Uri.parse(account.host).host,
-              isActive: isActive,
-              isDark: isDark,
-              onTap: isActive
-                  ? null
-                  : () => _switchAccount(context, account.id, account.host),
-              onOptions: () => _showDesktopAccountOptions(
-                context,
-                account.id,
-                isActive,
-                isDark,
-              ),
-            );
-          },
+        child: SafeArea(
+          top: !mode.isDesktop,
+          child: _AccountManagementBody(isDark: isDark),
         ),
       ),
     );
   }
 
-  Widget _buildMobileLayout(BuildContext context, bool isDark) {
-    return Consumer<AuthProvider>(
-      builder: (context, auth, _) {
-        if (auth.accounts.isEmpty) {
-          return _buildEmptyState(context);
-        }
-
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: auth.accounts.length,
-          itemBuilder: (context, index) {
-            final account = auth.accounts[index];
-            final isActive = auth.currentAccount?.id == account.id;
-
-            return _MobileAccountCard(
-              username: account.username,
-              host: Uri.parse(account.host).host,
-              isActive: isActive,
-              isDark: isDark,
-              onTap: isActive
-                  ? null
-                  : () => _switchAccount(context, account.id, account.host),
-              onOptions: () =>
-                  _showAccountOptions(context, account.id, isActive),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Future<void> _switchAccount(
-    BuildContext context,
-    String accountId,
-    String host,
-  ) async {
-    final auth = context.read<AuthProvider>();
-    final posts = context.read<PostsProvider>();
-    final settings = context.read<SettingsProvider>();
-
-    final success = await auth.switchAccount(accountId);
-    if (success && context.mounted) {
-      posts.clearAllPosts();
-      await settings.setHost(host);
-      if (!context.mounted) return;
-      Navigator.of(
-        context,
-      ).pushNamedAndRemoveUntil(AppRoutes.main, (route) => false);
-    }
-  }
-
-  Widget _buildEmptyState(BuildContext context) {
-    final isDesktop = LayoutScope.of(context).isDesktop;
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            CupertinoIcons.person_2,
-            size: 64,
-            color: CupertinoColors.secondaryLabel.resolveFrom(context),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'No Accounts',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Add an account to get started',
-            style: TextStyle(
-              fontSize: 15,
-              color: CupertinoColors.secondaryLabel.resolveFrom(context),
-            ),
-          ),
-          const SizedBox(height: 24),
-          CupertinoButton.filled(
-            onPressed: () => _showAddAccountSheet(context, isDesktop),
-            child: const Text('Add Account'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAddAccountSheet(BuildContext context, bool isDesktop) {
+  static void _showAddAccountSheet(BuildContext context, bool isDesktop) {
     if (isDesktop) {
       showCupertinoDialog(
         context: context,
@@ -252,7 +63,7 @@ class AccountManagementPage extends StatelessWidget {
     }
   }
 
-  void _showDesktopAccountOptions(
+  static void _showDesktopAccountOptions(
     BuildContext context,
     String accountId,
     bool isActive,
@@ -269,17 +80,17 @@ class AccountManagementPage extends StatelessWidget {
           Navigator.of(dialogContext).pop();
           final auth = context.read<AuthProvider>();
           final account = auth.accounts.firstWhere((a) => a.id == accountId);
-          _switchAccount(context, accountId, account.host);
+          _AccountManagementBody._switchAccount(context, accountId, account.host);
         },
         onRemove: () {
           Navigator.of(dialogContext).pop();
-          _confirmRemoveAccount(context, accountId);
+          _AccountManagementBody._confirmRemoveAccount(context, accountId);
         },
       ),
     );
   }
 
-  void _showAccountOptions(
+  static void _showAccountOptions(
     BuildContext context,
     String accountId,
     bool isActive,
@@ -320,7 +131,7 @@ class AccountManagementPage extends StatelessWidget {
             isDestructiveAction: true,
             onPressed: () {
               Navigator.of(context).pop();
-              _confirmRemoveAccount(context, accountId);
+              _AccountManagementBody._confirmRemoveAccount(context, accountId);
             },
             child: const Text('Remove Account'),
           ),
@@ -332,8 +143,207 @@ class AccountManagementPage extends StatelessWidget {
       ),
     );
   }
+}
 
-  void _confirmRemoveAccount(BuildContext context, String accountId) {
+/// Unified body widget that handles both desktop and mobile layouts
+class _AccountManagementBody extends StatelessWidget {
+  final bool isDark;
+
+  const _AccountManagementBody({required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final mode = LayoutScope.of(context);
+
+    if (mode.isDesktop) {
+      return Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with back button and title
+            Row(
+              children: [
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? CupertinoColors.white.withValues(alpha: 0.1)
+                            : CupertinoColors.black.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        CupertinoIcons.back,
+                        color: isDark
+                            ? CupertinoColors.white
+                            : CupertinoColors.black,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                ShaderMask(
+                  shaderCallback: (bounds) => const LinearGradient(
+                    colors: [
+                      _AccountColors.primaryIndigo,
+                      _AccountColors.primaryPurple,
+                    ],
+                  ).createShader(bounds),
+                  child: const Text(
+                    'Accounts',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: CupertinoColors.white,
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                _DesktopAddButton(
+                  onPressed: () => AccountManagementPage._showAddAccountSheet(context, true),
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+            // Account list
+            Expanded(
+              child: Consumer<AuthProvider>(
+                builder: (context, auth, _) {
+                  if (auth.accounts.isEmpty) {
+                    return _buildEmptyState(context);
+                  }
+                  return _buildDesktopAccountList(context, auth);
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      return Consumer<AuthProvider>(
+        builder: (context, auth, _) {
+          if (auth.accounts.isEmpty) {
+            return _buildEmptyState(context);
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: auth.accounts.length,
+            itemBuilder: (context, index) {
+              final account = auth.accounts[index];
+              final isActive = auth.currentAccount?.id == account.id;
+
+              return _MobileAccountCard(
+                username: account.username,
+                host: Uri.parse(account.host).host,
+                isActive: isActive,
+                isDark: isDark,
+                onTap: isActive
+                    ? null
+                    : () => _switchAccount(context, account.id, account.host),
+                onOptions: () =>
+                    AccountManagementPage._showAccountOptions(context, account.id, isActive),
+              );
+            },
+          );
+        },
+      );
+    }
+  }
+
+  Widget _buildDesktopAccountList(
+    BuildContext context,
+    AuthProvider auth,
+  ) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 600),
+        child: ListView.builder(
+          itemCount: auth.accounts.length,
+          itemBuilder: (context, index) {
+            final account = auth.accounts[index];
+            final isActive = auth.currentAccount?.id == account.id;
+            return _DesktopAccountCard(
+              username: account.username,
+              host: Uri.parse(account.host).host,
+              isActive: isActive,
+              isDark: isDark,
+              onTap: isActive
+                  ? null
+                  : () => _switchAccount(context, account.id, account.host),
+              onOptions: () => AccountManagementPage._showDesktopAccountOptions(
+                context,
+                account.id,
+                isActive,
+                isDark,
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    final isDesktop = LayoutScope.of(context).isDesktop;
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            CupertinoIcons.person_2,
+            size: 64,
+            color: CupertinoColors.secondaryLabel.resolveFrom(context),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'No Accounts',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Add an account to get started',
+            style: TextStyle(
+              fontSize: 15,
+              color: CupertinoColors.secondaryLabel.resolveFrom(context),
+            ),
+          ),
+          const SizedBox(height: 24),
+          CupertinoButton.filled(
+            onPressed: () => AccountManagementPage._showAddAccountSheet(context, isDesktop),
+            child: const Text('Add Account'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Future<void> _switchAccount(
+    BuildContext context,
+    String accountId,
+    String host,
+  ) async {
+    final auth = context.read<AuthProvider>();
+    final posts = context.read<PostsProvider>();
+    final settings = context.read<SettingsProvider>();
+
+    final success = await auth.switchAccount(accountId);
+    if (success && context.mounted) {
+      posts.clearAllPosts();
+      await settings.setHost(host);
+      if (!context.mounted) return;
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.main, (route) => false);
+    }
+  }
+
+  static void _confirmRemoveAccount(BuildContext context, String accountId) {
     showCupertinoDialog(
       context: context,
       builder: (dialogContext) => CupertinoAlertDialog(

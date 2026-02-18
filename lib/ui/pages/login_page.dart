@@ -281,8 +281,10 @@ class _LoginPageState extends State<LoginPage>
     final isLandscape = size.width > size.height;
     final mode = LayoutScope.of(context);
 
-    return CupertinoPageScaffold(
-      backgroundColor: isDark
+    return KeyedSubtree(
+      key: const ValueKey('login-page'),
+      child: CupertinoPageScaffold(
+        backgroundColor: isDark
           ? AppColors.darkBackground
           : AppColors.lightBackground,
       child: Stack(
@@ -317,6 +319,7 @@ class _LoginPageState extends State<LoginPage>
               child: _buildControllerHints(isDark),
             ),
         ],
+      ),
       ),
     );
   }

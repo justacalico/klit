@@ -64,7 +64,9 @@ class _UiPopularPageState extends State<UiPopularPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return KeyedSubtree(
+      key: const ValueKey('popular-page'),
+      child: Column(
       children: [
         PageToolbar(
           title: 'Popular Posts',
@@ -112,6 +114,7 @@ class _UiPopularPageState extends State<UiPopularPage> {
           ),
         ),
       ],
+      ),
     );
   }
 }

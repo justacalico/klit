@@ -126,11 +126,14 @@ class _UiFavoritesPageState extends State<UiFavoritesPage> {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
 
-    return Column(
+    return KeyedSubtree(
+      key: const ValueKey('favorites-page'),
+      child: Column(
       children: [
         _buildToolbar(isDark),
         Expanded(child: _buildContent(isDark)),
       ],
+      ),
     );
   }
 

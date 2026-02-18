@@ -64,7 +64,9 @@ class _UiHotPageState extends State<UiHotPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return KeyedSubtree(
+      key: const ValueKey('hot-page'),
+      child: Column(
       children: [
         PageToolbar(
           title: 'Hot Posts',
@@ -112,6 +114,7 @@ class _UiHotPageState extends State<UiHotPage> {
           ),
         ),
       ],
+      ),
     );
   }
 }

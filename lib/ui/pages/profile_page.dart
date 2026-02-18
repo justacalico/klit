@@ -79,11 +79,14 @@ class _UiProfilePageState extends State<UiProfilePage> {
   Widget build(BuildContext context) {
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
 
-    return Column(
+    return KeyedSubtree(
+      key: const ValueKey('profile-page'),
+      child: Column(
       children: [
         _buildToolbar(isDark),
         Expanded(child: _buildContent(isDark)),
       ],
+      ),
     );
   }
 
