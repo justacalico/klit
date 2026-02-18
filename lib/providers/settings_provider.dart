@@ -36,7 +36,6 @@ class SettingsProvider extends ChangeNotifier {
   UIStyle _uiStyle = UIStyle.material;
   bool _videoAutoPlay = true;
   bool _videoMuteByDefault = true;
-  bool _videoModeEnabled = false;
   bool _searchHistoryEnabled = true;
   int _scoreThreshold = AppConstants.defaultScoreThreshold;
 
@@ -72,7 +71,6 @@ class SettingsProvider extends ChangeNotifier {
   UIStyle get uiStyle => _uiStyle;
   bool get videoAutoPlay => _videoAutoPlay;
   bool get videoMuteByDefault => _videoMuteByDefault;
-  bool get videoModeEnabled => _videoModeEnabled;
   bool get searchHistoryEnabled => _searchHistoryEnabled;
   int get scoreThreshold => _scoreThreshold;
 
@@ -111,7 +109,6 @@ class SettingsProvider extends ChangeNotifier {
         )];
     _videoAutoPlay = _storageService.getVideoAutoPlay();
     _videoMuteByDefault = _storageService.getVideoMuteByDefault();
-    _videoModeEnabled = _storageService.getVideoModeEnabled();
     _searchHistoryEnabled = _storageService.getSearchHistoryEnabled();
     _scoreThreshold = _storageService.getScoreThreshold();
     notifyListeners();
@@ -351,13 +348,6 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> setVideoMuteByDefault(bool enabled) async {
     _videoMuteByDefault = enabled;
     await _storageService.setVideoMuteByDefault(enabled);
-    notifyListeners();
-  }
-
-  /// Set video mode enabled
-  Future<void> setVideoModeEnabled(bool enabled) async {
-    _videoModeEnabled = enabled;
-    await _storageService.setVideoModeEnabled(enabled);
     notifyListeners();
   }
 
