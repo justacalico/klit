@@ -1,11 +1,9 @@
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
 
 import '../../core/theme/ui_style_manager.dart';
 import '../../core/utils/helpers.dart';
-import '../../providers/providers.dart';
 import '../theme.dart';
 
 const Map<int, _NavItemData> _navDefs = {

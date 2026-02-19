@@ -1,5 +1,3 @@
-import 'dart:ui' show Size;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Material;

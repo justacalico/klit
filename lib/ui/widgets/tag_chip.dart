@@ -124,13 +124,27 @@ class TagList extends StatelessWidget {
 
   List<MapEntry<String, String>> _getAllTagsWithCategories() {
     final result = <MapEntry<String, String>>[];
-    for (final tag in tags.artist) result.add(MapEntry(tag, 'artist'));
-    for (final tag in tags.character) result.add(MapEntry(tag, 'character'));
-    for (final tag in tags.copyright) result.add(MapEntry(tag, 'copyright'));
-    for (final tag in tags.species) result.add(MapEntry(tag, 'species'));
-    for (final tag in tags.general) result.add(MapEntry(tag, 'general'));
-    for (final tag in tags.meta) result.add(MapEntry(tag, 'meta'));
-    for (final tag in tags.lore) result.add(MapEntry(tag, 'lore'));
+    for (final tag in tags.artist) {
+      result.add(MapEntry(tag, 'artist'));
+    }
+    for (final tag in tags.character) {
+      result.add(MapEntry(tag, 'character'));
+    }
+    for (final tag in tags.copyright) {
+      result.add(MapEntry(tag, 'copyright'));
+    }
+    for (final tag in tags.species) {
+      result.add(MapEntry(tag, 'species'));
+    }
+    for (final tag in tags.general) {
+      result.add(MapEntry(tag, 'general'));
+    }
+    for (final tag in tags.meta) {
+      result.add(MapEntry(tag, 'meta'));
+    }
+    for (final tag in tags.lore) {
+      result.add(MapEntry(tag, 'lore'));
+    }
     return result;
   }
 }

@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Tooltip;
+import 'package:flutter/material.dart' show Divider, Tooltip;
 import 'package:provider/provider.dart';
 
 import '../../app/routes.dart';

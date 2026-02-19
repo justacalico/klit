@@ -21,8 +21,7 @@ import '../../providers/providers.dart';
 import '../layout/layout_scope.dart';
 import '../shell/toolbar.dart';
 import '../theme.dart';
-import '../../core/types/navigation_args.dart';
-import '../widgets/widgets.dart' hide Colors;
+import '../widgets/widgets.dart';
 
 /// Post detail page - single state preserved across layout mode changes
 class PostDetailPage extends StatefulWidget {
