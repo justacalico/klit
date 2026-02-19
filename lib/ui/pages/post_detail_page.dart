@@ -28,6 +28,7 @@ class PostDetailPage extends StatefulWidget {
   final List<int> postIds;
   final int initialIndex;
   final void Function(String tag)? onSearchTag;
+  final void Function(int currentIndex)? onCurrentIndexChanged;
   final Future<List<int>> Function()? onLoadMore;
   final bool hasMore;
   final VoidCallback? onClose;
@@ -37,6 +38,7 @@ class PostDetailPage extends StatefulWidget {
     required this.postIds,
     required this.initialIndex,
     this.onSearchTag,
+    this.onCurrentIndexChanged,
     this.onLoadMore,
     this.hasMore = false,
     this.onClose,
@@ -165,6 +167,7 @@ class _PostDetailPageState extends State<PostDetailPage>
 
   void _onPageChanged(int index) {
     setState(() => _currentIndex = index);
+    widget.onCurrentIndexChanged?.call(index);
     _loadPost(index);
     _preloadAdjacentPosts();
   }
@@ -173,6 +176,7 @@ class _PostDetailPageState extends State<PostDetailPage>
     final newIndex = _currentIndex + direction;
     if (newIndex >= 0 && newIndex < _postIds.length) {
       setState(() => _currentIndex = newIndex);
+      widget.onCurrentIndexChanged?.call(newIndex);
       _loadPost(newIndex);
       _preloadAdjacentPosts();
       _pageController.jumpToPage(newIndex);

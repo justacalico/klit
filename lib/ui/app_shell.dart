@@ -257,13 +257,26 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
     }
   }
 
+  void _onOverlayCurrentIndexChanged(int index) {
+    if (_postOverlay == null) return;
+    setState(() {
+      _postOverlay = PostDetailArguments(
+        postIds: _postOverlay!.postIds,
+        initialIndex: index,
+        onLoadMore: _postOverlay!.onLoadMore,
+        hasMore: _postOverlay!.hasMore,
+      );
+    });
+  }
+
   Widget _buildPostOverlay() {
     final args = _postOverlay!;
     return UiPostDetailOverlay(
-      key: ValueKey('${args.postIds.hashCode}_${args.initialIndex}'),
+      key: ValueKey('overlay-${args.postIds.hashCode}'),
       postIds: args.postIds,
       initialIndex: args.initialIndex,
       onSearchTag: _openSearch,
+      onCurrentIndexChanged: _onOverlayCurrentIndexChanged,
       onClose: _closePostOverlay,
       onLoadMore: args.onLoadMore,
       hasMore: args.hasMore,

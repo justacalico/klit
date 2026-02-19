@@ -9,6 +9,7 @@ class UiPostDetailOverlay extends StatelessWidget {
     required this.postIds,
     required this.initialIndex,
     this.onSearchTag,
+    this.onCurrentIndexChanged,
     required this.onClose,
     this.onLoadMore,
     this.hasMore = false,
@@ -17,6 +18,7 @@ class UiPostDetailOverlay extends StatelessWidget {
   final List<int> postIds;
   final int initialIndex;
   final void Function(String tag)? onSearchTag;
+  final void Function(int currentIndex)? onCurrentIndexChanged;
   final VoidCallback onClose;
   final Future<List<int>> Function()? onLoadMore;
   final bool hasMore;
@@ -27,6 +29,7 @@ class UiPostDetailOverlay extends StatelessWidget {
       postIds: postIds,
       initialIndex: initialIndex,
       onSearchTag: onSearchTag,
+      onCurrentIndexChanged: onCurrentIndexChanged,
       onClose: onClose,
       onLoadMore: onLoadMore,
       hasMore: hasMore,
