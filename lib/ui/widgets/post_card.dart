@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
+
 import '../../core/constants/constants.dart';
 import '../../core/extensions/extensions.dart';
 import '../../core/theme/ui_style_manager.dart';
@@ -14,11 +15,6 @@ enum PostCardStyle {
 
 /// Reusable post card widget
 class PostCard extends StatelessWidget {
-  final Post post;
-  final VoidCallback onTap;
-  final PostCardStyle style;
-  final bool showInfo;
-
   const PostCard({
     super.key,
     required this.post,
@@ -27,11 +23,14 @@ class PostCard extends StatelessWidget {
     this.showInfo = true,
   });
 
+  final Post post;
+  final VoidCallback onTap;
+  final PostCardStyle style;
+  final bool showInfo;
+
   @override
   Widget build(BuildContext context) {
-    return style == PostCardStyle.grid
-        ? _buildGridCard(context)
-        : _buildListCard(context);
+    return style == PostCardStyle.grid ? _buildGridCard(context) : _buildListCard(context);
   }
 
   Widget _buildGridCard(BuildContext context) {
@@ -52,26 +51,22 @@ class PostCard extends StatelessWidget {
           ),
           boxShadow: isLiquidGlass
               ? [
-                  // Outer soft glow
                   BoxShadow(
                     color: ratingColor.withValues(alpha: isDark ? 0.5 : 0.35),
                     blurRadius: 16,
                     spreadRadius: 2,
                   ),
-                  // Inner bright glow for glass effect
                   BoxShadow(
                     color: ratingColor.withValues(alpha: isDark ? 0.3 : 0.2),
                     blurRadius: 6,
                     spreadRadius: 0,
                   ),
-                  // Subtle white highlight for glass reflection
                   BoxShadow(
                     color: CupertinoColors.white.withValues(alpha: isDark ? 0.08 : 0.15),
                     blurRadius: 2,
                     spreadRadius: 0,
                     offset: const Offset(0, -1),
                   ),
-                  // Standard shadow for depth
                   BoxShadow(
                     color: CupertinoColors.black.withValues(alpha: isDark ? 0.4 : 0.12),
                     blurRadius: 8,
@@ -79,13 +74,11 @@ class PostCard extends StatelessWidget {
                   ),
                 ]
               : [
-                  // Simple aura for Material mode
                   BoxShadow(
                     color: ratingColor.withValues(alpha: isDark ? 0.4 : 0.3),
                     blurRadius: 8,
                     spreadRadius: 1,
                   ),
-                  // Standard shadow
                   BoxShadow(
                     color: CupertinoColors.black.withValues(alpha: isDark ? 0.3 : 0.08),
                     blurRadius: 4,
@@ -193,7 +186,6 @@ class PostCard extends StatelessWidget {
             ),
           ),
         ),
-        // Show play icon overlay for videos
         if (post.isVideo)
           Center(
             child: Container(
@@ -325,18 +317,11 @@ class PostCard extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          size: 14,
-          color: CupertinoColors.secondaryLabel,
-        ),
+        Icon(icon, size: 14, color: CupertinoColors.secondaryLabel),
         const SizedBox(width: 4),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 12,
-            color: CupertinoColors.secondaryLabel,
-          ),
+          style: const TextStyle(fontSize: 12, color: CupertinoColors.secondaryLabel),
         ),
       ],
     );
@@ -357,10 +342,7 @@ class PostCard extends StatelessWidget {
           ),
           child: Text(
             tag.replaceAll('_', ' '),
-            style: const TextStyle(
-              fontSize: 10,
-              color: CupertinoColors.secondaryLabel,
-            ),
+            style: const TextStyle(fontSize: 10, color: CupertinoColors.secondaryLabel),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

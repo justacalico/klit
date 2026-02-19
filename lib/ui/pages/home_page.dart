@@ -2,21 +2,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import '../../core/types/navigation_args.dart';
 import '../../data/models/models.dart';
 import '../../providers/providers.dart';
-import '../widgets/widgets.dart';
-import 'post_detail_page.dart';
 import '../shell/toolbar.dart';
+import '../widgets/widgets.dart';
 
 class UiHomePage extends StatefulWidget {
-  final void Function(PostDetailArguments) onPostTap;
-  final VoidCallback onSearchTap;
-
   const UiHomePage({
     super.key,
     required this.onPostTap,
     required this.onSearchTap,
   });
+
+  final void Function(PostDetailArguments) onPostTap;
+  final VoidCallback onSearchTap;
 
   @override
   State<UiHomePage> createState() => _UiHomePageState();
@@ -48,7 +48,11 @@ class _UiHomePageState extends State<UiHomePage> {
       safeMode: _safeMode(context),
       scoreThreshold: sp.scoreThreshold,
     );
-    if (refresh) _refresh.refreshCompleted();
+    if (refresh) {
+      _refresh.refreshCompleted();
+    } else {
+      _refresh.loadComplete();
+    }
   }
 
   void _onPostTap(Post post) {
@@ -76,37 +80,37 @@ class _UiHomePageState extends State<UiHomePage> {
     return KeyedSubtree(
       key: const ValueKey('home-page'),
       child: Column(
-      children: [
-        PageToolbar(
-          title: 'Latest Posts',
-          icon: CupertinoIcons.house_fill,
-          actions: [
-            ToolbarButton(icon: CupertinoIcons.search, onPressed: widget.onSearchTap),
-            const SizedBox(width: 8),
-            ToolbarButton(icon: CupertinoIcons.refresh, onPressed: () => _load(refresh: true)),
-          ],
-        ),
-        Expanded(
-          child: Consumer<PostsProvider>(
-            builder: (_, pp, _) => SmartRefresher(
-              controller: _refresh,
-              enablePullDown: true,
-              enablePullUp: pp.hasMoreLatest,
-              onRefresh: () => _load(refresh: true),
-              onLoading: () => _load(),
-              child: PostsGrid(
-                posts: pp.latestPosts,
-                isLoading: pp.isLoadingLatest,
-                hasMore: pp.hasMoreLatest,
-                error: pp.latestError,
-                onPostTap: _onPostTap,
-                onLoadMore: () => _load(),
-                onRetry: () => _load(refresh: true),
+        children: [
+          PageToolbar(
+            title: 'Latest Posts',
+            icon: CupertinoIcons.house_fill,
+            actions: [
+              ToolbarButton(icon: CupertinoIcons.search, onPressed: widget.onSearchTap),
+              const SizedBox(width: 8),
+              ToolbarButton(icon: CupertinoIcons.refresh, onPressed: () => _load(refresh: true)),
+            ],
+          ),
+          Expanded(
+            child: Consumer<PostsProvider>(
+              builder: (_, pp, __) => SmartRefresher(
+                controller: _refresh,
+                enablePullDown: true,
+                enablePullUp: pp.hasMoreLatest,
+                onRefresh: () => _load(refresh: true),
+                onLoading: () => _load(),
+                child: PostsGrid(
+                  posts: pp.latestPosts,
+                  isLoading: pp.isLoadingLatest,
+                  hasMore: pp.hasMoreLatest,
+                  error: pp.latestError,
+                  onPostTap: _onPostTap,
+                  onLoadMore: () => _load(),
+                  onRetry: () => _load(refresh: true),
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
       ),
     );
   }

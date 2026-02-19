@@ -1,25 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
+
 import '../../data/models/models.dart';
 import '../../providers/providers.dart';
-import 'post_card.dart';
-import 'loading_shimmer.dart';
 import 'loading_indicator.dart';
+import 'loading_shimmer.dart';
+import 'post_card.dart';
 
 /// Grid view for posts with infinite scroll support
 class PostsGrid extends StatelessWidget {
-  final List<Post> posts;
-  final int? columns; // Optional - if null, uses settings
-  final double? spacing; // Optional - if null, uses settings
-  final double? padding; // Optional - if null, uses settings
-  final bool isLoading;
-  final bool hasMore;
-  final String? error;
-  final VoidCallback? onLoadMore;
-  final Function(Post post) onPostTap;
-  final VoidCallback? onRetry;
-  final ScrollController? scrollController;
-
   const PostsGrid({
     super.key,
     required this.posts,
@@ -35,16 +24,25 @@ class PostsGrid extends StatelessWidget {
     this.scrollController,
   });
 
+  final List<Post> posts;
+  final void Function(Post post) onPostTap;
+  final int? columns;
+  final double? spacing;
+  final double? padding;
+  final bool isLoading;
+  final bool hasMore;
+  final String? error;
+  final VoidCallback? onLoadMore;
+  final VoidCallback? onRetry;
+  final ScrollController? scrollController;
+
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
-    
-    // Use LayoutBuilder to react to size changes reliably
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenWidth = constraints.maxWidth;
-        
-        // Use provided values or fall back to settings
         final effectiveColumns = columns ?? settings.getEffectiveGridSize(screenWidth);
         final effectiveSpacing = spacing ?? settings.getEffectiveGridSpacing();
         final effectivePadding = padding ?? settings.getEffectiveGridPadding();
@@ -63,10 +61,7 @@ class PostsGrid extends StatelessWidget {
 
         return NotificationListener<ScrollNotification>(
           onNotification: (notification) {
-            // Trigger load more when user is approaching the end (800 pixels threshold)
-            // Use ScrollUpdateNotification to catch scrolling as it happens
-            if (notification is ScrollUpdateNotification || 
-                notification is ScrollEndNotification) {
+            if (notification is ScrollUpdateNotification || notification is ScrollEndNotification) {
               final metrics = notification.metrics;
               if (metrics.pixels >= metrics.maxScrollExtent - 800) {
                 if (hasMore && !isLoading && onLoadMore != null) {

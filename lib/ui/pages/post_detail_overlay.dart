@@ -1,15 +1,9 @@
 import 'package:flutter/cupertino.dart';
+
 import 'post_detail_page.dart';
 
 /// Post detail overlay for desktop - full-screen overlay with close.
 class UiPostDetailOverlay extends StatelessWidget {
-  final List<int> postIds;
-  final int initialIndex;
-  final void Function(String tag)? onSearchTag;
-  final VoidCallback onClose;
-  final Future<List<int>> Function()? onLoadMore;
-  final bool hasMore;
-
   const UiPostDetailOverlay({
     super.key,
     required this.postIds,
@@ -19,6 +13,13 @@ class UiPostDetailOverlay extends StatelessWidget {
     this.onLoadMore,
     this.hasMore = false,
   });
+
+  final List<int> postIds;
+  final int initialIndex;
+  final void Function(String tag)? onSearchTag;
+  final VoidCallback onClose;
+  final Future<List<int>> Function()? onLoadMore;
+  final bool hasMore;
 
   @override
   Widget build(BuildContext context) {

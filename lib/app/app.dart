@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +7,7 @@ import 'theme.dart';
 import '../core/theme/ui_style_manager.dart';
 import '../providers/providers.dart';
 import '../ui/layout/layout_scope.dart';
+import '../ui/layout/responsive_frame.dart';
 
 /// Main application widget
 class KlitApp extends StatelessWidget {
@@ -42,6 +44,10 @@ class KlitApp extends StatelessWidget {
                   child: child!,
                 ),
               );
+
+              if (kDebugMode) {
+                result = ResponsiveFrame(child: result);
+              }
 
               if (settings.themeMode == 0) {
                 final brightness = MediaQuery.platformBrightnessOf(context);

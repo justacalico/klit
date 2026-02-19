@@ -1,25 +1,34 @@
 import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
+
 import '../../core/theme/ui_style_manager.dart';
 import '../../core/utils/helpers.dart';
+import '../../providers/providers.dart';
 import '../theme.dart';
 
-/// Nav item definitions for bottom navbar (mobile)
-const Map<int, Map<String, dynamic>> _navDefs = {
-  0: {'icon': CupertinoIcons.home, 'activeIcon': CupertinoIcons.house_fill, 'label': 'Home'},
-  1: {'icon': CupertinoIcons.flame, 'activeIcon': CupertinoIcons.flame_fill, 'label': 'Hot'},
-  2: {'icon': CupertinoIcons.star, 'activeIcon': CupertinoIcons.star_fill, 'label': 'Popular'},
-  3: {'icon': CupertinoIcons.person, 'activeIcon': CupertinoIcons.person_fill, 'label': 'Profile'},
-  4: {'icon': CupertinoIcons.settings, 'activeIcon': CupertinoIcons.settings_solid, 'label': 'Settings'},
+const Map<int, _NavItemData> _navDefs = {
+  0: _NavItemData(icon: CupertinoIcons.home, activeIcon: CupertinoIcons.house_fill, label: 'Home'),
+  1: _NavItemData(icon: CupertinoIcons.flame, activeIcon: CupertinoIcons.flame_fill, label: 'Hot'),
+  2: _NavItemData(icon: CupertinoIcons.star, activeIcon: CupertinoIcons.star_fill, label: 'Popular'),
+  3: _NavItemData(icon: CupertinoIcons.person, activeIcon: CupertinoIcons.person_fill, label: 'Profile'),
+  4: _NavItemData(icon: CupertinoIcons.settings, activeIcon: CupertinoIcons.settings_solid, label: 'Settings'),
 };
 
-class AppNavBar extends StatelessWidget {
-  final List<int> navOrder;
-  final int currentIndex;
-  final ValueChanged<int> onTap;
-  final bool isGuest;
-  final VoidCallback onLogout;
+class _NavItemData {
+  const _NavItemData({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+  });
 
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+}
+
+class AppNavBar extends StatelessWidget {
   const AppNavBar({
     super.key,
     required this.navOrder,
@@ -28,6 +37,12 @@ class AppNavBar extends StatelessWidget {
     required this.isGuest,
     required this.onLogout,
   });
+
+  final List<int> navOrder;
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+  final bool isGuest;
+  final VoidCallback onLogout;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +57,7 @@ class AppNavBar extends StatelessWidget {
         child: _buildLiquidGlass(context, isDark),
       );
     }
-    return _buildMaterial(context, isDark);
+    return _buildMaterial(context, isDark, bottomPadding);
   }
 
   Widget _buildLiquidGlass(BuildContext context, bool isDark) {
@@ -78,7 +93,10 @@ class AppNavBar extends StatelessWidget {
                     ? [const Color(0xFF1C1C1E), const Color(0xFF2C2C2E)]
                     : [const Color(0xFFF5F5F7), const Color(0xFFEBEBEF)],
               ),
-              border: Border.all(color: UIColors.primaryPurple.withValues(alpha: isDark ? 0.2 : 0.1), width: 1),
+              border: Border.all(
+                color: UIColors.primaryPurple.withValues(alpha: isDark ? 0.2 : 0.1),
+                width: 1,
+              ),
             ),
             child: _buildContent(context, isDark),
           ),
@@ -87,19 +105,24 @@ class AppNavBar extends StatelessWidget {
     );
   }
 
-  Widget _buildMaterial(BuildContext context, bool isDark) {
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
+  Widget _buildMaterial(BuildContext context, bool isDark, double bottomPadding) {
     return Container(
       padding: EdgeInsets.only(bottom: bottomPadding),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white,
         border: Border(
-          top: BorderSide(color: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E5E7), width: 0.5),
+          top: BorderSide(
+            color: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E5E7),
+            width: 0.5,
+          ),
         ),
       ),
       child: SizedBox(
         height: 56,
-        child: _buildContent(context, isDark),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: _buildNavItems(context, isDark),
+        ),
       ),
     );
   }
@@ -107,55 +130,64 @@ class AppNavBar extends StatelessWidget {
   Widget _buildContent(BuildContext context, bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        for (int i = 0; i < navOrder.length; i++)
-          if (isGuest && navOrder[i] == 4)
-            _LogoutItem(isDark: isDark, onTap: onLogout)
-          else
-            _NavItem(
-              index: i,
-              currentIndex: currentIndex,
-              icon: _navDefs[navOrder[i]]!['icon'] as IconData,
-              activeIcon: _navDefs[navOrder[i]]!['activeIcon'] as IconData,
-              label: _navDefs[navOrder[i]]!['label'] as String,
-              isDark: isDark,
-              onTap: () => onTap(i),
-            ),
-      ],
+      children: _buildNavItems(context, isDark),
     );
+  }
+
+  List<Widget> _buildNavItems(BuildContext context, bool isDark) {
+    final items = <Widget>[];
+    for (var i = 0; i < navOrder.length; i++) {
+      final id = navOrder[i];
+      final isSelected = i == currentIndex;
+      if (id == 4 && isGuest) {
+        items.add(_LogoutItem(isDark: isDark, onTap: onLogout));
+      } else {
+        final def = _navDefs[id];
+        if (def != null) {
+          items.add(_NavBarItem(
+            icon: def.icon,
+            activeIcon: def.activeIcon,
+            label: def.label,
+            isSelected: isSelected,
+            isDark: isDark,
+            onTap: () {
+              HapticUtils.selectionClick();
+              onTap(i);
+            },
+          ));
+        }
+      }
+    }
+    return items;
   }
 }
 
-class _NavItem extends StatelessWidget {
-  final int index;
-  final int currentIndex;
-  final IconData icon;
-  final IconData activeIcon;
-  final String label;
-  final bool isDark;
-  final VoidCallback onTap;
-
-  const _NavItem({
-    required this.index,
-    required this.currentIndex,
+class _NavBarItem extends StatelessWidget {
+  const _NavBarItem({
     required this.icon,
     required this.activeIcon,
     required this.label,
+    required this.isSelected,
     required this.isDark,
     required this.onTap,
   });
 
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  final bool isSelected;
+  final bool isDark;
+  final VoidCallback onTap;
+
   @override
   Widget build(BuildContext context) {
-    final isSelected = currentIndex == index;
-    final color = isSelected ? UIColors.primaryPurple : (isDark ? CupertinoColors.white.withValues(alpha: 0.6) : CupertinoColors.black.withValues(alpha: 0.6));
+    final color = isSelected
+        ? UIColors.primaryPurple
+        : (isDark ? CupertinoColors.white.withValues(alpha: 0.6) : CupertinoColors.black.withValues(alpha: 0.6));
 
     return Expanded(
       child: GestureDetector(
-        onTap: () {
-          HapticUtils.selectionClick();
-          onTap();
-        },
+        onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
@@ -180,7 +212,11 @@ class _NavItem extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 label,
-                style: TextStyle(fontSize: 10, fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500, color: color),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  color: color,
+                ),
               ),
             ],
           ),
@@ -191,10 +227,10 @@ class _NavItem extends StatelessWidget {
 }
 
 class _LogoutItem extends StatelessWidget {
+  const _LogoutItem({required this.isDark, required this.onTap});
+
   final bool isDark;
   final VoidCallback onTap;
-
-  const _LogoutItem({required this.isDark, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -211,7 +247,10 @@ class _LogoutItem extends StatelessWidget {
           children: [
             Icon(CupertinoIcons.square_arrow_right, color: color, size: 24),
             const SizedBox(height: 4),
-            Text('Sign Out', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500, color: color)),
+            Text(
+              'Sign Out',
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500, color: color),
+            ),
           ],
         ),
       ),

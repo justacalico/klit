@@ -2,14 +2,14 @@ import 'package:flutter/cupertino.dart';
 
 /// Cupertino-style loading indicator
 class LoadingIndicator extends StatelessWidget {
-  final double size;
-  final Color? color;
-
   const LoadingIndicator({
     super.key,
     this.size = 20,
     this.color,
   });
+
+  final double size;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +28,9 @@ class LoadingIndicator extends StatelessWidget {
 
 /// Full page loading indicator
 class FullPageLoading extends StatelessWidget {
-  final String? message;
-
   const FullPageLoading({super.key, this.message});
+
+  final String? message;
 
   @override
   Widget build(BuildContext context) {
@@ -57,12 +57,12 @@ class FullPageLoading extends StatelessWidget {
 
 /// Infinite scroll loading indicator
 class InfiniteScrollLoading extends StatelessWidget {
-  final bool isLoading;
-
   const InfiniteScrollLoading({
     super.key,
     required this.isLoading,
   });
+
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {

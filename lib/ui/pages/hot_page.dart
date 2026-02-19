@@ -2,21 +2,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import '../../core/types/navigation_args.dart';
 import '../../data/models/models.dart';
 import '../../providers/providers.dart';
-import '../widgets/widgets.dart';
-import 'post_detail_page.dart';
 import '../shell/toolbar.dart';
+import '../widgets/selectors.dart';
+import '../widgets/widgets.dart';
 
 class UiHotPage extends StatefulWidget {
-  final void Function(PostDetailArguments) onPostTap;
-  final VoidCallback onSearchTap;
-
   const UiHotPage({
     super.key,
     required this.onPostTap,
     required this.onSearchTap,
   });
+
+  final void Function(PostDetailArguments) onPostTap;
+  final VoidCallback onSearchTap;
 
   @override
   State<UiHotPage> createState() => _UiHotPageState();
@@ -43,7 +44,11 @@ class _UiHotPageState extends State<UiHotPage> {
   Future<void> _load({bool refresh = false}) async {
     final pp = context.read<PostsProvider>();
     await pp.loadHotPosts(refresh: refresh, safeMode: _safeMode(context));
-    if (refresh) _refresh.refreshCompleted();
+    if (refresh) {
+      _refresh.refreshCompleted();
+    } else {
+      _refresh.loadComplete();
+    }
   }
 
   void _onPostTap(Post post) {
@@ -67,53 +72,53 @@ class _UiHotPageState extends State<UiHotPage> {
     return KeyedSubtree(
       key: const ValueKey('hot-page'),
       child: Column(
-      children: [
-        PageToolbar(
-          title: 'Hot Posts',
-          icon: CupertinoIcons.flame_fill,
-          actions: [
-            ToolbarButton(icon: CupertinoIcons.search, onPressed: widget.onSearchTap),
-            const SizedBox(width: 8),
-            ToolbarButton(icon: CupertinoIcons.refresh, onPressed: () => _load(refresh: true)),
-          ],
-        ),
-        Expanded(
-          child: Consumer<PostsProvider>(
-            builder: (_, pp, _) => Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: DesktopTimeRangeSelector(
-                    selected: pp.hotTimeRange,
-                    options: const ['day', 'week', 'month'],
-                    customDate: pp.hotCustomDate,
-                    onChanged: (r) => pp.setHotTimeRange(r, safeMode: _safeMode(context)),
-                    onDateSelected: (d) => pp.setHotCustomDate(d, safeMode: _safeMode(context)),
-                  ),
-                ),
-                Expanded(
-                  child: SmartRefresher(
-                    controller: _refresh,
-                    enablePullDown: true,
-                    enablePullUp: pp.hasMoreHot,
-                    onRefresh: () => _load(refresh: true),
-                    onLoading: () => _load(),
-                    child: PostsGrid(
-                      posts: pp.hotPosts,
-                      isLoading: pp.isLoadingHot,
-                      hasMore: pp.hasMoreHot,
-                      error: pp.hotError,
-                      onPostTap: _onPostTap,
-                      onLoadMore: () => _load(),
-                      onRetry: () => _load(refresh: true),
+        children: [
+          PageToolbar(
+            title: 'Hot Posts',
+            icon: CupertinoIcons.flame_fill,
+            actions: [
+              ToolbarButton(icon: CupertinoIcons.search, onPressed: widget.onSearchTap),
+              const SizedBox(width: 8),
+              ToolbarButton(icon: CupertinoIcons.refresh, onPressed: () => _load(refresh: true)),
+            ],
+          ),
+          Expanded(
+            child: Consumer<PostsProvider>(
+              builder: (_, pp, __) => Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: DesktopTimeRangeSelector(
+                      selected: pp.hotTimeRange,
+                      options: const ['day', 'week', 'month'],
+                      customDate: pp.hotCustomDate,
+                      onChanged: (r) => pp.setHotTimeRange(r, safeMode: _safeMode(context)),
+                      onDateSelected: (d) => pp.setHotCustomDate(d, safeMode: _safeMode(context)),
                     ),
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: SmartRefresher(
+                      controller: _refresh,
+                      enablePullDown: true,
+                      enablePullUp: pp.hasMoreHot,
+                      onRefresh: () => _load(refresh: true),
+                      onLoading: () => _load(),
+                      child: PostsGrid(
+                        posts: pp.hotPosts,
+                        isLoading: pp.isLoadingHot,
+                        hasMore: pp.hasMoreHot,
+                        error: pp.hotError,
+                        onPostTap: _onPostTap,
+                        onLoadMore: () => _load(),
+                        onRetry: () => _load(refresh: true),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
       ),
     );
   }

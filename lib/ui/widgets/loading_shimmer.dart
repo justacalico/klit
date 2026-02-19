@@ -3,10 +3,6 @@ import 'package:shimmer/shimmer.dart';
 
 /// Loading shimmer effect for content
 class LoadingShimmer extends StatelessWidget {
-  final double height;
-  final double width;
-  final double borderRadius;
-
   const LoadingShimmer({
     super.key,
     this.height = 100,
@@ -14,17 +10,17 @@ class LoadingShimmer extends StatelessWidget {
     this.borderRadius = 8,
   });
 
+  final double height;
+  final double width;
+  final double borderRadius;
+
   @override
   Widget build(BuildContext context) {
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
 
     return Shimmer.fromColors(
-      baseColor: isDark
-          ? const Color(0xFF2C2C2E)
-          : const Color(0xFFE5E5EA),
-      highlightColor: isDark
-          ? const Color(0xFF3A3A3C)
-          : const Color(0xFFF2F2F7),
+      baseColor: isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE5E5EA),
+      highlightColor: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFF2F2F7),
       child: Container(
         height: height,
         width: width,
@@ -39,16 +35,16 @@ class LoadingShimmer extends StatelessWidget {
 
 /// Grid shimmer for loading posts
 class PostGridShimmer extends StatelessWidget {
-  final int columns;
-  final int itemCount;
-  final double spacing;
-
   const PostGridShimmer({
     super.key,
     this.columns = 2,
     this.itemCount = 6,
     this.spacing = 4,
   });
+
+  final int columns;
+  final int itemCount;
+  final double spacing;
 
   @override
   Widget build(BuildContext context) {
@@ -63,9 +59,7 @@ class PostGridShimmer extends StatelessWidget {
         childAspectRatio: 1,
       ),
       itemCount: itemCount,
-      itemBuilder: (context, index) => const LoadingShimmer(
-        borderRadius: 8,
-      ),
+      itemBuilder: (context, index) => const LoadingShimmer(borderRadius: 8),
     );
   }
 }

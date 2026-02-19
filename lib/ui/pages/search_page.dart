@@ -5,9 +5,9 @@ import '../../core/constants/constants.dart';
 import '../../core/utils/debouncer.dart';
 import '../../data/models/models.dart';
 import '../../data/services/services.dart';
+import '../../core/types/navigation_args.dart';
 import '../../providers/providers.dart';
 import '../widgets/widgets.dart';
-import 'post_detail_page.dart';
 
 /// Unified search page - reused from desktop search logic.
 class UiSearchPage extends StatefulWidget {

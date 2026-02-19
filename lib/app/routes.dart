@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import '../core/types/navigation_args.dart';
 import '../ui/app_shell.dart';
 import '../ui/pages/pages.dart';
 

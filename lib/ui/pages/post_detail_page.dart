@@ -2,8 +2,8 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart'
     show CachedNetworkImage, CachedNetworkImageProvider;
-import 'package:dio/dio.dart';
 import 'package:confetti/confetti.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart'
@@ -21,26 +21,8 @@ import '../../providers/providers.dart';
 import '../layout/layout_scope.dart';
 import '../shell/toolbar.dart';
 import '../theme.dart';
+import '../../core/types/navigation_args.dart';
 import '../widgets/widgets.dart' hide Colors;
-
-/// Arguments for navigating to post detail with swipe support
-class PostDetailArguments {
-  final List<int> postIds;
-  final int initialIndex;
-
-  /// Callback to load more posts, returns new post IDs
-  final Future<List<int>> Function()? onLoadMore;
-
-  /// Whether there are more posts to load
-  final bool hasMore;
-
-  const PostDetailArguments({
-    required this.postIds,
-    required this.initialIndex,
-    this.onLoadMore,
-    this.hasMore = false,
-  });
-}
 
 /// Post detail page - single state preserved across layout mode changes
 class PostDetailPage extends StatefulWidget {

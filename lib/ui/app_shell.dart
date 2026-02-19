@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../app/routes.dart';
 import '../core/input/input.dart';
 import '../core/theme/ui_style_manager.dart';
+import '../core/types/navigation_args.dart';
 import '../providers/providers.dart';
 
 import 'layout/layout_scope.dart';
@@ -23,7 +24,6 @@ class AppShell extends StatefulWidget {
 }
 
 class _AppShellState extends State<AppShell> with GamepadInputMixin {
-  bool _showControllerMode = false;
   PostDetailArguments? _postOverlay;
   StreamSubscription<GamepadState>? _gamepadStateSub;
 
@@ -32,11 +32,8 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
   @override
   void initState() {
     super.initState();
-    _showControllerMode = gamepad.isConnected;
     _gamepadStateSub = gamepad.stateChanges.listen((s) {
-      if (mounted && s.isConnected != _showControllerMode) {
-        setState(() => _showControllerMode = s.isConnected);
-      }
+      if (mounted) setState(() {});
     });
   }
 
@@ -133,11 +130,10 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
-    final mode = LayoutScope.of(context); // Desktop (sidebar) vs mobile (navbar) by width
+    final mode = LayoutScope.of(context);
     final nav = context.watch<NavigationProvider>();
     final selected = nav.getDesktopIndex();
 
-    // Content with stable key - stays mounted, layout mode is fixed for session
     final content = KeyedSubtree(
       key: ValueKey('shell-content-$selected'),
       child: RepaintBoundary(
@@ -158,7 +154,6 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
           child: Stack(
             clipBehavior: Clip.hardEdge,
             children: [
-              // Content area - layout mode fixed, resize only updates Positioned insets
               Positioned(
                 left: mode.isDesktop ? sidebarWidth : 0,
                 top: 0,
@@ -166,7 +161,6 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
                 bottom: mode.isDesktop ? 0 : navBarHeight,
                 child: content,
               ),
-              // Desktop sidebar - Material ensures it renders above content (fixes z-order)
               if (mode.isDesktop)
                 Positioned(
                   left: 0,
@@ -183,7 +177,6 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
                     ),
                   ),
                 ),
-              // Mobile nav bar - opaque background + elevation so content never shows through
               if (!mode.isDesktop)
                 Positioned(
                   left: 0,

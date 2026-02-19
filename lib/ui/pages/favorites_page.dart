@@ -4,7 +4,7 @@ import '../../core/constants/constants.dart';
 import '../../data/models/models.dart';
 import '../../data/services/services.dart';
 import '../../providers/providers.dart';
-import 'post_detail_page.dart';
+import '../../core/types/navigation_args.dart';
 import '../shell/toolbar.dart';
 import '../widgets/widgets.dart';
 

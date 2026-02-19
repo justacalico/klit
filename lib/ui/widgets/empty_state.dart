@@ -2,12 +2,6 @@ import 'package:flutter/cupertino.dart';
 
 /// Empty state widget
 class EmptyState extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String? message;
-  final String? actionLabel;
-  final VoidCallback? onAction;
-
   const EmptyState({
     super.key,
     required this.icon,
@@ -16,6 +10,12 @@ class EmptyState extends StatelessWidget {
     this.actionLabel,
     this.onAction,
   });
+
+  final IconData icon;
+  final String title;
+  final String? message;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -67,14 +67,14 @@ class EmptyState extends StatelessWidget {
 
 /// Error state widget
 class ErrorState extends StatelessWidget {
-  final String? message;
-  final VoidCallback? onRetry;
-
   const ErrorState({
     super.key,
     this.message,
     this.onRetry,
   });
+
+  final String? message;
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
