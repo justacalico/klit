@@ -5,7 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:flutter/material.dart'
-    show Colors, Divider, Image, InkWell, ListTile, Material, ReorderableListView;
+    show Colors, Divider, Image, InkWell, ListTile, Material, MaterialType, ReorderableListView;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -1751,19 +1751,21 @@ class _UiSettingsPageState extends State<UiSettingsPage>
           behaviorCards.add(
             _buildSettingsCard(
               isDark: isDark,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Finished posts (${settings.iFinishedEntries.length})',
+              child: Material(
+                type: MaterialType.transparency,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Finished posts (${settings.iFinishedEntries.length})',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 16,
@@ -1851,6 +1853,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                     );
                   }),
                 ],
+                ),
               ),
             ),
           );
