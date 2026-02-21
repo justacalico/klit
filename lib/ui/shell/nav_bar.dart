@@ -26,14 +26,29 @@ const Map<int, _NavItemData> _navDefs = {
     label: 'Popular',
   ),
   3: _NavItemData(
+    icon: CupertinoIcons.settings,
+    activeIcon: CupertinoIcons.settings_solid,
+    label: 'Settings',
+  ),
+  4: _NavItemData(
+    icon: CupertinoIcons.search,
+    activeIcon: CupertinoIcons.search,
+    label: 'Search',
+  ),
+  5: _NavItemData(
     icon: CupertinoIcons.person,
     activeIcon: CupertinoIcons.person_fill,
     label: 'Profile',
   ),
-  4: _NavItemData(
-    icon: CupertinoIcons.settings,
-    activeIcon: CupertinoIcons.settings_solid,
-    label: 'Settings',
+  6: _NavItemData(
+    icon: CupertinoIcons.heart,
+    activeIcon: CupertinoIcons.heart_fill,
+    label: 'Favorites',
+  ),
+  7: _NavItemData(
+    icon: CupertinoIcons.rectangle_stack_fill,
+    activeIcon: CupertinoIcons.rectangle_stack_fill,
+    label: 'Feeds',
   ),
 };
 

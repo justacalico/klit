@@ -1,6 +1,8 @@
 export 'account_management_page.dart';
 export 'blacklist_settings_page.dart';
 export 'favorites_page.dart';
+export 'feed_edit_page.dart';
+export 'feeds_page.dart';
 export 'home_page.dart';
 export 'host_settings_page.dart';
 export 'hot_page.dart';

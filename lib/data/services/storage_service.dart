@@ -284,7 +284,7 @@ class StorageService {
 
   List<int> getDesktopNavOrder() {
     final orderJson = _prefs.getString(AppConstants.desktopNavOrderKey);
-    if (orderJson == null) return [0, 1, 2, 4, 5, 6];
+    if (orderJson == null) return [0, 1, 2, 4, 5, 6, 7];
     final List<dynamic> order = json.decode(orderJson);
     return order.cast<int>();
   }
@@ -350,6 +350,27 @@ class StorageService {
 
   Future<void> setSearchHistoryEnabled(bool enabled) async {
     await _prefs.setBool(AppConstants.searchHistoryEnabledKey, enabled);
+  }
+
+  // Feeds
+
+  List<Feed> getFeeds() {
+    final feedsJson = _prefs.getString(AppConstants.feedsKey);
+    if (feedsJson == null) return [];
+    try {
+      final List<dynamic> list = json.decode(feedsJson);
+      return list
+          .whereType<Map<String, dynamic>>()
+          .map(Feed.fromJson)
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> setFeeds(List<Feed> feeds) async {
+    final list = feeds.map((e) => e.toJson()).toList();
+    await _prefs.setString(AppConstants.feedsKey, json.encode(list));
   }
 
   // Proxy

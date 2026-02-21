@@ -31,6 +31,7 @@ class AppConstants {
   static const String videoMuteByDefaultKey = 'video_mute_by_default';
   static const String searchHistoryEnabledKey = 'search_history_enabled';
   static const String scoreThresholdKey = 'score_threshold';
+  static const String feedsKey = 'feeds';
 
   /// Score threshold defaults
   static const int defaultScoreThreshold = 20;

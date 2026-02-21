@@ -1,0 +1,254 @@
+import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
+import '../../core/constants/constants.dart';
+import '../../data/models/models.dart';
+import '../../providers/providers.dart';
+
+/// Parse tag string (newlines or spaces) into a list of non-empty trimmed tags.
+List<String> _parseTags(String text) {
+  if (text.trim().isEmpty) return [];
+  return text
+      .split(RegExp(r'[\s\n]+'))
+      .map((s) => s.trim())
+      .where((s) => s.isNotEmpty)
+      .toList();
+}
+
+/// Feed create/edit page: name, type (image/video), include/exclude tags.
+class FeedEditPage extends StatefulWidget {
+  final Feed? feed;
+
+  const FeedEditPage({super.key, this.feed});
+
+  @override
+  State<FeedEditPage> createState() => _FeedEditPageState();
+}
+
+class _FeedEditPageState extends State<FeedEditPage> {
+  late TextEditingController _nameController;
+  late TextEditingController _includeController;
+  late TextEditingController _excludeController;
+  late bool _isVideo;
+  bool _isNew = true;
+
+  @override
+  void initState() {
+    super.initState();
+    final f = widget.feed;
+    _isNew = f == null;
+    _nameController = TextEditingController(text: f?.name ?? '');
+    _includeController = TextEditingController(
+      text: f?.includeTags.join(' ') ?? '',
+    );
+    _excludeController = TextEditingController(
+      text: f?.excludeTags.join(' ') ?? '',
+    );
+    _isVideo = f?.isVideo ?? false;
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _includeController.dispose();
+    _excludeController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final name = _nameController.text.trim();
+    final includeTags = _parseTags(_includeController.text);
+    final excludeTags = _parseTags(_excludeController.text);
+
+    final feedsProvider = context.read<FeedsProvider>();
+    if (_isNew) {
+      final feed = Feed(
+        id: '',
+        name: name.isEmpty ? 'Unnamed feed' : name,
+        isVideo: _isVideo,
+        includeTags: includeTags,
+        excludeTags: excludeTags,
+      );
+      await feedsProvider.addFeed(feed);
+    } else {
+      final existing = widget.feed!;
+      final feed = Feed(
+        id: existing.id,
+        name: name.isEmpty ? 'Unnamed feed' : name,
+        isVideo: _isVideo,
+        includeTags: includeTags,
+        excludeTags: excludeTags,
+      );
+      await feedsProvider.updateFeed(feed);
+    }
+
+    if (mounted) Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
+
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        middle: Text(_isNew ? 'New feed' : 'Edit feed'),
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: _save,
+          child: const Text('Save'),
+        ),
+      ),
+      child: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          children: [
+            const SizedBox(height: 8),
+            Text(
+              'Name',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: CupertinoColors.systemGrey,
+              ),
+            ),
+            const SizedBox(height: 6),
+            CupertinoTextField(
+              controller: _nameController,
+              placeholder: 'e.g. My art feed',
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: (isDark ? CupertinoColors.white : CupertinoColors.black)
+                      .withValues(alpha: 0.08),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Type',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: CupertinoColors.systemGrey,
+              ),
+            ),
+            const SizedBox(height: 8),
+            CupertinoSlidingSegmentedControl<bool>(
+              groupValue: _isVideo,
+              children: {
+                false: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        CupertinoIcons.photo_fill,
+                        size: 20,
+                        color: _isVideo == false
+                            ? CupertinoColors.white
+                            : CupertinoColors.systemGrey,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Image',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: _isVideo == false
+                              ? CupertinoColors.white
+                              : CupertinoColors.systemGrey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                true: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        CupertinoIcons.play_rectangle_fill,
+                        size: 20,
+                        color: _isVideo == true
+                            ? CupertinoColors.white
+                            : CupertinoColors.systemGrey,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Video',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: _isVideo == true
+                              ? CupertinoColors.white
+                              : CupertinoColors.systemGrey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              },
+              onValueChanged: (v) {
+                if (v != null) setState(() => _isVideo = v);
+              },
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Tags to include',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: CupertinoColors.systemGrey,
+              ),
+            ),
+            const SizedBox(height: 6),
+            CupertinoTextField(
+              controller: _includeController,
+              placeholder: 'e.g. fox cute\n(one per line or space-separated)',
+              maxLines: 4,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: (isDark ? CupertinoColors.white : CupertinoColors.black)
+                      .withValues(alpha: 0.08),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Tags to exclude',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: CupertinoColors.systemGrey,
+              ),
+            ),
+            const SizedBox(height: 6),
+            CupertinoTextField(
+              controller: _excludeController,
+              placeholder: 'e.g. gore\n(one per line or space-separated)',
+              maxLines: 4,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: (isDark ? CupertinoColors.white : CupertinoColors.black)
+                      .withValues(alpha: 0.08),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

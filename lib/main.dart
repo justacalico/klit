@@ -72,6 +72,7 @@ void main() async {
 
   // Create navigation provider for shared navigation state
   final navigationProvider = NavigationProvider();
+  final feedsProvider = FeedsProvider(storageService: storageService);
 
   runApp(
     MultiProvider(
@@ -82,6 +83,7 @@ void main() async {
         ChangeNotifierProvider<SettingsProvider>.value(value: settingsProvider),
         ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
         ChangeNotifierProvider<PostsProvider>.value(value: postsProvider),
+        ChangeNotifierProvider<FeedsProvider>.value(value: feedsProvider),
         ChangeNotifierProvider<NavigationProvider>.value(
           value: navigationProvider,
         ),

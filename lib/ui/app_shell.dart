@@ -32,7 +32,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
   /// Previous layout mode to detect desktop <-> mobile transitions.
   LayoutMode? _previousMode;
 
-  static const List<int> _desktopOrder = [0, 1, 2, 6, 4, 5, 3];
+  static const List<int> _desktopOrder = [0, 1, 2, 6, 7, 4, 5, 3];
 
   @override
   void initState() {
@@ -366,6 +366,8 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
         );
       case 6:
         return UiFavoritesPage(onPostTap: _onPostTap);
+      case 7:
+        return UiFeedsPage();
       default:
         return UiHomePage(onPostTap: _onPostTap, onSearchTap: _openSearch);
     }

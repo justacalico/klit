@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import '../core/types/navigation_args.dart';
+import '../data/models/models.dart';
 import '../ui/app_shell.dart';
 import '../ui/pages/pages.dart';
 
@@ -16,6 +17,8 @@ class AppRoutes {
   static const String accountManagement = '/settings/accounts';
   static const String hostSettings = '/settings/host';
   static const String blacklistSettings = '/settings/blacklist';
+  static const String feeds = '/feeds';
+  static const String feedEdit = '/feeds/edit';
 }
 
 /// App router configuration
@@ -87,6 +90,19 @@ class AppRouter {
           settings: settings,
         );
 
+      case AppRoutes.feeds:
+        return CupertinoPageRoute(
+          builder: (_) => const _FeedsRoutePage(),
+          settings: settings,
+        );
+
+      case AppRoutes.feedEdit:
+        final feed = settings.arguments as Feed?;
+        return CupertinoPageRoute(
+          builder: (_) => FeedEditPage(feed: feed),
+          settings: settings,
+        );
+
       default:
         return CupertinoPageRoute(
           builder: (_) => const LoginPage(),
@@ -155,5 +171,14 @@ class _FavoritesRoutePage extends StatelessWidget {
         context,
       ).pushNamed(AppRoutes.postDetail, arguments: args),
     );
+  }
+}
+
+class _FeedsRoutePage extends StatelessWidget {
+  const _FeedsRoutePage();
+
+  @override
+  Widget build(BuildContext context) {
+    return UiFeedsPage();
   }
 }

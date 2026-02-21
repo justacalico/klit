@@ -52,6 +52,11 @@ class _NavItemDef {
       label: 'Favorites',
       section: 'account',
     ),
+    7: _NavItemDef(
+      icon: CupertinoIcons.rectangle_stack_fill,
+      label: 'Feeds',
+      section: 'tools',
+    ),
   };
 }
 
