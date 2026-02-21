@@ -2,11 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 /// Cupertino-style loading indicator
 class LoadingIndicator extends StatelessWidget {
-  const LoadingIndicator({
-    super.key,
-    this.size = 20,
-    this.color,
-  });
+  const LoadingIndicator({super.key, this.size = 20, this.color});
 
   final double size;
   final Color? color;
@@ -17,10 +13,7 @@ class LoadingIndicator extends StatelessWidget {
       child: SizedBox(
         width: size,
         height: size,
-        child: CupertinoActivityIndicator(
-          radius: size / 2,
-          color: color,
-        ),
+        child: CupertinoActivityIndicator(radius: size / 2, color: color),
       ),
     );
   }
@@ -57,10 +50,7 @@ class FullPageLoading extends StatelessWidget {
 
 /// Infinite scroll loading indicator
 class InfiniteScrollLoading extends StatelessWidget {
-  const InfiniteScrollLoading({
-    super.key,
-    required this.isLoading,
-  });
+  const InfiniteScrollLoading({super.key, required this.isLoading});
 
   final bool isLoading;
 

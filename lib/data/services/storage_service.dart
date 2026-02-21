@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -21,7 +20,7 @@ class StorageService {
   StorageService({FlutterSecureStorage? secureStorage})
     : _secureStorage = secureStorage ?? const FlutterSecureStorage();
 
-  /// Initialize the storage service
+  /// Init storage; uses SharedPreferences fallback on Linux if libsecret fails.
   Future<void> init() async {
     if (_initialized) return;
     _prefs = await SharedPreferences.getInstance();
@@ -48,7 +47,6 @@ class StorageService {
     _initialized = true;
   }
 
-  /// Read from secure storage with fallback
   Future<String?> _secureRead(String key) async {
     if (_useSecureStorageFallback) {
       return _prefs.getString('$_fallbackPrefix$key');
@@ -62,7 +60,6 @@ class StorageService {
     }
   }
 
-  /// Write to secure storage with fallback
   Future<void> _secureWrite(String key, String value) async {
     if (_useSecureStorageFallback) {
       await _prefs.setString('$_fallbackPrefix$key', value);
@@ -77,7 +74,6 @@ class StorageService {
     }
   }
 
-  /// Delete from secure storage with fallback
   Future<void> _secureDelete(String key) async {
     if (_useSecureStorageFallback) {
       await _prefs.remove('$_fallbackPrefix$key');
@@ -92,7 +88,6 @@ class StorageService {
     }
   }
 
-  /// Delete all from secure storage with fallback
   Future<void> _secureDeleteAll() async {
     if (_useSecureStorageFallback) {
       final keys = _prefs
@@ -119,9 +114,8 @@ class StorageService {
     }
   }
 
-  // ==================== Account Management ====================
+  // Account management
 
-  /// Get all stored accounts
   Future<List<Account>> getAccounts() async {
     final accountsJson = await _secureRead(AppConstants.accountsKey);
     if (accountsJson == null) return [];
@@ -132,37 +126,18 @@ class StorageService {
         .toList();
   }
 
-  /// Save accounts to secure storage
   Future<void> saveAccounts(List<Account> accounts) async {
     final accountsJson = json.encode(accounts.map((e) => e.toJson()).toList());
     await _secureWrite(AppConstants.accountsKey, accountsJson);
   }
 
-  /// Add a new account
   Future<Account> addAccount({
     required String username,
     required String apiKey,
     required String host,
   }) async {
-    if (kDebugMode) {
-      print('\n---------- StorageService.addAccount START ----------');
-      print('StorageService.addAccount: username=$username');
-      print('StorageService.addAccount: host=$host');
-      print('StorageService.addAccount: Getting existing accounts...');
-    }
     final accounts = await getAccounts();
-    if (kDebugMode) {
-      print('StorageService.addAccount: Existing accounts count=${accounts.length}');
-      for (var i = 0; i < accounts.length; i++) {
-        print('StorageService.addAccount: Existing[$i]: id=${accounts[i].id}, username=${accounts[i].username}');
-      }
-    }
-
     final newId = const Uuid().v4();
-    if (kDebugMode) {
-      print('StorageService.addAccount: Generated new account ID=$newId');
-    }
-
     final account = Account(
       id: newId,
       username: username,
@@ -173,57 +148,21 @@ class StorageService {
     );
 
     accounts.add(account);
-    if (kDebugMode) {
-      print('StorageService.addAccount: Accounts list now has ${accounts.length} accounts');
-      print('StorageService.addAccount: Saving accounts to storage...');
-    }
-
     try {
       await saveAccounts(accounts);
-      if (kDebugMode) {
-        print('StorageService.addAccount: saveAccounts completed!');
-      }
-    } catch (e, stackTrace) {
-      if (kDebugMode) {
-        print('StorageService.addAccount: ERROR in saveAccounts!');
-        print('StorageService.addAccount: Exception=$e');
-        print('StorageService.addAccount: StackTrace=$stackTrace');
-      }
+    } catch (e, _) {
       rethrow;
     }
 
-    // Always set new account as active
-    if (kDebugMode) {
-      print('StorageService.addAccount: Setting active account ID=${account.id}');
-    }
     try {
       await setActiveAccountId(account.id);
-      if (kDebugMode) {
-        print('StorageService.addAccount: setActiveAccountId completed!');
-      }
-    } catch (e, stackTrace) {
-      if (kDebugMode) {
-        print('StorageService.addAccount: ERROR in setActiveAccountId!');
-        print('StorageService.addAccount: Exception=$e');
-        print('StorageService.addAccount: StackTrace=$stackTrace');
-      }
+    } catch (e, _) {
       rethrow;
-    }
-
-    // Verify the save worked
-    if (kDebugMode) {
-      print('StorageService.addAccount: Verifying save...');
-      final verifyAccounts = await getAccounts();
-      print('StorageService.addAccount: Verified accounts count=${verifyAccounts.length}');
-      final verifyActiveId = await getActiveAccountId();
-      print('StorageService.addAccount: Verified active ID=$verifyActiveId');
-      print('---------- StorageService.addAccount END ----------\n');
     }
 
     return account;
   }
 
-  /// Remove an account
   Future<void> removeAccount(String accountId) async {
     final accounts = await getAccounts();
     accounts.removeWhere((a) => a.id == accountId);
@@ -235,12 +174,10 @@ class StorageService {
     }
   }
 
-  /// Get the active account ID
   Future<String?> getActiveAccountId() async {
     return await _secureRead(AppConstants.activeAccountKey);
   }
 
-  /// Set the active account ID
   Future<void> setActiveAccountId(String? accountId) async {
     if (accountId == null) {
       await _secureDelete(AppConstants.activeAccountKey);
@@ -249,7 +186,6 @@ class StorageService {
     }
   }
 
-  /// Get the active account
   Future<Account?> getActiveAccount() async {
     final activeId = await getActiveAccountId();
     if (activeId == null) return null;
@@ -258,103 +194,83 @@ class StorageService {
     return accounts.where((a) => a.id == activeId).firstOrNull;
   }
 
-  // ==================== Preferences ====================
+  // Preferences
 
-  /// Get the API host
   String getHost() {
     return _prefs.getString(AppConstants.hostKey) ?? ApiConstants.defaultHost;
   }
 
-  /// Set the API host
   Future<void> setHost(String host) async {
     await _prefs.setString(AppConstants.hostKey, host);
   }
 
-  /// Get grid size
   int getGridSize() {
     return _prefs.getInt(AppConstants.gridSizeKey) ??
         AppConstants.defaultGridColumns;
   }
 
-  /// Set grid size
   Future<void> setGridSize(int size) async {
     await _prefs.setInt(AppConstants.gridSizeKey, size);
   }
 
-  /// Get grid spacing
   double getGridSpacing() {
     return _prefs.getDouble(AppConstants.gridSpacingKey) ??
         AppConstants.defaultGridSpacing;
   }
 
-  /// Set grid spacing
   Future<void> setGridSpacing(double spacing) async {
     await _prefs.setDouble(AppConstants.gridSpacingKey, spacing);
   }
 
-  /// Get grid padding
   double getGridPadding() {
     return _prefs.getDouble(AppConstants.gridPaddingKey) ??
         AppConstants.defaultGridPadding;
   }
 
-  /// Set grid padding
   Future<void> setGridPadding(double padding) async {
     await _prefs.setDouble(AppConstants.gridPaddingKey, padding);
   }
 
-  /// Get grid auto mode
   bool getGridAutoMode() {
     return _prefs.getBool(AppConstants.gridAutoModeKey) ?? true;
   }
 
-  /// Set grid auto mode
   Future<void> setGridAutoMode(bool enabled) async {
     await _prefs.setBool(AppConstants.gridAutoModeKey, enabled);
   }
 
-  /// Get safe mode setting
   bool getSafeMode() {
     return _prefs.getBool(AppConstants.safeModeKey) ?? false;
   }
 
-  /// Set safe mode setting
   Future<void> setSafeMode(bool enabled) async {
     await _prefs.setBool(AppConstants.safeModeKey, enabled);
   }
 
-  /// Get left-handed mode setting
   bool getLeftHandedMode() {
     return _prefs.getBool(AppConstants.leftHandedModeKey) ?? false;
   }
 
-  /// Set left-handed mode setting
   Future<void> setLeftHandedMode(bool enabled) async {
     await _prefs.setBool(AppConstants.leftHandedModeKey, enabled);
   }
 
-  /// Get upvote when favorited setting
   bool getUpvoteWhenFavorited() {
     return _prefs.getBool(AppConstants.upvoteWhenFavoritedKey) ?? true;
   }
 
-  /// Set upvote when favorited setting
   Future<void> setUpvoteWhenFavorited(bool enabled) async {
     await _prefs.setBool(AppConstants.upvoteWhenFavoritedKey, enabled);
   }
 
-  /// Get confetti on favorite setting
   bool getConfettiOnFavorite() {
     return _prefs.getBool(AppConstants.confettiOnFavoriteKey) ?? true;
   }
 
-  /// Set confetti on favorite setting
   Future<void> setConfettiOnFavorite(bool enabled) async {
     await _prefs.setBool(AppConstants.confettiOnFavoriteKey, enabled);
   }
 
-  /// Get mobile navigation order (list of tab IDs)
-  /// Default order: [0, 1, 2, 3, 4] = [Home, Hot, Popular, Profile, Settings]
   List<int> getMobileNavOrder() {
     final orderJson = _prefs.getString(AppConstants.mobileNavOrderKey);
     if (orderJson == null) return [0, 1, 2, 3, 4];
@@ -362,13 +278,10 @@ class StorageService {
     return order.cast<int>();
   }
 
-  /// Set mobile navigation order
   Future<void> setMobileNavOrder(List<int> order) async {
     await _prefs.setString(AppConstants.mobileNavOrderKey, json.encode(order));
   }
 
-  /// Get desktop navigation order (list of tab IDs)
-  /// Default order: [0, 1, 2, 4, 5, 6] = [Home, Hot, Popular, Search, Profile, Favorites]
   List<int> getDesktopNavOrder() {
     final orderJson = _prefs.getString(AppConstants.desktopNavOrderKey);
     if (orderJson == null) return [0, 1, 2, 4, 5, 6];
@@ -376,34 +289,28 @@ class StorageService {
     return order.cast<int>();
   }
 
-  /// Set desktop navigation order
   Future<void> setDesktopNavOrder(List<int> order) async {
     await _prefs.setString(AppConstants.desktopNavOrderKey, json.encode(order));
   }
 
-  /// Get theme mode (0 = system, 1 = light, 2 = dark)
   int getThemeMode() {
     return _prefs.getInt(AppConstants.themeKey) ?? 0;
   }
 
-  /// Set theme mode
   Future<void> setThemeMode(int mode) async {
     await _prefs.setInt(AppConstants.themeKey, mode);
   }
 
-  /// Get UI style (0 = liquid glass, 1 = material)
   int getUIStyle() {
     return _prefs.getInt(AppConstants.uiStyleKey) ?? 1;
   }
 
-  /// Set UI style
   Future<void> setUIStyle(int style) async {
     await _prefs.setInt(AppConstants.uiStyleKey, style);
   }
 
-  // ==================== Search History ====================
+  // Search history
 
-  /// Get search history
   List<SearchHistoryItem> getSearchHistory() {
     final historyJson = _prefs.getString(AppConstants.searchHistoryKey);
     if (historyJson == null) return [];
@@ -415,7 +322,6 @@ class StorageService {
       ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
   }
 
-  /// Add to search history
   Future<void> addToSearchHistory(String query) async {
     if (query.trim().isEmpty) return;
 
@@ -434,24 +340,20 @@ class StorageService {
     await _prefs.setString(AppConstants.searchHistoryKey, historyJson);
   }
 
-  /// Clear search history
   Future<void> clearSearchHistory() async {
     await _prefs.remove(AppConstants.searchHistoryKey);
   }
 
-  /// Get search history enabled
   bool getSearchHistoryEnabled() {
     return _prefs.getBool(AppConstants.searchHistoryEnabledKey) ?? true;
   }
 
-  /// Set search history enabled
   Future<void> setSearchHistoryEnabled(bool enabled) async {
     await _prefs.setBool(AppConstants.searchHistoryEnabledKey, enabled);
   }
 
-  // ==================== Proxy Configuration ====================
+  // Proxy
 
-  /// Get proxy configuration
   ProxyConfig getProxyConfig() {
     final proxyJson = _prefs.getString(AppConstants.proxyConfigKey);
     if (proxyJson == null) return const ProxyConfig();
@@ -462,72 +364,59 @@ class StorageService {
     }
   }
 
-  /// Set proxy configuration
   Future<void> setProxyConfig(ProxyConfig config) async {
     await _prefs.setString(AppConstants.proxyConfigKey, config.toJsonString());
   }
 
-  // ==================== Blacklist Configuration ====================
+  // Blacklist
 
-  /// Get user blacklist (raw string with newlines)
   String getBlacklist() {
     return _prefs.getString(AppConstants.blacklistKey) ?? '';
   }
 
-  /// Set user blacklist
   Future<void> setBlacklist(String blacklist) async {
     await _prefs.setString(AppConstants.blacklistKey, blacklist);
   }
 
-  /// Get whether blacklist is enabled
   bool getBlacklistEnabled() {
     return _prefs.getBool(AppConstants.blacklistEnabledKey) ?? true;
   }
 
-  /// Set whether blacklist is enabled
   Future<void> setBlacklistEnabled(bool enabled) async {
     await _prefs.setBool(AppConstants.blacklistEnabledKey, enabled);
   }
 
-  /// Get video auto play setting
   bool getVideoAutoPlay() {
     return _prefs.getBool(AppConstants.videoAutoPlayKey) ?? true;
   }
 
-  /// Set video auto play setting
   Future<void> setVideoAutoPlay(bool enabled) async {
     await _prefs.setBool(AppConstants.videoAutoPlayKey, enabled);
   }
 
-  /// Get video mute by default setting
   bool getVideoMuteByDefault() {
     return _prefs.getBool(AppConstants.videoMuteByDefaultKey) ?? true;
   }
 
-  /// Set video mute by default setting
   Future<void> setVideoMuteByDefault(bool enabled) async {
     await _prefs.setBool(AppConstants.videoMuteByDefaultKey, enabled);
   }
 
-  /// Get score threshold for latest posts
   int getScoreThreshold() {
     return _prefs.getInt(AppConstants.scoreThresholdKey) ??
         AppConstants.defaultScoreThreshold;
   }
 
-  /// Set score threshold for latest posts
   Future<void> setScoreThreshold(int threshold) async {
     await _prefs.setInt(AppConstants.scoreThresholdKey, threshold);
   }
 
-  // ==================== Cache Management ====================
+  // Cache
 
-  /// Clear all preferences (not secure storage)
   Future<void> clearPreferences() async {
     await _prefs.clear();
   }
 
-  /// Clear all data including accounts
   Future<void> clearAll() async {
     await _prefs.clear();
     await _secureDeleteAll();

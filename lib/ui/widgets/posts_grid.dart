@@ -43,7 +43,8 @@ class PostsGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenWidth = constraints.maxWidth;
-        final effectiveColumns = columns ?? settings.getEffectiveGridSize(screenWidth);
+        final effectiveColumns =
+            columns ?? settings.getEffectiveGridSize(screenWidth);
         final effectiveSpacing = spacing ?? settings.getEffectiveGridSpacing();
         final effectivePadding = padding ?? settings.getEffectiveGridPadding();
 
@@ -61,7 +62,8 @@ class PostsGrid extends StatelessWidget {
 
         return NotificationListener<ScrollNotification>(
           onNotification: (notification) {
-            if (notification is ScrollUpdateNotification || notification is ScrollEndNotification) {
+            if (notification is ScrollUpdateNotification ||
+                notification is ScrollEndNotification) {
               final metrics = notification.metrics;
               if (metrics.pixels >= metrics.maxScrollExtent - 800) {
                 if (hasMore && !isLoading && onLoadMore != null) {

@@ -190,7 +190,6 @@ class GamepadController {
   bool _isInitialized = false;
   static const Duration _pollInterval = Duration(milliseconds: 16); // ~60fps
 
-  /// Initialize the gamepad controller
   void initialize() {
     if (_isInitialized) return;
     _isInitialized = true;
@@ -201,11 +200,8 @@ class GamepadController {
     // Also listen to raw keyboard events for keyboard-based gamepad simulation
     // (useful for testing without a controller)
     HardwareKeyboard.instance.addHandler(_handleKeyboardEvent);
-
-    debugPrint('[GamepadController] Initialized');
   }
 
-  /// Dispose of resources
   void dispose() {
     _pollTimer?.cancel();
     _repeatTimer?.cancel();
@@ -263,7 +259,6 @@ class GamepadController {
     }
   }
 
-  /// Handle keyboard events (including gamepad buttons mapped via Steam Input)
   bool _handleKeyboardEvent(KeyEvent event) {
     final button = _mapKeyToButton(event.logicalKey);
 
@@ -298,8 +293,6 @@ class GamepadController {
     return false;
   }
 
-  /// Map logical key to gamepad button
-  /// Steam Input can map controller buttons to various keys
   GamepadButton? _mapKeyToButton(LogicalKeyboardKey key) {
     // Xbox controller button mappings (common Steam Input defaults)
     switch (key) {
@@ -363,7 +356,6 @@ class GamepadController {
     }
   }
 
-  /// Map arrow/WASD keys to directions
   GamepadDirection? _mapKeyToDirection(LogicalKeyboardKey key) {
     switch (key) {
       case LogicalKeyboardKey.arrowUp:
@@ -402,8 +394,6 @@ class GamepadController {
     );
 
     _buttonPressController.add(button);
-
-    debugPrint('[GamepadController] Button down: $button');
   }
 
   void _handleButtonUp(GamepadButton button) {
@@ -438,8 +428,6 @@ class GamepadController {
     );
     final newState = _state.copyWith(leftStick: stick, isConnected: true);
     _updateState(newState);
-
-    debugPrint('[GamepadController] Direction: $direction');
   }
 
   void _handleDirectionRelease(GamepadDirection direction) {
@@ -454,7 +442,6 @@ class GamepadController {
     }
   }
 
-  /// Update thumbstick state (called from native platform channel)
   void updateThumbstick({
     required bool isLeft,
     required double x,

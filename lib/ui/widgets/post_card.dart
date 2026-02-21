@@ -8,10 +8,7 @@ import '../../data/models/models.dart';
 import 'loading_shimmer.dart';
 
 /// Post card display style
-enum PostCardStyle {
-  grid,
-  list,
-}
+enum PostCardStyle { grid, list }
 
 /// Reusable post card widget
 class PostCard extends StatelessWidget {
@@ -30,7 +27,9 @@ class PostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return style == PostCardStyle.grid ? _buildGridCard(context) : _buildListCard(context);
+    return style == PostCardStyle.grid
+        ? _buildGridCard(context)
+        : _buildListCard(context);
   }
 
   Widget _buildGridCard(BuildContext context) {
@@ -43,7 +42,9 @@ class PostCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
+          color: isDark
+              ? AppColors.darkSecondaryBackground
+              : CupertinoColors.white,
           borderRadius: BorderRadius.circular(isLiquidGlass ? 12 : 8),
           border: Border.all(
             color: ratingColor.withValues(alpha: isLiquidGlass ? 0.7 : 0.6),
@@ -62,13 +63,17 @@ class PostCard extends StatelessWidget {
                     spreadRadius: 0,
                   ),
                   BoxShadow(
-                    color: CupertinoColors.white.withValues(alpha: isDark ? 0.08 : 0.15),
+                    color: CupertinoColors.white.withValues(
+                      alpha: isDark ? 0.08 : 0.15,
+                    ),
                     blurRadius: 2,
                     spreadRadius: 0,
                     offset: const Offset(0, -1),
                   ),
                   BoxShadow(
-                    color: CupertinoColors.black.withValues(alpha: isDark ? 0.4 : 0.12),
+                    color: CupertinoColors.black.withValues(
+                      alpha: isDark ? 0.4 : 0.12,
+                    ),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -80,7 +85,9 @@ class PostCard extends StatelessWidget {
                     spreadRadius: 1,
                   ),
                   BoxShadow(
-                    color: CupertinoColors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+                    color: CupertinoColors.black.withValues(
+                      alpha: isDark ? 0.3 : 0.08,
+                    ),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
@@ -89,10 +96,7 @@ class PostCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Stack(
           fit: StackFit.expand,
-          children: [
-            _buildImage(),
-            if (showInfo) _buildOverlay(context),
-          ],
+          children: [_buildImage(), if (showInfo) _buildOverlay(context)],
         ),
       ),
     );
@@ -107,11 +111,15 @@ class PostCard extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkSecondaryBackground : CupertinoColors.white,
+          color: isDark
+              ? AppColors.darkSecondaryBackground
+              : CupertinoColors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: CupertinoColors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+              color: CupertinoColors.black.withValues(
+                alpha: isDark ? 0.3 : 0.08,
+              ),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -120,11 +128,7 @@ class PostCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Row(
           children: [
-            SizedBox(
-              width: 120,
-              height: 120,
-              child: _buildImage(),
-            ),
+            SizedBox(width: 120, height: 120, child: _buildImage()),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(12),
@@ -160,7 +164,9 @@ class PostCard extends StatelessWidget {
         color: CupertinoColors.systemGrey5,
         child: Center(
           child: Icon(
-            post.isVideo ? CupertinoIcons.play_rectangle_fill : CupertinoIcons.photo,
+            post.isVideo
+                ? CupertinoIcons.play_rectangle_fill
+                : CupertinoIcons.photo,
             size: 40,
             color: CupertinoColors.systemGrey,
           ),
@@ -179,7 +185,9 @@ class PostCard extends StatelessWidget {
             color: CupertinoColors.systemGrey5,
             child: Center(
               child: Icon(
-                post.isVideo ? CupertinoIcons.play_rectangle_fill : CupertinoIcons.exclamationmark_triangle,
+                post.isVideo
+                    ? CupertinoIcons.play_rectangle_fill
+                    : CupertinoIcons.exclamationmark_triangle,
                 size: 30,
                 color: CupertinoColors.systemGrey,
               ),
@@ -224,10 +232,7 @@ class PostCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            if (post.isVideo) ...[
-              _buildVideoBadge(),
-              const SizedBox(width: 4),
-            ],
+            if (post.isVideo) ...[_buildVideoBadge(), const SizedBox(width: 4)],
             const Spacer(),
             _buildScoreBadge(),
           ],
@@ -308,7 +313,10 @@ class PostCard extends StatelessWidget {
         const SizedBox(width: 12),
         _buildStatItem(CupertinoIcons.heart_fill, post.favCount.compact),
         const SizedBox(width: 12),
-        _buildStatItem(CupertinoIcons.chat_bubble, post.commentCount.toString()),
+        _buildStatItem(
+          CupertinoIcons.chat_bubble,
+          post.commentCount.toString(),
+        ),
       ],
     );
   }
@@ -321,7 +329,10 @@ class PostCard extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           value,
-          style: const TextStyle(fontSize: 12, color: CupertinoColors.secondaryLabel),
+          style: const TextStyle(
+            fontSize: 12,
+            color: CupertinoColors.secondaryLabel,
+          ),
         ),
       ],
     );
@@ -342,7 +353,10 @@ class PostCard extends StatelessWidget {
           ),
           child: Text(
             tag.replaceAll('_', ' '),
-            style: const TextStyle(fontSize: 10, color: CupertinoColors.secondaryLabel),
+            style: const TextStyle(
+              fontSize: 10,
+              color: CupertinoColors.secondaryLabel,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

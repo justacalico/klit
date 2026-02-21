@@ -34,20 +34,15 @@ extension ContextExtensions on BuildContext {
     required Widget child,
     bool barrierDismissible = true,
   }) {
-    return showCupertinoModalPopup<T>(
-      context: this,
-      builder: (_) => child,
-    );
+    return showCupertinoModalPopup<T>(context: this, builder: (_) => child);
   }
 
   /// Show a snackbar-like notification
   void showNotification(String message, {bool isError = false}) {
     showCupertinoModalPopup(
       context: this,
-      builder: (context) => _NotificationBanner(
-        message: message,
-        isError: isError,
-      ),
+      builder: (context) =>
+          _NotificationBanner(message: message, isError: isError),
     );
   }
 }
@@ -56,10 +51,7 @@ class _NotificationBanner extends StatefulWidget {
   final String message;
   final bool isError;
 
-  const _NotificationBanner({
-    required this.message,
-    required this.isError,
-  });
+  const _NotificationBanner({required this.message, required this.isError});
 
   @override
   State<_NotificationBanner> createState() => _NotificationBannerState();

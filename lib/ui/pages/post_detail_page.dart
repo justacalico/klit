@@ -81,7 +81,9 @@ class _PostDetailPageState extends State<PostDetailPage>
     _postIds = List.from(widget.postIds);
     _hasMore = widget.hasMore;
     _pageController = PageController(initialPage: _currentIndex);
-    _confettiController = ConfettiController(duration: const Duration(seconds: 1));
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 1),
+    );
     _focusNode = FocusNode();
     _loadPost(_currentIndex);
     _preloadAdjacentPosts();
@@ -107,7 +109,9 @@ class _PostDetailPageState extends State<PostDetailPage>
   void _preloadAdjacentPosts() {
     if (_currentIndex > 0) _loadPost(_currentIndex - 1);
     if (_currentIndex < _postIds.length - 1) _loadPost(_currentIndex + 1);
-    if (_hasMore && !_isLoadingMore && widget.onLoadMore != null &&
+    if (_hasMore &&
+        !_isLoadingMore &&
+        widget.onLoadMore != null &&
         _currentIndex >= _postIds.length - 3) {
       _loadMorePosts();
     }
@@ -183,7 +187,8 @@ class _PostDetailPageState extends State<PostDetailPage>
     }
   }
 
-  Future<void> _refreshCurrentPost() => _loadPost(_currentIndex, forceRefresh: true);
+  Future<void> _refreshCurrentPost() =>
+      _loadPost(_currentIndex, forceRefresh: true);
 
   Future<void> _vote(int index, int score) async {
     final post = _loadedPosts[index];
@@ -358,7 +363,9 @@ class _PostDetailPageState extends State<PostDetailPage>
     });
     try {
       final downloadsDir = await _getDownloadsDirectory();
-      if (downloadsDir == null) throw Exception('Could not find Downloads directory');
+      if (downloadsDir == null) {
+        throw Exception('Could not find Downloads directory');
+      }
       final extension = post.file.ext.isNotEmpty ? post.file.ext : 'png';
       final filename = 'e926_${post.id}.$extension';
       final filePath = '${downloadsDir.path}/$filename';
@@ -442,7 +449,9 @@ class _PostDetailPageState extends State<PostDetailPage>
       } else if (Platform.isWindows) {
         await Process.run('explorer', [directory]);
       }
-    } catch (_) {}
+    } catch (_) {
+      // Best-effort open folder; ignore failures.
+    }
   }
 
   @override
@@ -636,7 +645,12 @@ class _MobilePostDetailBody extends StatelessWidget {
     );
   }
 
-  Widget _buildPageContent(BuildContext context, int index, bool isDark, bool isOled) {
+  Widget _buildPageContent(
+    BuildContext context,
+    int index,
+    bool isDark,
+    bool isOled,
+  ) {
     final post = state._loadedPosts[index];
     final isLoading = state._loadingStates[index] == true;
     final error = state._errorStates[index];
@@ -675,22 +689,81 @@ class _MobilePostDetailBody extends StatelessWidget {
     );
   }
 
-  Widget _buildImage(BuildContext context, Post post) => _MobilePostDetailContentBuilder.buildImage(context, state, post);
-  Widget _buildActionBar(BuildContext context, int index, Post post, bool isDark, bool isOled) =>
-      _MobilePostDetailContentBuilder.buildActionBar(context, state, index, post, isDark, isOled);
-  Widget _buildStats(BuildContext context, Post post, int index, bool isDark, bool isOled) =>
-      _MobilePostDetailContentBuilder.buildStats(context, state, post, index, isDark, isOled);
-  Widget _buildDescription(BuildContext context, Post post, bool isDark, bool isOled) =>
-      _MobilePostDetailContentBuilder.buildDescription(context, state, post, isDark, isOled);
-  Widget _buildTags(BuildContext context, Post post, bool isDark, bool isOled) =>
-      _MobilePostDetailContentBuilder.buildTags(context, state, post, isDark, isOled);
-  Widget _buildMetadata(BuildContext context, Post post, bool isDark, bool isOled) =>
-      _MobilePostDetailContentBuilder.buildMetadata(context, state, post, isDark, isOled);
+  Widget _buildImage(BuildContext context, Post post) =>
+      _MobilePostDetailContentBuilder.buildImage(context, state, post);
+  Widget _buildActionBar(
+    BuildContext context,
+    int index,
+    Post post,
+    bool isDark,
+    bool isOled,
+  ) => _MobilePostDetailContentBuilder.buildActionBar(
+    context,
+    state,
+    index,
+    post,
+    isDark,
+    isOled,
+  );
+  Widget _buildStats(
+    BuildContext context,
+    Post post,
+    int index,
+    bool isDark,
+    bool isOled,
+  ) => _MobilePostDetailContentBuilder.buildStats(
+    context,
+    state,
+    post,
+    index,
+    isDark,
+    isOled,
+  );
+  Widget _buildDescription(
+    BuildContext context,
+    Post post,
+    bool isDark,
+    bool isOled,
+  ) => _MobilePostDetailContentBuilder.buildDescription(
+    context,
+    state,
+    post,
+    isDark,
+    isOled,
+  );
+  Widget _buildTags(
+    BuildContext context,
+    Post post,
+    bool isDark,
+    bool isOled,
+  ) => _MobilePostDetailContentBuilder.buildTags(
+    context,
+    state,
+    post,
+    isDark,
+    isOled,
+  );
+  Widget _buildMetadata(
+    BuildContext context,
+    Post post,
+    bool isDark,
+    bool isOled,
+  ) => _MobilePostDetailContentBuilder.buildMetadata(
+    context,
+    state,
+    post,
+    isDark,
+    isOled,
+  );
 }
 
 /// Helper to hold mobile-specific build logic (extracted from _MobilePostDetailViewState)
 class _MobilePostDetailContentBuilder {
-  static Widget buildImage(BuildContext context, _PostDetailPageState s, Post post) {
+  static Widget buildImage(
+    BuildContext context,
+    _PostDetailPageState s,
+    Post post,
+  ) {
     if (post.isVideo && post.file.url != null) {
       final settings = context.read<SettingsProvider>();
       final aspectRatio = (post.file.height > 0)
@@ -730,17 +803,26 @@ class _MobilePostDetailContentBuilder {
                     imageUrl: post.preview.url!,
                     fit: BoxFit.contain,
                     placeholder: (_, _) => const CupertinoActivityIndicator(),
-                    errorWidget: (_, _, _) => const CupertinoActivityIndicator(),
+                    errorWidget: (_, _, _) =>
+                        const CupertinoActivityIndicator(),
                   )
                 : const CupertinoActivityIndicator(),
-            errorWidget: (_, _, _) => const Icon(CupertinoIcons.exclamationmark_triangle, size: 48),
+            errorWidget: (_, _, _) =>
+                const Icon(CupertinoIcons.exclamationmark_triangle, size: 48),
           ),
         ),
       ),
     );
   }
 
-  static Widget buildActionBar(BuildContext context, _PostDetailPageState s, int index, Post post, bool isDark, bool isOled) {
+  static Widget buildActionBar(
+    BuildContext context,
+    _PostDetailPageState s,
+    int index,
+    Post post,
+    bool isDark,
+    bool isOled,
+  ) {
     final authProvider = context.watch<AuthProvider>();
     if (authProvider.isGuest) return const SizedBox.shrink();
     final isFav = s._isFavorited[index] ?? post.isFavorited;
@@ -750,23 +832,59 @@ class _MobilePostDetailContentBuilder {
     final leftHandedMode = context.watch<SettingsProvider>().leftHandedMode;
 
     final commentBtn = _buildGlassActionButton(
-      context, s, index, CupertinoIcons.chat_bubble, CupertinoIcons.chat_bubble_fill,
-      '${post.commentCount}', false, false, CupertinoColors.systemBlue, isDark, isOled,
+      context,
+      s,
+      index,
+      CupertinoIcons.chat_bubble,
+      CupertinoIcons.chat_bubble_fill,
+      '${post.commentCount}',
+      false,
+      false,
+      CupertinoColors.systemBlue,
+      isDark,
+      isOled,
       () => s._showComments(index),
     );
     final upvoteBtn = _buildGlassActionButton(
-      context, s, index, CupertinoIcons.arrow_up_circle, CupertinoIcons.arrow_up_circle_fill,
-      'Upvote', userVote == 1, isVoting, AppColors.safeColor, isDark, isOled,
+      context,
+      s,
+      index,
+      CupertinoIcons.arrow_up_circle,
+      CupertinoIcons.arrow_up_circle_fill,
+      'Upvote',
+      userVote == 1,
+      isVoting,
+      AppColors.safeColor,
+      isDark,
+      isOled,
       () => s._vote(index, userVote == 1 ? 0 : 1),
     );
     final downvoteBtn = _buildGlassActionButton(
-      context, s, index, CupertinoIcons.arrow_down_circle, CupertinoIcons.arrow_down_circle_fill,
-      'Downvote', userVote == -1, isVoting, AppColors.explicitColor, isDark, isOled,
+      context,
+      s,
+      index,
+      CupertinoIcons.arrow_down_circle,
+      CupertinoIcons.arrow_down_circle_fill,
+      'Downvote',
+      userVote == -1,
+      isVoting,
+      AppColors.explicitColor,
+      isDark,
+      isOled,
       () => s._vote(index, userVote == -1 ? 0 : -1),
     );
     final favoriteBtn = _buildGlassActionButton(
-      context, s, index, CupertinoIcons.heart, CupertinoIcons.heart_fill,
-      'Favorite', isFav, isTogglingFav, CupertinoColors.systemPink, isDark, isOled,
+      context,
+      s,
+      index,
+      CupertinoIcons.heart,
+      CupertinoIcons.heart_fill,
+      'Favorite',
+      isFav,
+      isTogglingFav,
+      CupertinoColors.systemPink,
+      isDark,
+      isOled,
       () => s._toggleFavorite(index),
     );
 
@@ -775,7 +893,10 @@ class _MobilePostDetailContentBuilder {
         : [upvoteBtn, downvoteBtn, favoriteBtn, commentBtn];
 
     return _buildLiquidGlassContainer(
-      context, s, isDark: isDark, isOled: isOled,
+      context,
+      s,
+      isDark: isDark,
+      isOled: isOled,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: buttons.map((b) => Expanded(child: b)).toList(),
@@ -797,10 +918,13 @@ class _MobilePostDetailContentBuilder {
     bool isOled,
     VoidCallback onTap,
   ) {
-    final displayColor = isActive ? color : (isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2);
+    final displayColor = isActive
+        ? color
+        : (isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2);
     return CupertinoButton(
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-      onPressed: isLoading ? null : onTap, minimumSize: Size(0, 0),
+      onPressed: isLoading ? null : onTap,
+      minimumSize: Size(0, 0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -811,7 +935,11 @@ class _MobilePostDetailContentBuilder {
                   height: 24,
                   child: CupertinoActivityIndicator(color: color),
                 )
-              : Icon(isActive ? activeIcon : icon, size: 24, color: displayColor),
+              : Icon(
+                  isActive ? activeIcon : icon,
+                  size: 24,
+                  color: displayColor,
+                ),
           const SizedBox(height: 6),
           Text(
             label,
@@ -847,16 +975,37 @@ class _MobilePostDetailContentBuilder {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: isOled ? [Colors.white.withValues(alpha: 0.06), Colors.white.withValues(alpha: 0.02)]
-                    : isDark ? [Colors.white.withValues(alpha: 0.12), Colors.white.withValues(alpha: 0.06)]
-                    : [Colors.white.withValues(alpha: 0.8), Colors.white.withValues(alpha: 0.6)],
+                colors: isOled
+                    ? [
+                        Colors.white.withValues(alpha: 0.06),
+                        Colors.white.withValues(alpha: 0.02),
+                      ]
+                    : isDark
+                    ? [
+                        Colors.white.withValues(alpha: 0.12),
+                        Colors.white.withValues(alpha: 0.06),
+                      ]
+                    : [
+                        Colors.white.withValues(alpha: 0.8),
+                        Colors.white.withValues(alpha: 0.6),
+                      ],
               ),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: isOled ? Colors.white.withValues(alpha: 0.08) : isDark ? Colors.white.withValues(alpha: 0.15) : Colors.white.withValues(alpha: 0.5),
+                color: isOled
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : isDark
+                    ? Colors.white.withValues(alpha: 0.15)
+                    : Colors.white.withValues(alpha: 0.5),
                 width: 0.5,
               ),
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: isOled ? 0.4 : 0.1), blurRadius: 20, spreadRadius: -5)],
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isOled ? 0.4 : 0.1),
+                  blurRadius: 20,
+                  spreadRadius: -5,
+                ),
+              ],
             ),
             child: child,
           ),
@@ -865,58 +1014,134 @@ class _MobilePostDetailContentBuilder {
     );
   }
 
-  static Widget buildStats(BuildContext context, _PostDetailPageState s, Post post, int index, bool isDark, bool isOled) {
+  static Widget buildStats(
+    BuildContext context,
+    _PostDetailPageState s,
+    Post post,
+    int index,
+    bool isDark,
+    bool isOled,
+  ) {
     final score = s._updatedScores[index] ?? post.score;
     final isFav = s._isFavorited[index] ?? post.isFavorited;
-    final favCount = isFav != post.isFavorited ? (isFav ? post.favCount + 1 : post.favCount - 1) : post.favCount;
+    final favCount = isFav != post.isFavorited
+        ? (isFav ? post.favCount + 1 : post.favCount - 1)
+        : post.favCount;
     return _buildLiquidGlassContainer(
-      context, s,
+      context,
+      s,
       isDark: isDark,
       isOled: isOled,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildGlassStatItem(context, score.total.toString(), 'Score', score.total >= 0 ? AppColors.safeColor : AppColors.explicitColor, isDark),
-          _buildGlassStatItem(context, favCount.compact, 'Favorites', UIColors.primaryViolet, isDark),
-          _buildGlassStatItem(context, post.commentCount.toString(), 'Comments', UIColors.primaryIndigo, isDark),
+          _buildGlassStatItem(
+            context,
+            score.total.toString(),
+            'Score',
+            score.total >= 0 ? AppColors.safeColor : AppColors.explicitColor,
+            isDark,
+          ),
+          _buildGlassStatItem(
+            context,
+            favCount.compact,
+            'Favorites',
+            UIColors.primaryViolet,
+            isDark,
+          ),
+          _buildGlassStatItem(
+            context,
+            post.commentCount.toString(),
+            'Comments',
+            UIColors.primaryIndigo,
+            isDark,
+          ),
         ],
       ),
     );
   }
 
-  static Widget _buildGlassStatItem(BuildContext context, String value, String label, Color color, bool isDark) {
+  static Widget _buildGlassStatItem(
+    BuildContext context,
+    String value,
+    String label,
+    Color color,
+    bool isDark,
+  ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
         const SizedBox(height: 4),
-        Text(label, style: TextStyle(fontSize: 12, color: isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: isDark
+                ? CupertinoColors.systemGrey
+                : CupertinoColors.systemGrey2,
+          ),
+        ),
       ],
     );
   }
 
-  static Widget buildDescription(BuildContext context, _PostDetailPageState s, Post post, bool isDark, bool isOled) {
+  static Widget buildDescription(
+    BuildContext context,
+    _PostDetailPageState s,
+    Post post,
+    bool isDark,
+    bool isOled,
+  ) {
     return _buildLiquidGlassContainer(
-      context, s,
+      context,
+      s,
       isDark: isDark,
       isOled: isOled,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Description', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
+          Text(
+            'Description',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: isDark ? CupertinoColors.white : CupertinoColors.black,
+            ),
+          ),
           const SizedBox(height: 8),
           if (post.description.isEmpty)
-            Text('No description', style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey))
+            Text(
+              'No description',
+              style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey),
+            )
           else
             Theme(
-              data: ThemeData(brightness: isDark ? Brightness.dark : Brightness.light),
+              data: ThemeData(
+                brightness: isDark ? Brightness.dark : Brightness.light,
+              ),
               child: MarkdownBody(
                 data: post.description,
                 selectable: true,
                 shrinkWrap: true,
                 styleSheet: MarkdownStyleSheet(
-                  p: TextStyle(fontSize: 14, color: isDark ? CupertinoColors.white.withValues(alpha: 0.85) : CupertinoColors.label),
-                  a: TextStyle(color: CupertinoColors.systemBlue, decoration: TextDecoration.underline),
+                  p: TextStyle(
+                    fontSize: 14,
+                    color: isDark
+                        ? CupertinoColors.white.withValues(alpha: 0.85)
+                        : CupertinoColors.label,
+                  ),
+                  a: TextStyle(
+                    color: CupertinoColors.systemBlue,
+                    decoration: TextDecoration.underline,
+                  ),
                 ),
               ),
             ),
@@ -925,15 +1150,29 @@ class _MobilePostDetailContentBuilder {
     );
   }
 
-  static Widget buildTags(BuildContext context, _PostDetailPageState s, Post post, bool isDark, bool isOled) {
+  static Widget buildTags(
+    BuildContext context,
+    _PostDetailPageState s,
+    Post post,
+    bool isDark,
+    bool isOled,
+  ) {
     return _buildLiquidGlassContainer(
-      context, s,
+      context,
+      s,
       isDark: isDark,
       isOled: isOled,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Tags', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
+          Text(
+            'Tags',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: isDark ? CupertinoColors.white : CupertinoColors.black,
+            ),
+          ),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -943,12 +1182,27 @@ class _MobilePostDetailContentBuilder {
               return GestureDetector(
                 onTap: () => s._searchTag(tag),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
-                    color: (isDark ? UIColors.primaryPurple : UIColors.primaryIndigo).withValues(alpha: 0.2),
+                    color:
+                        (isDark
+                                ? UIColors.primaryPurple
+                                : UIColors.primaryIndigo)
+                            .withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(tag, style: TextStyle(fontSize: 14, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
+                  child: Text(
+                    tag,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: isDark
+                          ? CupertinoColors.white
+                          : CupertinoColors.black,
+                    ),
+                  ),
                 ),
               );
             }).toList(),
@@ -958,31 +1212,63 @@ class _MobilePostDetailContentBuilder {
     );
   }
 
-  static Widget buildMetadata(BuildContext context, _PostDetailPageState s, Post post, bool isDark, bool isOled) {
+  static Widget buildMetadata(
+    BuildContext context,
+    _PostDetailPageState s,
+    Post post,
+    bool isDark,
+    bool isOled,
+  ) {
     return _buildLiquidGlassContainer(
-      context, s,
+      context,
+      s,
       isDark: isDark,
       isOled: isOled,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildMetadataRow(context, 'ID', '#${post.id}', isDark),
-          _buildMetadataRow(context, 'Size', '${post.file.width}×${post.file.height}', isDark),
-          _buildMetadataRow(context, 'Type', post.file.ext.toUpperCase(), isDark),
+          _buildMetadataRow(
+            context,
+            'Size',
+            '${post.file.width}×${post.file.height}',
+            isDark,
+          ),
+          _buildMetadataRow(
+            context,
+            'Type',
+            post.file.ext.toUpperCase(),
+            isDark,
+          ),
           _buildMetadataRow(context, 'Rating', post.rating, isDark),
         ],
       ),
     );
   }
 
-  static Widget _buildMetadataRow(BuildContext context, String label, String value, bool isDark) {
+  static Widget _buildMetadataRow(
+    BuildContext context,
+    String label,
+    String value,
+    bool isDark,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey)),
-          Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: isDark ? CupertinoColors.white : CupertinoColors.black)),
+          Text(
+            label,
+            style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: isDark ? CupertinoColors.white : CupertinoColors.black,
+            ),
+          ),
         ],
       ),
     );
@@ -1001,7 +1287,11 @@ class _DesktopPostDetailBody extends StatelessWidget {
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
 
     if (s._isFullScreen && s._currentPost != null) {
-      return _DesktopPostDetailContentBuilder.buildFullScreenView(context, s, isDark);
+      return _DesktopPostDetailContentBuilder.buildFullScreenView(
+        context,
+        s,
+        isDark,
+      );
     }
 
     return KeyboardListener(
@@ -1010,9 +1300,18 @@ class _DesktopPostDetailBody extends StatelessWidget {
       onKeyEvent: (event) {
         if (event is KeyDownEvent) {
           final key = event.logicalKey.keyLabel.toLowerCase();
-          if (key == 'd') { s._navigatePost(1); return; }
-          if (key == 'a') { s._navigatePost(-1); return; }
-          if (key == 'f') { s._toggleFavorite(s._currentIndex); return; }
+          if (key == 'd') {
+            s._navigatePost(1);
+            return;
+          }
+          if (key == 'a') {
+            s._navigatePost(-1);
+            return;
+          }
+          if (key == 'f') {
+            s._toggleFavorite(s._currentIndex);
+            return;
+          }
           if (key == 'w') {
             final cv = s._userVote[s._currentIndex];
             s._vote(s._currentIndex, cv == 1 ? 0 : 1);
@@ -1028,11 +1327,24 @@ class _DesktopPostDetailBody extends StatelessWidget {
       child: Stack(
         children: [
           Container(
-            color: isDark ? AppColors.darkBackground : AppColors.lightBackground,
+            color: isDark
+                ? AppColors.darkBackground
+                : AppColors.lightBackground,
             child: Column(
               children: [
-                _DesktopPostDetailContentBuilder.buildTopBar(context, s, onClose, isDark),
-                Expanded(child: _DesktopPostDetailContentBuilder.buildContent(context, s, isDark)),
+                _DesktopPostDetailContentBuilder.buildTopBar(
+                  context,
+                  s,
+                  onClose,
+                  isDark,
+                ),
+                Expanded(
+                  child: _DesktopPostDetailContentBuilder.buildContent(
+                    context,
+                    s,
+                    isDark,
+                  ),
+                ),
               ],
             ),
           ),
@@ -1047,8 +1359,12 @@ class _DesktopPostDetailBody extends StatelessWidget {
               numberOfParticles: 25,
               gravity: 0.3,
               colors: const [
-                Color(0xFFFF6B9D), Color(0xFFFF8E53), Color(0xFFFFD93D),
-                Color(0xFF6BCB77), Color(0xFF4D96FF), Color(0xFFC9B1FF),
+                Color(0xFFFF6B9D),
+                Color(0xFFFF8E53),
+                Color(0xFFFFD93D),
+                Color(0xFF6BCB77),
+                Color(0xFF4D96FF),
+                Color(0xFFC9B1FF),
               ],
             ),
           ),
@@ -1057,7 +1373,11 @@ class _DesktopPostDetailBody extends StatelessWidget {
               bottom: 16,
               left: 0,
               right: 0,
-              child: _DesktopPostDetailContentBuilder.buildControllerHints(context, s, isDark),
+              child: _DesktopPostDetailContentBuilder.buildControllerHints(
+                context,
+                s,
+                isDark,
+              ),
             ),
         ],
       ),
@@ -1067,7 +1387,11 @@ class _DesktopPostDetailBody extends StatelessWidget {
 
 /// Desktop-specific build logic
 class _DesktopPostDetailContentBuilder {
-  static Widget buildFullScreenView(BuildContext context, _PostDetailPageState s, bool isDark) {
+  static Widget buildFullScreenView(
+    BuildContext context,
+    _PostDetailPageState s,
+    bool isDark,
+  ) {
     final post = s._currentPost!;
     if (post.isVideo && post.file.url != null) {
       return FullScreenVideoViewer(
@@ -1085,17 +1409,19 @@ class _DesktopPostDetailContentBuilder {
           minScale: 0.5,
           maxScale: 4,
           child: Center(
-            child: CachedNetworkImage(
-              imageUrl: imageUrl,
-              fit: BoxFit.contain,
-            ),
+            child: CachedNetworkImage(imageUrl: imageUrl, fit: BoxFit.contain),
           ),
         ),
       ),
     );
   }
 
-  static Widget buildTopBar(BuildContext context, _PostDetailPageState s, VoidCallback onClose, bool isDark) {
+  static Widget buildTopBar(
+    BuildContext context,
+    _PostDetailPageState s,
+    VoidCallback onClose,
+    bool isDark,
+  ) {
     final hasMultiple = s._postIds.length > 1;
     return ClipRect(
       child: BackdropFilter(
@@ -1108,47 +1434,86 @@ class _DesktopPostDetailContentBuilder {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
-                  ? [const Color(0xFF18181B).withValues(alpha: 0.85), const Color(0xFF1F1F23).withValues(alpha: 0.9)]
-                  : [const Color(0xFFFFFFFF).withValues(alpha: 0.85), const Color(0xFFFAFAFC).withValues(alpha: 0.9)],
+                  ? [
+                      const Color(0xFF18181B).withValues(alpha: 0.85),
+                      const Color(0xFF1F1F23).withValues(alpha: 0.9),
+                    ]
+                  : [
+                      const Color(0xFFFFFFFF).withValues(alpha: 0.85),
+                      const Color(0xFFFAFAFC).withValues(alpha: 0.9),
+                    ],
             ),
             border: Border(
               bottom: BorderSide(
-                color: UIColors.primaryPurple.withValues(alpha: isDark ? 0.15 : 0.1),
+                color: UIColors.primaryPurple.withValues(
+                  alpha: isDark ? 0.15 : 0.1,
+                ),
                 width: 1,
               ),
             ),
           ),
           child: Row(
             children: [
-              ToolbarButton(icon: CupertinoIcons.back, tooltip: 'Back', onPressed: onClose),
+              ToolbarButton(
+                icon: CupertinoIcons.back,
+                tooltip: 'Back',
+                onPressed: onClose,
+              ),
               const SizedBox(width: 8),
-              Text('Back', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: isDark ? CupertinoColors.white : const Color(0xFF1F2937))),
+              Text(
+                'Back',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: isDark
+                      ? CupertinoColors.white
+                      : const Color(0xFF1F2937),
+                ),
+              ),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [UIColors.primaryIndigo, UIColors.primaryPurple]),
+                  gradient: const LinearGradient(
+                    colors: [UIColors.primaryIndigo, UIColors.primaryPurple],
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(CupertinoIcons.photo, size: 14, color: CupertinoColors.white),
+                child: const Icon(
+                  CupertinoIcons.photo,
+                  size: 14,
+                  color: CupertinoColors.white,
+                ),
               ),
               const SizedBox(width: 10),
               Text(
-                hasMultiple ? 'Post #${s._currentPostId} (${s._currentIndex + 1}/${s._postIds.length})' : 'Post #${s._currentPostId}',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: isDark ? CupertinoColors.white : const Color(0xFF1F2937)),
+                hasMultiple
+                    ? 'Post #${s._currentPostId} (${s._currentIndex + 1}/${s._postIds.length})'
+                    : 'Post #${s._currentPostId}',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? CupertinoColors.white
+                      : const Color(0xFF1F2937),
+                ),
               ),
               const Spacer(),
               if (hasMultiple) ...[
                 ToolbarButton(
                   icon: CupertinoIcons.chevron_left,
                   tooltip: 'Previous',
-                  onPressed: s._currentIndex > 0 ? () => s._navigatePost(-1) : null,
+                  onPressed: s._currentIndex > 0
+                      ? () => s._navigatePost(-1)
+                      : null,
                 ),
                 const SizedBox(width: 8),
                 ToolbarButton(
                   icon: CupertinoIcons.chevron_right,
                   tooltip: 'Next',
-                  onPressed: s._currentIndex < s._postIds.length - 1 ? () => s._navigatePost(1) : null,
+                  onPressed: s._currentIndex < s._postIds.length - 1
+                      ? () => s._navigatePost(1)
+                      : null,
                 ),
               ],
             ],
@@ -1158,12 +1523,18 @@ class _DesktopPostDetailContentBuilder {
     );
   }
 
-  static Widget buildContent(BuildContext context, _PostDetailPageState s, bool isDark) {
+  static Widget buildContent(
+    BuildContext context,
+    _PostDetailPageState s,
+    bool isDark,
+  ) {
     final isLoading = s._loadingStates[s._currentIndex] == true;
     final error = s._errorStates[s._currentIndex];
     final post = s._currentPost;
 
-    if (isLoading) return const Center(child: CupertinoActivityIndicator(radius: 16));
+    if (isLoading) {
+      return const Center(child: CupertinoActivityIndicator(radius: 16));
+    }
     if (error != null) {
       return Center(
         child: Column(
@@ -1173,7 +1544,10 @@ class _DesktopPostDetailContentBuilder {
             const SizedBox(height: 16),
             Text(error),
             const SizedBox(height: 16),
-            CupertinoButton.filled(onPressed: () => s._loadPost(s._currentIndex), child: const Text('Retry')),
+            CupertinoButton.filled(
+              onPressed: () => s._loadPost(s._currentIndex),
+              child: const Text('Retry'),
+            ),
           ],
         ),
       );
@@ -1187,7 +1561,10 @@ class _DesktopPostDetailContentBuilder {
 
         if (useNarrowLayout) {
           // Vertical stack for smaller screens - image on top, info below
-          final imageHeight = (constraints.maxHeight * 0.45).clamp(200.0, 500.0);
+          final imageHeight = (constraints.maxHeight * 0.45).clamp(
+            200.0,
+            500.0,
+          );
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -1204,15 +1581,28 @@ class _DesktopPostDetailContentBuilder {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(flex: 3, child: buildMediaPanel(context, s, post, isDark)),
-            Container(width: 1, color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator),
-            SizedBox(width: 380, child: buildInfoPanel(context, s, post, isDark)),
+            Container(
+              width: 1,
+              color: isDark
+                  ? AppColors.darkSeparator
+                  : AppColors.lightSeparator,
+            ),
+            SizedBox(
+              width: 380,
+              child: buildInfoPanel(context, s, post, isDark),
+            ),
           ],
         );
       },
     );
   }
 
-  static Widget buildMediaPanel(BuildContext context, _PostDetailPageState s, Post post, bool isDark) {
+  static Widget buildMediaPanel(
+    BuildContext context,
+    _PostDetailPageState s,
+    Post post,
+    bool isDark,
+  ) {
     return Container(
       color: isDark ? const Color(0xFF0A0A0C) : CupertinoColors.systemGrey6,
       child: Stack(
@@ -1230,11 +1620,18 @@ class _DesktopPostDetailContentBuilder {
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [UIColors.primaryPurple.withValues(alpha: 0.9), UIColors.primaryIndigo.withValues(alpha: 0.9)],
+                      colors: [
+                        UIColors.primaryPurple.withValues(alpha: 0.9),
+                        UIColors.primaryIndigo.withValues(alpha: 0.9),
+                      ],
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(CupertinoIcons.fullscreen, color: CupertinoColors.white, size: 20),
+                  child: const Icon(
+                    CupertinoIcons.fullscreen,
+                    color: CupertinoColors.white,
+                    size: 20,
+                  ),
                 ),
               ),
             ),
@@ -1243,7 +1640,11 @@ class _DesktopPostDetailContentBuilder {
     );
   }
 
-  static Widget buildMedia(BuildContext context, _PostDetailPageState s, Post post) {
+  static Widget buildMedia(
+    BuildContext context,
+    _PostDetailPageState s,
+    Post post,
+  ) {
     if (post.isVideo && post.file.url != null) {
       final settings = context.read<SettingsProvider>();
       return VideoPlayerWidget(
@@ -1267,15 +1668,24 @@ class _DesktopPostDetailContentBuilder {
           imageUrl: imageUrl,
           fit: BoxFit.contain,
           placeholder: (_, _) => post.preview.url != null
-              ? CachedNetworkImage(imageUrl: post.preview.url!, fit: BoxFit.contain)
+              ? CachedNetworkImage(
+                  imageUrl: post.preview.url!,
+                  fit: BoxFit.contain,
+                )
               : const CupertinoActivityIndicator(),
-          errorWidget: (_, _, _) => const Icon(CupertinoIcons.exclamationmark_triangle, size: 48),
+          errorWidget: (_, _, _) =>
+              const Icon(CupertinoIcons.exclamationmark_triangle, size: 48),
         ),
       ),
     );
   }
 
-  static Widget buildInfoPanel(BuildContext context, _PostDetailPageState s, Post post, bool isDark) {
+  static Widget buildInfoPanel(
+    BuildContext context,
+    _PostDetailPageState s,
+    Post post,
+    bool isDark,
+  ) {
     final score = s._updatedScores[s._currentIndex] ?? post.score;
     final isFav = s._isFavorited[s._currentIndex] ?? post.isFavorited;
     final userVote = s._userVote[s._currentIndex];
@@ -1291,13 +1701,28 @@ class _DesktopPostDetailContentBuilder {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
-                  ? [const Color(0xFF2C2C2E).withValues(alpha: 0.7), const Color(0xFF1C1C1E).withValues(alpha: 0.8)]
-                  : [const Color(0xFFFFFFFF).withValues(alpha: 0.7), const Color(0xFFF8F8FA).withValues(alpha: 0.8)],
+                  ? [
+                      const Color(0xFF2C2C2E).withValues(alpha: 0.7),
+                      const Color(0xFF1C1C1E).withValues(alpha: 0.8),
+                    ]
+                  : [
+                      const Color(0xFFFFFFFF).withValues(alpha: 0.7),
+                      const Color(0xFFF8F8FA).withValues(alpha: 0.8),
+                    ],
             ),
           ),
           child: Column(
             children: [
-              buildActionBar(context, s, score, isFav, userVote, isVoting, isTogglingFav, isDark),
+              buildActionBar(
+                context,
+                s,
+                score,
+                isFav,
+                userVote,
+                isVoting,
+                isTogglingFav,
+                isDark,
+              ),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
@@ -1326,8 +1751,14 @@ class _DesktopPostDetailContentBuilder {
   }
 
   static Widget buildActionBar(
-    BuildContext context, _PostDetailPageState s,
-    PostScore score, bool isFav, int? userVote, bool isVoting, bool isTogglingFav, bool isDark,
+    BuildContext context,
+    _PostDetailPageState s,
+    PostScore score,
+    bool isFav,
+    int? userVote,
+    bool isVoting,
+    bool isTogglingFav,
+    bool isDark,
   ) {
     return ClipRect(
       child: BackdropFilter(
@@ -1339,20 +1770,81 @@ class _DesktopPostDetailContentBuilder {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
-                  ? [UIColors.primaryPurple.withValues(alpha: 0.08), UIColors.primaryIndigo.withValues(alpha: 0.05)]
-                  : [UIColors.primaryPurple.withValues(alpha: 0.05), UIColors.primaryIndigo.withValues(alpha: 0.03)],
+                  ? [
+                      UIColors.primaryPurple.withValues(alpha: 0.08),
+                      UIColors.primaryIndigo.withValues(alpha: 0.05),
+                    ]
+                  : [
+                      UIColors.primaryPurple.withValues(alpha: 0.05),
+                      UIColors.primaryIndigo.withValues(alpha: 0.03),
+                    ],
             ),
-            border: Border(bottom: BorderSide(color: UIColors.primaryPurple.withValues(alpha: isDark ? 0.15 : 0.1))),
+            border: Border(
+              bottom: BorderSide(
+                color: UIColors.primaryPurple.withValues(
+                  alpha: isDark ? 0.15 : 0.1,
+                ),
+              ),
+            ),
           ),
           child: Row(
             children: [
-              Expanded(child: _buildGradientActionButton(context, s, CupertinoIcons.arrow_up, CupertinoIcons.arrow_up_circle_fill, userVote == 1, isVoting, [const Color(0xFF22C55E), const Color(0xFF16A34A)], isDark, onTap: () => s._vote(s._currentIndex, userVote == 1 ? 0 : 1))),
+              Expanded(
+                child: _buildGradientActionButton(
+                  context,
+                  s,
+                  CupertinoIcons.arrow_up,
+                  CupertinoIcons.arrow_up_circle_fill,
+                  userVote == 1,
+                  isVoting,
+                  [const Color(0xFF22C55E), const Color(0xFF16A34A)],
+                  isDark,
+                  onTap: () => s._vote(s._currentIndex, userVote == 1 ? 0 : 1),
+                ),
+              ),
               const SizedBox(width: 8),
-              Expanded(child: _buildGradientActionButton(context, s, CupertinoIcons.arrow_down, CupertinoIcons.arrow_down_circle_fill, userVote == -1, isVoting, [const Color(0xFFEF4444), const Color(0xFFDC2626)], isDark, onTap: () => s._vote(s._currentIndex, userVote == -1 ? 0 : -1))),
+              Expanded(
+                child: _buildGradientActionButton(
+                  context,
+                  s,
+                  CupertinoIcons.arrow_down,
+                  CupertinoIcons.arrow_down_circle_fill,
+                  userVote == -1,
+                  isVoting,
+                  [const Color(0xFFEF4444), const Color(0xFFDC2626)],
+                  isDark,
+                  onTap: () =>
+                      s._vote(s._currentIndex, userVote == -1 ? 0 : -1),
+                ),
+              ),
               const SizedBox(width: 8),
-              Expanded(child: _buildGradientActionButton(context, s, CupertinoIcons.heart, CupertinoIcons.heart_fill, isFav, isTogglingFav, [UIColors.primaryPurple, UIColors.primaryViolet], isDark, onTap: () => s._toggleFavorite(s._currentIndex))),
+              Expanded(
+                child: _buildGradientActionButton(
+                  context,
+                  s,
+                  CupertinoIcons.heart,
+                  CupertinoIcons.heart_fill,
+                  isFav,
+                  isTogglingFav,
+                  [UIColors.primaryPurple, UIColors.primaryViolet],
+                  isDark,
+                  onTap: () => s._toggleFavorite(s._currentIndex),
+                ),
+              ),
               const SizedBox(width: 8),
-              Expanded(child: _buildGradientActionButton(context, s, CupertinoIcons.square_arrow_down, CupertinoIcons.square_arrow_down_fill, false, s._isDownloading[s._currentIndex] == true, [UIColors.primaryIndigo, UIColors.primaryPurple], isDark, onTap: () => s._downloadPost())),
+              Expanded(
+                child: _buildGradientActionButton(
+                  context,
+                  s,
+                  CupertinoIcons.square_arrow_down,
+                  CupertinoIcons.square_arrow_down_fill,
+                  false,
+                  s._isDownloading[s._currentIndex] == true,
+                  [UIColors.primaryIndigo, UIColors.primaryPurple],
+                  isDark,
+                  onTap: () => s._downloadPost(),
+                ),
+              ),
             ],
           ),
         ),
@@ -1377,23 +1869,70 @@ class _DesktopPostDetailContentBuilder {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          gradient: isActive ? LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: activeGradient) : null,
-          color: isActive ? null : (isDark ? const Color(0xFF2C2C2E).withValues(alpha: 0.6) : const Color(0xFFF3F4F6).withValues(alpha: 0.8)),
+          gradient: isActive
+              ? LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: activeGradient,
+                )
+              : null,
+          color: isActive
+              ? null
+              : (isDark
+                    ? const Color(0xFF2C2C2E).withValues(alpha: 0.6)
+                    : const Color(0xFFF3F4F6).withValues(alpha: 0.8)),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isActive ? Colors.transparent : UIColors.primaryPurple.withValues(alpha: isDark ? 0.2 : 0.1)),
-          boxShadow: isActive ? [BoxShadow(color: activeGradient[0].withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 2))] : null,
+          border: Border.all(
+            color: isActive
+                ? Colors.transparent
+                : UIColors.primaryPurple.withValues(alpha: isDark ? 0.2 : 0.1),
+          ),
+          boxShadow: isActive
+              ? [
+                  BoxShadow(
+                    color: activeGradient[0].withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Center(
           child: isLoading
-              ? SizedBox(width: 20, height: 20, child: CupertinoActivityIndicator(color: isActive ? CupertinoColors.white : UIColors.primaryPurple))
-              : Icon(isActive ? activeIcon : icon, size: 20, color: isActive ? CupertinoColors.white : (isDark ? CupertinoColors.white.withValues(alpha: 0.7) : const Color(0xFF374151))),
+              ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CupertinoActivityIndicator(
+                    color: isActive
+                        ? CupertinoColors.white
+                        : UIColors.primaryPurple,
+                  ),
+                )
+              : Icon(
+                  isActive ? activeIcon : icon,
+                  size: 20,
+                  color: isActive
+                      ? CupertinoColors.white
+                      : (isDark
+                            ? CupertinoColors.white.withValues(alpha: 0.7)
+                            : const Color(0xFF374151)),
+                ),
         ),
       ),
     );
   }
 
-  static Widget buildStatsCard(BuildContext context, _PostDetailPageState s, Post post, PostScore score, bool isFav, bool isDark) {
-    final favCount = isFav != post.isFavorited ? (isFav ? post.favCount + 1 : post.favCount - 1) : post.favCount;
+  static Widget buildStatsCard(
+    BuildContext context,
+    _PostDetailPageState s,
+    Post post,
+    PostScore score,
+    bool isFav,
+    bool isDark,
+  ) {
+    final favCount = isFav != post.isFavorited
+        ? (isFav ? post.favCount + 1 : post.favCount - 1)
+        : post.favCount;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
@@ -1405,20 +1944,50 @@ class _DesktopPostDetailContentBuilder {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
-                  ? [UIColors.primaryPurple.withValues(alpha: 0.08), UIColors.primaryIndigo.withValues(alpha: 0.05)]
-                  : [UIColors.primaryPurple.withValues(alpha: 0.06), UIColors.primaryIndigo.withValues(alpha: 0.03)],
+                  ? [
+                      UIColors.primaryPurple.withValues(alpha: 0.08),
+                      UIColors.primaryIndigo.withValues(alpha: 0.05),
+                    ]
+                  : [
+                      UIColors.primaryPurple.withValues(alpha: 0.06),
+                      UIColors.primaryIndigo.withValues(alpha: 0.03),
+                    ],
             ),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: UIColors.primaryPurple.withValues(alpha: isDark ? 0.2 : 0.12)),
+            border: Border.all(
+              color: UIColors.primaryPurple.withValues(
+                alpha: isDark ? 0.2 : 0.12,
+              ),
+            ),
           ),
           child: Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildStatColumn(CupertinoIcons.arrow_up_circle_fill, score.total.toString(), 'Score', score.total >= 0 ? const Color(0xFF22C55E) : const Color(0xFFEF4444), isDark),
-                  _buildStatColumn(CupertinoIcons.heart_fill, favCount.compact, 'Favorites', UIColors.primaryViolet, isDark),
-                  _buildStatColumn(CupertinoIcons.chat_bubble_fill, post.commentCount.toString(), 'Comments', UIColors.primaryIndigo, isDark),
+                  _buildStatColumn(
+                    CupertinoIcons.arrow_up_circle_fill,
+                    score.total.toString(),
+                    'Score',
+                    score.total >= 0
+                        ? const Color(0xFF22C55E)
+                        : const Color(0xFFEF4444),
+                    isDark,
+                  ),
+                  _buildStatColumn(
+                    CupertinoIcons.heart_fill,
+                    favCount.compact,
+                    'Favorites',
+                    UIColors.primaryViolet,
+                    isDark,
+                  ),
+                  _buildStatColumn(
+                    CupertinoIcons.chat_bubble_fill,
+                    post.commentCount.toString(),
+                    'Comments',
+                    UIColors.primaryIndigo,
+                    isDark,
+                  ),
                 ],
               ),
             ],
@@ -1428,20 +1997,41 @@ class _DesktopPostDetailContentBuilder {
     );
   }
 
-  static Widget _buildStatColumn(IconData icon, String value, String label, Color color, bool isDark) {
+  static Widget _buildStatColumn(
+    IconData icon,
+    String value,
+    String label,
+    Color color,
+    bool isDark,
+  ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, size: 24, color: color),
         const SizedBox(height: 8),
-        Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? CupertinoColors.white : const Color(0xFF1F2937))),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+          ),
+        ),
         const SizedBox(height: 4),
-        Text(label, style: TextStyle(fontSize: 12, color: CupertinoColors.systemGrey)),
+        Text(
+          label,
+          style: TextStyle(fontSize: 12, color: CupertinoColors.systemGrey),
+        ),
       ],
     );
   }
 
-  static Widget buildDescriptionCard(BuildContext context, _PostDetailPageState s, Post post, bool isDark) {
+  static Widget buildDescriptionCard(
+    BuildContext context,
+    _PostDetailPageState s,
+    Post post,
+    bool isDark,
+  ) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
@@ -1453,26 +2043,55 @@ class _DesktopPostDetailContentBuilder {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
-                  ? [UIColors.primaryPurple.withValues(alpha: 0.08), UIColors.primaryIndigo.withValues(alpha: 0.05)]
-                  : [UIColors.primaryPurple.withValues(alpha: 0.06), UIColors.primaryIndigo.withValues(alpha: 0.03)],
+                  ? [
+                      UIColors.primaryPurple.withValues(alpha: 0.08),
+                      UIColors.primaryIndigo.withValues(alpha: 0.05),
+                    ]
+                  : [
+                      UIColors.primaryPurple.withValues(alpha: 0.06),
+                      UIColors.primaryIndigo.withValues(alpha: 0.03),
+                    ],
             ),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: UIColors.primaryPurple.withValues(alpha: isDark ? 0.2 : 0.12)),
+            border: Border.all(
+              color: UIColors.primaryPurple.withValues(
+                alpha: isDark ? 0.2 : 0.12,
+              ),
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Description', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: isDark ? CupertinoColors.white : const Color(0xFF1F2937))),
+              Text(
+                'Description',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? CupertinoColors.white
+                      : const Color(0xFF1F2937),
+                ),
+              ),
               const SizedBox(height: 12),
               Theme(
-                data: ThemeData(brightness: isDark ? Brightness.dark : Brightness.light),
+                data: ThemeData(
+                  brightness: isDark ? Brightness.dark : Brightness.light,
+                ),
                 child: MarkdownBody(
                   data: post.description,
                   selectable: true,
                   shrinkWrap: true,
                   styleSheet: MarkdownStyleSheet(
-                    p: TextStyle(fontSize: 14, color: isDark ? CupertinoColors.white.withValues(alpha: 0.85) : CupertinoColors.label),
-                    a: TextStyle(color: CupertinoColors.systemBlue, decoration: TextDecoration.underline),
+                    p: TextStyle(
+                      fontSize: 14,
+                      color: isDark
+                          ? CupertinoColors.white.withValues(alpha: 0.85)
+                          : CupertinoColors.label,
+                    ),
+                    a: TextStyle(
+                      color: CupertinoColors.systemBlue,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
               ),
@@ -1483,7 +2102,12 @@ class _DesktopPostDetailContentBuilder {
     );
   }
 
-  static Widget buildTagsCard(BuildContext context, _PostDetailPageState s, Post post, bool isDark) {
+  static Widget buildTagsCard(
+    BuildContext context,
+    _PostDetailPageState s,
+    Post post,
+    bool isDark,
+  ) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
@@ -1495,16 +2119,35 @@ class _DesktopPostDetailContentBuilder {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
-                  ? [UIColors.primaryPurple.withValues(alpha: 0.08), UIColors.primaryIndigo.withValues(alpha: 0.05)]
-                  : [UIColors.primaryPurple.withValues(alpha: 0.06), UIColors.primaryIndigo.withValues(alpha: 0.03)],
+                  ? [
+                      UIColors.primaryPurple.withValues(alpha: 0.08),
+                      UIColors.primaryIndigo.withValues(alpha: 0.05),
+                    ]
+                  : [
+                      UIColors.primaryPurple.withValues(alpha: 0.06),
+                      UIColors.primaryIndigo.withValues(alpha: 0.03),
+                    ],
             ),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: UIColors.primaryPurple.withValues(alpha: isDark ? 0.2 : 0.12)),
+            border: Border.all(
+              color: UIColors.primaryPurple.withValues(
+                alpha: isDark ? 0.2 : 0.12,
+              ),
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Tags', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: isDark ? CupertinoColors.white : const Color(0xFF1F2937))),
+              Text(
+                'Tags',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? CupertinoColors.white
+                      : const Color(0xFF1F2937),
+                ),
+              ),
               const SizedBox(height: 12),
               Wrap(
                 spacing: 8,
@@ -1514,12 +2157,27 @@ class _DesktopPostDetailContentBuilder {
                   return GestureDetector(
                     onTap: () => s._searchTag(tag),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
-                        color: (isDark ? UIColors.primaryPurple : UIColors.primaryIndigo).withValues(alpha: 0.2),
+                        color:
+                            (isDark
+                                    ? UIColors.primaryPurple
+                                    : UIColors.primaryIndigo)
+                                .withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Text(tag, style: TextStyle(fontSize: 14, color: isDark ? CupertinoColors.white : const Color(0xFF1F2937))),
+                      child: Text(
+                        tag,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isDark
+                              ? CupertinoColors.white
+                              : const Color(0xFF1F2937),
+                        ),
+                      ),
                     ),
                   );
                 }).toList(),
@@ -1531,7 +2189,12 @@ class _DesktopPostDetailContentBuilder {
     );
   }
 
-  static Widget buildMetadataCard(BuildContext context, _PostDetailPageState s, Post post, bool isDark) {
+  static Widget buildMetadataCard(
+    BuildContext context,
+    _PostDetailPageState s,
+    Post post,
+    bool isDark,
+  ) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
@@ -1543,17 +2206,31 @@ class _DesktopPostDetailContentBuilder {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
-                  ? [UIColors.primaryPurple.withValues(alpha: 0.08), UIColors.primaryIndigo.withValues(alpha: 0.05)]
-                  : [UIColors.primaryPurple.withValues(alpha: 0.06), UIColors.primaryIndigo.withValues(alpha: 0.03)],
+                  ? [
+                      UIColors.primaryPurple.withValues(alpha: 0.08),
+                      UIColors.primaryIndigo.withValues(alpha: 0.05),
+                    ]
+                  : [
+                      UIColors.primaryPurple.withValues(alpha: 0.06),
+                      UIColors.primaryIndigo.withValues(alpha: 0.03),
+                    ],
             ),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: UIColors.primaryPurple.withValues(alpha: isDark ? 0.2 : 0.12)),
+            border: Border.all(
+              color: UIColors.primaryPurple.withValues(
+                alpha: isDark ? 0.2 : 0.12,
+              ),
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildMetadataRow('ID', '#${post.id}', isDark),
-              _buildMetadataRow('Size', '${post.file.width}×${post.file.height}', isDark),
+              _buildMetadataRow(
+                'Size',
+                '${post.file.width}×${post.file.height}',
+                isDark,
+              ),
               _buildMetadataRow('Type', post.file.ext.toUpperCase(), isDark),
               _buildMetadataRow('Rating', post.rating, isDark),
             ],
@@ -1569,14 +2246,28 @@ class _DesktopPostDetailContentBuilder {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey)),
-          Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: isDark ? CupertinoColors.white : const Color(0xFF1F2937))),
+          Text(
+            label,
+            style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  static Widget buildControllerHints(BuildContext context, _PostDetailPageState s, bool isDark) {
+  static Widget buildControllerHints(
+    BuildContext context,
+    _PostDetailPageState s,
+    bool isDark,
+  ) {
     final currentVote = s._userVote[s._currentIndex];
     final isFavorited = s._isFavorited[s._currentIndex] ?? false;
     return ClipRRect(
@@ -1587,10 +2278,19 @@ class _DesktopPostDetailContentBuilder {
           margin: const EdgeInsets.symmetric(horizontal: 24),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           decoration: BoxDecoration(
-            color: (isDark ? const Color(0xFF18181B) : const Color(0xFFFFFFFF)).withValues(alpha: 0.85),
+            color: (isDark ? const Color(0xFF18181B) : const Color(0xFFFFFFFF))
+                .withValues(alpha: 0.85),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7)),
-            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 12, offset: const Offset(0, 4))],
+            border: Border.all(
+              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1599,13 +2299,42 @@ class _DesktopPostDetailContentBuilder {
               _buildHintButton('LB', 'Previous', isDark),
               const SizedBox(width: 16),
               _buildHintButton('RB', 'Next', isDark),
-              Container(margin: const EdgeInsets.symmetric(horizontal: 16), width: 1, height: 20, color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFD4D4D8)),
-              _buildHintButton('Y', isFavorited ? 'Unfavorite' : 'Favorite', isDark, color: isFavorited ? const Color(0xFFFF6B9D) : null),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                width: 1,
+                height: 20,
+                color: isDark
+                    ? const Color(0xFF3F3F46)
+                    : const Color(0xFFD4D4D8),
+              ),
+              _buildHintButton(
+                'Y',
+                isFavorited ? 'Unfavorite' : 'Favorite',
+                isDark,
+                color: isFavorited ? const Color(0xFFFF6B9D) : null,
+              ),
               const SizedBox(width: 16),
-              _buildHintButton('RT', currentVote == 1 ? 'Remove Vote' : 'Upvote', isDark, color: currentVote == 1 ? const Color(0xFF22C55E) : null),
+              _buildHintButton(
+                'RT',
+                currentVote == 1 ? 'Remove Vote' : 'Upvote',
+                isDark,
+                color: currentVote == 1 ? const Color(0xFF22C55E) : null,
+              ),
               const SizedBox(width: 16),
-              _buildHintButton('X', currentVote == -1 ? 'Remove Vote' : 'Downvote', isDark, color: currentVote == -1 ? const Color(0xFFEF4444) : null),
-              Container(margin: const EdgeInsets.symmetric(horizontal: 16), width: 1, height: 20, color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFD4D4D8)),
+              _buildHintButton(
+                'X',
+                currentVote == -1 ? 'Remove Vote' : 'Downvote',
+                isDark,
+                color: currentVote == -1 ? const Color(0xFFEF4444) : null,
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                width: 1,
+                height: 20,
+                color: isDark
+                    ? const Color(0xFF3F3F46)
+                    : const Color(0xFFD4D4D8),
+              ),
               _buildHintButton('B', 'Close', isDark),
               const SizedBox(width: 16),
               _buildHintButton('A', 'Fullscreen', isDark),
@@ -1616,8 +2345,14 @@ class _DesktopPostDetailContentBuilder {
     );
   }
 
-  static Widget _buildHintButton(String button, String label, bool isDark, {Color? color}) {
-    final c = color ?? (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A));
+  static Widget _buildHintButton(
+    String button,
+    String label,
+    bool isDark, {
+    Color? color,
+  }) {
+    final c =
+        color ?? (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A));
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1628,10 +2363,24 @@ class _DesktopPostDetailContentBuilder {
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: c.withValues(alpha: 0.4)),
           ),
-          child: Text(button, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: c)),
+          child: Text(
+            button,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: c,
+            ),
+          ),
         ),
         const SizedBox(width: 6),
-        Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF3F3F46))),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF3F3F46),
+          ),
+        ),
       ],
     );
   }
@@ -2337,9 +3086,7 @@ class _CommentCard extends StatelessWidget {
                     ),
                     blockquotePadding: const EdgeInsets.only(left: 10),
                   ),
-                  onTapLink: (text, href, title) {
-                    // Handle link taps
-                  },
+                  onTapLink: (text, href, title) {},
                 ),
               ),
               const SizedBox(height: 10),

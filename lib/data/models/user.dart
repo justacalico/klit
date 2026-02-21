@@ -43,7 +43,9 @@ class User {
       id: json['id'] as int,
       name: json['name'] as String,
       level: json['level'] as int,
-      levelString: json['level_string'] as String? ?? _levelToString(json['level'] as int),
+      levelString:
+          json['level_string'] as String? ??
+          _levelToString(json['level'] as int),
       postUploadCount: json['post_upload_count'] as int? ?? 0,
       postUpdateCount: json['post_update_count'] as int? ?? 0,
       noteUpdateCount: json['note_update_count'] as int? ?? 0,
@@ -98,7 +100,7 @@ class User {
   String get accountAge {
     final now = DateTime.now();
     final difference = now.difference(createdAt);
-    
+
     if (difference.inDays >= 365) {
       final years = (difference.inDays / 365).floor();
       return '$years year${years > 1 ? 's' : ''}';
@@ -113,7 +115,8 @@ class User {
   }
 
   /// Get total feedback count
-  int get totalFeedback => positiveFeedbackCount + neutralFeedbackCount + negativeFeedbackCount;
+  int get totalFeedback =>
+      positiveFeedbackCount + neutralFeedbackCount + negativeFeedbackCount;
 
   /// Get feedback ratio (positive / total)
   double get feedbackRatio {

@@ -3,7 +3,6 @@ import '../core/constants/constants.dart';
 import '../data/models/models.dart';
 import '../data/services/services.dart';
 
-/// Provider for authentication state
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService;
   ApiService? _apiService;
@@ -17,7 +16,6 @@ class AuthProvider extends ChangeNotifier {
 
   AuthProvider({required AuthService authService}) : _authService = authService;
 
-  /// Set the API service reference (call after creation)
   void setApiService(ApiService apiService) {
     _apiService = apiService;
   }
@@ -31,7 +29,6 @@ class AuthProvider extends ChangeNotifier {
   bool get isGuest => _isGuest;
   bool get isInitialized => _isInitialized;
 
-  /// Initialize authentication state
   Future<void> initialize() async {
     if (_isInitialized) return;
 
@@ -48,7 +45,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Login with credentials
   Future<bool> login({
     required String username,
     required String apiKey,
@@ -81,7 +77,6 @@ class AuthProvider extends ChangeNotifier {
     );
   }
 
-  /// Switch to a different account
   Future<bool> switchAccount(String accountId) async {
     _isLoading = true;
     _error = null;
@@ -105,7 +100,6 @@ class AuthProvider extends ChangeNotifier {
     );
   }
 
-  /// Remove an account
   Future<bool> removeAccount(String accountId) async {
     _isLoading = true;
     notifyListeners();
@@ -117,7 +111,10 @@ class AuthProvider extends ChangeNotifier {
       if (_accounts.isNotEmpty) {
         _currentAccount = _accounts.first;
         _apiService?.setBaseUrl(_currentAccount!.host);
-        _apiService?.setAuth(_currentAccount!.username, _currentAccount!.apiKey);
+        _apiService?.setAuth(
+          _currentAccount!.username,
+          _currentAccount!.apiKey,
+        );
       } else {
         _currentAccount = null;
         _apiService?.clearAuth();
@@ -129,7 +126,6 @@ class AuthProvider extends ChangeNotifier {
     return _accounts.isEmpty && _currentAccount == null;
   }
 
-  /// Logout current account only
   Future<void> logout() async {
     _isLoading = true;
     notifyListeners();

@@ -67,11 +67,7 @@ class EmptyState extends StatelessWidget {
 
 /// Error state widget
 class ErrorState extends StatelessWidget {
-  const ErrorState({
-    super.key,
-    this.message,
-    this.onRetry,
-  });
+  const ErrorState({super.key, this.message, this.onRetry});
 
   final String? message;
   final VoidCallback? onRetry;

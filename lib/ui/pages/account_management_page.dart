@@ -36,7 +36,8 @@ class AccountManagementPage extends StatelessWidget {
                 middle: const Text('Accounts'),
                 trailing: CupertinoButton(
                   padding: EdgeInsets.zero,
-                  onPressed: () => _showAddAccountSheet(context, mode.isDesktop),
+                  onPressed: () =>
+                      _showAddAccountSheet(context, mode.isDesktop),
                   child: const Icon(CupertinoIcons.plus),
                 ),
               ),
@@ -80,7 +81,11 @@ class AccountManagementPage extends StatelessWidget {
           Navigator.of(dialogContext).pop();
           final auth = context.read<AuthProvider>();
           final account = auth.accounts.firstWhere((a) => a.id == accountId);
-          _AccountManagementBody._switchAccount(context, accountId, account.host);
+          _AccountManagementBody._switchAccount(
+            context,
+            accountId,
+            account.host,
+          );
         },
         onRemove: () {
           Navigator.of(dialogContext).pop();
@@ -205,7 +210,8 @@ class _AccountManagementBody extends StatelessWidget {
                 ),
                 const Spacer(),
                 _DesktopAddButton(
-                  onPressed: () => AccountManagementPage._showAddAccountSheet(context, true),
+                  onPressed: () =>
+                      AccountManagementPage._showAddAccountSheet(context, true),
                 ),
               ],
             ),
@@ -246,8 +252,11 @@ class _AccountManagementBody extends StatelessWidget {
                 onTap: isActive
                     ? null
                     : () => _switchAccount(context, account.id, account.host),
-                onOptions: () =>
-                    AccountManagementPage._showAccountOptions(context, account.id, isActive),
+                onOptions: () => AccountManagementPage._showAccountOptions(
+                  context,
+                  account.id,
+                  isActive,
+                ),
               );
             },
           );
@@ -256,10 +265,7 @@ class _AccountManagementBody extends StatelessWidget {
     }
   }
 
-  Widget _buildDesktopAccountList(
-    BuildContext context,
-    AuthProvider auth,
-  ) {
+  Widget _buildDesktopAccountList(BuildContext context, AuthProvider auth) {
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 600),
@@ -315,7 +321,8 @@ class _AccountManagementBody extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           CupertinoButton.filled(
-            onPressed: () => AccountManagementPage._showAddAccountSheet(context, isDesktop),
+            onPressed: () =>
+                AccountManagementPage._showAddAccountSheet(context, isDesktop),
             child: const Text('Add Account'),
           ),
         ],
@@ -456,7 +463,9 @@ class _AddAccountSheetState extends State<_AddAccountSheet> {
         r'^https?:\/\/(localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6})(:\d+)?(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?$',
       );
       if (!urlPattern.hasMatch(host)) {
-        _showValidationError('Please enter a valid URL (e.g., http://localhost:3000 or https://example.com)');
+        _showValidationError(
+          'Please enter a valid URL (e.g., http://localhost:3000 or https://example.com)',
+        );
         return;
       }
     }
@@ -621,9 +630,7 @@ class _AddAccountSheetState extends State<_AddAccountSheet> {
   }
 }
 
-// ============================================================================
 // Desktop Widgets
-// ============================================================================
 
 /// Desktop add button with gradient
 class _DesktopAddButton extends StatefulWidget {
@@ -1233,7 +1240,9 @@ class _DesktopAddAccountDialogState extends State<_DesktopAddAccountDialog> {
         r'^https?:\/\/(localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6})(:\d+)?(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?$',
       );
       if (!urlPattern.hasMatch(host)) {
-        _showValidationError('Please enter a valid URL (e.g., http://localhost:3000 or https://example.com)');
+        _showValidationError(
+          'Please enter a valid URL (e.g., http://localhost:3000 or https://example.com)',
+        );
         return;
       }
     }
@@ -1525,4 +1534,3 @@ class _DesktopAddDialogButtonState extends State<_DesktopAddDialogButton> {
     );
   }
 }
-

@@ -14,11 +14,7 @@ class UiSearchPage extends StatefulWidget {
   final String? initialQuery;
   final void Function(PostDetailArguments) onPostTap;
 
-  const UiSearchPage({
-    super.key,
-    this.initialQuery,
-    required this.onPostTap,
-  });
+  const UiSearchPage({super.key, this.initialQuery, required this.onPostTap});
 
   @override
   State<UiSearchPage> createState() => _UiSearchPageState();
@@ -51,15 +47,26 @@ class _UiSearchPageState extends State<UiSearchPage>
   @override
   void initState() {
     super.initState();
-    _filterCtrl = AnimationController(duration: const Duration(milliseconds: 250), vsync: this);
-    _filterSlide = Tween<double>(begin: -20, end: 0).animate(CurvedAnimation(parent: _filterCtrl, curve: Curves.easeOutCubic));
-    _filterFade = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(parent: _filterCtrl, curve: Curves.easeOutCubic));
+    _filterCtrl = AnimationController(
+      duration: const Duration(milliseconds: 250),
+      vsync: this,
+    );
+    _filterSlide = Tween<double>(
+      begin: -20,
+      end: 0,
+    ).animate(CurvedAnimation(parent: _filterCtrl, curve: Curves.easeOutCubic));
+    _filterFade = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _filterCtrl, curve: Curves.easeOutCubic));
 
     if (widget.initialQuery != null) {
       _searchController.text = widget.initialQuery!;
       _performSearch();
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) => _focusNode.requestFocus());
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _focusNode.requestFocus(),
+    );
   }
 
   @override
@@ -154,7 +161,9 @@ class _UiSearchPageState extends State<UiSearchPage>
           ? '${before.substring(0, lastSpace + 1)}$tagWithPrefix '
           : '$tagWithPrefix ';
       _searchController.text = newBefore + after;
-      _searchController.selection = TextSelection.collapsed(offset: newBefore.length);
+      _searchController.selection = TextSelection.collapsed(
+        offset: newBefore.length,
+      );
     }
     _closeTagSuggestions();
     _currentTagPrefix = '';
@@ -182,20 +191,22 @@ class _UiSearchPageState extends State<UiSearchPage>
     final posts = pp.searchResults;
     final idx = posts.indexWhere((p) => p.id == post.id);
 
-    widget.onPostTap(PostDetailArguments(
-      postIds: posts.map((p) => p.id).toList(),
-      initialIndex: idx >= 0 ? idx : 0,
-      hasMore: pp.hasMoreSearch,
-      onLoadMore: () async {
-        await pp.searchPosts(
-          query: pp.currentSearchQuery,
-          rating: _selectedRating,
-          order: _selectedOrder,
-          safeMode: sp.safeMode,
-        );
-        return pp.searchResults.map((p) => p.id).toList();
-      },
-    ));
+    widget.onPostTap(
+      PostDetailArguments(
+        postIds: posts.map((p) => p.id).toList(),
+        initialIndex: idx >= 0 ? idx : 0,
+        hasMore: pp.hasMoreSearch,
+        onLoadMore: () async {
+          await pp.searchPosts(
+            query: pp.currentSearchQuery,
+            rating: _selectedRating,
+            order: _selectedOrder,
+            safeMode: sp.safeMode,
+          );
+          return pp.searchResults.map((p) => p.id).toList();
+        },
+      ),
+    );
   }
 
   void _loadMore() {
@@ -227,49 +238,57 @@ class _UiSearchPageState extends State<UiSearchPage>
     return KeyedSubtree(
       key: const ValueKey('search-page'),
       child: Stack(
-      children: [
-        Column(
-          children: [
-            _buildToolbar(context, isDark),
-            Expanded(
-              child: Row(
-                children: [
-                  _buildHistorySidebar(context, isDark),
-                  Container(width: 1, color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator),
-                  Expanded(child: _buildResults(context)),
-                ],
+        children: [
+          Column(
+            children: [
+              _buildToolbar(context, isDark),
+              Expanded(
+                child: Row(
+                  children: [
+                    _buildHistorySidebar(context, isDark),
+                    Container(
+                      width: 1,
+                      color: isDark
+                          ? AppColors.darkSeparator
+                          : AppColors.lightSeparator,
+                    ),
+                    Expanded(child: _buildResults(context)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (_showFilters || _filterCtrl.isAnimating)
+            AnimatedBuilder(
+              animation: _filterCtrl,
+              builder: (_, _) => Positioned(
+                top: 60 + _filterSlide.value,
+                left: 220,
+                right: 20,
+                child: Opacity(
+                  opacity: _filterFade.value,
+                  child: _buildFilters(context, isDark),
+                ),
               ),
             ),
-          ],
-        ),
-        if (_showFilters || _filterCtrl.isAnimating)
-          AnimatedBuilder(
-            animation: _filterCtrl,
-            builder: (_, _) => Positioned(
-              top: 60 + _filterSlide.value,
-              left: 220,
-              right: 20,
-              child: Opacity(opacity: _filterFade.value, child: _buildFilters(context, isDark)),
-            ),
-          ),
-        if (_showTagSuggestions && _tagSuggestions.isNotEmpty)
-          Positioned.fill(
-            child: GestureDetector(
-              onTap: _closeTagSuggestions,
-              behavior: HitTestBehavior.opaque,
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: 52,
-                    left: 48,
-                    right: 150,
-                    child: _buildTagSuggestions(isDark),
-                  ),
-                ],
+          if (_showTagSuggestions && _tagSuggestions.isNotEmpty)
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: _closeTagSuggestions,
+                behavior: HitTestBehavior.opaque,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: 52,
+                      left: 48,
+                      right: 150,
+                      child: _buildTagSuggestions(isDark),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-      ],
+        ],
       ),
     );
   }
@@ -283,12 +302,20 @@ class _UiSearchPageState extends State<UiSearchPage>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [const Color(0xFF18181B).withValues(alpha: 0.85), const Color(0xFF1F1F23).withValues(alpha: 0.9)]
-              : [const Color(0xFFFFFFFF).withValues(alpha: 0.85), const Color(0xFFFAFAFC).withValues(alpha: 0.9)],
+              ? [
+                  const Color(0xFF18181B).withValues(alpha: 0.85),
+                  const Color(0xFF1F1F23).withValues(alpha: 0.9),
+                ]
+              : [
+                  const Color(0xFFFFFFFF).withValues(alpha: 0.85),
+                  const Color(0xFFFAFAFC).withValues(alpha: 0.9),
+                ],
         ),
         border: Border(
           bottom: BorderSide(
-            color: isDark ? const Color(0xFF3A3A3C).withValues(alpha: 0.5) : const Color(0xFFE5E5E7).withValues(alpha: 0.5),
+            color: isDark
+                ? const Color(0xFF3A3A3C).withValues(alpha: 0.5)
+                : const Color(0xFFE5E5E7).withValues(alpha: 0.5),
             width: 1,
           ),
         ),
@@ -305,7 +332,11 @@ class _UiSearchPageState extends State<UiSearchPage>
               ),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(CupertinoIcons.search, size: 16, color: CupertinoColors.white),
+            child: const Icon(
+              CupertinoIcons.search,
+              size: 16,
+              color: CupertinoColors.white,
+            ),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -314,12 +345,27 @@ class _UiSearchPageState extends State<UiSearchPage>
               focusNode: _focusNode,
               placeholder: 'Search tags...',
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              style: TextStyle(fontSize: 15, color: isDark ? CupertinoColors.white : const Color(0xFF1F2937)),
-              placeholderStyle: TextStyle(fontSize: 15, color: isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2),
+              style: TextStyle(
+                fontSize: 15,
+                color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+              ),
+              placeholderStyle: TextStyle(
+                fontSize: 15,
+                color: isDark
+                    ? CupertinoColors.systemGrey
+                    : CupertinoColors.systemGrey2,
+              ),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF27272A).withValues(alpha: 0.6) : const Color(0xFFF4F4F5).withValues(alpha: 0.8),
+                color: isDark
+                    ? const Color(0xFF27272A).withValues(alpha: 0.6)
+                    : const Color(0xFFF4F4F5).withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: isDark ? const Color(0xFF8B5CF6).withValues(alpha: 0.2) : const Color(0xFF8B5CF6).withValues(alpha: 0.15), width: 1),
+                border: Border.all(
+                  color: isDark
+                      ? const Color(0xFF8B5CF6).withValues(alpha: 0.2)
+                      : const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+                  width: 1,
+                ),
               ),
               onChanged: (v) {
                 if (v.isEmpty) {
@@ -344,9 +390,20 @@ class _UiSearchPageState extends State<UiSearchPage>
             ),
           ),
           const SizedBox(width: 12),
-          _ToolbarBtn(icon: CupertinoIcons.search, onTap: () { _closeTagSuggestions(); _performSearch(); }),
+          _ToolbarBtn(
+            icon: CupertinoIcons.search,
+            onTap: () {
+              _closeTagSuggestions();
+              _performSearch();
+            },
+          ),
           const SizedBox(width: 8),
-          _ToolbarBtn(icon: _showFilters ? CupertinoIcons.slider_horizontal_below_rectangle : CupertinoIcons.slider_horizontal_3, onTap: _toggleFilters),
+          _ToolbarBtn(
+            icon: _showFilters
+                ? CupertinoIcons.slider_horizontal_below_rectangle
+                : CupertinoIcons.slider_horizontal_3,
+            onTap: _toggleFilters,
+          ),
         ],
       ),
     );
@@ -361,8 +418,15 @@ class _UiSearchPageState extends State<UiSearchPage>
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            color: isDark ? CupertinoColors.white.withValues(alpha: 0.14) : CupertinoColors.white.withValues(alpha: 0.95),
-            border: Border.all(color: isDark ? CupertinoColors.white.withValues(alpha: 0.15) : CupertinoColors.black.withValues(alpha: 0.1), width: 0.5),
+            color: isDark
+                ? CupertinoColors.white.withValues(alpha: 0.14)
+                : CupertinoColors.white.withValues(alpha: 0.95),
+            border: Border.all(
+              color: isDark
+                  ? CupertinoColors.white.withValues(alpha: 0.15)
+                  : CupertinoColors.black.withValues(alpha: 0.1),
+              width: 0.5,
+            ),
           ),
           child: ListView.builder(
             shrinkWrap: true,
@@ -373,10 +437,22 @@ class _UiSearchPageState extends State<UiSearchPage>
               return GestureDetector(
                 onTap: () => _insertTagSuggestion(tag.name),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     border: i < _tagSuggestions.length - 1
-                        ? Border(bottom: BorderSide(color: isDark ? CupertinoColors.white.withValues(alpha: 0.1) : CupertinoColors.black.withValues(alpha: 0.05), width: 0.5))
+                        ? Border(
+                            bottom: BorderSide(
+                              color: isDark
+                                  ? CupertinoColors.white.withValues(alpha: 0.1)
+                                  : CupertinoColors.black.withValues(
+                                      alpha: 0.05,
+                                    ),
+                              width: 0.5,
+                            ),
+                          )
                         : null,
                   ),
                   child: Row(
@@ -384,15 +460,34 @@ class _UiSearchPageState extends State<UiSearchPage>
                       Container(
                         width: 4,
                         height: 24,
-                        decoration: BoxDecoration(color: tag.color, borderRadius: BorderRadius.circular(2)),
+                        decoration: BoxDecoration(
+                          color: tag.color,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Text(tag.name.replaceAll('_', ' '), style: TextStyle(color: tag.color, fontSize: 14, fontWeight: FontWeight.w500)),
+                        child: Text(
+                          tag.name.replaceAll('_', ' '),
+                          style: TextStyle(
+                            color: tag.color,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
                       Text(
-                        tag.postCount >= 1000000 ? '${(tag.postCount / 1000000).toStringAsFixed(1)}m' : (tag.postCount >= 1000 ? '${(tag.postCount / 1000).toStringAsFixed(1)}k' : '${tag.postCount}'),
-                        style: TextStyle(color: isDark ? CupertinoColors.white.withValues(alpha: 0.5) : CupertinoColors.black.withValues(alpha: 0.4), fontSize: 13),
+                        tag.postCount >= 1000000
+                            ? '${(tag.postCount / 1000000).toStringAsFixed(1)}m'
+                            : (tag.postCount >= 1000
+                                  ? '${(tag.postCount / 1000).toStringAsFixed(1)}k'
+                                  : '${tag.postCount}'),
+                        style: TextStyle(
+                          color: isDark
+                              ? CupertinoColors.white.withValues(alpha: 0.5)
+                              : CupertinoColors.black.withValues(alpha: 0.4),
+                          fontSize: 13,
+                        ),
                       ),
                     ],
                   ),
@@ -409,9 +504,16 @@ class _UiSearchPageState extends State<UiSearchPage>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF18181B).withValues(alpha: 0.85) : const Color(0xFFFFFFFF).withValues(alpha: 0.9),
+        color: isDark
+            ? const Color(0xFF18181B).withValues(alpha: 0.85)
+            : const Color(0xFFFFFFFF).withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isDark ? const Color(0xFF8B5CF6).withValues(alpha: 0.2) : const Color(0xFF8B5CF6).withValues(alpha: 0.15), width: 1),
+        border: Border.all(
+          color: isDark
+              ? const Color(0xFF8B5CF6).withValues(alpha: 0.2)
+              : const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+          width: 1,
+        ),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -422,10 +524,22 @@ class _UiSearchPageState extends State<UiSearchPage>
             CupertinoSlidingSegmentedControl<String>(
               groupValue: _selectedRating ?? 'all',
               children: const {
-                'all': Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Text('All', style: TextStyle(fontSize: 12))),
-                's': Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Text('Safe', style: TextStyle(fontSize: 12))),
-                'q': Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Text('Questionable', style: TextStyle(fontSize: 12))),
-                'e': Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Text('Explicit', style: TextStyle(fontSize: 12))),
+                'all': Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Text('All', style: TextStyle(fontSize: 12)),
+                ),
+                's': Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Text('Safe', style: TextStyle(fontSize: 12)),
+                ),
+                'q': Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Text('Questionable', style: TextStyle(fontSize: 12)),
+                ),
+                'e': Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Text('Explicit', style: TextStyle(fontSize: 12)),
+                ),
               },
               onValueChanged: (v) {
                 setState(() => _selectedRating = v == 'all' ? null : v);
@@ -437,7 +551,13 @@ class _UiSearchPageState extends State<UiSearchPage>
             const SizedBox(width: 8),
             CupertinoSlidingSegmentedControl<String>(
               groupValue: _selectedOrder,
-              children: {for (final e in _orderOptions.entries) e.key: Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: Text(e.value, style: const TextStyle(fontSize: 12)))},
+              children: {
+                for (final e in _orderOptions.entries)
+                  e.key: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(e.value, style: const TextStyle(fontSize: 12)),
+                  ),
+              },
               onValueChanged: (v) {
                 if (v != null) {
                   setState(() => _selectedOrder = v);
@@ -463,12 +583,26 @@ class _UiSearchPageState extends State<UiSearchPage>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('History', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: CupertinoColors.secondaryLabel.resolveFrom(context))),
+                Text(
+                  'History',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                  ),
+                ),
                 CupertinoButton(
                   padding: EdgeInsets.zero,
                   minimumSize: Size.zero,
-                  onPressed: () => context.read<SettingsProvider>().clearSearchHistory(),
-                  child: Text('Clear', style: TextStyle(fontSize: 12, color: CupertinoTheme.of(context).primaryColor)),
+                  onPressed: () =>
+                      context.read<SettingsProvider>().clearSearchHistory(),
+                  child: Text(
+                    'Clear',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: CupertinoTheme.of(context).primaryColor,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -479,7 +613,15 @@ class _UiSearchPageState extends State<UiSearchPage>
                 final history = sp.searchHistory;
                 if (history.isEmpty) {
                   return Center(
-                    child: Text('No recent searches', style: TextStyle(fontSize: 12, color: CupertinoColors.secondaryLabel.resolveFrom(context))),
+                    child: Text(
+                      'No recent searches',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: CupertinoColors.secondaryLabel.resolveFrom(
+                          context,
+                        ),
+                      ),
+                    ),
                   );
                 }
                 return ListView.builder(
@@ -487,16 +629,29 @@ class _UiSearchPageState extends State<UiSearchPage>
                   itemBuilder: (_, i) {
                     final item = history[i];
                     return CupertinoButton(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       onPressed: () {
                         _searchController.text = item.query;
                         _performSearch();
                       },
                       child: Row(
                         children: [
-                          const Icon(CupertinoIcons.clock, size: 14, color: CupertinoColors.secondaryLabel),
+                          const Icon(
+                            CupertinoIcons.clock,
+                            size: 14,
+                            color: CupertinoColors.secondaryLabel,
+                          ),
                           const SizedBox(width: 8),
-                          Expanded(child: Text(item.query, style: const TextStyle(fontSize: 13), overflow: TextOverflow.ellipsis)),
+                          Expanded(
+                            child: Text(
+                              item.query,
+                              style: const TextStyle(fontSize: 13),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
                     );
@@ -518,11 +673,27 @@ class _UiSearchPageState extends State<UiSearchPage>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(CupertinoIcons.search, size: 64, color: CupertinoColors.secondaryLabel.resolveFrom(context)),
+                Icon(
+                  CupertinoIcons.search,
+                  size: 64,
+                  color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                ),
                 const SizedBox(height: 16),
-                Text('Search for posts', style: TextStyle(fontSize: 18, color: CupertinoColors.secondaryLabel.resolveFrom(context))),
+                Text(
+                  'Search for posts',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text('Enter tags to find posts', style: TextStyle(fontSize: 14, color: CupertinoColors.tertiaryLabel.resolveFrom(context))),
+                Text(
+                  'Enter tags to find posts',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: CupertinoColors.tertiaryLabel.resolveFrom(context),
+                  ),
+                ),
               ],
             ),
           );
@@ -531,7 +702,11 @@ class _UiSearchPageState extends State<UiSearchPage>
           onNotification: (n) {
             if (n is ScrollEndNotification) {
               final m = n.metrics;
-              if (m.pixels >= m.maxScrollExtent - 200 && pp.hasMoreSearch && !pp.isLoadingSearch) _loadMore();
+              if (m.pixels >= m.maxScrollExtent - 200 &&
+                  pp.hasMoreSearch &&
+                  !pp.isLoadingSearch) {
+                _loadMore();
+              }
             }
             return false;
           },
@@ -563,7 +738,9 @@ class _ToolbarBtn extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: CupertinoTheme.brightnessOf(context) == Brightness.dark ? const Color(0xFF2C2C2E).withValues(alpha: 0.6) : const Color(0xFFF3F4F6).withValues(alpha: 0.8),
+          color: CupertinoTheme.brightnessOf(context) == Brightness.dark
+              ? const Color(0xFF2C2C2E).withValues(alpha: 0.6)
+              : const Color(0xFFF3F4F6).withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(icon, size: 18),

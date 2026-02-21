@@ -52,7 +52,8 @@ class _UiProfilePageState extends State<UiProfilePage> {
     if (mounted) {
       result.when(
         success: (user) {
-          if (user.blacklistedTags != null && user.blacklistedTags!.isNotEmpty) {
+          if (user.blacklistedTags != null &&
+              user.blacklistedTags!.isNotEmpty) {
             final settingsProvider = context.read<SettingsProvider>();
             settingsProvider.setBlacklist(user.blacklistedTags!);
           }
@@ -82,10 +83,10 @@ class _UiProfilePageState extends State<UiProfilePage> {
     return KeyedSubtree(
       key: const ValueKey('profile-page'),
       child: Column(
-      children: [
-        _buildToolbar(isDark),
-        Expanded(child: _buildContent(isDark)),
-      ],
+        children: [
+          _buildToolbar(isDark),
+          Expanded(child: _buildContent(isDark)),
+        ],
       ),
     );
   }
@@ -137,8 +138,9 @@ class _UiProfilePageState extends State<UiProfilePage> {
             CupertinoButton.filled(
               onPressed: () {
                 authProvider.logout();
-                Navigator.of(context)
-                    .pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
               },
               child: const Text('Sign In'),
             ),
@@ -287,7 +289,9 @@ class _UiProfilePageState extends State<UiProfilePage> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: _getLevelColor(user.level).withValues(alpha: 0.2),
+                        color: _getLevelColor(
+                          user.level,
+                        ).withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -387,8 +391,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
     );
   }
 
-  Widget _buildStatRow(
-      IconData icon, String label, String value, Color color) {
+  Widget _buildStatRow(IconData icon, String label, String value, Color color) {
     return Row(
       children: [
         Container(
@@ -401,8 +404,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
           child: Icon(icon, color: color, size: 20),
         ),
         const SizedBox(width: 16),
-        Expanded(
-            child: Text(label, style: const TextStyle(fontSize: 15))),
+        Expanded(child: Text(label, style: const TextStyle(fontSize: 15))),
         Text(
           value,
           style: TextStyle(

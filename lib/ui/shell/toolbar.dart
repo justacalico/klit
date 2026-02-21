@@ -29,7 +29,9 @@ class PageToolbar extends StatelessWidget {
         color: isDark ? const Color(0xFF18181B) : const Color(0xFFFAFAFC),
         border: Border(
           bottom: BorderSide(
-            color: UIColors.primaryPurple.withValues(alpha: isDark ? 0.15 : 0.1),
+            color: UIColors.primaryPurple.withValues(
+              alpha: isDark ? 0.15 : 0.1,
+            ),
             width: 1,
           ),
         ),
@@ -114,7 +116,9 @@ class _ToolbarButtonState extends State<ToolbarButton> {
             border: Border.all(
               color: _hovered && !disabled
                   ? UIColors.primaryPurple.withValues(alpha: 0.3)
-                  : (isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E7EB)),
+                  : (isDark
+                        ? const Color(0xFF3A3A3C)
+                        : const Color(0xFFE5E7EB)),
               width: 1,
             ),
           ),
@@ -123,7 +127,11 @@ class _ToolbarButtonState extends State<ToolbarButton> {
             size: 18,
             color: disabled
                 ? CupertinoColors.systemGrey
-                : (_hovered ? UIColors.primaryPurple : (isDark ? CupertinoColors.white : const Color(0xFF374151))),
+                : (_hovered
+                      ? UIColors.primaryPurple
+                      : (isDark
+                            ? CupertinoColors.white
+                            : const Color(0xFF374151))),
           ),
         ),
       ),

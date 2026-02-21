@@ -13,7 +13,6 @@ typedef HostChangeCallback = void Function(String host);
 /// Callback type for when score threshold changes
 typedef ScoreThresholdChangeCallback = void Function(int threshold);
 
-/// Provider for app settings
 class SettingsProvider extends ChangeNotifier {
   final StorageService _storageService;
 
@@ -84,7 +83,6 @@ class SettingsProvider extends ChangeNotifier {
         .toList();
   }
 
-  /// Initialize settings from storage
   Future<void> initialize() async {
     _themeMode = _storageService.getThemeMode();
     _gridSize = _storageService.getGridSize();

@@ -107,10 +107,9 @@ class _SearchRoutePage extends StatelessWidget {
       child: SafeArea(
         child: UiSearchPage(
           initialQuery: initialQuery,
-          onPostTap: (args) => Navigator.of(context).pushNamed(
-            AppRoutes.postDetail,
-            arguments: args,
-          ),
+          onPostTap: (args) => Navigator.of(
+            context,
+          ).pushNamed(AppRoutes.postDetail, arguments: args),
         ),
       ),
     );
@@ -122,9 +121,7 @@ class _ProfileRoutePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return UiProfilePage(
-      onNavigate: (r) => Navigator.of(context).pushNamed(r),
-    );
+    return UiProfilePage(onNavigate: (r) => Navigator.of(context).pushNamed(r));
   }
 }
 
@@ -134,10 +131,9 @@ class _FavoritesRoutePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return UiFavoritesPage(
-      onPostTap: (args) => Navigator.of(context).pushNamed(
-        AppRoutes.postDetail,
-        arguments: args,
-      ),
+      onPostTap: (args) => Navigator.of(
+        context,
+      ).pushNamed(AppRoutes.postDetail, arguments: args),
     );
   }
 }

@@ -7,11 +7,31 @@ import '../../core/utils/helpers.dart';
 import '../theme.dart';
 
 const Map<int, _NavItemData> _navDefs = {
-  0: _NavItemData(icon: CupertinoIcons.home, activeIcon: CupertinoIcons.house_fill, label: 'Home'),
-  1: _NavItemData(icon: CupertinoIcons.flame, activeIcon: CupertinoIcons.flame_fill, label: 'Hot'),
-  2: _NavItemData(icon: CupertinoIcons.star, activeIcon: CupertinoIcons.star_fill, label: 'Popular'),
-  3: _NavItemData(icon: CupertinoIcons.person, activeIcon: CupertinoIcons.person_fill, label: 'Profile'),
-  4: _NavItemData(icon: CupertinoIcons.settings, activeIcon: CupertinoIcons.settings_solid, label: 'Settings'),
+  0: _NavItemData(
+    icon: CupertinoIcons.home,
+    activeIcon: CupertinoIcons.house_fill,
+    label: 'Home',
+  ),
+  1: _NavItemData(
+    icon: CupertinoIcons.flame,
+    activeIcon: CupertinoIcons.flame_fill,
+    label: 'Hot',
+  ),
+  2: _NavItemData(
+    icon: CupertinoIcons.star,
+    activeIcon: CupertinoIcons.star_fill,
+    label: 'Popular',
+  ),
+  3: _NavItemData(
+    icon: CupertinoIcons.person,
+    activeIcon: CupertinoIcons.person_fill,
+    label: 'Profile',
+  ),
+  4: _NavItemData(
+    icon: CupertinoIcons.settings,
+    activeIcon: CupertinoIcons.settings_solid,
+    label: 'Settings',
+  ),
 };
 
 class _NavItemData {
@@ -65,7 +85,9 @@ class AppNavBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: UIColors.primaryPurple.withValues(alpha: isDark ? 0.3 : 0.15),
+            color: UIColors.primaryPurple.withValues(
+              alpha: isDark ? 0.3 : 0.15,
+            ),
             blurRadius: 20,
             spreadRadius: -2,
             offset: const Offset(0, 8),
@@ -92,7 +114,9 @@ class AppNavBar extends StatelessWidget {
                     : [const Color(0xFFF5F5F7), const Color(0xFFEBEBEF)],
               ),
               border: Border.all(
-                color: UIColors.primaryPurple.withValues(alpha: isDark ? 0.2 : 0.1),
+                color: UIColors.primaryPurple.withValues(
+                  alpha: isDark ? 0.2 : 0.1,
+                ),
                 width: 1,
               ),
             ),
@@ -103,7 +127,11 @@ class AppNavBar extends StatelessWidget {
     );
   }
 
-  Widget _buildMaterial(BuildContext context, bool isDark, double bottomPadding) {
+  Widget _buildMaterial(
+    BuildContext context,
+    bool isDark,
+    double bottomPadding,
+  ) {
     return Container(
       padding: EdgeInsets.only(bottom: bottomPadding),
       decoration: BoxDecoration(
@@ -142,17 +170,19 @@ class AppNavBar extends StatelessWidget {
       } else {
         final def = _navDefs[id];
         if (def != null) {
-          items.add(_NavBarItem(
-            icon: def.icon,
-            activeIcon: def.activeIcon,
-            label: def.label,
-            isSelected: isSelected,
-            isDark: isDark,
-            onTap: () {
-              HapticUtils.selectionClick();
-              onTap(i);
-            },
-          ));
+          items.add(
+            _NavBarItem(
+              icon: def.icon,
+              activeIcon: def.activeIcon,
+              label: def.label,
+              isSelected: isSelected,
+              isDark: isDark,
+              onTap: () {
+                HapticUtils.selectionClick();
+                onTap(i);
+              },
+            ),
+          );
         }
       }
     }
@@ -181,7 +211,9 @@ class _NavBarItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = isSelected
         ? UIColors.primaryPurple
-        : (isDark ? CupertinoColors.white.withValues(alpha: 0.6) : CupertinoColors.black.withValues(alpha: 0.6));
+        : (isDark
+              ? CupertinoColors.white.withValues(alpha: 0.6)
+              : CupertinoColors.black.withValues(alpha: 0.6));
 
     return Expanded(
       child: GestureDetector(
@@ -232,7 +264,9 @@ class _LogoutItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isDark ? CupertinoColors.white.withValues(alpha: 0.5) : CupertinoColors.black.withValues(alpha: 0.4);
+    final color = isDark
+        ? CupertinoColors.white.withValues(alpha: 0.5)
+        : CupertinoColors.black.withValues(alpha: 0.4);
     return Expanded(
       child: GestureDetector(
         onTap: () {
@@ -247,7 +281,11 @@ class _LogoutItem extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               'Sign Out',
-              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500, color: color),
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: color,
+              ),
             ),
           ],
         ),

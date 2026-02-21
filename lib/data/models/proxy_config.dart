@@ -51,7 +51,7 @@ class ProxyConfig {
   /// Get the proxy URL string (e.g., "http://host:port" or "http://user:pass@host:port")
   String? get proxyUrl {
     if (!enabled || host.isEmpty) return null;
-    
+
     if (useAuthentication && username != null && username!.isNotEmpty) {
       final encodedUser = Uri.encodeComponent(username!);
       final encodedPass = Uri.encodeComponent(password ?? '');
@@ -93,7 +93,9 @@ class ProxyConfig {
 
   /// Create from JSON string
   factory ProxyConfig.fromJsonString(String jsonString) {
-    return ProxyConfig.fromJson(json.decode(jsonString) as Map<String, dynamic>);
+    return ProxyConfig.fromJson(
+      json.decode(jsonString) as Map<String, dynamic>,
+    );
   }
 
   /// Convert to JSON string

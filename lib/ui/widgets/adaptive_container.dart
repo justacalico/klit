@@ -73,7 +73,8 @@ class AdaptiveContainer extends StatelessWidget {
             decoration: BoxDecoration(
               color: effectiveTint,
               borderRadius: effectiveBorderRadius,
-              border: border ??
+              border:
+                  border ??
                   Border.all(
                     color: isDark
                         ? const Color(0xFF3A3A3C).withValues(alpha: 0.5)
@@ -92,7 +93,9 @@ class AdaptiveContainer extends StatelessWidget {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
 
-    final defaultColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF2F2F7);
+    final defaultColor = isDark
+        ? const Color(0xFF1C1C1E)
+        : const Color(0xFFF2F2F7);
 
     final effectiveColor = tintColor ?? defaultColor;
     final effectiveBorderRadius = borderRadius ?? BorderRadius.circular(12);
@@ -106,7 +109,8 @@ class AdaptiveContainer extends StatelessWidget {
       decoration: BoxDecoration(
         color: effectiveColor,
         borderRadius: effectiveBorderRadius,
-        border: border ??
+        border:
+            border ??
             Border.all(
               color: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFD1D1D6),
               width: 0.5,

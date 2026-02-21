@@ -56,15 +56,17 @@ class _UiHotPageState extends State<UiHotPage> {
     final posts = pp.hotPosts;
     final idx = posts.indexWhere((p) => p.id == post.id);
 
-    widget.onPostTap(PostDetailArguments(
-      postIds: posts.map((p) => p.id).toList(),
-      initialIndex: idx >= 0 ? idx : 0,
-      hasMore: pp.hasMoreHot,
-      onLoadMore: () async {
-        await pp.loadHotPosts(safeMode: _safeMode(context));
-        return pp.hotPosts.map((p) => p.id).toList();
-      },
-    ));
+    widget.onPostTap(
+      PostDetailArguments(
+        postIds: posts.map((p) => p.id).toList(),
+        initialIndex: idx >= 0 ? idx : 0,
+        hasMore: pp.hasMoreHot,
+        onLoadMore: () async {
+          await pp.loadHotPosts(safeMode: _safeMode(context));
+          return pp.hotPosts.map((p) => p.id).toList();
+        },
+      ),
+    );
   }
 
   @override
@@ -77,9 +79,15 @@ class _UiHotPageState extends State<UiHotPage> {
             title: 'Hot Posts',
             icon: CupertinoIcons.flame_fill,
             actions: [
-              ToolbarButton(icon: CupertinoIcons.search, onPressed: widget.onSearchTap),
+              ToolbarButton(
+                icon: CupertinoIcons.search,
+                onPressed: widget.onSearchTap,
+              ),
               const SizedBox(width: 8),
-              ToolbarButton(icon: CupertinoIcons.refresh, onPressed: () => _load(refresh: true)),
+              ToolbarButton(
+                icon: CupertinoIcons.refresh,
+                onPressed: () => _load(refresh: true),
+              ),
             ],
           ),
           Expanded(
@@ -87,13 +95,18 @@ class _UiHotPageState extends State<UiHotPage> {
               builder: (_, pp, _) => Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     child: DesktopTimeRangeSelector(
                       selected: pp.hotTimeRange,
                       options: const ['day', 'week', 'month'],
                       customDate: pp.hotCustomDate,
-                      onChanged: (r) => pp.setHotTimeRange(r, safeMode: _safeMode(context)),
-                      onDateSelected: (d) => pp.setHotCustomDate(d, safeMode: _safeMode(context)),
+                      onChanged: (r) =>
+                          pp.setHotTimeRange(r, safeMode: _safeMode(context)),
+                      onDateSelected: (d) =>
+                          pp.setHotCustomDate(d, safeMode: _safeMode(context)),
                     ),
                   ),
                   Expanded(

@@ -52,7 +52,8 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
     if (direction == GamepadDirection.up && pos > 0) {
       _onNav(_desktopOrder[pos - 1]);
       HapticFeedback.selectionClick();
-    } else if (direction == GamepadDirection.down && pos < _desktopOrder.length - 1) {
+    } else if (direction == GamepadDirection.down &&
+        pos < _desktopOrder.length - 1) {
       _onNav(_desktopOrder[pos + 1]);
       HapticFeedback.selectionClick();
     }
@@ -111,7 +112,9 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
               Navigator.of(ctx).pop();
               await context.read<AuthProvider>().logout();
               if (mounted) {
-                Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.login, (_) => false);
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil(AppRoutes.login, (_) => false);
               }
             },
             child: const Text('Sign Out'),
@@ -136,11 +139,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
 
     final content = KeyedSubtree(
       key: ValueKey('shell-content-$selected'),
-      child: RepaintBoundary(
-        child: ClipRect(
-          child: _buildContent(selected),
-        ),
-      ),
+      child: RepaintBoundary(child: ClipRect(child: _buildContent(selected))),
     );
 
     final navBarHeight = _getMobileNavBarHeight(context);
@@ -183,7 +182,9 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
                   right: 0,
                   bottom: 0,
                   child: ColoredBox(
-                    color: isDark ? const Color(0xFF0A0A0C) : const Color(0xFFF8F8FC),
+                    color: isDark
+                        ? const Color(0xFF0A0A0C)
+                        : const Color(0xFFF8F8FC),
                     child: SizedBox(
                       height: navBarHeight,
                       child: Material(
@@ -218,7 +219,9 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
     final auth = context.watch<AuthProvider>();
     final settings = context.watch<SettingsProvider>();
     final rawOrder = settings.mobileNavOrder;
-    final navOrder = auth.isGuest ? rawOrder.where((id) => id != 3).toList() : rawOrder;
+    final navOrder = auth.isGuest
+        ? rawOrder.where((id) => id != 3).toList()
+        : rawOrder;
     final mobileIdx = nav.getMobileIndex();
     final pos = navOrder.indexOf(mobileIdx);
     final currentIndex = pos >= 0 ? pos : 0;
@@ -245,11 +248,18 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
       case 2:
         return UiPopularPage(onPostTap: _onPostTap, onSearchTap: _openSearch);
       case 3:
-        return UiSettingsPage(onNavigate: (r) => Navigator.of(context).pushNamed(r));
+        return UiSettingsPage(
+          onNavigate: (r) => Navigator.of(context).pushNamed(r),
+        );
       case 4:
-        return UiSearchPage(initialQuery: nav.searchQuery, onPostTap: _onPostTap);
+        return UiSearchPage(
+          initialQuery: nav.searchQuery,
+          onPostTap: _onPostTap,
+        );
       case 5:
-        return UiProfilePage(onNavigate: (r) => Navigator.of(context).pushNamed(r));
+        return UiProfilePage(
+          onNavigate: (r) => Navigator.of(context).pushNamed(r),
+        );
       case 6:
         return UiFavoritesPage(onPostTap: _onPostTap);
       default:

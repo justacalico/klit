@@ -32,10 +32,7 @@ class TagChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected ? color : color.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: color.withValues(alpha: 0.3),
-            width: 1,
-          ),
+          border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -114,7 +111,9 @@ class TagList extends StatelessWidget {
             child: TagChip(
               tag: entry.key,
               category: entry.value,
-              onTap: onTagTap != null ? () => onTagTap!(entry.key, entry.value) : null,
+              onTap: onTagTap != null
+                  ? () => onTagTap!(entry.key, entry.value)
+                  : null,
             ),
           );
         }).toList(),

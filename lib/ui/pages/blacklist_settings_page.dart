@@ -48,7 +48,7 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
     final settings = context.read<SettingsProvider>();
     await settings.setBlacklist(_blacklistController.text);
     setState(() => _hasChanges = false);
-    
+
     if (mounted) {
       _showToast('Blacklist saved');
     }
@@ -57,7 +57,7 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
   Future<void> _syncFromAccount() async {
     final authProvider = context.read<AuthProvider>();
     final settings = context.read<SettingsProvider>();
-    
+
     if (authProvider.isGuest || authProvider.currentAccount == null) {
       _showToast('Sign in to sync blacklist from your account');
       return;
@@ -73,7 +73,8 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
 
       await result.when(
         success: (user) async {
-          if (user.blacklistedTags != null && user.blacklistedTags!.isNotEmpty) {
+          if (user.blacklistedTags != null &&
+              user.blacklistedTags!.isNotEmpty) {
             _blacklistController.text = user.blacklistedTags!;
             await settings.setBlacklist(user.blacklistedTags!);
             _showToast('Blacklist synced from account');
@@ -120,23 +121,35 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 12),
-              _buildHelpSection('Basic Tags', 
-                'Enter one tag per line to hide posts containing that tag.\n\nExample:\nyoung\nscat'),
+              _buildHelpSection(
+                'Basic Tags',
+                'Enter one tag per line to hide posts containing that tag.\n\nExample:\nyoung\nscat',
+              ),
               const SizedBox(height: 12),
-              _buildHelpSection('Multiple Tags (AND)', 
-                'Put multiple tags on one line to require ALL tags.\n\nExample:\nmale solo\n(hides posts with BOTH male AND solo)'),
+              _buildHelpSection(
+                'Multiple Tags (AND)',
+                'Put multiple tags on one line to require ALL tags.\n\nExample:\nmale solo\n(hides posts with BOTH male AND solo)',
+              ),
               const SizedBox(height: 12),
-              _buildHelpSection('Exclusions', 
-                'Use - to exclude a tag from a rule.\n\nExample:\nmale -muscular\n(hides male posts EXCEPT muscular ones)'),
+              _buildHelpSection(
+                'Exclusions',
+                'Use - to exclude a tag from a rule.\n\nExample:\nmale -muscular\n(hides male posts EXCEPT muscular ones)',
+              ),
               const SizedBox(height: 12),
-              _buildHelpSection('Special Filters', 
-                'rating:s - Safe\nrating:q - Questionable\nrating:e - Explicit\ntype:video - Videos\ntype:gif - GIFs'),
+              _buildHelpSection(
+                'Special Filters',
+                'rating:s - Safe\nrating:q - Questionable\nrating:e - Explicit\ntype:video - Videos\ntype:gif - GIFs',
+              ),
               const SizedBox(height: 12),
-              _buildHelpSection('Wildcards', 
-                'Use * for partial matches.\n\nExample:\nyoung*\n(matches young, younger, youngest, etc.)'),
+              _buildHelpSection(
+                'Wildcards',
+                'Use * for partial matches.\n\nExample:\nyoung*\n(matches young, younger, youngest, etc.)',
+              ),
               const SizedBox(height: 12),
-              _buildHelpSection('Comments', 
-                'Lines starting with # are ignored.\n\nExample:\n# This is a comment'),
+              _buildHelpSection(
+                'Comments',
+                'Lines starting with # are ignored.\n\nExample:\n# This is a comment',
+              ),
             ],
           ),
         ),
@@ -156,19 +169,10 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
       children: [
         Text(
           title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
         ),
         const SizedBox(height: 4),
-        Text(
-          content,
-          style: const TextStyle(
-            fontSize: 13,
-            height: 1.4,
-          ),
-        ),
+        Text(content, style: const TextStyle(fontSize: 13, height: 1.4)),
       ],
     );
   }
@@ -183,66 +187,64 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
     return KeyedSubtree(
       key: const ValueKey('blacklist-settings-page'),
       child: CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        backgroundColor: isDark
-            ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
-            : CupertinoColors.white.withValues(alpha: 0.85),
-        border: Border(
-          bottom: BorderSide(
-            color: isDark
-                ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
-                : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
-            width: 0.5,
-          ),
-        ),
-        middle: Text(
-          'Blacklist',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: isDark ? CupertinoColors.white : CupertinoColors.black,
-          ),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CupertinoButton(
-              padding: EdgeInsets.zero,
-              onPressed: _showHelpDialog,
-              child: Icon(
-                CupertinoIcons.question_circle,
-                color: _ThemeColors.primaryPurple,
-                size: 24,
-              ),
+        navigationBar: CupertinoNavigationBar(
+          backgroundColor: isDark
+              ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
+              : CupertinoColors.white.withValues(alpha: 0.85),
+          border: Border(
+            bottom: BorderSide(
+              color: isDark
+                  ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
+                  : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+              width: 0.5,
             ),
-            if (_hasChanges)
+          ),
+          middle: Text(
+            'Blacklist',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: isDark ? CupertinoColors.white : CupertinoColors.black,
+            ),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
               CupertinoButton(
-                padding: const EdgeInsets.only(left: 8),
-                onPressed: _saveBlacklist,
-                child: Text(
-                  'Save',
-                  style: TextStyle(
-                    color: _ThemeColors.primaryPurple,
-                    fontWeight: FontWeight.w600,
-                  ),
+                padding: EdgeInsets.zero,
+                onPressed: _showHelpDialog,
+                child: Icon(
+                  CupertinoIcons.question_circle,
+                  color: _ThemeColors.primaryPurple,
+                  size: 24,
                 ),
               ),
-          ],
+              if (_hasChanges)
+                CupertinoButton(
+                  padding: const EdgeInsets.only(left: 8),
+                  onPressed: _saveBlacklist,
+                  child: Text(
+                    'Save',
+                    style: TextStyle(
+                      color: _ThemeColors.primaryPurple,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
-      ),
-      child: SafeArea(
-        child: Column(
-          children: [
-            // Sync button section
-            _buildSyncSection(isDark, isGuest),
-            // Blacklist editor
-            Expanded(
-              child: _buildEditor(isDark),
-            ),
-            // Footer with stats
-            _buildFooter(isDark),
-          ],
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Sync button section
+              _buildSyncSection(isDark, isGuest),
+              // Blacklist editor
+              Expanded(child: _buildEditor(isDark)),
+              // Footer with stats
+              _buildFooter(isDark),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -271,7 +273,9 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                    color: isDark
+                        ? CupertinoColors.white
+                        : CupertinoColors.black,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -368,7 +372,8 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
                 expands: true,
                 textAlignVertical: TextAlignVertical.top,
                 padding: const EdgeInsets.all(16),
-                placeholder: '# Example blacklist\nyoung\nscat\ngore\n-safe_for_work muscular',
+                placeholder:
+                    '# Example blacklist\nyoung\nscat\ngore\n-safe_for_work muscular',
                 placeholderStyle: TextStyle(
                   color: CupertinoColors.systemGrey,
                   fontSize: 14,
@@ -393,7 +398,7 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
   Widget _buildFooter(bool isDark) {
     final settings = context.watch<SettingsProvider>();
     final lineCount = settings.blacklistLines.length;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

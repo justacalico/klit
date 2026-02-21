@@ -189,16 +189,24 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                   onTap: () => _selectCategory(category.id),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? category.color.withValues(alpha: 0.2)
                           : (isDark
                                 ? CupertinoColors.white.withValues(alpha: 0.08)
-                                : CupertinoColors.black.withValues(alpha: 0.05)),
+                                : CupertinoColors.black.withValues(
+                                    alpha: 0.05,
+                                  )),
                       borderRadius: BorderRadius.circular(12),
                       border: isSelected
-                          ? Border.all(color: category.color.withValues(alpha: 0.4), width: 1)
+                          ? Border.all(
+                              color: category.color.withValues(alpha: 0.4),
+                              width: 1,
+                            )
                           : null,
                     ),
                     child: Row(
@@ -209,17 +217,23 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                           size: 16,
                           color: isSelected
                               ? category.color
-                              : (isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2),
+                              : (isDark
+                                    ? CupertinoColors.systemGrey
+                                    : CupertinoColors.systemGrey2),
                         ),
                         const SizedBox(width: 8),
                         Text(
                           category.title,
                           style: TextStyle(
                             fontSize: 13,
-                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.w500,
                             color: isSelected
                                 ? category.color
-                                : (isDark ? CupertinoColors.white : CupertinoColors.black),
+                                : (isDark
+                                      ? CupertinoColors.white
+                                      : CupertinoColors.black),
                           ),
                         ),
                       ],
@@ -669,9 +683,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     );
   }
 
-  // ============================================
   // Account Content
-  // ============================================
   Widget _buildAccountContent(bool isDark) {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, _) {
@@ -830,9 +842,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     );
   }
 
-  // ============================================
   // Appearance Content
-  // ============================================
   Widget _buildAppearanceContent(bool isDark) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
@@ -1114,9 +1124,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     );
   }
 
-  // ============================================
   // Content Settings
-  // ============================================
   Widget _buildContentSettings(bool isDark) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
@@ -1370,7 +1378,8 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                       ),
                       color: _DesignColors.accentOrange.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
-                      onPressed: () => widget.onNavigate(AppRoutes.blacklistSettings),
+                      onPressed: () =>
+                          widget.onNavigate(AppRoutes.blacklistSettings),
                       child: const Text(
                         'Manage',
                         style: TextStyle(
@@ -1407,9 +1416,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     );
   }
 
-  // ============================================
   // Behavior Content
-  // ============================================
   Widget _buildBehaviorContent(bool isDark) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
@@ -1437,9 +1444,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     );
   }
 
-  // ============================================
   // Video Content
-  // ============================================
   Widget _buildVideoContent(bool isDark) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
@@ -1490,9 +1495,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     );
   }
 
-  // ============================================
   // Customization Content
-  // ============================================
   Widget _buildCustomizationContent(bool isDark) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
@@ -1645,9 +1648,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     );
   }
 
-  // ============================================
   // Data Content
-  // ============================================
   Widget _buildDataContent(bool isDark) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
@@ -1757,9 +1758,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     );
   }
 
-  // ============================================
   // Network Content
-  // ============================================
   Widget _buildNetworkContent(bool isDark) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
@@ -1980,9 +1979,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     );
   }
 
-  // ============================================
   // About Content
-  // ============================================
   Widget _buildAboutContent(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

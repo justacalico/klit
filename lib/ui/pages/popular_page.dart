@@ -56,15 +56,17 @@ class _UiPopularPageState extends State<UiPopularPage> {
     final posts = pp.popularPosts;
     final idx = posts.indexWhere((p) => p.id == post.id);
 
-    widget.onPostTap(PostDetailArguments(
-      postIds: posts.map((p) => p.id).toList(),
-      initialIndex: idx >= 0 ? idx : 0,
-      hasMore: pp.hasMorePopular,
-      onLoadMore: () async {
-        await pp.loadPopularPosts(safeMode: _safeMode(context));
-        return pp.popularPosts.map((p) => p.id).toList();
-      },
-    ));
+    widget.onPostTap(
+      PostDetailArguments(
+        postIds: posts.map((p) => p.id).toList(),
+        initialIndex: idx >= 0 ? idx : 0,
+        hasMore: pp.hasMorePopular,
+        onLoadMore: () async {
+          await pp.loadPopularPosts(safeMode: _safeMode(context));
+          return pp.popularPosts.map((p) => p.id).toList();
+        },
+      ),
+    );
   }
 
   @override
@@ -77,9 +79,15 @@ class _UiPopularPageState extends State<UiPopularPage> {
             title: 'Popular Posts',
             icon: CupertinoIcons.star_fill,
             actions: [
-              ToolbarButton(icon: CupertinoIcons.search, onPressed: widget.onSearchTap),
+              ToolbarButton(
+                icon: CupertinoIcons.search,
+                onPressed: widget.onSearchTap,
+              ),
               const SizedBox(width: 8),
-              ToolbarButton(icon: CupertinoIcons.refresh, onPressed: () => _load(refresh: true)),
+              ToolbarButton(
+                icon: CupertinoIcons.refresh,
+                onPressed: () => _load(refresh: true),
+              ),
             ],
           ),
           Expanded(
@@ -87,13 +95,22 @@ class _UiPopularPageState extends State<UiPopularPage> {
               builder: (_, pp, _) => Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     child: DesktopTimeRangeSelector(
                       selected: pp.popularTimeRange,
                       options: const ['day', 'week', 'month'],
                       customDate: pp.popularCustomDate,
-                      onChanged: (r) => pp.setPopularTimeRange(r, safeMode: _safeMode(context)),
-                      onDateSelected: (d) => pp.setPopularCustomDate(d, safeMode: _safeMode(context)),
+                      onChanged: (r) => pp.setPopularTimeRange(
+                        r,
+                        safeMode: _safeMode(context),
+                      ),
+                      onDateSelected: (d) => pp.setPopularCustomDate(
+                        d,
+                        safeMode: _safeMode(context),
+                      ),
                     ),
                   ),
                   Expanded(

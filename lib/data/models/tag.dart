@@ -112,10 +112,7 @@ class PostSearchParams {
   }
 
   Map<String, dynamic> toQueryParams() {
-    final params = <String, dynamic>{
-      'page': page,
-      'limit': limit,
-    };
+    final params = <String, dynamic>{'page': page, 'limit': limit};
 
     final tagParts = <String>[];
     if (tags != null && tags!.isNotEmpty) {
@@ -128,7 +125,7 @@ class PostSearchParams {
     if (tagParts.isNotEmpty) {
       params['tags'] = tagParts.join(' ');
     }
-    
+
     // Order is a separate query parameter, not a tag
     if (order != null && order!.isNotEmpty) {
       params['tags'] = (params['tags'] ?? '') + ' order:$order';
@@ -143,10 +140,7 @@ class SearchHistoryItem {
   final String query;
   final DateTime timestamp;
 
-  const SearchHistoryItem({
-    required this.query,
-    required this.timestamp,
-  });
+  const SearchHistoryItem({required this.query, required this.timestamp});
 
   factory SearchHistoryItem.fromJson(Map<String, dynamic> json) {
     return SearchHistoryItem(
@@ -156,9 +150,6 @@ class SearchHistoryItem {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'query': query,
-      'timestamp': timestamp.toIso8601String(),
-    };
+    return {'query': query, 'timestamp': timestamp.toIso8601String()};
   }
 }

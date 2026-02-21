@@ -20,7 +20,9 @@ class LoadingShimmer extends StatelessWidget {
 
     return Shimmer.fromColors(
       baseColor: isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE5E5EA),
-      highlightColor: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFF2F2F7),
+      highlightColor: isDark
+          ? const Color(0xFF3A3A3C)
+          : const Color(0xFFF2F2F7),
       child: Container(
         height: height,
         width: width,

@@ -129,10 +129,10 @@ class _UiFavoritesPageState extends State<UiFavoritesPage> {
     return KeyedSubtree(
       key: const ValueKey('favorites-page'),
       child: Column(
-      children: [
-        _buildToolbar(isDark),
-        Expanded(child: _buildContent(isDark)),
-      ],
+        children: [
+          _buildToolbar(isDark),
+          Expanded(child: _buildContent(isDark)),
+        ],
       ),
     );
   }

@@ -295,9 +295,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       return _buildErrorWidget('Failed to initialize video player');
     }
 
-    return RepaintBoundary(
-      child: Chewie(controller: _chewieController!),
-    );
+    return RepaintBoundary(child: Chewie(controller: _chewieController!));
   }
 }
 
@@ -396,10 +394,7 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
       allowFullScreen: true,
       aspectRatio: _videoController!.value.aspectRatio,
       placeholder: widget.thumbnailUrl != null
-          ? Image.network(
-              widget.thumbnailUrl!,
-              fit: BoxFit.cover,
-            )
+          ? Image.network(widget.thumbnailUrl!, fit: BoxFit.cover)
           : null,
       materialProgressColors: ChewieProgressColors(
         playedColor: AppColors.primaryBlue,
@@ -443,21 +438,14 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Icon(
-            CupertinoIcons.xmark,
-            color: CupertinoColors.white,
-          ),
+          child: const Icon(CupertinoIcons.xmark, color: CupertinoColors.white),
         ),
         middle: const Text(
           'Video',
           style: TextStyle(color: CupertinoColors.white),
         ),
       ),
-      child: SafeArea(
-        child: Center(
-          child: _buildContent(),
-        ),
-      ),
+      child: SafeArea(child: Center(child: _buildContent())),
     );
   }
 
@@ -466,17 +454,11 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
       return const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CupertinoActivityIndicator(
-            color: CupertinoColors.white,
-            radius: 20,
-          ),
+          CupertinoActivityIndicator(color: CupertinoColors.white, radius: 20),
           SizedBox(height: 16),
           Text(
             'Loading video...',
-            style: TextStyle(
-              color: CupertinoColors.systemGrey,
-              fontSize: 16,
-            ),
+            style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 16),
           ),
         ],
       );

@@ -30,19 +30,14 @@ class KlitApp extends StatelessWidget {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            supportedLocales: const [
-              Locale('en', 'US'),
-            ],
+            supportedLocales: const [Locale('en', 'US')],
             builder: (context, child) {
               final width = MediaQuery.sizeOf(context).width;
               final mode = LayoutMode.fromWidth(width);
 
               Widget result = LayoutScope(
                 mode: mode,
-                child: UIStyleManager(
-                  style: settings.uiStyle,
-                  child: child!,
-                ),
+                child: UIStyleManager(style: settings.uiStyle, child: child!),
               );
 
               if (kDebugMode) {

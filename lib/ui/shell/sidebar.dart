@@ -21,12 +21,36 @@ class _NavItemDef {
   });
 
   static const Map<int, _NavItemDef> items = {
-    0: _NavItemDef(icon: CupertinoIcons.house_fill, label: 'Home', section: 'browse'),
-    1: _NavItemDef(icon: CupertinoIcons.flame_fill, label: 'Hot', section: 'browse'),
-    2: _NavItemDef(icon: CupertinoIcons.star_fill, label: 'Popular', section: 'browse'),
-    4: _NavItemDef(icon: CupertinoIcons.search, label: 'Search', section: 'tools'),
-    5: _NavItemDef(icon: CupertinoIcons.person_fill, label: 'Profile', section: 'account'),
-    6: _NavItemDef(icon: CupertinoIcons.heart_fill, label: 'Favorites', section: 'account'),
+    0: _NavItemDef(
+      icon: CupertinoIcons.house_fill,
+      label: 'Home',
+      section: 'browse',
+    ),
+    1: _NavItemDef(
+      icon: CupertinoIcons.flame_fill,
+      label: 'Hot',
+      section: 'browse',
+    ),
+    2: _NavItemDef(
+      icon: CupertinoIcons.star_fill,
+      label: 'Popular',
+      section: 'browse',
+    ),
+    4: _NavItemDef(
+      icon: CupertinoIcons.search,
+      label: 'Search',
+      section: 'tools',
+    ),
+    5: _NavItemDef(
+      icon: CupertinoIcons.person_fill,
+      label: 'Profile',
+      section: 'account',
+    ),
+    6: _NavItemDef(
+      icon: CupertinoIcons.heart_fill,
+      label: 'Favorites',
+      section: 'account',
+    ),
   };
 }
 
@@ -56,7 +80,9 @@ class AppSidebar extends StatelessWidget {
             onPressed: () {
               Navigator.of(ctx).pop();
               context.read<AuthProvider>().logout();
-              Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.login, (_) => false);
+              Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil(AppRoutes.login, (_) => false);
             },
             child: const Text('Sign Out'),
           ),
@@ -106,7 +132,10 @@ class AppSidebar extends StatelessWidget {
         SizedBox(
           height: 60,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: isCollapsed ? 12 : 16, vertical: 12),
+            padding: EdgeInsets.symmetric(
+              horizontal: isCollapsed ? 12 : 16,
+              vertical: 12,
+            ),
             child: Row(
               children: [
                 Container(
@@ -116,10 +145,7 @@ class AppSidebar extends StatelessWidget {
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [
-                        UIColors.primaryIndigo,
-                        UIColors.primaryPurple,
-                      ],
+                      colors: [UIColors.primaryIndigo, UIColors.primaryPurple],
                     ),
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -141,7 +167,9 @@ class AppSidebar extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? CupertinoColors.white : const Color(0xFF1C1C1E),
+                      color: isDark
+                          ? CupertinoColors.white
+                          : const Color(0xFF1C1C1E),
                     ),
                   ),
                 ],
@@ -156,9 +184,12 @@ class AppSidebar extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (browse.isNotEmpty) _buildSection(context, 'Browse', browse, isDark),
-                if (tools.isNotEmpty) _buildSection(context, 'Tools', tools, isDark),
-                if (account.isNotEmpty) _buildSection(context, 'Account', account, isDark),
+                if (browse.isNotEmpty)
+                  _buildSection(context, 'Browse', browse, isDark),
+                if (tools.isNotEmpty)
+                  _buildSection(context, 'Tools', tools, isDark),
+                if (account.isNotEmpty)
+                  _buildSection(context, 'Account', account, isDark),
               ],
             ),
           ),
@@ -230,7 +261,9 @@ class AppSidebar extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2,
+                color: isDark
+                    ? CupertinoColors.systemGrey
+                    : CupertinoColors.systemGrey2,
               ),
             ),
           ),
@@ -292,23 +325,36 @@ class _SidebarItemState extends State<_SidebarItem> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        UIColors.primaryIndigo.withValues(alpha: isDark ? 0.25 : 0.15),
-                        UIColors.primaryPurple.withValues(alpha: isDark ? 0.2 : 0.12),
+                        UIColors.primaryIndigo.withValues(
+                          alpha: isDark ? 0.25 : 0.15,
+                        ),
+                        UIColors.primaryPurple.withValues(
+                          alpha: isDark ? 0.2 : 0.12,
+                        ),
                       ],
                     )
                   : _hovered
-                      ? LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            (isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE5E5EA)).withValues(alpha: 0.6),
-                            (isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE5E5EA)).withValues(alpha: 0.4),
-                          ],
-                        )
-                      : null,
+                  ? LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        (isDark
+                                ? const Color(0xFF2C2C2E)
+                                : const Color(0xFFE5E5EA))
+                            .withValues(alpha: 0.6),
+                        (isDark
+                                ? const Color(0xFF2C2C2E)
+                                : const Color(0xFFE5E5EA))
+                            .withValues(alpha: 0.4),
+                      ],
+                    )
+                  : null,
               borderRadius: BorderRadius.circular(12),
               border: widget.isSelected
-                  ? Border.all(color: UIColors.primaryPurple.withValues(alpha: 0.3), width: 1)
+                  ? Border.all(
+                      color: UIColors.primaryPurple.withValues(alpha: 0.3),
+                      width: 1,
+                    )
                   : null,
             ),
             child: widget.isCollapsed
@@ -320,7 +366,9 @@ class _SidebarItemState extends State<_SidebarItem> {
                         size: 16,
                         color: widget.isSelected
                             ? CupertinoColors.white
-                            : (isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2),
+                            : (isDark
+                                  ? CupertinoColors.systemGrey
+                                  : CupertinoColors.systemGrey2),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -328,10 +376,14 @@ class _SidebarItemState extends State<_SidebarItem> {
                           widget.label,
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w500,
+                            fontWeight: widget.isSelected
+                                ? FontWeight.w600
+                                : FontWeight.w500,
                             color: widget.isSelected
                                 ? UIColors.primaryPurple
-                                : (isDark ? CupertinoColors.white : const Color(0xFF374151)),
+                                : (isDark
+                                      ? CupertinoColors.white
+                                      : const Color(0xFF374151)),
                           ),
                         ),
                       ),
@@ -372,10 +424,14 @@ class _CollapseButtonState extends State<_CollapseButton> {
             decoration: BoxDecoration(
               color: _hovered
                   ? UIColors.primaryPurple.withValues(alpha: 0.1)
-                  : (isDark ? const Color(0xFF2C2C2E).withValues(alpha: 0.6) : const Color(0xFFF2F2F7).withValues(alpha: 0.8)),
+                  : (isDark
+                        ? const Color(0xFF2C2C2E).withValues(alpha: 0.6)
+                        : const Color(0xFFF2F2F7).withValues(alpha: 0.8)),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: _hovered ? UIColors.primaryPurple.withValues(alpha: 0.4) : const Color(0x00000000),
+                color: _hovered
+                    ? UIColors.primaryPurple.withValues(alpha: 0.4)
+                    : const Color(0x00000000),
                 width: 1,
               ),
             ),
@@ -384,7 +440,11 @@ class _CollapseButtonState extends State<_CollapseButton> {
                 Icon(
                   CupertinoIcons.sidebar_left,
                   size: 18,
-                  color: _hovered ? UIColors.primaryPurple : (isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2),
+                  color: _hovered
+                      ? UIColors.primaryPurple
+                      : (isDark
+                            ? CupertinoColors.systemGrey
+                            : CupertinoColors.systemGrey2),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -393,14 +453,20 @@ class _CollapseButtonState extends State<_CollapseButton> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: _hovered ? UIColors.primaryPurple : (isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2),
+                      color: _hovered
+                          ? UIColors.primaryPurple
+                          : (isDark
+                                ? CupertinoColors.systemGrey
+                                : CupertinoColors.systemGrey2),
                     ),
                   ),
                 ),
                 Icon(
                   CupertinoIcons.chevron_left,
                   size: 14,
-                  color: _hovered ? UIColors.primaryPurple.withValues(alpha: 0.7) : CupertinoColors.systemGrey.withValues(alpha: 0.5),
+                  color: _hovered
+                      ? UIColors.primaryPurple.withValues(alpha: 0.7)
+                      : CupertinoColors.systemGrey.withValues(alpha: 0.5),
                 ),
               ],
             ),

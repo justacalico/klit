@@ -61,18 +61,20 @@ class _UiHomePageState extends State<UiHomePage> {
     final posts = pp.latestPosts;
     final idx = posts.indexWhere((p) => p.id == post.id);
 
-    widget.onPostTap(PostDetailArguments(
-      postIds: posts.map((p) => p.id).toList(),
-      initialIndex: idx >= 0 ? idx : 0,
-      hasMore: pp.hasMoreLatest,
-      onLoadMore: () async {
-        await pp.loadLatestPosts(
-          safeMode: _safeMode(context),
-          scoreThreshold: sp.scoreThreshold,
-        );
-        return pp.latestPosts.map((p) => p.id).toList();
-      },
-    ));
+    widget.onPostTap(
+      PostDetailArguments(
+        postIds: posts.map((p) => p.id).toList(),
+        initialIndex: idx >= 0 ? idx : 0,
+        hasMore: pp.hasMoreLatest,
+        onLoadMore: () async {
+          await pp.loadLatestPosts(
+            safeMode: _safeMode(context),
+            scoreThreshold: sp.scoreThreshold,
+          );
+          return pp.latestPosts.map((p) => p.id).toList();
+        },
+      ),
+    );
   }
 
   @override
@@ -85,9 +87,15 @@ class _UiHomePageState extends State<UiHomePage> {
             title: 'Latest Posts',
             icon: CupertinoIcons.house_fill,
             actions: [
-              ToolbarButton(icon: CupertinoIcons.search, onPressed: widget.onSearchTap),
+              ToolbarButton(
+                icon: CupertinoIcons.search,
+                onPressed: widget.onSearchTap,
+              ),
               const SizedBox(width: 8),
-              ToolbarButton(icon: CupertinoIcons.refresh, onPressed: () => _load(refresh: true)),
+              ToolbarButton(
+                icon: CupertinoIcons.refresh,
+                onPressed: () => _load(refresh: true),
+              ),
             ],
           ),
           Expanded(

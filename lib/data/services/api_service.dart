@@ -71,7 +71,6 @@ class ApiService {
     );
   }
 
-  /// Apply proxy configuration to Dio
   void _applyProxyConfig() {
     // Skip proxy configuration on web platform
     if (kIsWeb) return;
@@ -110,16 +109,13 @@ class ApiService {
     }
   }
 
-  /// Update proxy configuration
   void setProxyConfig(ProxyConfig config) {
     _proxyConfig = config;
     _applyProxyConfig();
   }
 
-  /// Get current proxy configuration
   ProxyConfig get proxyConfig => _proxyConfig;
 
-  /// Enforce rate limiting
   Future<void> _enforceRateLimit() async {
     if (_lastRequestTime != null) {
       final timeSinceLastRequest = DateTime.now().difference(_lastRequestTime!);
@@ -130,7 +126,6 @@ class ApiService {
     _lastRequestTime = DateTime.now();
   }
 
-  /// Handle Dio errors and convert to ApiException
   DioException _handleDioError(DioException error) {
     ApiException apiError;
 
@@ -199,13 +194,11 @@ class ApiService {
     );
   }
 
-  /// Update the base URL
   void setBaseUrl(String baseUrl) {
     _baseUrl = baseUrl;
     _dio.options.baseUrl = baseUrl;
   }
 
-  /// Set authentication credentials
   void setAuth(String username, String apiKey) {
     _authHeader = Account(
       id: '',
@@ -216,12 +209,10 @@ class ApiService {
     ).basicAuthHeader;
   }
 
-  /// Clear authentication
   void clearAuth() {
     _authHeader = null;
   }
 
-  /// Verify credentials by making a test request
   Future<ApiResult<bool>> verifyCredentials(
     String username,
     String apiKey,
@@ -235,65 +226,25 @@ class ApiService {
         createdAt: DateTime.now(),
       ).basicAuthHeader;
 
-      if (kDebugMode) {
-        print('ApiService.verifyCredentials: username=$username');
-        print('ApiService.verifyCredentials: baseUrl=$_baseUrl');
-        print('ApiService.verifyCredentials: endpoint=/users/$username.json');
-        print(
-          'ApiService.verifyCredentials: authHeader=${tempAuth.substring(0, 10)}...',
-        );
-      }
-
       final response = await _dio.get(
         '/users/$username.json',
         options: Options(headers: {'Authorization': tempAuth}),
       );
 
-      if (kDebugMode) {
-        print(
-          'ApiService.verifyCredentials: statusCode=${response.statusCode}',
-        );
-        print(
-          'ApiService.verifyCredentials: response data type=${response.data?.runtimeType}',
-        );
-        print('ApiService.verifyCredentials: response data=${response.data}');
-      }
-
       if (response.statusCode == 200 && response.data != null) {
         return ApiResult.success(true);
       }
-      if (kDebugMode) {
-        print(
-          'ApiService.verifyCredentials: Failed - status not 200 or data null',
-        );
-      }
       return ApiResult.failure(ApiException.unauthorized());
     } on DioException catch (e) {
-      if (kDebugMode) {
-        print('ApiService.verifyCredentials: DioException caught');
-        print('ApiService.verifyCredentials: error type=${e.type}');
-        print('ApiService.verifyCredentials: error message=${e.message}');
-        print(
-          'ApiService.verifyCredentials: response statusCode=${e.response?.statusCode}',
-        );
-        print(
-          'ApiService.verifyCredentials: response data=${e.response?.data}',
-        );
-        print('ApiService.verifyCredentials: inner error=${e.error}');
-      }
       if (e.error is ApiException) {
         return ApiResult.failure(e.error as ApiException);
       }
       return ApiResult.failure(ApiException.unknown(e));
     } catch (e) {
-      if (kDebugMode) {
-        print('ApiService.verifyCredentials: Generic exception: $e');
-      }
       return ApiResult.failure(ApiException.unknown(e));
     }
   }
 
-  /// Get user profile by username
   Future<ApiResult<User>> getUserProfile(String username) async {
     try {
       final response = await _dio.get('/users/$username.json');
@@ -336,56 +287,31 @@ class ApiService {
       );
 
       final queryParams = params.toQueryParams();
-      if (kDebugMode) {
-        print(
-          'Making request to ${ApiConstants.postsEndpoint} with params: $queryParams',
-        );
-      }
 
       final response = await _dio.get(
         ApiConstants.postsEndpoint,
         queryParameters: queryParams,
       );
 
-      if (kDebugMode) {
-        print('Response status: ${response.statusCode}');
-      }
-
       if (response.statusCode == 200 && response.data != null) {
         final postsData = response.data['posts'] as List<dynamic>;
-        if (kDebugMode) {
-          print('Got ${postsData.length} posts');
-        }
         final posts = postsData
             .map((e) => Post.fromJson(e as Map<String, dynamic>))
-            .where((p) => p.file.url != null) // Filter out posts without URLs
+            .where((p) => p.file.url != null)
             .toList();
-        if (kDebugMode) {
-          print('After filtering: ${posts.length} posts with URLs');
-        }
         return ApiResult.success(posts);
       }
       return ApiResult.failure(ApiException.unknown());
     } on DioException catch (e) {
-      if (kDebugMode) {
-        print('API Error: ${e.message}');
-      }
-      if (kDebugMode) {
-        print('Response: ${e.response?.data}');
-      }
       if (e.error is ApiException) {
         return ApiResult.failure(e.error as ApiException);
       }
       return ApiResult.failure(ApiException.unknown(e));
     } catch (e) {
-      if (kDebugMode) {
-        print('Exception: $e');
-      }
       return ApiResult.failure(ApiException.unknown(e));
     }
   }
 
-  /// Get a single post by ID
   Future<ApiResult<Post>> getPostById(int id) async {
     try {
       final response = await _dio.get('/posts/$id.json');
@@ -494,25 +420,15 @@ class ApiService {
       }
       return ApiResult.failure(ApiException.unknown());
     } on DioException catch (e) {
-      if (kDebugMode) {
-        print('Popular posts error: ${e.message}');
-      }
-      if (kDebugMode) {
-        print('Response: ${e.response?.data}');
-      }
       if (e.error is ApiException) {
         return ApiResult.failure(e.error as ApiException);
       }
       return ApiResult.failure(ApiException.unknown(e));
     } catch (e) {
-      if (kDebugMode) {
-        print('Popular posts exception: $e');
-      }
       return ApiResult.failure(ApiException.unknown(e));
     }
   }
 
-  /// Search for tags
   Future<ApiResult<List<Tag>>> searchTags({
     required String query,
     int limit = 10,

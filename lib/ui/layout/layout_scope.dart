@@ -24,11 +24,7 @@ enum LayoutMode {
 /// InheritedWidget that provides [LayoutMode] to the widget tree.
 /// Mounted at app root so all pages read layout from one place.
 class LayoutScope extends InheritedWidget {
-  const LayoutScope({
-    super.key,
-    required this.mode,
-    required super.child,
-  });
+  const LayoutScope({super.key, required this.mode, required super.child});
 
   final LayoutMode mode;
 

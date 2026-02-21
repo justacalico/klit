@@ -60,7 +60,7 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
 
     // Save the new host (this triggers onHostChanged which updates API and clears posts)
     await context.read<SettingsProvider>().setHost(host);
-    
+
     if (mounted) {
       Navigator.of(context).pop();
       _showSuccess('Host updated. Posts will reload from the new server.');
@@ -106,45 +106,45 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
     return KeyedSubtree(
       key: const ValueKey('host-settings-page'),
       child: CupertinoPageScaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF000000)
-          : CupertinoColors.systemGroupedBackground,
-      navigationBar: CupertinoNavigationBar(
         backgroundColor: isDark
-            ? const Color(0xFF1C1C1E).withValues(alpha: 0.9)
-            : CupertinoColors.white.withValues(alpha: 0.9),
-        border: Border(
-          bottom: BorderSide(
-            color: isDark
-                ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
-                : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
-            width: 0.5,
+            ? const Color(0xFF000000)
+            : CupertinoColors.systemGroupedBackground,
+        navigationBar: CupertinoNavigationBar(
+          backgroundColor: isDark
+              ? const Color(0xFF1C1C1E).withValues(alpha: 0.9)
+              : CupertinoColors.white.withValues(alpha: 0.9),
+          border: Border(
+            bottom: BorderSide(
+              color: isDark
+                  ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
+                  : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+              width: 0.5,
+            ),
+          ),
+          middle: Text(
+            'Server Configuration',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: isDark ? CupertinoColors.white : CupertinoColors.black,
+            ),
           ),
         ),
-        middle: Text(
-          'Server Configuration',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: isDark ? CupertinoColors.white : CupertinoColors.black,
+        child: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              _buildSectionHeader('PRESET SERVERS'),
+              const SizedBox(height: 8),
+              _buildPresetHosts(context, isDark),
+              const SizedBox(height: 24),
+              _buildSectionHeader('CUSTOM SERVER'),
+              const SizedBox(height: 8),
+              _buildCustomHost(context, isDark),
+              const SizedBox(height: 24),
+              _buildInfoCard(context, isDark),
+            ],
           ),
         ),
-      ),
-      child: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            _buildSectionHeader('PRESET SERVERS'),
-            const SizedBox(height: 8),
-            _buildPresetHosts(context, isDark),
-            const SizedBox(height: 24),
-            _buildSectionHeader('CUSTOM SERVER'),
-            const SizedBox(height: 8),
-            _buildCustomHost(context, isDark),
-            const SizedBox(height: 24),
-            _buildInfoCard(context, isDark),
-          ],
-        ),
-      ),
       ),
     );
   }
@@ -206,11 +206,17 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
                                   end: Alignment.bottomRight,
                                   colors: [
                                     _ThemeColors.primaryPurple,
-                                    _ThemeColors.primaryPurple.withValues(alpha: 0.8),
+                                    _ThemeColors.primaryPurple.withValues(
+                                      alpha: 0.8,
+                                    ),
                                   ],
                                 )
                               : null,
-                          color: isSelected ? null : (isDark ? const Color(0xFF2C2C2E) : CupertinoColors.systemGrey5),
+                          color: isSelected
+                              ? null
+                              : (isDark
+                                    ? const Color(0xFF2C2C2E)
+                                    : CupertinoColors.systemGrey5),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
@@ -218,7 +224,9 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
                           size: 20,
                           color: isSelected
                               ? CupertinoColors.white
-                              : CupertinoColors.secondaryLabel.resolveFrom(context),
+                              : CupertinoColors.secondaryLabel.resolveFrom(
+                                  context,
+                                ),
                         ),
                       ),
                       const SizedBox(width: 14),
@@ -231,7 +239,9 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
-                                color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                                color: isDark
+                                    ? CupertinoColors.white
+                                    : CupertinoColors.black,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -239,7 +249,8 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
                               host['description']!,
                               style: TextStyle(
                                 fontSize: 14,
-                                color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                                color: CupertinoColors.secondaryLabel
+                                    .resolveFrom(context),
                               ),
                             ),
                           ],
@@ -284,8 +295,8 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
           color: isCustom
               ? _ThemeColors.primaryPurple
               : (isDark
-                  ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
-                  : CupertinoColors.systemGrey5),
+                    ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
+                    : CupertinoColors.systemGrey5),
           width: isCustom ? 2 : 0.5,
         ),
       ),
@@ -313,7 +324,9 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
               color: CupertinoColors.placeholderText.resolveFrom(context),
             ),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF2C2C2E) : CupertinoColors.systemGrey6,
+              color: isDark
+                  ? const Color(0xFF2C2C2E)
+                  : CupertinoColors.systemGrey6,
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -351,7 +364,9 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _ThemeColors.primaryPurple.withValues(alpha: isDark ? 0.15 : 0.1),
+        color: _ThemeColors.primaryPurple.withValues(
+          alpha: isDark ? 0.15 : 0.1,
+        ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: _ThemeColors.primaryPurple.withValues(alpha: 0.2),

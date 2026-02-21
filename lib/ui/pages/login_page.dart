@@ -285,41 +285,41 @@ class _LoginPageState extends State<LoginPage>
       key: const ValueKey('login-page'),
       child: CupertinoPageScaffold(
         backgroundColor: isDark
-          ? AppColors.darkBackground
-          : AppColors.lightBackground,
-      child: Stack(
-        children: [
-          _buildAnimatedBackground(isDark),
-          SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(
-                  horizontal: mode.isDesktop ? size.width * 0.25 : 24,
-                  vertical: 24,
-                ),
-                child: FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: isLandscape && mode.isMobile
-                        ? _buildLandscapeLayout(isDark)
-                        : _buildPortraitLayout(isDark),
+            ? AppColors.darkBackground
+            : AppColors.lightBackground,
+        child: Stack(
+          children: [
+            _buildAnimatedBackground(isDark),
+            SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: mode.isDesktop ? size.width * 0.25 : 24,
+                    vertical: 24,
+                  ),
+                  child: FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: isLandscape && mode.isMobile
+                          ? _buildLandscapeLayout(isDark)
+                          : _buildPortraitLayout(isDark),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
 
-          // Controller hints overlay
-          if (_showControllerHints)
-            Positioned(
-              bottom: 24,
-              left: 0,
-              right: 0,
-              child: _buildControllerHints(isDark),
-            ),
-        ],
-      ),
+            // Controller hints overlay
+            if (_showControllerHints)
+              Positioned(
+                bottom: 24,
+                left: 0,
+                right: 0,
+                child: _buildControllerHints(isDark),
+              ),
+          ],
+        ),
       ),
     );
   }

@@ -47,8 +47,8 @@ class VersionData {
     return VersionData(
       version: json['version'] ?? '',
       date: json['date'],
-      platforms: json['platforms'] != null 
-          ? List<String>.from(json['platforms']) 
+      platforms: json['platforms'] != null
+          ? List<String>.from(json['platforms'])
           : null,
       downloads: json['downloads'],
       sourceCode: json['sourceCode'],
@@ -77,33 +77,37 @@ class UpdateCheckResult {
 class UpdateService {
   static const String _baseUrl = 'https://openlyst.ink/api/v1';
   static const String _appSlug = 'klit';
-  
+
   final Dio _dio;
 
-  UpdateService() : _dio = Dio(
-    BaseOptions(
-      baseUrl: _baseUrl,
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    ),
-  );
+  UpdateService()
+    : _dio = Dio(
+        BaseOptions(
+          baseUrl: _baseUrl,
+          connectTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 10),
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
+      );
 
   /// Check for updates by comparing current version with latest from API
   Future<UpdateCheckResult> checkForUpdate(String currentVersion) async {
     try {
       final response = await _dio.get('/apps/$_appSlug/latest');
-      
+
       if (response.statusCode == 200) {
         final data = LatestVersionResponse.fromJson(response.data);
-        
+
         if (data.success && data.data != null) {
           final latestVersion = data.data!.version;
-          final updateAvailable = _isNewerVersion(latestVersion, currentVersion);
-          
+          final updateAvailable = _isNewerVersion(
+            latestVersion,
+            currentVersion,
+          );
+
           return UpdateCheckResult(
             updateAvailable: updateAvailable,
             currentVersion: currentVersion,
@@ -128,13 +132,15 @@ class UpdateService {
       String errorMessage;
       if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.receiveTimeout) {
-        errorMessage = 'Connection timed out. Please check your internet connection.';
+        errorMessage =
+            'Connection timed out. Please check your internet connection.';
       } else if (e.type == DioExceptionType.connectionError) {
-        errorMessage = 'Unable to connect to server. Please check your internet connection.';
+        errorMessage =
+            'Unable to connect to server. Please check your internet connection.';
       } else {
         errorMessage = 'Failed to check for updates: ${e.message}';
       }
-      
+
       return UpdateCheckResult(
         updateAvailable: false,
         currentVersion: currentVersion,
@@ -155,7 +161,7 @@ class UpdateService {
     try {
       final latestParts = latest.split('.').map(int.parse).toList();
       final currentParts = current.split('.').map(int.parse).toList();
-      
+
       // Pad shorter version with zeros
       while (latestParts.length < 3) {
         latestParts.add(0);
@@ -163,13 +169,13 @@ class UpdateService {
       while (currentParts.length < 3) {
         currentParts.add(0);
       }
-      
+
       // Compare major, minor, patch
       for (int i = 0; i < 3; i++) {
         if (latestParts[i] > currentParts[i]) return true;
         if (latestParts[i] < currentParts[i]) return false;
       }
-      
+
       return false; // Versions are equal
     } catch (e) {
       // If parsing fails, do string comparison

@@ -45,14 +45,11 @@ extension UIStyleExtension on UIStyle {
 class UIStyleManager extends InheritedWidget {
   final UIStyle style;
 
-  const UIStyleManager({
-    super.key,
-    required this.style,
-    required super.child,
-  });
+  const UIStyleManager({super.key, required this.style, required super.child});
 
   static UIStyle of(BuildContext context) {
-    final manager = context.dependOnInheritedWidgetOfExactType<UIStyleManager>();
+    final manager = context
+        .dependOnInheritedWidgetOfExactType<UIStyleManager>();
     return manager?.style ?? UIStyle.liquidGlass;
   }
 
