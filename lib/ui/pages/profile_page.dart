@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';
@@ -6,7 +9,9 @@ import '../../core/extensions/extensions.dart';
 import '../../data/models/models.dart';
 import '../../data/services/services.dart';
 import '../../providers/providers.dart';
+import '../layout/layout_scope.dart';
 import '../shell/toolbar.dart';
+import '../theme.dart';
 
 /// Unified profile page - single file for all layouts.
 class UiProfilePage extends StatefulWidget {
@@ -20,6 +25,7 @@ class UiProfilePage extends StatefulWidget {
 
 class _UiProfilePageState extends State<UiProfilePage> {
   User? _user;
+  String? _avatarUrl;
   bool _isLoading = true;
   String? _error;
 
@@ -51,16 +57,36 @@ class _UiProfilePageState extends State<UiProfilePage> {
 
     if (mounted) {
       result.when(
-        success: (user) {
+        success: (user) async {
           if (user.blacklistedTags != null &&
               user.blacklistedTags!.isNotEmpty) {
             final settingsProvider = context.read<SettingsProvider>();
             settingsProvider.setBlacklist(user.blacklistedTags!);
           }
-          setState(() {
-            _user = user;
-            _isLoading = false;
-          });
+          String? avatarUrl;
+          if (user.avatarUrl != null && user.avatarUrl!.isNotEmpty) {
+            avatarUrl = user.avatarUrl!.startsWith(RegExp(r'https?://'))
+                ? user.avatarUrl
+                : '${apiService.baseUrl}/${user.avatarUrl!.startsWith('/') ? user.avatarUrl!.substring(1) : user.avatarUrl}';
+          } else if (user.avatarId != null && user.avatarId!.isNotEmpty) {
+            final postId = int.tryParse(user.avatarId!);
+            if (postId != null) {
+              final postResult = await apiService.getPostById(postId);
+              postResult.when(
+                success: (post) {
+                  avatarUrl = post.preview.url ?? post.sample.url;
+                },
+                failure: (_) {},
+              );
+            }
+          }
+          if (mounted) {
+            setState(() {
+              _user = user;
+              _avatarUrl = avatarUrl;
+              _isLoading = false;
+            });
+          }
         },
         failure: (error) {
           setState(() {
@@ -210,27 +236,22 @@ class _UiProfilePageState extends State<UiProfilePage> {
       );
     }
 
+    final mode = LayoutScope.of(context);
+    final isNarrow = !mode.isDesktop;
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 800),
+          constraints: const BoxConstraints(maxWidth: 720),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildProfileCard(account, _user!, isDark),
-              const SizedBox(height: 24),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: _buildStatsCard(_user!, isDark)),
-                  const SizedBox(width: 24),
-                  Expanded(
-                    child: _buildAccountInfoCard(account, _user!, isDark),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
+              _buildProfileHero(account, _user!, isDark),
+              const SizedBox(height: 20),
+              _buildStatsGrid(_user!, isDark, isNarrow),
+              const SizedBox(height: 20),
+              _buildAccountInfoCard(account, _user!, isDark),
+              const SizedBox(height: 20),
               _buildActionsCard(context, isDark),
             ],
           ),
@@ -239,297 +260,376 @@ class _UiProfilePageState extends State<UiProfilePage> {
     );
   }
 
-  Widget _buildProfileCard(Account account, User user, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              color: AppColors.primaryBlue.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
+  Widget _buildProfileHero(Account account, User user, bool isDark) {
+    final initial = user.name.isNotEmpty ? user.name[0].toUpperCase() : '?';
+    final levelColor = _getLevelColor(user.level);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 24),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [
+                      UIColors.primaryPurple.withValues(alpha: 0.12),
+                      UIColors.primaryIndigo.withValues(alpha: 0.08),
+                    ]
+                  : [
+                      UIColors.primaryPurple.withValues(alpha: 0.08),
+                      UIColors.primaryIndigo.withValues(alpha: 0.06),
+                    ],
             ),
-            child: Center(
-              child: Text(
-                user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
-                style: TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryBlue,
-                ),
+            border: Border.all(
+              color: UIColors.primaryPurple.withValues(
+                alpha: isDark ? 0.25 : 0.15,
               ),
             ),
           ),
-          const SizedBox(width: 24),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  user.name,
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
+          child: Column(
+            children: [
+              _buildAvatar(initial, isDark),
+              const SizedBox(height: 16),
+              Text(
+                user.name,
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getLevelColor(
-                          user.level,
-                        ).withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        user.levelString,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: _getLevelColor(user.level),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      account.host.replaceAll('https://', ''),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: CupertinoColors.systemGrey,
-                      ),
-                    ),
-                  ],
-                ),
-                if (user.isBanned) ...[
-                  const SizedBox(height: 8),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
+                      horizontal: 14,
+                      vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.explicitColor.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
+                      color: levelColor.withValues(alpha: 0.25),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                     child: Text(
-                      'Banned',
+                      user.levelString,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.explicitColor,
+                        color: levelColor,
                       ),
                     ),
                   ),
+                  const SizedBox(width: 12),
+                  Text(
+                    account.host.replaceAll(RegExp(r'https?://'), ''),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: isDark
+                          ? CupertinoColors.systemGrey
+                          : CupertinoColors.systemGrey,
+                    ),
+                  ),
                 ],
+              ),
+              if (user.isBanned) ...[
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.explicitColor.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Text(
+                    'Banned',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.explicitColor,
+                    ),
+                  ),
+                ),
               ],
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildStatsCard(User user, bool isDark) {
+  Widget _buildAvatar(String initial, bool isDark) {
+    const size = 96.0;
+    final fallback = Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            UIColors.primaryIndigo.withValues(alpha: 0.9),
+            UIColors.primaryPurple.withValues(alpha: 0.9),
+          ],
+        ),
+      ),
+      child: Center(
+        child: Text(
+          initial,
+          style: const TextStyle(
+            fontSize: 40,
+            fontWeight: FontWeight.bold,
+            color: CupertinoColors.white,
+          ),
+        ),
+      ),
+    );
+    if (_avatarUrl == null || _avatarUrl!.isEmpty) return fallback;
+    return SizedBox(
+      width: size,
+      height: size,
+      child: ClipOval(
+        child: CachedNetworkImage(
+          imageUrl: _avatarUrl!,
+          fit: BoxFit.cover,
+          width: size,
+          height: size,
+          placeholder: (_, __) => fallback,
+          errorWidget: (_, __, ___) => fallback,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatsGrid(User user, bool isDark, bool isNarrow) {
+    final stats = [
+      _StatItem(CupertinoIcons.heart_fill, 'Favorites', user.favoriteCount.compact, AppColors.explicitColor),
+      _StatItem(CupertinoIcons.cloud_upload_fill, 'Uploads', user.postUploadCount.compact, AppColors.primaryBlue),
+      _StatItem(CupertinoIcons.pencil, 'Post Edits', user.postUpdateCount.compact, AppColors.primaryGreen),
+      _StatItem(CupertinoIcons.text_badge_plus, 'Note Updates', user.noteUpdateCount.compact, UIColors.primaryPurple),
+    ];
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final crossCount = isNarrow ? 2 : 4;
+        final spacing = 12.0;
+        final totalSpacing = (crossCount - 1) * spacing;
+        final itemWidth = (constraints.maxWidth - totalSpacing) / crossCount;
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: stats.map((s) => SizedBox(
+            width: itemWidth,
+            child: _buildStatTile(s, isDark),
+          )).toList(),
+        );
+      },
+    );
+  }
+
+  Widget _buildStatTile(_StatItem item, bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
       decoration: BoxDecoration(
         color: isDark
             ? AppColors.darkSecondaryBackground
             : CupertinoColors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: (isDark ? CupertinoColors.white : CupertinoColors.black).withValues(alpha: 0.06),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Statistics',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: item.color.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(item.icon, color: item.color, size: 18),
           ),
-          const SizedBox(height: 20),
-          _buildStatRow(
-            CupertinoIcons.heart_fill,
-            'Favorites',
-            user.favoriteCount.compact,
-            AppColors.explicitColor,
+          const SizedBox(height: 10),
+          Text(
+            item.value,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: item.color,
+            ),
           ),
-          const SizedBox(height: 16),
-          _buildStatRow(
-            CupertinoIcons.cloud_upload_fill,
-            'Uploads',
-            user.postUploadCount.compact,
-            AppColors.primaryBlue,
-          ),
-          const SizedBox(height: 16),
-          _buildStatRow(
-            CupertinoIcons.pencil,
-            'Post Edits',
-            user.postUpdateCount.compact,
-            AppColors.primaryGreen,
-          ),
-          const SizedBox(height: 16),
-          _buildStatRow(
-            CupertinoIcons.text_badge_plus,
-            'Note Updates',
-            user.noteUpdateCount.compact,
-            AppColors.primaryPurple,
+          const SizedBox(height: 2),
+          Text(
+            item.label,
+            style: TextStyle(
+              fontSize: 13,
+              color: isDark ? CupertinoColors.systemGrey : const Color(0xFF6B7280),
+            ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildStatRow(IconData icon, String label, String value, Color color) {
-    return Row(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, color: color, size: 20),
-        ),
-        const SizedBox(width: 16),
-        Expanded(child: Text(label, style: const TextStyle(fontSize: 15))),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-      ],
     );
   }
 
   Widget _buildAccountInfoCard(Account account, User user, bool isDark) {
+    final rows = <_InfoRow>[
+      _InfoRow('User ID', '#${user.id}'),
+      _InfoRow('Member Since', user.createdAt.relativeTime),
+      _InfoRow('Account Age', user.accountAge),
+      _InfoRow(
+        'Feedback',
+        '+${user.positiveFeedbackCount} / ${user.neutralFeedbackCount} / -${user.negativeFeedbackCount}',
+      ),
+    ];
+    if (user.canApprovePosts) rows.add(const _InfoRow('Can Approve', 'Yes'));
+    if (user.canUploadFree) rows.add(const _InfoRow('Unlimited Upload', 'Yes'));
+
     return Container(
-      padding: const EdgeInsets.all(24),
+      width: double.infinity,
       decoration: BoxDecoration(
         color: isDark
             ? AppColors.darkSecondaryBackground
             : CupertinoColors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: (isDark ? CupertinoColors.white : CupertinoColors.black).withValues(alpha: 0.06),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Account Info',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
+            child: Text(
+              'Account Info',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
+                color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+              ),
+            ),
           ),
-          const SizedBox(height: 20),
-          _buildInfoRow('User ID', '#${user.id}'),
-          const SizedBox(height: 12),
-          _buildInfoRow('Member Since', user.createdAt.relativeTime),
-          const SizedBox(height: 12),
-          _buildInfoRow('Account Age', user.accountAge),
-          const SizedBox(height: 12),
-          _buildInfoRow(
-            'Feedback',
-            '+${user.positiveFeedbackCount} / ${user.neutralFeedbackCount} / -${user.negativeFeedbackCount}',
-          ),
-          if (user.canApprovePosts) ...[
-            const SizedBox(height: 12),
-            _buildInfoRow('Can Approve', 'Yes'),
-          ],
-          if (user.canUploadFree) ...[
-            const SizedBox(height: 12),
-            _buildInfoRow('Unlimited Upload', 'Yes'),
-          ],
+          ...rows.asMap().entries.map((e) {
+            final isLast = e.key == rows.length - 1;
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        e.value.label,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: CupertinoColors.systemGrey,
+                        ),
+                      ),
+                      Text(
+                        e.value.value,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (!isLast)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20, right: 20),
+                    child: Container(
+                      height: 1,
+                      color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
+                    ),
+                  ),
+              ],
+            );
+          }),
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            color: CupertinoColors.systemGrey,
-          ),
-        ),
-        Text(
-          value,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-        ),
-      ],
-    );
-  }
-
   Widget _buildActionsCard(BuildContext context, bool isDark) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: CupertinoButton(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              onPressed: () => _navigate(AppRoutes.accountManagement),
+    return Row(
+      children: [
+        Expanded(
+          child: CupertinoButton(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            onPressed: () => _navigate(AppRoutes.accountManagement),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: UIColors.primaryIndigo.withValues(alpha: 0.5),
+                ),
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(CupertinoIcons.person_2, color: AppColors.primaryBlue),
+                  Icon(CupertinoIcons.person_2, color: UIColors.primaryIndigo, size: 20),
                   const SizedBox(width: 8),
                   Text(
                     'Manage Accounts',
-                    style: TextStyle(color: AppColors.primaryBlue),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: UIColors.primaryIndigo,
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-          Container(
-            width: 1,
-            height: 40,
-            color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
-          ),
-          Expanded(
-            child: CupertinoButton(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              onPressed: () => _showSignOutConfirmation(context),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: CupertinoButton(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            onPressed: () => _showSignOutConfirmation(context),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: CupertinoColors.destructiveRed.withValues(alpha: 0.12),
+              ),
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     CupertinoIcons.arrow_right_square,
                     color: CupertinoColors.destructiveRed,
+                    size: 20,
                   ),
                   SizedBox(width: 8),
                   Text(
                     'Sign Out',
-                    style: TextStyle(color: CupertinoColors.destructiveRed),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: CupertinoColors.destructiveRed,
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -571,4 +671,18 @@ class _UiProfilePageState extends State<UiProfilePage> {
     if (level >= 30) return AppColors.primaryGreen;
     return AppColors.primaryBlue;
   }
+}
+
+class _StatItem {
+  const _StatItem(this.icon, this.label, this.value, this.color);
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+}
+
+class _InfoRow {
+  const _InfoRow(this.label, this.value);
+  final String label;
+  final String value;
 }
