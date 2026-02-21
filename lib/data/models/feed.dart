@@ -57,7 +57,8 @@ class Feed {
     );
   }
 
-  /// Build the search query string for this feed (tags + type:image or type:video).
+  /// Build the search query string for this feed (tags + e621 file-type metatags).
+  /// e621 has no type:image/type:video; use ( ~type:jpg ~type:png ... ) or ( ~type:mp4 ~type:webm ).
   String toSearchQuery() {
     final parts = <String>[];
     if (includeTags.isNotEmpty) {
@@ -67,7 +68,11 @@ class Feed {
       if (t.trim().isEmpty) continue;
       parts.add('-${t.trim()}');
     }
-    parts.add(isVideo ? 'type:video' : 'type:image');
+    if (isVideo) {
+      parts.add('( ~type:mp4 ~type:webm )');
+    } else {
+      parts.add('( ~type:jpg ~type:png ~type:gif ~type:webp )');
+    }
     return parts.join(' ').trim();
   }
 }
