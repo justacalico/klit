@@ -529,7 +529,9 @@ class _PostDetailPageState extends State<PostDetailPage>
       await settings.removeIFinishedPostId(post.id);
       return;
     }
-    if (settings.iFinishedAskPhotoEnabled) {
+    // Camera only on Android/iOS; on desktop skip camera and add without photo.
+    if (settings.iFinishedAskPhotoEnabled &&
+        (Platform.isAndroid || Platform.isIOS)) {
       final status = await Permission.camera.request();
       if (!mounted) return;
       if (status.isDenied || status.isPermanentlyDenied) {
