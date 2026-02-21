@@ -14,6 +14,8 @@ class Comment {
   final bool isSticky;
   final String? warningType;
   final int? warningUserId;
+  /// Preview/avatar image URL for the comment creator (from API or relative path).
+  final String? creatorAvatarUrl;
 
   const Comment({
     required this.id,
@@ -30,10 +32,15 @@ class Comment {
     required this.isSticky,
     this.warningType,
     this.warningUserId,
+    this.creatorAvatarUrl,
   });
 
   /// Create a Comment from JSON
   factory Comment.fromJson(Map<String, dynamic> json) {
+    final String? avatarUrl = json['creator_avatar_url'] as String? ??
+        (json['creator'] is Map
+            ? (json['creator'] as Map<String, dynamic>)['avatar_url'] as String?
+            : null);
     return Comment(
       id: json['id'] as int,
       postId: json['post_id'] as int,
@@ -49,6 +56,7 @@ class Comment {
       isSticky: json['is_sticky'] as bool? ?? false,
       warningType: json['warning_type'] as String?,
       warningUserId: json['warning_user_id'] as int?,
+      creatorAvatarUrl: avatarUrl,
     );
   }
 
@@ -68,6 +76,7 @@ class Comment {
       'is_sticky': isSticky,
       'warning_type': warningType,
       'warning_user_id': warningUserId,
+      if (creatorAvatarUrl != null) 'creator_avatar_url': creatorAvatarUrl,
     };
   }
 }

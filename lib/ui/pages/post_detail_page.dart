@@ -3229,6 +3229,65 @@ class _CommentsSheetState extends State<_CommentsSheet> {
   }
 }
 
+/// Avatar for a comment creator: network image when URL available, else placeholder icon.
+class _CommentAvatar extends StatelessWidget {
+  final Comment comment;
+  final bool isDark;
+  final String apiBaseUrl;
+
+  const _CommentAvatar({
+    required this.comment,
+    required this.isDark,
+    required this.apiBaseUrl,
+  });
+
+  String? get _avatarUrl {
+    final raw = comment.creatorAvatarUrl;
+    if (raw == null || raw.isEmpty) return null;
+    if (raw.startsWith(RegExp(r'https?://'))) return raw;
+    final base = apiBaseUrl.endsWith('/') ? apiBaseUrl : '$apiBaseUrl/';
+    final path = raw.startsWith('/') ? raw.substring(1) : raw;
+    return '$base$path';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final url = _avatarUrl;
+    final placeholder = Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            CupertinoColors.systemBlue.withValues(alpha: 0.25),
+            CupertinoColors.systemBlue.withValues(alpha: 0.1),
+          ],
+        ),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        CupertinoIcons.person_fill,
+        size: 14,
+        color: isDark
+            ? CupertinoColors.systemBlue.withValues(alpha: 0.8)
+            : CupertinoColors.systemBlue,
+      ),
+    );
+    if (url == null) return placeholder;
+    return SizedBox(
+      width: 32,
+      height: 32,
+      child: ClipOval(
+        child: CachedNetworkImage(
+          imageUrl: url,
+          fit: BoxFit.cover,
+          placeholder: (_, __) => placeholder,
+          errorWidget: (_, __, ___) => placeholder,
+        ),
+      ),
+    );
+  }
+}
+
 /// Individual comment card with liquid glass design
 class _CommentCard extends StatelessWidget {
   final Comment comment;
@@ -3288,28 +3347,10 @@ class _CommentCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              CupertinoColors.systemBlue.withValues(
-                                alpha: 0.25,
-                              ),
-                              CupertinoColors.systemBlue.withValues(alpha: 0.1),
-                            ],
-                          ),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          CupertinoIcons.person_fill,
-                          size: 14,
-                          color: isDark
-                              ? CupertinoColors.systemBlue.withValues(
-                                  alpha: 0.8,
-                                )
-                              : CupertinoColors.systemBlue,
-                        ),
+                      _CommentAvatar(
+                        comment: comment,
+                        isDark: isDark,
+                        apiBaseUrl: context.read<ApiService>().baseUrl,
                       ),
                       const SizedBox(width: 10),
                       Text(

@@ -194,6 +194,9 @@ class ApiService {
     );
   }
 
+  /// Current API base URL (e.g. for resolving relative avatar URLs).
+  String get baseUrl => _baseUrl;
+
   void setBaseUrl(String baseUrl) {
     _baseUrl = baseUrl;
     _dio.options.baseUrl = baseUrl;
