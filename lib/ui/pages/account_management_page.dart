@@ -363,6 +363,8 @@ class AccountManagementContent extends StatelessWidget {
   }
 
   static void _confirmRemoveAccount(BuildContext context, String accountId) {
+    final auth = context.read<AuthProvider>();
+    final navigator = Navigator.of(context);
     showCupertinoDialog(
       context: context,
       builder: (dialogContext) => CupertinoAlertDialog(
@@ -376,15 +378,9 @@ class AccountManagementContent extends StatelessWidget {
           CupertinoDialogAction(
             isDestructiveAction: true,
             onPressed: () async {
-              // Get references BEFORE popping the dialog
-              final auth = context.read<AuthProvider>();
-              final navigator = Navigator.of(context);
-
               Navigator.of(dialogContext).pop();
               final noAccountsLeft = await auth.removeAccount(accountId);
-
               if (noAccountsLeft) {
-                // No accounts left, go to login page
                 navigator.pushNamedAndRemoveUntil(
                   AppRoutes.login,
                   (route) => false,
