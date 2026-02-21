@@ -70,6 +70,49 @@ String _descriptionToMarkdown(String raw) {
   return s;
 }
 
+/// Builds the 48×48 uploader avatar: network image when [avatarUrl] is set, else initial letter.
+Widget _uploaderAvatarWidget({
+  required String? avatarUrl,
+  required String initial,
+  required bool isDark,
+  required double size,
+}) {
+  final fallback = Container(
+    width: size,
+    height: size,
+    decoration: BoxDecoration(
+      color: (isDark ? UIColors.primaryPurple : UIColors.primaryIndigo)
+          .withValues(alpha: 0.3),
+      shape: BoxShape.circle,
+    ),
+    child: Center(
+      child: Text(
+        initial,
+        style: TextStyle(
+          fontSize: size * 0.42,
+          fontWeight: FontWeight.bold,
+          color: isDark ? CupertinoColors.white : CupertinoColors.black,
+        ),
+      ),
+    ),
+  );
+  if (avatarUrl == null || avatarUrl.isEmpty) return fallback;
+  return SizedBox(
+    width: size,
+    height: size,
+    child: ClipOval(
+      child: CachedNetworkImage(
+        imageUrl: avatarUrl,
+        fit: BoxFit.cover,
+        width: size,
+        height: size,
+        placeholder: (_, __) => fallback,
+        errorWidget: (_, __, ___) => fallback,
+      ),
+    ),
+  );
+}
+
 /// Post detail page - single state preserved across layout mode changes
 class PostDetailPage extends StatefulWidget {
   final List<int> postIds;
@@ -117,6 +160,8 @@ class _PostDetailPageState extends State<PostDetailPage>
   bool _showControllerHints = false;
   late ConfettiController _confettiController;
   late FocusNode _focusNode;
+  final Map<String, String?> _uploaderAvatarUrls = {};
+  final Set<String> _uploaderAvatarLoading = {};
 
   int get _currentPostId => _postIds[_currentIndex];
   Post? get _currentPost => _loadedPosts[_currentIndex];
@@ -236,6 +281,41 @@ class _PostDetailPageState extends State<PostDetailPage>
 
   Future<void> _refreshCurrentPost() =>
       _loadPost(_currentIndex, forceRefresh: true);
+
+  Future<void> _loadUploaderAvatar(String username) async {
+    if (_uploaderAvatarLoading.contains(username)) return;
+    _uploaderAvatarLoading.add(username);
+    final api = context.read<ApiService>();
+    String? url;
+    final userResult = await api.getUserProfile(username);
+    await userResult.when(
+      success: (user) async {
+        if (user.avatarUrl != null && user.avatarUrl!.isNotEmpty) {
+          url = user.avatarUrl!.startsWith(RegExp(r'https?://'))
+              ? user.avatarUrl
+              : '${api.baseUrl}/${user.avatarUrl!.startsWith('/') ? user.avatarUrl!.substring(1) : user.avatarUrl}';
+        } else if (user.avatarId != null && user.avatarId!.isNotEmpty) {
+          final postId = int.tryParse(user.avatarId!);
+          if (postId != null) {
+            final postResult = await api.getPostById(postId);
+            postResult.when(
+              success: (post) {
+                url = post.preview.url ?? post.sample.url;
+              },
+              failure: (_) {},
+            );
+          }
+        }
+      },
+      failure: (_) {},
+    );
+    if (mounted) {
+      setState(() {
+        _uploaderAvatarUrls[username] = url;
+        _uploaderAvatarLoading.remove(username);
+      });
+    }
+  }
 
   Future<void> _vote(int index, int score) async {
     final post = _loadedPosts[index];
@@ -1262,6 +1342,19 @@ class _MobilePostDetailContentBuilder {
         ? '$host/users/${Uri.encodeComponent(post.uploaderName!)}'
         : null;
 
+    if (post.uploaderName != null &&
+        post.uploaderName!.isNotEmpty &&
+        s._uploaderAvatarUrls[post.uploaderName] == null &&
+        !s._uploaderAvatarLoading.contains(post.uploaderName)) {
+      final username = post.uploaderName!;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        s._loadUploaderAvatar(username);
+      });
+    }
+    final avatarUrl = post.uploaderName != null
+        ? s._uploaderAvatarUrls[post.uploaderName]
+        : null;
+
     return _buildLiquidGlassContainer(
       context,
       s,
@@ -1269,26 +1362,11 @@ class _MobilePostDetailContentBuilder {
       isOled: isOled,
       child: Row(
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: (isDark ? UIColors.primaryPurple : UIColors.primaryIndigo)
-                  .withValues(alpha: 0.3),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                initial,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDark
-                      ? CupertinoColors.white
-                      : CupertinoColors.black,
-                ),
-              ),
-            ),
+          _uploaderAvatarWidget(
+            avatarUrl: avatarUrl,
+            initial: initial,
+            isDark: isDark,
+            size: 48,
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -2284,6 +2362,19 @@ class _DesktopPostDetailContentBuilder {
         ? '$host/users/${Uri.encodeComponent(post.uploaderName!)}'
         : null;
 
+    if (post.uploaderName != null &&
+        post.uploaderName!.isNotEmpty &&
+        s._uploaderAvatarUrls[post.uploaderName] == null &&
+        !s._uploaderAvatarLoading.contains(post.uploaderName)) {
+      final username = post.uploaderName!;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        s._loadUploaderAvatar(username);
+      });
+    }
+    final avatarUrl = post.uploaderName != null
+        ? s._uploaderAvatarUrls[post.uploaderName]
+        : null;
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
@@ -2313,28 +2404,11 @@ class _DesktopPostDetailContentBuilder {
           ),
           child: Row(
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: (isDark
-                          ? UIColors.primaryPurple
-                          : UIColors.primaryIndigo)
-                      .withValues(alpha: 0.3),
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    initial,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: isDark
-                          ? CupertinoColors.white
-                          : const Color(0xFF1F2937),
-                    ),
-                  ),
-                ),
+              _uploaderAvatarWidget(
+                avatarUrl: avatarUrl,
+                initial: initial,
+                isDark: isDark,
+                size: 48,
               ),
               const SizedBox(width: 14),
               Expanded(
