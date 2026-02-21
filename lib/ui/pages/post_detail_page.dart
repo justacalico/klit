@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
+import 'package:gal/gal.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart'
     show CachedNetworkImage, CachedNetworkImageProvider;
 import 'package:confetti/confetti.dart';
@@ -410,13 +412,64 @@ class _PostDetailPageState extends State<PostDetailPage>
       _downloadProgress[_currentIndex] = 0;
     });
     try {
-      final downloadsDir = await _getDownloadsDirectory();
+      final extension = post.file.ext.isNotEmpty ? post.file.ext : 'png';
+      final filename = 'e926_${post.id}.$extension';
+
+      if (Platform.isAndroid || Platform.isIOS) {
+        await _downloadToGallery(fileUrl, filename, post.isVideo);
+      } else {
+        await _downloadToDesktop(fileUrl, filename);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isDownloading[_currentIndex] = false);
+        _showError('Download failed: ${e.toString()}');
+      }
+    }
+  }
+
+  /// Android/iOS: download to temp file then save to gallery.
+  Future<void> _downloadToGallery(String fileUrl, String filename, bool isVideo) async {
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final filePath = '${tempDir.path}/$filename';
+      final file = File(filePath);
+      final dio = Dio();
+      await dio.download(
+        fileUrl,
+        filePath,
+        onReceiveProgress: (received, total) {
+          if (total > 0 && mounted) {
+            setState(() => _downloadProgress[_currentIndex] = received / total);
+          }
+        },
+      );
+      if (isVideo) {
+        await Gal.putVideo(filePath);
+      } else {
+        await Gal.putImage(filePath);
+      }
+      try {
+        await file.delete();
+      } catch (_) {}
+      if (mounted) {
+        setState(() => _isDownloading[_currentIndex] = false);
+        _showSavedToGallery();
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Desktop: save to Downloads/openlyst/klit.
+  Future<void> _downloadToDesktop(String fileUrl, String filename) async {
+    try {
+      final downloadsDir = await _getDesktopDownloadsDirectory();
       if (downloadsDir == null) {
         throw Exception('Could not find Downloads directory');
       }
-      final extension = post.file.ext.isNotEmpty ? post.file.ext : 'png';
-      final filename = 'e926_${post.id}.$extension';
-      final filePath = '${downloadsDir.path}/$filename';
+      await downloadsDir.create(recursive: true);
+      final filePath = '${downloadsDir.path}${Platform.pathSeparator}$filename';
       final file = File(filePath);
       if (await file.exists()) {
         if (mounted) {
@@ -440,26 +493,43 @@ class _PostDetailPageState extends State<PostDetailPage>
         _showDownloadComplete(filePath);
       }
     } catch (e) {
-      if (mounted) {
-        setState(() => _isDownloading[_currentIndex] = false);
-        _showError('Download failed: ${e.toString()}');
-      }
+      rethrow;
     }
   }
 
-  Future<Directory?> _getDownloadsDirectory() async {
+  /// Returns Downloads/openlyst/klit on desktop; null on mobile.
+  Future<Directory?> _getDesktopDownloadsDirectory() async {
     if (Platform.isLinux || Platform.isMacOS) {
       final home = Platform.environment['HOME'];
-      if (home != null) return Directory('$home/Downloads');
+      if (home != null) return Directory('$home/Downloads/openlyst/klit');
     } else if (Platform.isWindows) {
       final userProfile = Platform.environment['USERPROFILE'];
-      if (userProfile != null) return Directory('$userProfile\\Downloads');
+      if (userProfile != null) {
+        return Directory('$userProfile\\Downloads\\openlyst\\klit');
+      }
     }
     return null;
   }
 
+  void _showSavedToGallery() {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('Saved to Gallery'),
+        content: const Text('Image or video was saved to your photo library.'),
+        actions: [
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            child: const Text('OK'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showDownloadComplete(String filePath, {bool alreadyExists = false}) {
-    final fileName = filePath.split('/').last.split('\\').last;
+    final fileName = filePath.split(Platform.pathSeparator).last;
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
@@ -467,7 +537,7 @@ class _PostDetailPageState extends State<PostDetailPage>
         content: Text(
           alreadyExists
               ? 'File already exists:\n$fileName'
-              : 'Saved to Downloads:\n$fileName',
+              : 'Saved to Downloads/openlyst/klit:\n$fileName',
         ),
         actions: [
           CupertinoDialogAction(
@@ -886,7 +956,7 @@ class _MobilePostDetailContentBuilder {
     bool isOled,
   ) {
     final authProvider = context.watch<AuthProvider>();
-    if (authProvider.isGuest) return const SizedBox.shrink();
+    final isGuest = authProvider.isGuest;
     final isFav = s._isFavorited[index] ?? post.isFavorited;
     final userVote = s._userVote[index];
     final isVoting = s._isVoting[index] == true;
@@ -949,10 +1019,26 @@ class _MobilePostDetailContentBuilder {
       isOled,
       () => s._toggleFavorite(index),
     );
+    final downloadBtn = _buildGlassActionButton(
+      context,
+      s,
+      index,
+      CupertinoIcons.square_arrow_down,
+      CupertinoIcons.square_arrow_down_fill,
+      'Download',
+      false,
+      s._isDownloading[index] == true,
+      UIColors.primaryIndigo,
+      isDark,
+      isOled,
+      () => s._downloadPost(),
+    );
 
-    final buttons = leftHandedMode
-        ? [commentBtn, favoriteBtn, downvoteBtn, upvoteBtn]
-        : [upvoteBtn, downvoteBtn, favoriteBtn, commentBtn];
+    final buttons = isGuest
+        ? [downloadBtn]
+        : leftHandedMode
+            ? [commentBtn, favoriteBtn, downvoteBtn, upvoteBtn, downloadBtn]
+            : [upvoteBtn, downvoteBtn, favoriteBtn, commentBtn, downloadBtn];
 
     return _buildLiquidGlassContainer(
       context,
