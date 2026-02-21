@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:flutter/material.dart'
-    show Material, ListTile, ReorderableListView, Divider;
+    show Colors, Divider, InkWell, ListTile, Material, ReorderableListView;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -56,6 +56,10 @@ class UiSettingsPage extends StatefulWidget {
 class _UiSettingsPageState extends State<UiSettingsPage>
     with SingleTickerProviderStateMixin {
   String _selectedCategory = 'account';
+  /// On mobile: true = show main list (iOS style), false = show selected category sub-page.
+  bool _mobileShowMainList = true;
+  final _mobileSearchController = TextEditingController();
+  final _mobileSearchFocus = FocusNode();
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   String _appVersion = '...';
@@ -152,6 +156,8 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     _animationController.dispose();
     _sidebarSearchController.dispose();
     _sidebarSearchFocus.dispose();
+    _mobileSearchController.dispose();
+    _mobileSearchFocus.dispose();
     super.dispose();
   }
 
@@ -246,71 +252,175 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     );
   }
 
-  /// Mobile layout: pill tabs (Account, Appearance, Content, Behavior style) + content
+  /// Mobile layout: iOS-style main list of categories, then sub-pages for each
   Widget _buildMobileLayout(BuildContext context, bool isDark) {
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
+    if (!_mobileShowMainList) {
+      return _buildMobileSubPage(context, isDark, isOled);
+    }
+    return _buildMobileMainList(context, isDark);
+  }
+
+  /// iOS-style main list: search + rows with icon, title, chevron
+  Widget _buildMobileMainList(BuildContext context, bool isDark) {
+    final query = _mobileSearchController.text.trim().toLowerCase();
+    final filtered = query.isEmpty
+        ? _categories
+        : _categories
+            .where((c) => c.title.toLowerCase().contains(query))
+            .toList();
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Horizontal pill-shaped category tabs (reference: Account | Appearance | Content | Behavior)
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-          child: Row(
-            children: _categories.map((category) {
-              final isSelected = _selectedCategory == category.id;
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: GestureDetector(
-                  onTap: () => _selectCategory(category.id),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? _DesignColors.primaryPurple
-                          : (isDark
-                                ? const Color(0xFF2C2C2E)
-                                : const Color(0xFFE5E5E7)),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          category.icon,
-                          size: 18,
-                          color: isSelected
-                              ? CupertinoColors.white
-                              : (isDark
-                                    ? CupertinoColors.systemGrey
-                                    : CupertinoColors.systemGrey2),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          category.title,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight:
-                                isSelected ? FontWeight.w600 : FontWeight.w500,
-                            color: isSelected
-                                ? CupertinoColors.white
-                                : (isDark
-                                      ? CupertinoColors.white
-                                      : CupertinoColors.black),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
+        // Search bar (iOS "Search Settings" style)
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          child: CupertinoSearchTextField(
+            controller: _mobileSearchController,
+            focusNode: _mobileSearchFocus,
+            placeholder: 'Search Settings',
+            style: TextStyle(
+              color: isDark ? CupertinoColors.white : CupertinoColors.black,
+            ),
+            onChanged: (_) => setState(() {}),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? const Color(0xFF2C2C2E)
+                  : CupertinoColors.tertiarySystemFill,
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         ),
-        Expanded(child: _buildMainContent(isDark)),
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            itemCount: filtered.length,
+            itemBuilder: (context, index) {
+              final category = filtered[index];
+              return _buildMobileMainListRow(category, isDark);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobileMainListRow(_SettingsCategory category, bool isDark) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          _selectCategory(category.id);
+          setState(() => _mobileShowMainList = false);
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+          child: Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: category.color.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Icon(category.icon, size: 18, color: category.color),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  category.title,
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w400,
+                    color: isDark
+                        ? CupertinoColors.white
+                        : CupertinoColors.black,
+                  ),
+                ),
+              ),
+              Icon(
+                CupertinoIcons.chevron_right,
+                size: 18,
+                color: isDark
+                    ? CupertinoColors.systemGrey
+                    : CupertinoColors.systemGrey2,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Mobile sub-page: nav bar with back + category title, then category content
+  Widget _buildMobileSubPage(BuildContext context, bool isDark, bool isOled) {
+    final category = _categories.firstWhere((c) => c.id == _selectedCategory);
+
+    return Column(
+      children: [
+        // Nav bar: back + title (iOS style)
+        Container(
+          height: 56,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          decoration: BoxDecoration(
+            color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+            border: Border(
+              bottom: BorderSide(
+                color: AppColors.resolveSeparator(isDark, isOled: isOled),
+                width: 0.5,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              CupertinoButton(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                onPressed: () => setState(() => _mobileShowMainList = true),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      CupertinoIcons.back,
+                      color: _DesignColors.primaryPurple,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Settings',
+                      style: TextStyle(
+                        fontSize: 17,
+                        color: _DesignColors.primaryPurple,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  category.title,
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                    color: isDark
+                        ? CupertinoColors.white
+                        : CupertinoColors.black,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(width: 80),
+            ],
+          ),
+        ),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: _buildCategoryContent(isDark),
+          ),
+        ),
       ],
     );
   }
