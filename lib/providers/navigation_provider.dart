@@ -40,51 +40,14 @@ class NavigationProvider extends ChangeNotifier {
     }
   }
 
-  int desktopToMobileIndex(int desktopIndex) {
-    switch (desktopIndex) {
-      case 0:
-        return 0;
-      case 1:
-        return 1;
-      case 2:
-        return 2;
-      case 3:
-        return 4;
-      case 4:
-        return 4;
-      case 5:
-        return 3;
-      case 6:
-        return 3;
-      default:
-        return 0;
-    }
-  }
-
-  int mobileToDesktopIndex(int mobileIndex) {
-    switch (mobileIndex) {
-      case 0:
-        return 0;
-      case 1:
-        return 1;
-      case 2:
-        return 2;
-      case 3:
-        return 5;
-      case 4:
-        return 3;
-      default:
-        return 0;
-    }
-  }
-
-  int getMobileIndex() => desktopToMobileIndex(_currentIndex);
+  /// Current page id (0=Home, 1=Hot, 2=Popular, 3=Settings, 4=Search, 5=Profile, 6=Favorites, 7=Feeds).
+  /// Mobile nav bar uses the same ids in navOrder; position is navOrder.indexOf(id).
+  int getMobileIndex() => _currentIndex;
   int getDesktopIndex() => _currentIndex;
 
-  void setFromMobileIndex(int mobileIndex) {
-    final desktopIndex = mobileToDesktopIndex(mobileIndex);
-    if (_currentIndex != desktopIndex) {
-      _currentIndex = desktopIndex;
+  void setFromMobileIndex(int pageId) {
+    if (_currentIndex != pageId) {
+      _currentIndex = pageId;
       notifyListeners();
     }
   }
