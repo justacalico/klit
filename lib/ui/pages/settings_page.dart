@@ -67,6 +67,8 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   String _selectedCategory = 'account';
   /// On mobile: true = show main list (iOS style), false = show selected category sub-page.
   bool _mobileShowMainList = true;
+  /// When opening with initialCategory on mobile, wait one frame before showing content to avoid flashing wrong category.
+  bool _mobileInitialCategoryReady = true;
   final _mobileSearchController = TextEditingController();
   final _mobileSearchFocus = FocusNode();
   late AnimationController _animationController;
@@ -180,10 +182,21 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   void _applyInitialCategory() {
     if (widget.initialCategory == null) return;
     final id = widget.initialCategory!;
-    if (_categories.any((c) => c.id == id)) {
-      _selectedCategory = id;
-      _mobileShowMainList = false;
-    }
+    if (!_categories.any((c) => c.id == id)) return;
+    _selectedCategory = id;
+    _mobileShowMainList = false;
+    // On mobile, defer showing category content by one frame so the first paint
+    // never shows a wrong category (avoids flash when state is from a reused or
+    // previously built widget).
+    _mobileInitialCategoryReady = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() {
+        _selectedCategory = id;
+        _mobileShowMainList = false;
+        _mobileInitialCategoryReady = true;
+      });
+    });
   }
 
   @override
@@ -394,6 +407,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   /// Mobile sub-page: nav bar with back + category title, then category content
   Widget _buildMobileSubPage(BuildContext context, bool isDark, bool isOled) {
     final category = _categories.firstWhere((c) => c.id == _selectedCategory);
+    final showContent = _mobileInitialCategoryReady;
 
     return Column(
       children: [
@@ -451,10 +465,17 @@ class _UiSettingsPageState extends State<UiSettingsPage>
           ),
         ),
         Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: _buildCategoryContent(isDark),
-          ),
+          child: showContent
+              ? SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: _buildCategoryContent(isDark),
+                )
+              : Container(
+                  color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+                  child: const Center(
+                    child: CupertinoActivityIndicator(),
+                  ),
+                ),
         ),
       ],
     );
