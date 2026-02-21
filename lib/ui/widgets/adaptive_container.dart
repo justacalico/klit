@@ -1,8 +1,11 @@
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
+import '../../core/constants/constants.dart';
 import '../../core/theme/ui_style_manager.dart';
+import '../../providers/providers.dart';
 
 /// An adaptive container that switches between liquid glass and material styles
 /// based on the current UI style setting.
@@ -51,10 +54,12 @@ class AdaptiveContainer extends StatelessWidget {
   Widget _buildLiquidGlass(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
 
-    final defaultTint = isDark
-        ? const Color(0xFF1C1C1E).withValues(alpha: opacity)
-        : const Color(0xFFF2F2F7).withValues(alpha: opacity);
+    final defaultTint = (isOled
+            ? AppColors.oledSecondaryBackground
+            : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF2F2F7)))
+        .withValues(alpha: opacity);
 
     final effectiveTint = tintColor?.withValues(alpha: opacity) ?? defaultTint;
     final effectiveBorderRadius = borderRadius ?? BorderRadius.circular(12);
@@ -92,10 +97,11 @@ class AdaptiveContainer extends StatelessWidget {
   Widget _buildMaterial(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
 
-    final defaultColor = isDark
-        ? const Color(0xFF1C1C1E)
-        : const Color(0xFFF2F2F7);
+    final defaultColor = isOled
+        ? AppColors.oledSecondaryBackground
+        : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF2F2F7));
 
     final effectiveColor = tintColor ?? defaultColor;
     final effectiveBorderRadius = borderRadius ?? BorderRadius.circular(12);

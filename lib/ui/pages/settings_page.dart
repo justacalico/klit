@@ -225,16 +225,19 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
     final mode = LayoutScope.of(context);
 
     return KeyedSubtree(
       key: const ValueKey('settings-page'),
       child: Container(
-        color: isDark ? const Color(0xFF0D0D0F) : const Color(0xFFF5F5F7),
+        color: isOled
+            ? AppColors.oledBackground
+            : (isDark ? const Color(0xFF0D0D0F) : const Color(0xFFF5F5F7)),
         child: mode.isDesktop
             ? Row(
                 children: [
-                  _buildSidebar(isDark),
+                  _buildSidebar(isDark, isOled),
                   Expanded(child: _buildMainContent(isDark)),
                 ],
               )
@@ -313,18 +316,18 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   }
 
   /// macOS-style sidebar: search at top, list with blue highlight for selected
-  Widget _buildSidebar(bool isDark) {
+  Widget _buildSidebar(bool isDark, bool isOled) {
     return Container(
       width: 260,
       decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF1C1C1E)
-            : const Color(0xFFF5F5F7),
+        color: isOled
+            ? AppColors.oledSecondaryBackground
+            : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F7)),
         border: Border(
           right: BorderSide(
-            color: isDark
-                ? const Color(0xFF2C2C2E)
-                : const Color(0xFFE5E5E7),
+            color: isOled
+                ? AppColors.oledSeparator
+                : (isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE5E5E7)),
             width: 1,
           ),
         ),

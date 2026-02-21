@@ -1,10 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/constants/constants.dart';
 import '../../core/extensions/extensions.dart';
 import '../../core/theme/ui_style_manager.dart';
 import '../../data/models/models.dart';
+import '../../providers/providers.dart';
 import 'loading_shimmer.dart';
 
 /// Post card display style
@@ -38,13 +40,12 @@ class PostCard extends StatelessWidget {
     final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
     final ratingColor = post.ratingColor;
 
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: isDark
-              ? AppColors.darkSecondaryBackground
-              : CupertinoColors.white,
+          color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
           borderRadius: BorderRadius.circular(isLiquidGlass ? 12 : 8),
           border: Border.all(
             color: ratingColor.withValues(alpha: isLiquidGlass ? 0.7 : 0.6),
@@ -105,15 +106,14 @@ class PostCard extends StatelessWidget {
   Widget _buildListCard(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
-          color: isDark
-              ? AppColors.darkSecondaryBackground
-              : CupertinoColors.white,
+          color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(

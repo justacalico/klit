@@ -5,6 +5,7 @@ import 'package:flutter/material.dart' show Divider, Tooltip;
 import 'package:provider/provider.dart';
 
 import '../../app/routes.dart';
+import '../../core/constants/constants.dart';
 import '../../core/theme/ui_style_manager.dart';
 import '../../providers/providers.dart';
 import '../theme.dart';
@@ -100,6 +101,7 @@ class AppSidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
     final isGuest = context.watch<AuthProvider>().isGuest;
     final navOrder = context.watch<SettingsProvider>().desktopNavOrder;
     final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
@@ -125,7 +127,9 @@ class AppSidebar extends StatelessWidget {
       }
     }
 
-    final bgColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF2F2F7);
+    final bgColor = isOled
+        ? AppColors.oledSecondaryBackground
+        : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF2F2F7));
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [

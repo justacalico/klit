@@ -1,8 +1,11 @@
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
+import '../../core/constants/constants.dart';
 import '../../core/theme/ui_style_manager.dart';
+import '../../providers/providers.dart';
 import '../../core/utils/helpers.dart';
 import '../theme.dart';
 
@@ -66,19 +69,25 @@ class AppNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
     final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     if (isLiquidGlass) {
       return Padding(
         padding: EdgeInsets.fromLTRB(16, 0, 16, bottomPadding + 16),
-        child: _buildLiquidGlass(context, isDark),
+        child: _buildLiquidGlass(context, isDark, isOled),
       );
     }
-    return _buildMaterial(context, isDark, bottomPadding);
+    return _buildMaterial(context, isDark, isOled, bottomPadding);
   }
 
-  Widget _buildLiquidGlass(BuildContext context, bool isDark) {
+  Widget _buildLiquidGlass(BuildContext context, bool isDark, bool isOled) {
+    final gradientColors = isOled
+        ? [AppColors.oledSecondaryBackground, const Color(0xFF0F0F0F)]
+        : (isDark
+            ? [const Color(0xFF1C1C1E), const Color(0xFF2C2C2E)]
+            : [const Color(0xFFF5F5F7), const Color(0xFFEBEBEF)]);
     return Container(
       height: 68,
       decoration: BoxDecoration(
@@ -109,9 +118,7 @@ class AppNavBar extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: isDark
-                    ? [const Color(0xFF1C1C1E), const Color(0xFF2C2C2E)]
-                    : [const Color(0xFFF5F5F7), const Color(0xFFEBEBEF)],
+                colors: gradientColors,
               ),
               border: Border.all(
                 color: UIColors.primaryPurple.withValues(
@@ -130,12 +137,15 @@ class AppNavBar extends StatelessWidget {
   Widget _buildMaterial(
     BuildContext context,
     bool isDark,
+    bool isOled,
     double bottomPadding,
   ) {
     return Container(
       padding: EdgeInsets.only(bottom: bottomPadding),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white,
+        color: isOled
+            ? AppColors.oledSecondaryBackground
+            : (isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white),
         border: Border(
           top: BorderSide(
             color: isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E5E7),

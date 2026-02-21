@@ -234,6 +234,7 @@ class _UiSearchPageState extends State<UiSearchPage>
   @override
   Widget build(BuildContext context) {
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
 
     return KeyedSubtree(
       key: const ValueKey('search-page'),
@@ -245,12 +246,10 @@ class _UiSearchPageState extends State<UiSearchPage>
               Expanded(
                 child: Row(
                   children: [
-                    _buildHistorySidebar(context, isDark),
+                    _buildHistorySidebar(context, isDark, isOled),
                     Container(
                       width: 1,
-                      color: isDark
-                          ? AppColors.darkSeparator
-                          : AppColors.lightSeparator,
+                      color: AppColors.resolveSeparator(isDark, isOled: isOled),
                     ),
                     Expanded(child: _buildResults(context)),
                   ],
@@ -571,10 +570,10 @@ class _UiSearchPageState extends State<UiSearchPage>
     );
   }
 
-  Widget _buildHistorySidebar(BuildContext context, bool isDark) {
+  Widget _buildHistorySidebar(BuildContext context, bool isDark, bool isOled) {
     return Container(
       width: 200,
-      color: isDark ? AppColors.darkBackground : CupertinoColors.white,
+      color: AppColors.resolveScaffoldBackground(isDark, isOled: isOled),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -100,6 +100,14 @@ class AppColors {
   static const Color oledGroupedBackground = Color(0xFF000000);
   static const Color oledSeparator = Color(0xFF1C1C1C);
 
+  /// Resolve scaffold/background colors; pass [isOled] true when theme is OLED.
+  static Color resolveScaffoldBackground(bool isDark, {bool isOled = false}) =>
+      isOled ? oledBackground : (isDark ? darkBackground : lightBackground);
+  static Color resolveSecondaryBackground(bool isDark, {bool isOled = false}) =>
+      isOled ? oledSecondaryBackground : (isDark ? darkSecondaryBackground : lightSecondaryBackground);
+  static Color resolveSeparator(bool isDark, {bool isOled = false}) =>
+      isOled ? oledSeparator : (isDark ? darkSeparator : lightSeparator);
+
   // Rating colors
   static const Color safeColor = Color(0xFF34C759);
   static const Color questionableColor = Color(0xFFFF9500);

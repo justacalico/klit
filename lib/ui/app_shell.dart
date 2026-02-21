@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../app/routes.dart';
+import '../core/constants/constants.dart';
 import '../core/input/input.dart';
 import '../core/theme/ui_style_manager.dart';
 import '../core/types/navigation_args.dart';
@@ -176,6 +177,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
     final mode = LayoutScope.of(context);
     final nav = context.watch<NavigationProvider>();
     final selected = nav.getDesktopIndex();
@@ -252,7 +254,9 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
 
     return CupertinoPageScaffold(
       child: Container(
-        color: isDark ? const Color(0xFF0A0A0C) : const Color(0xFFF8F8FC),
+        color: isOled
+            ? AppColors.oledBackground
+            : (isDark ? const Color(0xFF0A0A0C) : const Color(0xFFF8F8FC)),
         child: PopScope(
           canPop: false,
           child: Stack(

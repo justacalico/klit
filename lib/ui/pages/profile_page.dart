@@ -238,6 +238,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
 
     final mode = LayoutScope.of(context);
     final isNarrow = !mode.isDesktop;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -248,9 +249,9 @@ class _UiProfilePageState extends State<UiProfilePage> {
             children: [
               _buildProfileHero(account, _user!, isDark),
               const SizedBox(height: 20),
-              _buildStatsGrid(_user!, isDark, isNarrow),
+              _buildStatsGrid(_user!, isDark, isOled, isNarrow),
               const SizedBox(height: 20),
-              _buildAccountInfoCard(account, _user!, isDark),
+              _buildAccountInfoCard(account, _user!, isDark, isOled),
               const SizedBox(height: 20),
               _buildActionsCard(context, isDark),
             ],
@@ -410,7 +411,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
     );
   }
 
-  Widget _buildStatsGrid(User user, bool isDark, bool isNarrow) {
+  Widget _buildStatsGrid(User user, bool isDark, bool isOled, bool isNarrow) {
     final stats = [
       _StatItem(CupertinoIcons.heart_fill, 'Favorites', user.favoriteCount.compact, AppColors.explicitColor),
       _StatItem(CupertinoIcons.cloud_upload_fill, 'Uploads', user.postUploadCount.compact, AppColors.primaryBlue),
@@ -428,20 +429,18 @@ class _UiProfilePageState extends State<UiProfilePage> {
           runSpacing: spacing,
           children: stats.map((s) => SizedBox(
             width: itemWidth,
-            child: _buildStatTile(s, isDark),
+            child: _buildStatTile(s, isDark, isOled),
           )).toList(),
         );
       },
     );
   }
 
-  Widget _buildStatTile(_StatItem item, bool isDark) {
+  Widget _buildStatTile(_StatItem item, bool isDark, bool isOled) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
+        color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: (isDark ? CupertinoColors.white : CupertinoColors.black).withValues(alpha: 0.06),
@@ -481,7 +480,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
     );
   }
 
-  Widget _buildAccountInfoCard(Account account, User user, bool isDark) {
+  Widget _buildAccountInfoCard(Account account, User user, bool isDark, bool isOled) {
     final rows = <_InfoRow>[
       _InfoRow('User ID', '#${user.id}'),
       _InfoRow('Member Since', user.createdAt.relativeTime),
@@ -497,9 +496,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
+        color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: (isDark ? CupertinoColors.white : CupertinoColors.black).withValues(alpha: 0.06),
@@ -552,7 +549,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
                     padding: const EdgeInsets.only(left: 20, right: 20),
                     child: Container(
                       height: 1,
-                      color: isDark ? AppColors.darkSeparator : AppColors.lightSeparator,
+                      color: AppColors.resolveSeparator(isDark, isOled: isOled),
                     ),
                   ),
               ],

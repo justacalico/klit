@@ -277,6 +277,7 @@ class _LoginPageState extends State<LoginPage>
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
     final size = MediaQuery.of(context).size;
     final isLandscape = size.width > size.height;
     final mode = LayoutScope.of(context);
@@ -284,9 +285,7 @@ class _LoginPageState extends State<LoginPage>
     return KeyedSubtree(
       key: const ValueKey('login-page'),
       child: CupertinoPageScaffold(
-        backgroundColor: isDark
-            ? AppColors.darkBackground
-            : AppColors.lightBackground,
+        backgroundColor: AppColors.resolveScaffoldBackground(isDark, isOled: isOled),
         child: Stack(
           children: [
             _buildAnimatedBackground(isDark),
