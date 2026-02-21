@@ -93,6 +93,10 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
     final nav = context.read<NavigationProvider>();
     nav.openSearch(query);
     setState(() => _postOverlay = null);
+    // On mobile, post detail is a pushed route; pop so user sees shell with search tab.
+    if (_postDetailRoutePushed && Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
   }
 
   void _onPostTap(PostDetailArguments args) {
@@ -109,6 +113,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
           builder: (ctx) => PostDetailPage(
             postIds: args.postIds,
             initialIndex: args.initialIndex,
+            onSearchTag: _openSearch,
             onLoadMore: args.onLoadMore,
             hasMore: args.hasMore,
             onCurrentIndexChanged: (index) {
