@@ -147,10 +147,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   @override
   void initState() {
     super.initState();
-    if (widget.initialCategory != null) {
-      _selectedCategory = widget.initialCategory!;
-      _mobileShowMainList = false;
-    }
+    _applyInitialCategory();
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
@@ -178,6 +175,25 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     _mobileSearchController.dispose();
     _mobileSearchFocus.dispose();
     super.dispose();
+  }
+
+  void _applyInitialCategory() {
+    if (widget.initialCategory == null) return;
+    final id = widget.initialCategory!;
+    if (_categories.any((c) => c.id == id)) {
+      _selectedCategory = id;
+      _mobileShowMainList = false;
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant UiSettingsPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialCategory != null &&
+        widget.initialCategory != oldWidget.initialCategory) {
+      _applyInitialCategory();
+      setState(() {});
+    }
   }
 
   void _selectCategory(String id) {

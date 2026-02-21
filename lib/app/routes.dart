@@ -85,10 +85,12 @@ class AppRouter {
         );
 
       case AppRoutes.settings:
+        final initialCategory = settings.arguments as String?;
         return CupertinoPageRoute(
           builder: (ctx) => UiSettingsPage(
+            key: ValueKey('settings-${initialCategory ?? "main"}'),
             onNavigate: (r) => Navigator.of(ctx).pushNamed(r),
-            initialCategory: settings.arguments as String?,
+            initialCategory: initialCategory,
           ),
           settings: settings,
         );
