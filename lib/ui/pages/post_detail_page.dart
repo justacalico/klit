@@ -11,6 +11,7 @@ import 'package:flutter/material.dart'
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../app/routes.dart';
 import '../../core/constants/constants.dart';
 import '../../core/extensions/extensions.dart';
@@ -684,6 +685,8 @@ class _MobilePostDetailBody extends StatelessWidget {
           _buildActionBar(context, index, post, isDark, isOled),
           const SizedBox(height: 16),
           _buildStats(context, post, index, isDark, isOled),
+          const SizedBox(height: 16),
+          _buildUploader(context, post, isDark, isOled),
           if (post.description.isNotEmpty) ...[
             const SizedBox(height: 16),
             _buildDescription(context, post, isDark, isOled),
@@ -725,6 +728,18 @@ class _MobilePostDetailBody extends StatelessWidget {
     state,
     post,
     index,
+    isDark,
+    isOled,
+  );
+  Widget _buildUploader(
+    BuildContext context,
+    Post post,
+    bool isDark,
+    bool isOled,
+  ) => _MobilePostDetailContentBuilder.buildUploaderCard(
+    context,
+    state,
+    post,
     isDark,
     isOled,
   );
@@ -1099,6 +1114,109 @@ class _MobilePostDetailContentBuilder {
           ),
         ),
       ],
+    );
+  }
+
+  static Widget buildUploaderCard(
+    BuildContext context,
+    _PostDetailPageState s,
+    Post post,
+    bool isDark,
+    bool isOled,
+  ) {
+    final displayName =
+        post.uploaderName?.isNotEmpty == true
+            ? post.uploaderName!
+            : 'User #${post.uploaderId}';
+    final initial = displayName.isNotEmpty
+        ? displayName.replaceFirst(':', ' ').trim().isNotEmpty
+            ? displayName.replaceFirst(':', ' ').trim()[0].toUpperCase()
+            : '#'
+        : '?';
+    final host = context.read<SettingsProvider>().host;
+    final profileUrl = post.uploaderName?.isNotEmpty == true
+        ? '$host/users/${Uri.encodeComponent(post.uploaderName!)}'
+        : null;
+
+    return _buildLiquidGlassContainer(
+      context,
+      s,
+      isDark: isDark,
+      isOled: isOled,
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: (isDark ? UIColors.primaryPurple : UIColors.primaryIndigo)
+                  .withValues(alpha: 0.3),
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                initial,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDark
+                      ? CupertinoColors.white
+                      : CupertinoColors.black,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Uploader',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark
+                        ? CupertinoColors.systemGrey
+                        : CupertinoColors.systemGrey2,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  displayName,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: isDark
+                        ? CupertinoColors.white
+                        : CupertinoColors.black,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          if (profileUrl != null)
+            CupertinoButton(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              minimumSize: Size.zero,
+              onPressed: () async {
+                final uri = Uri.parse(profileUrl);
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
+              },
+              child: Text(
+                'View profile',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: CupertinoColors.systemBlue,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -1746,6 +1864,8 @@ class _DesktopPostDetailContentBuilder {
                     children: [
                       buildStatsCard(context, s, post, score, isFav, isDark),
                       const SizedBox(height: 16),
+                      buildUploaderCard(context, s, post, isDark),
+                      const SizedBox(height: 16),
                       if (post.description.isNotEmpty) ...[
                         buildDescriptionCard(context, s, post, isDark),
                         const SizedBox(height: 16),
@@ -2005,6 +2125,132 @@ class _DesktopPostDetailContentBuilder {
                   ),
                 ],
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  static Widget buildUploaderCard(
+    BuildContext context,
+    _PostDetailPageState s,
+    Post post,
+    bool isDark,
+  ) {
+    final displayName =
+        post.uploaderName?.isNotEmpty == true
+            ? post.uploaderName!
+            : 'User #${post.uploaderId}';
+    final initial = displayName.isNotEmpty
+        ? displayName.replaceFirst(':', ' ').trim().isNotEmpty
+            ? displayName.replaceFirst(':', ' ').trim()[0].toUpperCase()
+            : '#'
+        : '?';
+    final host = context.read<SettingsProvider>().host;
+    final profileUrl = post.uploaderName?.isNotEmpty == true
+        ? '$host/users/${Uri.encodeComponent(post.uploaderName!)}'
+        : null;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [
+                      UIColors.primaryPurple.withValues(alpha: 0.08),
+                      UIColors.primaryIndigo.withValues(alpha: 0.05),
+                    ]
+                  : [
+                      UIColors.primaryPurple.withValues(alpha: 0.06),
+                      UIColors.primaryIndigo.withValues(alpha: 0.03),
+                    ],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: UIColors.primaryPurple.withValues(
+                alpha: isDark ? 0.2 : 0.12,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: (isDark
+                          ? UIColors.primaryPurple
+                          : UIColors.primaryIndigo)
+                      .withValues(alpha: 0.3),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    initial,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isDark
+                          ? CupertinoColors.white
+                          : const Color(0xFF1F2937),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Uploader',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: CupertinoColors.systemGrey,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      displayName,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? CupertinoColors.white
+                            : const Color(0xFF1F2937),
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              if (profileUrl != null)
+                CupertinoButton(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  minimumSize: Size.zero,
+                  onPressed: () async {
+                    final uri = Uri.parse(profileUrl);
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                    }
+                  },
+                  child: Text(
+                    'View profile',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: CupertinoColors.systemBlue,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

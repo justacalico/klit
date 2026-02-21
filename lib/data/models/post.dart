@@ -21,6 +21,7 @@ class Post {
   final PostRelationships relationships;
   final int? approverId;
   final int uploaderId;
+  final String? uploaderName;
   final String description;
   final int commentCount;
   final bool isFavorited;
@@ -46,6 +47,7 @@ class Post {
     required this.relationships,
     this.approverId,
     required this.uploaderId,
+    this.uploaderName,
     required this.description,
     required this.commentCount,
     required this.isFavorited,
@@ -97,6 +99,7 @@ class Post {
       ),
       approverId: parseInt(json['approver_id']),
       uploaderId: parseIntRequired(json['uploader_id'], 0),
+      uploaderName: json['owner'] as String? ?? json['uploader'] as String?,
       description: json['description'] as String? ?? '',
       commentCount: parseIntRequired(json['comment_count'], 0),
       isFavorited: json['is_favorited'] as bool? ?? false,
