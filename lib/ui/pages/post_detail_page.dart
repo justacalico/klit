@@ -24,6 +24,20 @@ import '../shell/toolbar.dart';
 import '../theme.dart';
 import '../widgets/widgets.dart';
 
+/// Tag chip color from post rating: explicit=red, safe=green, other=grey, else no override.
+Color? _tagColorForRating(String rating) {
+  switch (rating) {
+    case 'e':
+      return AppColors.explicitColor;
+    case 's':
+      return AppColors.safeColor;
+    case 'q':
+      return CupertinoColors.systemGrey;
+    default:
+      return null;
+  }
+}
+
 /// Converts common BBCode in post descriptions to Markdown so it renders (e.g. [b] -> **).
 String _descriptionToMarkdown(String raw) {
   return raw
@@ -1311,6 +1325,13 @@ class _MobilePostDetailContentBuilder {
               runSpacing: 8,
               children: post.tags.all.take(20).map((t) {
                 final tag = t.replaceFirst(':', ' ');
+                final ratingColor = _tagColorForRating(post.rating);
+                final chipColor = ratingColor != null
+                    ? ratingColor.withValues(alpha: 0.25)
+                    : (isDark
+                            ? UIColors.primaryPurple
+                            : UIColors.primaryIndigo)
+                        .withValues(alpha: 0.2);
                 return GestureDetector(
                   onTap: () => s._searchTag(tag),
                   child: Container(
@@ -1319,11 +1340,7 @@ class _MobilePostDetailContentBuilder {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color:
-                          (isDark
-                                  ? UIColors.primaryPurple
-                                  : UIColors.primaryIndigo)
-                              .withValues(alpha: 0.2),
+                      color: chipColor,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -1333,11 +1350,11 @@ class _MobilePostDetailContentBuilder {
                         color: isDark
                           ? CupertinoColors.white
                           : CupertinoColors.black,
+                      ),
                     ),
                   ),
-                ),
-              );
-            }).toList(),
+                );
+              }).toList(),
             ),
           ),
         ],
@@ -2420,6 +2437,13 @@ class _DesktopPostDetailContentBuilder {
                   runSpacing: 8,
                   children: post.tags.all.take(20).map((t) {
                     final tag = t.replaceFirst(':', ' ');
+                    final ratingColor = _tagColorForRating(post.rating);
+                    final chipColor = ratingColor != null
+                        ? ratingColor.withValues(alpha: 0.25)
+                        : (isDark
+                                ? UIColors.primaryPurple
+                                : UIColors.primaryIndigo)
+                            .withValues(alpha: 0.2);
                     return GestureDetector(
                       onTap: () => s._searchTag(tag),
                       child: Container(
@@ -2428,11 +2452,7 @@ class _DesktopPostDetailContentBuilder {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color:
-                              (isDark
-                                      ? UIColors.primaryPurple
-                                      : UIColors.primaryIndigo)
-                                  .withValues(alpha: 0.2),
+                          color: chipColor,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
