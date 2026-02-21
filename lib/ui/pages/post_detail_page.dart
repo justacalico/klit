@@ -23,6 +23,15 @@ import '../shell/toolbar.dart';
 import '../theme.dart';
 import '../widgets/widgets.dart';
 
+/// Converts common BBCode in post descriptions to Markdown so it renders (e.g. [b] -> **).
+String _descriptionToMarkdown(String raw) {
+  return raw
+      .replaceAll(RegExp(r'\[b\]', caseSensitive: false), '**')
+      .replaceAll(RegExp(r'\[/b\]', caseSensitive: false), '**')
+      .replaceAll(RegExp(r'\[i\]', caseSensitive: false), '*')
+      .replaceAll(RegExp(r'\[/i\]', caseSensitive: false), '*');
+}
+
 /// Post detail page - single state preserved across layout mode changes
 class PostDetailPage extends StatefulWidget {
   final List<int> postIds;
@@ -1123,24 +1132,27 @@ class _MobilePostDetailContentBuilder {
               style: TextStyle(fontSize: 14, color: CupertinoColors.systemGrey),
             )
           else
-            Theme(
-              data: ThemeData(
-                brightness: isDark ? Brightness.dark : Brightness.light,
-              ),
-              child: MarkdownBody(
-                data: post.description,
-                selectable: true,
-                shrinkWrap: true,
-                styleSheet: MarkdownStyleSheet(
-                  p: TextStyle(
-                    fontSize: 14,
-                    color: isDark
-                        ? CupertinoColors.white.withValues(alpha: 0.85)
-                        : CupertinoColors.label,
-                  ),
-                  a: TextStyle(
-                    color: CupertinoColors.systemBlue,
-                    decoration: TextDecoration.underline,
+            SizedBox(
+              width: double.infinity,
+              child: Theme(
+                data: ThemeData(
+                  brightness: isDark ? Brightness.dark : Brightness.light,
+                ),
+                child: MarkdownBody(
+                  data: _descriptionToMarkdown(post.description),
+                  selectable: true,
+                  shrinkWrap: true,
+                  styleSheet: MarkdownStyleSheet(
+                    p: TextStyle(
+                      fontSize: 14,
+                      color: isDark
+                          ? CupertinoColors.white.withValues(alpha: 0.85)
+                          : CupertinoColors.label,
+                    ),
+                    a: TextStyle(
+                      color: CupertinoColors.systemBlue,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
               ),
@@ -1174,31 +1186,33 @@ class _MobilePostDetailContentBuilder {
             ),
           ),
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: post.tags.all.take(20).map((t) {
-              final tag = t.replaceFirst(':', ' ');
-              return GestureDetector(
-                onTap: () => s._searchTag(tag),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color:
-                        (isDark
-                                ? UIColors.primaryPurple
-                                : UIColors.primaryIndigo)
-                            .withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    tag,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: isDark
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: post.tags.all.take(20).map((t) {
+                final tag = t.replaceFirst(':', ' ');
+                return GestureDetector(
+                  onTap: () => s._searchTag(tag),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color:
+                          (isDark
+                                  ? UIColors.primaryPurple
+                                  : UIColors.primaryIndigo)
+                              .withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      tag,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark
                           ? CupertinoColors.white
                           : CupertinoColors.black,
                     ),
@@ -1206,6 +1220,7 @@ class _MobilePostDetailContentBuilder {
                 ),
               );
             }).toList(),
+            ),
           ),
         ],
       ),
@@ -2073,24 +2088,27 @@ class _DesktopPostDetailContentBuilder {
                 ),
               ),
               const SizedBox(height: 12),
-              Theme(
-                data: ThemeData(
-                  brightness: isDark ? Brightness.dark : Brightness.light,
-                ),
-                child: MarkdownBody(
-                  data: post.description,
-                  selectable: true,
-                  shrinkWrap: true,
-                  styleSheet: MarkdownStyleSheet(
-                    p: TextStyle(
-                      fontSize: 14,
-                      color: isDark
-                          ? CupertinoColors.white.withValues(alpha: 0.85)
-                          : CupertinoColors.label,
-                    ),
-                    a: TextStyle(
-                      color: CupertinoColors.systemBlue,
-                      decoration: TextDecoration.underline,
+              SizedBox(
+                width: double.infinity,
+                child: Theme(
+                  data: ThemeData(
+                    brightness: isDark ? Brightness.dark : Brightness.light,
+                  ),
+                  child: MarkdownBody(
+                    data: _descriptionToMarkdown(post.description),
+                    selectable: true,
+                    shrinkWrap: true,
+                    styleSheet: MarkdownStyleSheet(
+                      p: TextStyle(
+                        fontSize: 14,
+                        color: isDark
+                            ? CupertinoColors.white.withValues(alpha: 0.85)
+                            : CupertinoColors.label,
+                      ),
+                      a: TextStyle(
+                        color: CupertinoColors.systemBlue,
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ),
                 ),
@@ -2149,38 +2167,41 @@ class _DesktopPostDetailContentBuilder {
                 ),
               ),
               const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: post.tags.all.take(20).map((t) {
-                  final tag = t.replaceFirst(':', ' ');
-                  return GestureDetector(
-                    onTap: () => s._searchTag(tag),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color:
-                            (isDark
-                                    ? UIColors.primaryPurple
-                                    : UIColors.primaryIndigo)
-                                .withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        tag,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: isDark
-                              ? CupertinoColors.white
-                              : const Color(0xFF1F2937),
+              SizedBox(
+                width: double.infinity,
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: post.tags.all.take(20).map((t) {
+                    final tag = t.replaceFirst(':', ' ');
+                    return GestureDetector(
+                      onTap: () => s._searchTag(tag),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color:
+                              (isDark
+                                      ? UIColors.primaryPurple
+                                      : UIColors.primaryIndigo)
+                                  .withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          tag,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isDark
+                                ? CupertinoColors.white
+                                : const Color(0xFF1F2937),
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                }).toList(),
+                    );
+                  }).toList(),
+                ),
               ),
             ],
           ),
@@ -3040,15 +3061,17 @@ class _CommentCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              Theme(
-                data: ThemeData(
-                  brightness: isDark ? Brightness.dark : Brightness.light,
-                ),
-                child: MarkdownBody(
-                  data: comment.body,
-                  selectable: true,
-                  shrinkWrap: true,
-                  styleSheet: MarkdownStyleSheet(
+              SizedBox(
+                width: double.infinity,
+                child: Theme(
+                  data: ThemeData(
+                    brightness: isDark ? Brightness.dark : Brightness.light,
+                  ),
+                  child: MarkdownBody(
+                    data: _descriptionToMarkdown(comment.body),
+                    selectable: true,
+                    shrinkWrap: true,
+                    styleSheet: MarkdownStyleSheet(
                     p: TextStyle(
                       fontSize: 14,
                       color: isDark
@@ -3086,7 +3109,8 @@ class _CommentCard extends StatelessWidget {
                     ),
                     blockquotePadding: const EdgeInsets.only(left: 10),
                   ),
-                  onTapLink: (text, href, title) {},
+                    onTapLink: (text, href, title) {},
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
