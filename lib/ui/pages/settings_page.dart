@@ -125,16 +125,16 @@ class _UiSettingsPageState extends State<UiSettingsPage>
       color: _DesignColors.accentTeal,
     ),
     _SettingsCategory(
-      id: 'data',
-      title: 'Data',
-      icon: CupertinoIcons.tray_full_fill,
-      color: CupertinoColors.systemBlue,
-    ),
-    _SettingsCategory(
       id: 'network',
       title: 'Network',
       icon: CupertinoIcons.globe,
       color: _DesignColors.accentGreen,
+    ),
+    _SettingsCategory(
+      id: 'data',
+      title: 'Data',
+      icon: CupertinoIcons.tray_full_fill,
+      color: CupertinoColors.systemBlue,
     ),
     _SettingsCategory(
       id: 'about',
@@ -1994,8 +1994,8 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                 isDark: isDark,
                 icon: CupertinoIcons.sidebar_left,
                 iconColor: _DesignColors.accentTeal,
-                title: 'Sidebar Order',
-                subtitle: 'Customize the order of sidebar items',
+                title: 'Sidebar order',
+                subtitle: 'Reorder desktop sidebar items',
                 trailing: CupertinoButton(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -2005,6 +2005,35 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                   borderRadius: BorderRadius.circular(8),
                   onPressed: () =>
                       _showDesktopNavOrderDialog(context, settings, isDark),
+                  child: const Text(
+                    'Configure',
+                    style: TextStyle(
+                      color: _DesignColors.accentTeal,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildSettingsCard(
+              isDark: isDark,
+              child: _buildSettingRow(
+                isDark: isDark,
+                icon: CupertinoIcons.list_bullet,
+                iconColor: _DesignColors.accentTeal,
+                title: 'Mobile nav bar order',
+                subtitle: 'Reorder bottom navigation items',
+                trailing: CupertinoButton(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  color: _DesignColors.accentTeal.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8),
+                  onPressed: () =>
+                      _showMobileNavOrderDialog(context, settings, isDark),
                   child: const Text(
                     'Configure',
                     style: TextStyle(
@@ -2034,6 +2063,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
       4: {'icon': CupertinoIcons.search, 'label': 'Search'},
       5: {'icon': CupertinoIcons.person_fill, 'label': 'Profile'},
       6: {'icon': CupertinoIcons.heart_fill, 'label': 'Favorites'},
+      7: {'icon': CupertinoIcons.square_stack_3d_up_fill, 'label': 'Feeds'},
     };
 
     List<int> currentOrder = List.from(settings.desktopNavOrder);
@@ -2109,7 +2139,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
               CupertinoDialogAction(
                 onPressed: () {
                   setDialogState(() {
-                    currentOrder = [0, 1, 2, 4, 5, 6];
+                    currentOrder = [0, 1, 2, 4, 5, 6, 7];
                   });
                 },
                 child: const Text('Reset'),
@@ -2123,6 +2153,120 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                 isDefaultAction: true,
                 onPressed: () {
                   settings.setDesktopNavOrder(currentOrder);
+                  Navigator.pop(context);
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  void _showMobileNavOrderDialog(
+    BuildContext context,
+    SettingsProvider settings,
+    bool isDark,
+  ) {
+    final navItems = <int, Map<String, dynamic>>{
+      0: {'icon': CupertinoIcons.house_fill, 'label': 'Home'},
+      1: {'icon': CupertinoIcons.flame_fill, 'label': 'Hot'},
+      2: {'icon': CupertinoIcons.star_fill, 'label': 'Popular'},
+      3: {'icon': CupertinoIcons.gear_solid, 'label': 'Settings'},
+      4: {'icon': CupertinoIcons.search, 'label': 'Search'},
+      5: {'icon': CupertinoIcons.person_fill, 'label': 'Profile'},
+      6: {'icon': CupertinoIcons.heart_fill, 'label': 'Favorites'},
+      7: {'icon': CupertinoIcons.square_stack_3d_up_fill, 'label': 'Feeds'},
+    };
+
+    List<int> currentOrder = List.from(settings.mobileNavOrder);
+
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return CupertinoAlertDialog(
+            title: const Text('Mobile nav bar order'),
+            content: SizedBox(
+              width: 300,
+              height: 350,
+              child: Column(
+                children: [
+                  const SizedBox(height: 16),
+                  Text(
+                    'Drag to reorder bottom nav items',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: CupertinoColors.secondaryLabel.resolveFrom(
+                        context,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: Material(
+                      color: CupertinoColors.transparent,
+                      child: ReorderableListView.builder(
+                        shrinkWrap: true,
+                        itemCount: currentOrder.length,
+                        onReorder: (oldIndex, newIndex) {
+                          setDialogState(() {
+                            if (newIndex > oldIndex) newIndex--;
+                            final item = currentOrder.removeAt(oldIndex);
+                            currentOrder.insert(newIndex, item);
+                          });
+                        },
+                        itemBuilder: (context, index) {
+                          final itemId = currentOrder[index];
+                          final item = navItems[itemId]!;
+                          return Container(
+                            key: ValueKey(itemId),
+                            margin: const EdgeInsets.only(bottom: 4),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFF2C2C2E)
+                                  : const Color(0xFFF2F2F7),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ListTile(
+                              dense: true,
+                              leading: Icon(
+                                item['icon'] as IconData,
+                                color: _DesignColors.primaryPurple,
+                                size: 20,
+                              ),
+                              title: Text(
+                                item['label'] as String,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () {
+                  setDialogState(() {
+                    currentOrder = [0, 1, 2, 4, 5, 7, 3];
+                  });
+                },
+                child: const Text('Reset'),
+              ),
+              CupertinoDialogAction(
+                isDestructiveAction: true,
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                onPressed: () {
+                  settings.setMobileNavOrder(currentOrder);
                   Navigator.pop(context);
                 },
                 child: const Text('Save'),
