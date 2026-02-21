@@ -11,11 +11,18 @@ import '../layout/layout_scope.dart';
 import '../widgets/widgets.dart';
 
 /// Unified search page - reused from desktop search logic.
+/// When [feedMode] is true, search toolbar and history are hidden (feed view).
 class UiSearchPage extends StatefulWidget {
   final String? initialQuery;
+  final bool feedMode;
   final void Function(PostDetailArguments) onPostTap;
 
-  const UiSearchPage({super.key, this.initialQuery, required this.onPostTap});
+  const UiSearchPage({
+    super.key,
+    this.initialQuery,
+    this.feedMode = false,
+    required this.onPostTap,
+  });
 
   @override
   State<UiSearchPage> createState() => _UiSearchPageState();
@@ -65,9 +72,11 @@ class _UiSearchPageState extends State<UiSearchPage>
       _searchController.text = widget.initialQuery!;
       _performSearch();
     }
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _focusNode.requestFocus(),
-    );
+    if (!widget.feedMode) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _focusNode.requestFocus(),
+      );
+    }
   }
 
   @override
@@ -183,7 +192,9 @@ class _UiSearchPageState extends State<UiSearchPage>
       order: _selectedOrder,
       safeMode: sp.safeMode,
     );
-    sp.addToSearchHistory(query);
+    if (!widget.feedMode) {
+      sp.addToSearchHistory(query);
+    }
   }
 
   void _onPostTap(Post post) {
@@ -296,26 +307,30 @@ class _UiSearchPageState extends State<UiSearchPage>
     final mode = LayoutScope.of(context);
     final isMobile = mode.isMobile;
 
+    final feedMode = widget.feedMode;
+
     return KeyedSubtree(
       key: const ValueKey('search-page'),
       child: Stack(
         children: [
           Column(
             children: [
-              _buildToolbar(context, isDark, isMobile),
+              if (!feedMode) _buildToolbar(context, isDark, isMobile),
               Expanded(
-                child: isMobile
+                child: feedMode
                     ? _buildResults(context)
-                    : Row(
-                        children: [
-                          _buildHistorySidebar(context, isDark, isOled),
-                          Container(
-                            width: 1,
-                            color: AppColors.resolveSeparator(isDark, isOled: isOled),
-                          ),
-                          Expanded(child: _buildResults(context)),
-                        ],
-                      ),
+                    : (isMobile
+                        ? _buildResults(context)
+                        : Row(
+                            children: [
+                              _buildHistorySidebar(context, isDark, isOled),
+                              Container(
+                                width: 1,
+                                color: AppColors.resolveSeparator(isDark, isOled: isOled),
+                              ),
+                              Expanded(child: _buildResults(context)),
+                            ],
+                          )),
               ),
             ],
           ),
@@ -763,6 +778,28 @@ class _UiSearchPageState extends State<UiSearchPage>
     return Consumer<PostsProvider>(
       builder: (_, pp, _) {
         if (pp.searchResults.isEmpty && !pp.isLoadingSearch) {
+          if (widget.feedMode) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    CupertinoIcons.rectangle_stack_fill,
+                    size: 64,
+                    color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No posts in this feed',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -786,6 +823,24 @@ class _UiSearchPageState extends State<UiSearchPage>
                   style: TextStyle(
                     fontSize: 14,
                     color: CupertinoColors.tertiaryLabel.resolveFrom(context),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+        if (pp.searchResults.isEmpty && pp.isLoadingSearch && widget.feedMode) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CupertinoActivityIndicator(radius: 16),
+                const SizedBox(height: 16),
+                Text(
+                  'Loading feed…',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: CupertinoColors.secondaryLabel.resolveFrom(context),
                   ),
                 ),
               ],

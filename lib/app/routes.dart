@@ -53,9 +53,21 @@ class AppRouter {
         );
 
       case AppRoutes.search:
-        final initialQuery = settings.arguments as String?;
+        final args = settings.arguments;
+        final String? initialQuery;
+        final String? feedTitle;
+        if (args is SearchRouteArguments) {
+          initialQuery = args.query;
+          feedTitle = args.feedTitle;
+        } else {
+          initialQuery = args as String?;
+          feedTitle = null;
+        }
         return CupertinoPageRoute(
-          builder: (_) => _SearchRoutePage(initialQuery: initialQuery),
+          builder: (_) => _SearchRoutePage(
+            initialQuery: initialQuery,
+            feedTitle: feedTitle,
+          ),
           settings: settings,
         );
 
@@ -114,12 +126,18 @@ class AppRouter {
 
 /// Full-page wrappers for routes pushed from shell (e.g. mobile).
 class _SearchRoutePage extends StatelessWidget {
-  final String? initialQuery;
+  const _SearchRoutePage({this.initialQuery, this.feedTitle});
 
-  const _SearchRoutePage({this.initialQuery});
+  final String? initialQuery;
+  final String? feedTitle;
 
   @override
   Widget build(BuildContext context) {
+    final isFeedMode = feedTitle != null && feedTitle!.isNotEmpty;
+    final title = isFeedMode
+        ? feedTitle!
+        : (initialQuery != null && initialQuery!.isNotEmpty ? initialQuery! : 'Search');
+
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         leading: CupertinoButton(
@@ -128,9 +146,7 @@ class _SearchRoutePage extends StatelessWidget {
           child: const Icon(CupertinoIcons.back),
         ),
         middle: Text(
-          initialQuery != null && initialQuery!.isNotEmpty
-              ? initialQuery!
-              : 'Search',
+          title,
           overflow: TextOverflow.ellipsis,
         ),
       ),
@@ -138,6 +154,7 @@ class _SearchRoutePage extends StatelessWidget {
         top: false,
         child: UiSearchPage(
           initialQuery: initialQuery,
+          feedMode: isFeedMode,
           onPostTap: (args) => Navigator.of(
             context,
           ).pushNamed(AppRoutes.postDetail, arguments: args),

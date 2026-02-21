@@ -273,7 +273,7 @@ class StorageService {
 
   List<int> getMobileNavOrder() {
     final orderJson = _prefs.getString(AppConstants.mobileNavOrderKey);
-    if (orderJson == null) return [0, 1, 2, 3, 4];
+    if (orderJson == null) return [0, 1, 2, 4, 5, 6, 7];
     final List<dynamic> order = json.decode(orderJson);
     return order.cast<int>();
   }

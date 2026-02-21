@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';
 import '../../core/constants/constants.dart';
+import '../../core/types/navigation_args.dart';
 import '../../data/models/models.dart';
 import '../../providers/providers.dart';
 import '../shell/toolbar.dart';
@@ -47,8 +48,11 @@ class UiFeedsPage extends StatelessWidget {
   }
 
   void _openFeed(BuildContext context, Feed feed) {
-    final query = feed.toSearchQuery();
-    Navigator.of(context).pushNamed(AppRoutes.search, arguments: query);
+    final args = SearchRouteArguments(
+      query: feed.toSearchQuery(),
+      feedTitle: feed.name.isEmpty ? 'Feed' : feed.name,
+    );
+    Navigator.of(context).pushNamed(AppRoutes.search, arguments: args);
   }
 
   void _openFeedEdit(BuildContext context, Feed? feed) {
