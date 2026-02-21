@@ -104,7 +104,21 @@ class _SearchRoutePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Icon(CupertinoIcons.back),
+        ),
+        middle: Text(
+          initialQuery != null && initialQuery!.isNotEmpty
+              ? initialQuery!
+              : 'Search',
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
       child: SafeArea(
+        top: false,
         child: UiSearchPage(
           initialQuery: initialQuery,
           onPostTap: (args) => Navigator.of(
