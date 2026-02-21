@@ -15,7 +15,6 @@ import '../../core/theme/ui_style_manager.dart';
 import '../../data/models/models.dart';
 import '../../data/models/proxy_config.dart';
 import '../../data/services/services.dart';
-import '../../data/services/update_service.dart';
 import '../../providers/providers.dart';
 
 /// Design constants for the settings page
@@ -1044,7 +1043,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
               ? CachedNetworkImage(
                   imageUrl: avatarUrl,
                   fit: BoxFit.cover,
-                  placeholder: (_, __) => Center(
+                  placeholder: (_, _) => Center(
                     child: Text(
                       (username != null && username.isNotEmpty)
                           ? username[0].toUpperCase()
@@ -1056,7 +1055,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                       ),
                     ),
                   ),
-                  errorWidget: (_, __, ___) => Center(
+                  errorWidget: (_, _, _) => Center(
                     child: Text(
                       (username != null && username.isNotEmpty)
                           ? username[0].toUpperCase()

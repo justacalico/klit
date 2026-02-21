@@ -105,8 +105,8 @@ Widget _uploaderAvatarWidget({
         fit: BoxFit.cover,
         width: size,
         height: size,
-        placeholder: (_, __) => fallback,
-        errorWidget: (_, __, ___) => fallback,
+        placeholder: (_, _) => fallback,
+        errorWidget: (_, _, _) => fallback,
       ),
     ),
   );
@@ -556,7 +556,7 @@ class _PostDetailPageState extends State<PostDetailPage>
       }
       try {
         await file.delete();
-      } catch (_) {}
+      } catch (_) { /* best-effort cleanup */ }
       if (mounted) {
         setState(() => _isDownloading[_currentIndex] = false);
         _showSavedToGallery();
@@ -3466,8 +3466,8 @@ class _CommentAvatar extends StatelessWidget {
         child: CachedNetworkImage(
           imageUrl: url,
           fit: BoxFit.cover,
-          placeholder: (_, __) => placeholder,
-          errorWidget: (_, __, ___) => placeholder,
+          placeholder: (_, _) => placeholder,
+          errorWidget: (_, _, _) => placeholder,
         ),
       ),
     );

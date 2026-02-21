@@ -436,8 +436,8 @@ class _UiProfilePageState extends State<UiProfilePage> {
           fit: BoxFit.cover,
           width: size,
           height: size,
-          placeholder: (_, __) => fallback,
-          errorWidget: (_, __, ___) => fallback,
+          placeholder: (_, _) => fallback,
+          errorWidget: (_, _, _) => fallback,
         ),
       ),
     );
