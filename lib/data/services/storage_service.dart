@@ -271,11 +271,26 @@ class StorageService {
     await _prefs.setBool(AppConstants.confettiOnFavoriteKey, enabled);
   }
 
+  static const List<int> _defaultMobileNavOrder = [0, 1, 2, 4, 5, 6, 7];
+  static const List<int> _legacyMobileNavOrder = [0, 1, 2, 3, 4];
+
   List<int> getMobileNavOrder() {
     final orderJson = _prefs.getString(AppConstants.mobileNavOrderKey);
-    if (orderJson == null) return [0, 1, 2, 4, 5, 6, 7];
-    final List<dynamic> order = json.decode(orderJson);
-    return order.cast<int>();
+    if (orderJson == null) return List.from(_defaultMobileNavOrder);
+    final List<int> order = (json.decode(orderJson) as List<dynamic>).cast<int>();
+    if (_listEquals(order, _legacyMobileNavOrder)) {
+      setMobileNavOrder(_defaultMobileNavOrder);
+      return List.from(_defaultMobileNavOrder);
+    }
+    return order;
+  }
+
+  static bool _listEquals<T>(List<T> a, List<T> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
   }
 
   Future<void> setMobileNavOrder(List<int> order) async {
