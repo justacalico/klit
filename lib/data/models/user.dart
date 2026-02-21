@@ -16,6 +16,8 @@ class User {
   final int negativeFeedbackCount;
   final DateTime createdAt;
   final String? avatarId;
+  /// Optional avatar image URL (from API or derived from avatar post).
+  final String? avatarUrl;
   final String? blacklistedTags;
 
   const User({
@@ -35,10 +37,15 @@ class User {
     required this.negativeFeedbackCount,
     required this.createdAt,
     this.avatarId,
+    this.avatarUrl,
     this.blacklistedTags,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
+    final String? avatarUrl = json['avatar_url'] as String? ??
+        (json['avatar'] is Map
+            ? (json['avatar'] as Map<String, dynamic>)['url'] as String?
+            : null);
     return User(
       id: json['id'] as int,
       name: json['name'] as String,
@@ -58,6 +65,7 @@ class User {
       negativeFeedbackCount: json['negative_feedback_count'] as int? ?? 0,
       createdAt: DateTime.parse(json['created_at'] as String),
       avatarId: json['avatar_id']?.toString(),
+      avatarUrl: avatarUrl,
       blacklistedTags: json['blacklisted_tags'] as String?,
     );
   }

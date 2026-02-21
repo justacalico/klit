@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart'
     show Material, ListTile, ReorderableListView, Divider;
@@ -10,7 +11,9 @@ import '../../app/routes.dart';
 import '../../core/constants/constants.dart';
 import '../layout/layout_scope.dart';
 import '../../core/theme/ui_style_manager.dart';
+import '../../data/models/models.dart';
 import '../../data/models/proxy_config.dart';
+import '../../data/services/services.dart';
 import '../../data/services/update_service.dart';
 import '../../providers/providers.dart';
 
@@ -58,6 +61,9 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   String _sidebarSearchQuery = '';
   final _sidebarSearchController = TextEditingController();
   final _sidebarSearchFocus = FocusNode();
+  String? _accountAvatarUrl;
+  String? _accountAvatarUsername;
+  bool _accountAvatarLoading = false;
 
   static const List<_SettingsCategory> _categories = [
     _SettingsCategory(
@@ -152,6 +158,40 @@ class _UiSettingsPageState extends State<UiSettingsPage>
       setState(() => _selectedCategory = id);
       _animationController.forward();
     });
+  }
+
+  Future<void> _loadAccountAvatar(BuildContext context, String username) async {
+    final api = context.read<ApiService>();
+    String? url;
+    final userResult = await api.getUserProfile(username);
+    await userResult.when(
+      success: (user) async {
+        if (user.avatarUrl != null && user.avatarUrl!.isNotEmpty) {
+          url = user.avatarUrl!.startsWith(RegExp(r'https?://'))
+              ? user.avatarUrl
+              : '${api.baseUrl}/${user.avatarUrl!.startsWith('/') ? user.avatarUrl!.substring(1) : user.avatarUrl}';
+        } else if (user.avatarId != null && user.avatarId!.isNotEmpty) {
+          final postId = int.tryParse(user.avatarId!);
+          if (postId != null) {
+            final postResult = await api.getPostById(postId);
+            postResult.when(
+              success: (post) {
+                url = post.preview.url ?? post.sample.url;
+              },
+              failure: (_) {},
+            );
+          }
+        }
+      },
+      failure: (_) {},
+    );
+    if (mounted) {
+      setState(() {
+        _accountAvatarUrl = url;
+        _accountAvatarUsername = username;
+        _accountAvatarLoading = false;
+      });
+    }
   }
 
   @override
@@ -673,6 +713,25 @@ class _UiSettingsPageState extends State<UiSettingsPage>
         final account = authProvider.currentAccount;
         final isGuest = authProvider.isGuest;
 
+        if (!isGuest && account != null) {
+          if (_accountAvatarUsername != account.username) {
+            _accountAvatarUrl = null;
+            _accountAvatarUsername = null;
+          }
+          if (_accountAvatarUrl == null && !_accountAvatarLoading) {
+            final username = account.username;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted || _accountAvatarLoading) return;
+              setState(() => _accountAvatarLoading = true);
+              _loadAccountAvatar(context, username);
+            });
+          }
+        }
+
+        final avatarUrl = (!isGuest && account != null && _accountAvatarUsername == account.username)
+            ? _accountAvatarUrl
+            : null;
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -682,60 +741,12 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                 children: [
                   Row(
                     children: [
-                      Container(
-                        width: 64,
-                        height: 64,
-                        decoration: BoxDecoration(
-                          gradient: isGuest
-                              ? LinearGradient(
-                                  colors: [
-                                    CupertinoColors.systemGrey.withValues(
-                                      alpha: 0.3,
-                                    ),
-                                    CupertinoColors.systemGrey.withValues(
-                                      alpha: 0.2,
-                                    ),
-                                  ],
-                                )
-                              : const LinearGradient(
-                                  colors: [
-                                    _DesignColors.primaryIndigo,
-                                    _DesignColors.primaryPurple,
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: isGuest
-                                  ? CupertinoColors.systemGrey.withValues(
-                                      alpha: 0.2,
-                                    )
-                                  : _DesignColors.primaryPurple.withValues(
-                                      alpha: 0.3,
-                                    ),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: isGuest
-                              ? const Icon(
-                                  CupertinoIcons.person_badge_plus_fill,
-                                  color: CupertinoColors.white,
-                                  size: 28,
-                                )
-                              : Text(
-                                  account?.username[0].toUpperCase() ?? '?',
-                                  style: const TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.bold,
-                                    color: CupertinoColors.white,
-                                  ),
-                                ),
-                        ),
+                      _buildAccountAvatar(
+                        isDark: isDark,
+                        isGuest: isGuest,
+                        username: account?.username,
+                        avatarUrl: avatarUrl,
+                        isLoading: _accountAvatarLoading && !isGuest,
                       ),
                       const SizedBox(width: 20),
                       Expanded(
@@ -824,6 +835,100 @@ class _UiSettingsPageState extends State<UiSettingsPage>
           ],
         );
       },
+    );
+  }
+
+  Widget _buildAccountAvatar({
+    required bool isDark,
+    required bool isGuest,
+    required String? username,
+    required String? avatarUrl,
+    required bool isLoading,
+  }) {
+    return Container(
+      width: 64,
+      height: 64,
+      decoration: BoxDecoration(
+        gradient: isGuest
+            ? LinearGradient(
+                colors: [
+                  CupertinoColors.systemGrey.withValues(alpha: 0.3),
+                  CupertinoColors.systemGrey.withValues(alpha: 0.2),
+                ],
+              )
+            : const LinearGradient(
+                colors: [
+                  _DesignColors.primaryIndigo,
+                  _DesignColors.primaryPurple,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: isGuest
+                ? CupertinoColors.systemGrey.withValues(alpha: 0.2)
+                : _DesignColors.primaryPurple.withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: isLoading
+          ? const Center(
+              child: CupertinoActivityIndicator(
+                color: CupertinoColors.white,
+              ),
+            )
+          : (avatarUrl != null && avatarUrl.isNotEmpty)
+              ? CachedNetworkImage(
+                  imageUrl: avatarUrl,
+                  fit: BoxFit.cover,
+                  placeholder: (_, __) => Center(
+                    child: Text(
+                      (username != null && username.isNotEmpty)
+                          ? username[0].toUpperCase()
+                          : '?',
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: CupertinoColors.white,
+                      ),
+                    ),
+                  ),
+                  errorWidget: (_, __, ___) => Center(
+                    child: Text(
+                      (username != null && username.isNotEmpty)
+                          ? username[0].toUpperCase()
+                          : '?',
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: CupertinoColors.white,
+                      ),
+                    ),
+                  ),
+                )
+              : Center(
+                  child: isGuest
+                      ? const Icon(
+                          CupertinoIcons.person_badge_plus_fill,
+                          color: CupertinoColors.white,
+                          size: 28,
+                        )
+                      : Text(
+                          (username != null && username.isNotEmpty)
+                              ? username[0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: CupertinoColors.white,
+                          ),
+                        ),
+                ),
     );
   }
 
