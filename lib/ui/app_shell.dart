@@ -311,7 +311,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
   double _getMobileNavBarHeight(BuildContext context) {
     final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    return isLiquidGlass ? 68 + 16 + bottomPadding : 56 + bottomPadding;
+    return isLiquidGlass ? 68 + 16 + bottomPadding : 60 + bottomPadding;
   }
 
   Widget _buildMobileNavBarContent(bool isDark) {

@@ -144,7 +144,7 @@ class AppNavBar extends StatelessWidget {
         ),
       ),
       child: SizedBox(
-        height: 56,
+        height: 60,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: _buildNavItems(context, isDark),
