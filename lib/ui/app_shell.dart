@@ -26,6 +26,10 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> with GamepadInputMixin {
   PostDetailArguments? _postOverlay;
   StreamSubscription<GamepadState>? _gamepadStateSub;
+  /// True while the post detail route we pushed from mobile is on the stack.
+  bool _postDetailRoutePushed = false;
+  /// Previous layout mode to detect desktop <-> mobile transitions.
+  LayoutMode? _previousMode;
 
   static const List<int> _desktopOrder = [0, 1, 2, 6, 4, 5, 3];
 
@@ -95,7 +99,41 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
     if (LayoutScope.of(context).isDesktop) {
       _openPostOverlay(args);
     } else {
-      Navigator.of(context).pushNamed(AppRoutes.postDetail, arguments: args);
+      setState(() => _postOverlay = args);
+      Navigator.of(context).push(
+        CupertinoPageRoute(
+          settings: RouteSettings(
+            name: AppRoutes.postDetail,
+            arguments: args,
+          ),
+          builder: (ctx) => PostDetailPage(
+            postIds: args.postIds,
+            initialIndex: args.initialIndex,
+            onLoadMore: args.onLoadMore,
+            hasMore: args.hasMore,
+            onCurrentIndexChanged: (index) {
+              if (!mounted) return;
+              setState(() {
+                _postOverlay = PostDetailArguments(
+                  postIds: _postOverlay!.postIds,
+                  initialIndex: index,
+                  onLoadMore: _postOverlay!.onLoadMore,
+                  hasMore: _postOverlay!.hasMore,
+                );
+              });
+            },
+            onClose: () => Navigator.of(context).pop(),
+          ),
+        ),
+      ).then((_) {
+        if (mounted) {
+          setState(() {
+            _postDetailRoutePushed = false;
+            _postOverlay = null;
+          });
+        }
+      });
+      setState(() => _postDetailRoutePushed = true);
     }
   }
 
@@ -136,6 +174,68 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
     final mode = LayoutScope.of(context);
     final nav = context.watch<NavigationProvider>();
     final selected = nav.getDesktopIndex();
+
+    // When switching desktop -> mobile with overlay open, push post detail so user keeps viewing the same post.
+    if (_previousMode != null &&
+        _previousMode!.isDesktop &&
+        mode.isMobile &&
+        _postOverlay != null &&
+        !_postDetailRoutePushed) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final overlay = _postOverlay;
+        if (overlay == null) return;
+        setState(() => _postDetailRoutePushed = true);
+        Navigator.of(context).push(
+          CupertinoPageRoute(
+            settings: RouteSettings(
+              name: AppRoutes.postDetail,
+              arguments: overlay,
+            ),
+            builder: (ctx) => PostDetailPage(
+              postIds: overlay.postIds,
+              initialIndex: overlay.initialIndex,
+              onLoadMore: overlay.onLoadMore,
+              hasMore: overlay.hasMore,
+              onCurrentIndexChanged: (index) {
+                if (!mounted) return;
+                setState(() {
+                  _postOverlay = PostDetailArguments(
+                    postIds: _postOverlay!.postIds,
+                    initialIndex: index,
+                    onLoadMore: _postOverlay!.onLoadMore,
+                    hasMore: _postOverlay!.hasMore,
+                  );
+                });
+              },
+              onClose: () => Navigator.of(context).pop(),
+            ),
+          ),
+        ).then((_) {
+          if (mounted) {
+            setState(() {
+              _postDetailRoutePushed = false;
+              _postOverlay = null;
+            });
+          }
+        });
+      });
+    }
+    // When switching mobile -> desktop with post detail route on stack, pop so overlay can show (same post).
+    if (_previousMode != null &&
+        _previousMode!.isMobile &&
+        mode.isDesktop &&
+        _postDetailRoutePushed &&
+        _postOverlay != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+          setState(() => _postDetailRoutePushed = false);
+        }
+      });
+    }
+    _previousMode = mode;
 
     final content = KeyedSubtree(
       key: ValueKey('shell-content-$selected'),
