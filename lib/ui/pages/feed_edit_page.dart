@@ -14,7 +14,7 @@ List<String> _parseTags(String text) {
       .toList();
 }
 
-/// Feed create/edit page: name, type (image/video), include/exclude tags.
+/// Feed create/edit page: name, type (image/video), and/or/exclude tags.
 class FeedEditPage extends StatefulWidget {
   final Feed? feed;
 
@@ -27,6 +27,7 @@ class FeedEditPage extends StatefulWidget {
 class _FeedEditPageState extends State<FeedEditPage> {
   late TextEditingController _nameController;
   late TextEditingController _includeController;
+  late TextEditingController _orController;
   late TextEditingController _excludeController;
   late bool _isVideo;
   bool _isNew = true;
@@ -40,6 +41,9 @@ class _FeedEditPageState extends State<FeedEditPage> {
     _includeController = TextEditingController(
       text: f?.includeTags.join(' ') ?? '',
     );
+    _orController = TextEditingController(
+      text: f?.orTags.join(' ') ?? '',
+    );
     _excludeController = TextEditingController(
       text: f?.excludeTags.join(' ') ?? '',
     );
@@ -50,6 +54,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
   void dispose() {
     _nameController.dispose();
     _includeController.dispose();
+    _orController.dispose();
     _excludeController.dispose();
     super.dispose();
   }
@@ -57,6 +62,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
   Future<void> _save() async {
     final name = _nameController.text.trim();
     final includeTags = _parseTags(_includeController.text);
+    final orTags = _parseTags(_orController.text);
     final excludeTags = _parseTags(_excludeController.text);
 
     final feedsProvider = context.read<FeedsProvider>();
@@ -66,6 +72,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
         name: name.isEmpty ? 'Unnamed feed' : name,
         isVideo: _isVideo,
         includeTags: includeTags,
+        orTags: orTags,
         excludeTags: excludeTags,
       );
       await feedsProvider.addFeed(feed);
@@ -76,6 +83,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
         name: name.isEmpty ? 'Unnamed feed' : name,
         isVideo: _isVideo,
         includeTags: includeTags,
+        orTags: orTags,
         excludeTags: excludeTags,
       );
       await feedsProvider.updateFeed(feed);
@@ -200,7 +208,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Tags to include',
+              'And tags',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -210,7 +218,31 @@ class _FeedEditPageState extends State<FeedEditPage> {
             const SizedBox(height: 6),
             CupertinoTextField(
               controller: _includeController,
-              placeholder: 'e.g. fox cute\n(one per line or space-separated)',
+              placeholder: 'Post must have all of these (e.g. cat or fox)',
+              maxLines: 4,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: (isDark ? CupertinoColors.white : CupertinoColors.black)
+                      .withValues(alpha: 0.08),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Or tags',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: CupertinoColors.systemGrey,
+              ),
+            ),
+            const SizedBox(height: 6),
+            CupertinoTextField(
+              controller: _orController,
+              placeholder: 'Any of these (e.g. cat fox for cat or fox)',
               maxLines: 4,
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
@@ -234,7 +266,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
             const SizedBox(height: 6),
             CupertinoTextField(
               controller: _excludeController,
-              placeholder: 'e.g. gore\n(one per line or space-separated)',
+              placeholder: 'e.g. cat when viewing fox to see only fox without cat',
               maxLines: 4,
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(

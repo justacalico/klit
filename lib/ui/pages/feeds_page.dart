@@ -185,8 +185,11 @@ class _FeedCard extends StatelessWidget {
     final typeLabel = feed.isVideo ? 'Video' : 'Image';
     final typeColor = feed.isVideo ? AppColors.primaryBlue : AppColors.primaryGreen;
     final includeStr = feed.includeTags.isEmpty
-        ? 'no include tags'
+        ? (feed.orTags.isEmpty ? 'no and tags' : '')
         : feed.includeTags.take(3).join(', ') + (feed.includeTags.length > 3 ? '…' : '');
+    final orStr = feed.orTags.isEmpty
+        ? ''
+        : 'or: ${feed.orTags.take(3).join(', ')}${feed.orTags.length > 3 ? '…' : ''}';
     final excludeStr = feed.excludeTags.isEmpty
         ? ''
         : '− ${feed.excludeTags.take(2).join(', ')}${feed.excludeTags.length > 2 ? '…' : ''}';
@@ -251,7 +254,11 @@ class _FeedCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      includeStr + (excludeStr.isEmpty ? '' : '  $excludeStr'),
+                      [
+                        if (includeStr.isNotEmpty) includeStr,
+                        if (orStr.isNotEmpty) orStr,
+                        if (excludeStr.isNotEmpty) excludeStr,
+                      ].join('  '),
                       style: const TextStyle(
                         fontSize: 13,
                         color: CupertinoColors.systemGrey,

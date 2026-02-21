@@ -1,10 +1,11 @@
 /// User-defined feed: saved tag filters and media type (image or video).
-/// Used like an RSS feed: open a feed to browse posts matching include/exclude tags and type.
+/// Used like an RSS feed: open a feed to browse posts matching and/or/exclude tags and type.
 class Feed {
   final String id;
   final String name;
   final bool isVideo;
   final List<String> includeTags;
+  final List<String> orTags;
   final List<String> excludeTags;
 
   const Feed({
@@ -12,11 +13,13 @@ class Feed {
     required this.name,
     required this.isVideo,
     required this.includeTags,
+    required this.orTags,
     required this.excludeTags,
   });
 
   factory Feed.fromJson(Map<String, dynamic> json) {
     final include = json['includeTags'];
+    final or = json['orTags'];
     final exclude = json['excludeTags'];
     return Feed(
       id: json['id'] as String,
@@ -24,6 +27,9 @@ class Feed {
       isVideo: json['isVideo'] as bool? ?? false,
       includeTags: include is List<dynamic>
           ? (include).map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList()
+          : [],
+      orTags: or is List<dynamic>
+          ? (or).map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList()
           : [],
       excludeTags: exclude is List<dynamic>
           ? (exclude).map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList()
@@ -37,6 +43,7 @@ class Feed {
       'name': name,
       'isVideo': isVideo,
       'includeTags': includeTags,
+      'orTags': orTags,
       'excludeTags': excludeTags,
     };
   }
@@ -46,6 +53,7 @@ class Feed {
     String? name,
     bool? isVideo,
     List<String>? includeTags,
+    List<String>? orTags,
     List<String>? excludeTags,
   }) {
     return Feed(
@@ -53,16 +61,23 @@ class Feed {
       name: name ?? this.name,
       isVideo: isVideo ?? this.isVideo,
       includeTags: includeTags ?? this.includeTags,
+      orTags: orTags ?? this.orTags,
       excludeTags: excludeTags ?? this.excludeTags,
     );
   }
 
   /// Build the search query string for this feed (tags + e621 file-type metatags).
-  /// e621 has no type:image/type:video; use ( ~type:jpg ~type:png ... ) or ( ~type:mp4 ~type:webm ).
+  /// e621: space = AND, ~tag = OR (group with spaces around parens), -tag = exclude.
   String toSearchQuery() {
     final parts = <String>[];
     if (includeTags.isNotEmpty) {
       parts.add(includeTags.join(' '));
+    }
+    if (orTags.isNotEmpty) {
+      final orClause = orTags.map((t) => '~${t.trim()}').where((s) => s.length > 1).join(' ');
+      if (orClause.isNotEmpty) {
+        parts.add('( $orClause )');
+      }
     }
     for (final t in excludeTags) {
       if (t.trim().isEmpty) continue;
