@@ -650,6 +650,7 @@ class _PostDetailPageState extends State<PostDetailPage>
           CupertinoActionSheetAction(
             onPressed: () {
               Navigator.of(context).pop();
+              _downloadPost();
             },
             child: const Text('Download'),
           ),
@@ -1286,20 +1287,7 @@ class _MobilePostDetailContentBuilder {
       isOled,
       () => s._toggleFavorite(index),
     );
-    final downloadBtn = _buildGlassActionButton(
-      context,
-      s,
-      index,
-      CupertinoIcons.square_arrow_down,
-      CupertinoIcons.square_arrow_down_fill,
-      'Download',
-      false,
-      s._isDownloading[index] == true,
-      UIColors.primaryIndigo,
-      isDark,
-      isOled,
-      () => s._downloadPost(),
-    );
+    // Download is available in the more-options sheet on mobile; no separate icon in the row.
     final iFinishedBtn = settings.iFinishedEnabled
         ? _buildGlassActionButton(
             context,
@@ -1318,11 +1306,13 @@ class _MobilePostDetailContentBuilder {
         : null;
 
     var buttons = isGuest
-        ? [downloadBtn]
+        ? <Widget>[]
         : leftHandedMode
-            ? [commentBtn, favoriteBtn, downvoteBtn, upvoteBtn, downloadBtn]
-            : [upvoteBtn, downvoteBtn, favoriteBtn, commentBtn, downloadBtn];
+            ? [commentBtn, favoriteBtn, downvoteBtn, upvoteBtn]
+            : [upvoteBtn, downvoteBtn, favoriteBtn, commentBtn];
     if (iFinishedBtn != null) buttons = [...buttons, iFinishedBtn];
+
+    if (buttons.isEmpty) return const SizedBox.shrink();
 
     return _buildLiquidGlassContainer(
       context,
