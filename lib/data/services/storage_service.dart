@@ -194,6 +194,9 @@ class StorageService {
     return accounts.where((a) => a.id == activeId).firstOrNull;
   }
 
+  Future<String> _accountScope() async =>
+      (await getActiveAccountId()) ?? 'guest';
+
   // Preferences
 
   String getHost() {
@@ -328,23 +331,34 @@ class StorageService {
     await _prefs.setInt(AppConstants.uiStyleKey, style);
   }
 
-  // Search history
+  // Search history (scoped by account)
 
-  List<SearchHistoryItem> getSearchHistory() {
-    final historyJson = _prefs.getString(AppConstants.searchHistoryKey);
-    if (historyJson == null) return [];
-
+  Future<List<SearchHistoryItem>> getSearchHistory() async {
+    final scope = await _accountScope();
+    final key = '${AppConstants.searchHistoryKey}_$scope';
+    String? historyJson = _prefs.getString(key);
+    if (historyJson == null) {
+      // Migrate from legacy key
+      historyJson = _prefs.getString(AppConstants.searchHistoryKey);
+      if (historyJson != null) {
+        await _prefs.setString(key, historyJson);
+        await _prefs.remove(AppConstants.searchHistoryKey);
+      } else {
+        return [];
+      }
+    }
     final List<dynamic> historyList = json.decode(historyJson);
-    return historyList
+    final result = historyList
         .map((e) => SearchHistoryItem.fromJson(e as Map<String, dynamic>))
         .toList()
       ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    return result;
   }
 
   Future<void> addToSearchHistory(String query) async {
     if (query.trim().isEmpty) return;
 
-    var history = getSearchHistory();
+    var history = await getSearchHistory();
     history.removeWhere((h) => h.query == query);
     history.insert(
       0,
@@ -355,12 +369,16 @@ class StorageService {
       history = history.take(AppConstants.maxSearchHistoryItems).toList();
     }
 
+    final scope = await _accountScope();
+    final key = '${AppConstants.searchHistoryKey}_$scope';
     final historyJson = json.encode(history.map((e) => e.toJson()).toList());
-    await _prefs.setString(AppConstants.searchHistoryKey, historyJson);
+    await _prefs.setString(key, historyJson);
   }
 
   Future<void> clearSearchHistory() async {
-    await _prefs.remove(AppConstants.searchHistoryKey);
+    final scope = await _accountScope();
+    final key = '${AppConstants.searchHistoryKey}_$scope';
+    await _prefs.remove(key);
   }
 
   bool getSearchHistoryEnabled() {
@@ -371,11 +389,22 @@ class StorageService {
     await _prefs.setBool(AppConstants.searchHistoryEnabledKey, enabled);
   }
 
-  // Feeds
+  // Feeds (scoped by account)
 
-  List<Feed> getFeeds() {
-    final feedsJson = _prefs.getString(AppConstants.feedsKey);
-    if (feedsJson == null) return [];
+  Future<List<Feed>> getFeeds() async {
+    final scope = await _accountScope();
+    final key = '${AppConstants.feedsKey}_$scope';
+    String? feedsJson = _prefs.getString(key);
+    if (feedsJson == null) {
+      // Migrate from legacy key
+      feedsJson = _prefs.getString(AppConstants.feedsKey);
+      if (feedsJson != null) {
+        await _prefs.setString(key, feedsJson);
+        await _prefs.remove(AppConstants.feedsKey);
+      } else {
+        return [];
+      }
+    }
     try {
       final List<dynamic> list = json.decode(feedsJson);
       return list
@@ -388,8 +417,10 @@ class StorageService {
   }
 
   Future<void> setFeeds(List<Feed> feeds) async {
+    final scope = await _accountScope();
+    final key = '${AppConstants.feedsKey}_$scope';
     final list = feeds.map((e) => e.toJson()).toList();
-    await _prefs.setString(AppConstants.feedsKey, json.encode(list));
+    await _prefs.setString(key, json.encode(list));
   }
 
   // Proxy

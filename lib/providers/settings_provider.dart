@@ -108,7 +108,7 @@ class SettingsProvider extends ChangeNotifier {
     _mobileNavOrder = _storageService.getMobileNavOrder();
     _desktopNavOrder = _storageService.getDesktopNavOrder();
     _host = _storageService.getHost();
-    _searchHistory = _storageService.getSearchHistory();
+    _searchHistory = await _storageService.getSearchHistory();
     _proxyConfig = _storageService.getProxyConfig();
     _blacklist = _storageService.getBlacklist();
     _blacklistEnabled = _storageService.getBlacklistEnabled();
@@ -274,7 +274,7 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> addToSearchHistory(String query) async {
     if (!_searchHistoryEnabled) return;
     await _storageService.addToSearchHistory(query);
-    _searchHistory = _storageService.getSearchHistory();
+    _searchHistory = await _storageService.getSearchHistory();
     notifyListeners();
   }
 
@@ -282,6 +282,12 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> clearSearchHistory() async {
     await _storageService.clearSearchHistory();
     _searchHistory = [];
+    notifyListeners();
+  }
+
+  /// Reload search history for current account (e.g. after account switch)
+  Future<void> reloadSearchHistory() async {
+    _searchHistory = await _storageService.getSearchHistory();
     notifyListeners();
   }
 

@@ -73,6 +73,17 @@ void main() async {
   // Create navigation provider for shared navigation state
   final navigationProvider = NavigationProvider();
   final feedsProvider = FeedsProvider(storageService: storageService);
+  await feedsProvider.loadFeeds();
+
+  // Reload account-scoped data (search history, feeds) when account changes
+  String? lastAccountScope = authProvider.currentAccount?.id ?? 'guest';
+  authProvider.addListener(() async {
+    final scope = authProvider.currentAccount?.id ?? 'guest';
+    if (scope == lastAccountScope) return;
+    lastAccountScope = scope;
+    await settingsProvider.reloadSearchHistory();
+    await feedsProvider.reloadFeeds();
+  });
 
   runApp(
     MultiProvider(

@@ -5,15 +5,25 @@ import '../data/services/services.dart';
 
 class FeedsProvider extends ChangeNotifier {
   FeedsProvider({required StorageService storageService})
-      : _storageService = storageService {
-    _feeds = _storageService.getFeeds();
-  }
+      : _storageService = storageService;
 
   final StorageService _storageService;
   final _uuid = const Uuid();
   List<Feed> _feeds = [];
 
   List<Feed> get feeds => List.unmodifiable(_feeds);
+
+  /// Load feeds for current account (call on startup and after account change)
+  Future<void> loadFeeds() async {
+    _feeds = await _storageService.getFeeds();
+    notifyListeners();
+  }
+
+  /// Reload feeds for current account (e.g. after account switch)
+  Future<void> reloadFeeds() async {
+    _feeds = await _storageService.getFeeds();
+    notifyListeners();
+  }
 
   Feed? getById(String id) {
     try {
