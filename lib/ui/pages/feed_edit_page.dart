@@ -29,7 +29,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
   late TextEditingController _includeController;
   late TextEditingController _orController;
   late TextEditingController _excludeController;
-  late bool _isVideo;
+  late String _mediaType;
   bool _isNew = true;
 
   @override
@@ -47,7 +47,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
     _excludeController = TextEditingController(
       text: f?.excludeTags.join(' ') ?? '',
     );
-    _isVideo = f?.isVideo ?? false;
+    _mediaType = f?.mediaType ?? Feed.mediaTypeImage;
   }
 
   @override
@@ -70,7 +70,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
       final feed = Feed(
         id: '',
         name: name.isEmpty ? 'Unnamed feed' : name,
-        isVideo: _isVideo,
+        mediaType: _mediaType,
         includeTags: includeTags,
         orTags: orTags,
         excludeTags: excludeTags,
@@ -81,7 +81,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
       final feed = Feed(
         id: existing.id,
         name: name.isEmpty ? 'Unnamed feed' : name,
-        isVideo: _isVideo,
+        mediaType: _mediaType,
         includeTags: includeTags,
         orTags: orTags,
         excludeTags: excludeTags,
@@ -148,10 +148,10 @@ class _FeedEditPageState extends State<FeedEditPage> {
               ),
             ),
             const SizedBox(height: 8),
-            CupertinoSlidingSegmentedControl<bool>(
-              groupValue: _isVideo,
+            CupertinoSlidingSegmentedControl<String>(
+              groupValue: _mediaType,
               children: {
-                false: Padding(
+                Feed.mediaTypeImage: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -159,7 +159,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
                       Icon(
                         CupertinoIcons.photo_fill,
                         size: 20,
-                        color: _isVideo == false
+                        color: _mediaType == Feed.mediaTypeImage
                             ? CupertinoColors.white
                             : CupertinoColors.systemGrey,
                       ),
@@ -168,7 +168,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
                         'Image',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          color: _isVideo == false
+                          color: _mediaType == Feed.mediaTypeImage
                               ? CupertinoColors.white
                               : CupertinoColors.systemGrey,
                         ),
@@ -176,7 +176,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
                     ],
                   ),
                 ),
-                true: Padding(
+                Feed.mediaTypeVideo: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -184,7 +184,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
                       Icon(
                         CupertinoIcons.play_rectangle_fill,
                         size: 20,
-                        color: _isVideo == true
+                        color: _mediaType == Feed.mediaTypeVideo
                             ? CupertinoColors.white
                             : CupertinoColors.systemGrey,
                       ),
@@ -193,7 +193,32 @@ class _FeedEditPageState extends State<FeedEditPage> {
                         'Video',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          color: _isVideo == true
+                          color: _mediaType == Feed.mediaTypeVideo
+                              ? CupertinoColors.white
+                              : CupertinoColors.systemGrey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Feed.mediaTypeAll: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        CupertinoIcons.rectangle_stack_fill,
+                        size: 20,
+                        color: _mediaType == Feed.mediaTypeAll
+                            ? CupertinoColors.white
+                            : CupertinoColors.systemGrey,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Both',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: _mediaType == Feed.mediaTypeAll
                               ? CupertinoColors.white
                               : CupertinoColors.systemGrey,
                         ),
@@ -203,7 +228,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
                 ),
               },
               onValueChanged: (v) {
-                if (v != null) setState(() => _isVideo = v);
+                if (v != null) setState(() => _mediaType = v);
               },
             ),
             const SizedBox(height: 24),

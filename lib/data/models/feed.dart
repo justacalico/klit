@@ -1,9 +1,14 @@
-/// User-defined feed: saved tag filters and media type (image or video).
+/// User-defined feed: saved tag filters and media type (image, video, or both).
 /// Used like an RSS feed: open a feed to browse posts matching and/or/exclude tags and type.
 class Feed {
+  static const String mediaTypeImage = 'image';
+  static const String mediaTypeVideo = 'video';
+  static const String mediaTypeAll = 'all';
+
   final String id;
   final String name;
-  final bool isVideo;
+  /// One of [mediaTypeImage], [mediaTypeVideo], [mediaTypeAll].
+  final String mediaType;
   final List<String> includeTags;
   final List<String> orTags;
   final List<String> excludeTags;
@@ -11,20 +16,27 @@ class Feed {
   const Feed({
     required this.id,
     required this.name,
-    required this.isVideo,
+    required this.mediaType,
     required this.includeTags,
     required this.orTags,
     required this.excludeTags,
   });
 
+  /// True if this feed is video-only (for backward compatibility).
+  bool get isVideo => mediaType == mediaTypeVideo;
+
   factory Feed.fromJson(Map<String, dynamic> json) {
     final include = json['includeTags'];
     final or = json['orTags'];
     final exclude = json['excludeTags'];
+    String mt = json['mediaType'] as String? ?? '';
+    if (mt != mediaTypeImage && mt != mediaTypeVideo && mt != mediaTypeAll) {
+      mt = json['isVideo'] == true ? mediaTypeVideo : mediaTypeImage;
+    }
     return Feed(
       id: json['id'] as String,
       name: json['name'] as String? ?? '',
-      isVideo: json['isVideo'] as bool? ?? false,
+      mediaType: mt,
       includeTags: include is List<dynamic>
           ? (include).map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList()
           : [],
@@ -41,7 +53,7 @@ class Feed {
     return {
       'id': id,
       'name': name,
-      'isVideo': isVideo,
+      'mediaType': mediaType,
       'includeTags': includeTags,
       'orTags': orTags,
       'excludeTags': excludeTags,
@@ -51,7 +63,7 @@ class Feed {
   Feed copyWith({
     String? id,
     String? name,
-    bool? isVideo,
+    String? mediaType,
     List<String>? includeTags,
     List<String>? orTags,
     List<String>? excludeTags,
@@ -59,7 +71,7 @@ class Feed {
     return Feed(
       id: id ?? this.id,
       name: name ?? this.name,
-      isVideo: isVideo ?? this.isVideo,
+      mediaType: mediaType ?? this.mediaType,
       includeTags: includeTags ?? this.includeTags,
       orTags: orTags ?? this.orTags,
       excludeTags: excludeTags ?? this.excludeTags,
@@ -83,10 +95,15 @@ class Feed {
       if (t.trim().isEmpty) continue;
       parts.add('-${t.trim()}');
     }
-    if (isVideo) {
-      parts.add('( ~type:mp4 ~type:webm )');
-    } else {
-      parts.add('( ~type:jpg ~type:png ~type:gif ~type:webp )');
+    switch (mediaType) {
+      case mediaTypeVideo:
+        parts.add('( ~type:mp4 ~type:webm )');
+        break;
+      case mediaTypeAll:
+        parts.add('( ~type:jpg ~type:png ~type:gif ~type:webp ~type:mp4 ~type:webm )');
+        break;
+      default:
+        parts.add('( ~type:jpg ~type:png ~type:gif ~type:webp )');
     }
     return parts.join(' ').trim();
   }

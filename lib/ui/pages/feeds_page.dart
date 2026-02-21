@@ -182,8 +182,16 @@ class _FeedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final typeLabel = feed.isVideo ? 'Video' : 'Image';
-    final typeColor = feed.isVideo ? AppColors.primaryBlue : AppColors.primaryGreen;
+    final typeLabel = feed.mediaType == Feed.mediaTypeVideo
+        ? 'Video'
+        : feed.mediaType == Feed.mediaTypeAll
+            ? 'Both'
+            : 'Image';
+    final typeColor = feed.mediaType == Feed.mediaTypeVideo
+        ? AppColors.primaryBlue
+        : feed.mediaType == Feed.mediaTypeAll
+            ? CupertinoColors.systemGrey
+            : AppColors.primaryGreen;
     final includeStr = feed.includeTags.isEmpty
         ? (feed.orTags.isEmpty ? 'no and tags' : '')
         : feed.includeTags.take(3).join(', ') + (feed.includeTags.length > 3 ? '…' : '');
@@ -234,7 +242,11 @@ class _FeedCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
-                  feed.isVideo ? CupertinoIcons.play_rectangle_fill : CupertinoIcons.photo_fill,
+                  feed.mediaType == Feed.mediaTypeVideo
+                      ? CupertinoIcons.play_rectangle_fill
+                      : feed.mediaType == Feed.mediaTypeAll
+                          ? CupertinoIcons.rectangle_stack_fill
+                          : CupertinoIcons.photo_fill,
                   color: typeColor,
                   size: 22,
                 ),
