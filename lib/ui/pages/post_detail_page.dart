@@ -277,13 +277,19 @@ class _PostDetailPageState extends State<PostDetailPage>
     super.dispose();
   }
 
+  /// Number of posts to preload on each side of the current post.
+  static const int _preloadWindow = 3;
+
   void _preloadAdjacentPosts() {
-    if (_currentIndex > 0) _loadPost(_currentIndex - 1);
-    if (_currentIndex < _postIds.length - 1) _loadPost(_currentIndex + 1);
+    final start = (_currentIndex - _preloadWindow).clamp(0, _postIds.length - 1);
+    final end = (_currentIndex + _preloadWindow).clamp(0, _postIds.length - 1);
+    for (var i = start; i <= end; i++) {
+      _loadPost(i);
+    }
     if (_hasMore &&
         !_isLoadingMore &&
         widget.onLoadMore != null &&
-        _currentIndex >= _postIds.length - 3) {
+        _currentIndex >= _postIds.length - _preloadWindow - 1) {
       _loadMorePosts();
     }
   }
