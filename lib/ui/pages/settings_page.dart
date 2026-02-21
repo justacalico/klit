@@ -19,6 +19,7 @@ import '../../data/models/models.dart';
 import '../../data/models/proxy_config.dart';
 import '../../data/services/services.dart';
 import '../../providers/providers.dart';
+import 'account_management_page.dart';
 
 /// Design constants for the settings page
 class _DesignColors {
@@ -48,8 +49,14 @@ class _SettingsCategory {
 /// Unified settings page - single file for all layouts.
 class UiSettingsPage extends StatefulWidget {
   final Function(String) onNavigate;
+  /// When opening Settings via route (e.g. from Profile), preselect this category.
+  final String? initialCategory;
 
-  const UiSettingsPage({super.key, required this.onNavigate});
+  const UiSettingsPage({
+    super.key,
+    required this.onNavigate,
+    this.initialCategory,
+  });
 
   @override
   State<UiSettingsPage> createState() => _UiSettingsPageState();
@@ -140,6 +147,10 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   @override
   void initState() {
     super.initState();
+    if (widget.initialCategory != null) {
+      _selectedCategory = widget.initialCategory!;
+      _mobileShowMainList = false;
+    }
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
@@ -930,38 +941,79 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                           ],
                         ),
                       ),
-                      CupertinoButton(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                        color: _DesignColors.primaryPurple,
-                        borderRadius: BorderRadius.circular(10),
-                        onPressed: () {
-                          if (isGuest) {
+                      if (isGuest)
+                        CupertinoButton(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          color: _DesignColors.primaryPurple,
+                          borderRadius: BorderRadius.circular(10),
+                          onPressed: () {
                             authProvider.logout();
                             Navigator.of(context).pushNamedAndRemoveUntil(
                               AppRoutes.login,
                               (route) => false,
                             );
-                          } else {
-                            widget.onNavigate(AppRoutes.accountManagement);
-                          }
-                        },
-                        child: Text(
-                          isGuest ? 'Sign In' : 'Manage',
-                          style: const TextStyle(
-                            color: CupertinoColors.white,
-                            fontWeight: FontWeight.w600,
+                          },
+                          child: const Text(
+                            'Sign In',
+                            style: TextStyle(
+                              color: CupertinoColors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 ],
               ),
             ),
             if (!isGuest) ...[
+              const SizedBox(height: 16),
+              _buildSettingsCard(
+                isDark: isDark,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Accounts (${authProvider.accounts.length})',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: isDark
+                                ? CupertinoColors.white
+                                : CupertinoColors.black,
+                          ),
+                        ),
+                        CupertinoButton(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          onPressed: () =>
+                              AccountManagementContent.showAddAccountSheet(
+                            context,
+                            LayoutScope.of(context).isDesktop,
+                          ),
+                          child: const Text('Add'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    AccountManagementContent(
+                      isDark: isDark,
+                      embeddedInSettings: true,
+                      showAddButtonAboveList: true,
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 16),
               _buildSettingsCard(
                 isDark: isDark,

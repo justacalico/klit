@@ -14,42 +14,23 @@ class _AccountColors {
   static const Color primaryViolet = Color(0xFFA855F7);
 }
 
-/// Account management page - unified single file for desktop and mobile
-class AccountManagementPage extends StatelessWidget {
-  const AccountManagementPage({super.key});
+/// Embeddable account list and empty state; add/switch/remove via static [showAddAccountSheet].
+class AccountManagementContent extends StatelessWidget {
+  final bool isDark;
+  /// When true, used inside Settings: no desktop back/title row; optional Add above list on mobile.
+  final bool embeddedInSettings;
+  /// When true (and embedded), show an "Add account" row above the list on mobile.
+  final bool showAddButtonAboveList;
 
-  @override
-  Widget build(BuildContext context) {
-    final brightness = CupertinoTheme.brightnessOf(context);
-    final isDark = brightness == Brightness.dark;
-    final mode = LayoutScope.of(context);
+  const AccountManagementContent({
+    super.key,
+    required this.isDark,
+    this.embeddedInSettings = false,
+    this.showAddButtonAboveList = false,
+  });
 
-    return KeyedSubtree(
-      key: const ValueKey('account-management-page'),
-      child: CupertinoPageScaffold(
-        backgroundColor: isDark
-            ? const Color(0xFF0A0A0C)
-            : AppColors.lightGroupedBackground,
-        navigationBar: mode.isDesktop
-            ? null
-            : CupertinoNavigationBar(
-                middle: const Text('Accounts'),
-                trailing: CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () =>
-                      _showAddAccountSheet(context, mode.isDesktop),
-                  child: const Icon(CupertinoIcons.plus),
-                ),
-              ),
-        child: SafeArea(
-          top: !mode.isDesktop,
-          child: _AccountManagementBody(isDark: isDark),
-        ),
-      ),
-    );
-  }
-
-  static void _showAddAccountSheet(BuildContext context, bool isDesktop) {
+  /// Show add-account sheet (dialog on desktop, modal on mobile). Used by Settings and empty state.
+  static void showAddAccountSheet(BuildContext context, bool isDesktop) {
     if (isDesktop) {
       showCupertinoDialog(
         context: context,
@@ -81,7 +62,7 @@ class AccountManagementPage extends StatelessWidget {
           Navigator.of(dialogContext).pop();
           final auth = context.read<AuthProvider>();
           final account = auth.accounts.firstWhere((a) => a.id == accountId);
-          _AccountManagementBody._switchAccount(
+          AccountManagementContent._switchAccount(
             context,
             accountId,
             account.host,
@@ -89,7 +70,7 @@ class AccountManagementPage extends StatelessWidget {
         },
         onRemove: () {
           Navigator.of(dialogContext).pop();
-          _AccountManagementBody._confirmRemoveAccount(context, accountId);
+          AccountManagementContent._confirmRemoveAccount(context, accountId);
         },
       ),
     );
@@ -136,7 +117,7 @@ class AccountManagementPage extends StatelessWidget {
             isDestructiveAction: true,
             onPressed: () {
               Navigator.of(context).pop();
-              _AccountManagementBody._confirmRemoveAccount(context, accountId);
+              AccountManagementContent._confirmRemoveAccount(context, accountId);
             },
             child: const Text('Remove Account'),
           ),
@@ -148,13 +129,6 @@ class AccountManagementPage extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Unified body widget that handles both desktop and mobile layouts
-class _AccountManagementBody extends StatelessWidget {
-  final bool isDark;
-
-  const _AccountManagementBody({required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -162,71 +136,86 @@ class _AccountManagementBody extends StatelessWidget {
 
     if (mode.isDesktop) {
       return Padding(
-        padding: const EdgeInsets.all(32),
+        padding: EdgeInsets.all(embeddedInSettings ? 0 : 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: embeddedInSettings ? MainAxisSize.min : MainAxisSize.max,
           children: [
-            // Header with back button and title
-            Row(
-              children: [
-                MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? CupertinoColors.white.withValues(alpha: 0.1)
-                            : CupertinoColors.black.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        CupertinoIcons.back,
-                        color: isDark
-                            ? CupertinoColors.white
-                            : CupertinoColors.black,
-                        size: 20,
+            if (!embeddedInSettings) ...[
+              // Header with back button and title
+              Row(
+                children: [
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? CupertinoColors.white.withValues(alpha: 0.1)
+                              : CupertinoColors.black.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          CupertinoIcons.back,
+                          color: isDark
+                              ? CupertinoColors.white
+                              : CupertinoColors.black,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                ShaderMask(
-                  shaderCallback: (bounds) => const LinearGradient(
-                    colors: [
-                      _AccountColors.primaryIndigo,
-                      _AccountColors.primaryPurple,
-                    ],
-                  ).createShader(bounds),
-                  child: const Text(
-                    'Accounts',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: CupertinoColors.white,
+                  const SizedBox(width: 16),
+                  ShaderMask(
+                    shaderCallback: (bounds) => const LinearGradient(
+                      colors: [
+                        _AccountColors.primaryIndigo,
+                        _AccountColors.primaryPurple,
+                      ],
+                    ).createShader(bounds),
+                    child: const Text(
+                      'Accounts',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: CupertinoColors.white,
+                      ),
                     ),
                   ),
-                ),
-                const Spacer(),
-                _DesktopAddButton(
-                  onPressed: () =>
-                      AccountManagementPage._showAddAccountSheet(context, true),
-                ),
-              ],
-            ),
-            const SizedBox(height: 32),
-            // Account list
-            Expanded(
-              child: Consumer<AuthProvider>(
-                builder: (context, auth, _) {
-                  if (auth.accounts.isEmpty) {
-                    return _buildEmptyState(context);
-                  }
-                  return _buildDesktopAccountList(context, auth);
-                },
+                  const Spacer(),
+                  _DesktopAddButton(
+                    onPressed: () =>
+                        AccountManagementContent.showAddAccountSheet(context, true),
+                  ),
+                ],
               ),
-            ),
+              const SizedBox(height: 32),
+            ],
+            // Account list
+            embeddedInSettings
+                ? SizedBox(
+                    height: 400,
+                    child: Consumer<AuthProvider>(
+                      builder: (context, auth, _) {
+                        if (auth.accounts.isEmpty) {
+                          return _buildEmptyState(context);
+                        }
+                        return _buildDesktopAccountList(context, auth);
+                      },
+                    ),
+                  )
+                : Expanded(
+                    child: Consumer<AuthProvider>(
+                      builder: (context, auth, _) {
+                        if (auth.accounts.isEmpty) {
+                          return _buildEmptyState(context);
+                        }
+                        return _buildDesktopAccountList(context, auth);
+                      },
+                    ),
+                  ),
           ],
         ),
       );
@@ -236,8 +225,8 @@ class _AccountManagementBody extends StatelessWidget {
           if (auth.accounts.isEmpty) {
             return _buildEmptyState(context);
           }
-
-          return ListView.builder(
+          final isDesktop = false;
+          final list = ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: auth.accounts.length,
             itemBuilder: (context, index) {
@@ -252,7 +241,7 @@ class _AccountManagementBody extends StatelessWidget {
                 onTap: isActive
                     ? null
                     : () => _switchAccount(context, account.id, account.host),
-                onOptions: () => AccountManagementPage._showAccountOptions(
+                onOptions: () => AccountManagementContent._showAccountOptions(
                   context,
                   account.id,
                   isActive,
@@ -260,6 +249,29 @@ class _AccountManagementBody extends StatelessWidget {
               );
             },
           );
+          if (embeddedInSettings && showAddButtonAboveList) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      CupertinoButton(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        onPressed: () =>
+                            AccountManagementContent.showAddAccountSheet(context, isDesktop),
+                        child: const Text('Add account'),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 320, child: list),
+              ],
+            );
+          }
+          return list;
         },
       );
     }
@@ -282,7 +294,7 @@ class _AccountManagementBody extends StatelessWidget {
               onTap: isActive
                   ? null
                   : () => _switchAccount(context, account.id, account.host),
-              onOptions: () => AccountManagementPage._showDesktopAccountOptions(
+              onOptions: () => AccountManagementContent._showDesktopAccountOptions(
                 context,
                 account.id,
                 isActive,
@@ -322,7 +334,7 @@ class _AccountManagementBody extends StatelessWidget {
           const SizedBox(height: 24),
           CupertinoButton.filled(
             onPressed: () =>
-                AccountManagementPage._showAddAccountSheet(context, isDesktop),
+                AccountManagementContent.showAddAccountSheet(context, isDesktop),
             child: const Text('Add Account'),
           ),
         ],

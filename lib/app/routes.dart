@@ -14,7 +14,7 @@ class AppRoutes {
   static const String search = '/search';
   static const String profile = '/profile';
   static const String favorites = '/favorites';
-  static const String accountManagement = '/settings/accounts';
+  static const String settings = '/settings';
   static const String hostSettings = '/settings/host';
   static const String blacklistSettings = '/settings/blacklist';
   static const String feeds = '/feeds';
@@ -84,9 +84,12 @@ class AppRouter {
           settings: settings,
         );
 
-      case AppRoutes.accountManagement:
+      case AppRoutes.settings:
         return CupertinoPageRoute(
-          builder: (_) => const AccountManagementPage(),
+          builder: (ctx) => UiSettingsPage(
+            onNavigate: (r) => Navigator.of(ctx).pushNamed(r),
+            initialCategory: settings.arguments as String?,
+          ),
           settings: settings,
         );
 

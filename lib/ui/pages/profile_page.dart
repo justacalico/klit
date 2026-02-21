@@ -104,8 +104,8 @@ class _UiProfilePageState extends State<UiProfilePage> {
     }
   }
 
-  void _navigate(String route) {
-    (widget.onNavigate ?? ((r) => Navigator.of(context).pushNamed(r)))(route);
+  void _navigateToSettingsAccount() {
+    Navigator.of(context).pushNamed(AppRoutes.settings, arguments: 'account');
   }
 
   @override
@@ -155,7 +155,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
         ToolbarButton(
           icon: CupertinoIcons.gear,
           tooltip: 'Account Settings',
-          onPressed: () => _navigate(AppRoutes.accountManagement),
+          onPressed: _navigateToSettingsAccount,
         ),
       ],
     );
@@ -598,7 +598,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
         Expanded(
           child: CupertinoButton(
             padding: const EdgeInsets.symmetric(vertical: 14),
-            onPressed: () => _navigate(AppRoutes.accountManagement),
+            onPressed: _navigateToSettingsAccount,
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
