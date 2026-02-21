@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:palette_generator/palette_generator.dart';
 import 'package:flutter/material.dart'
     show Material, ListTile, ReorderableListView, Divider;
 import 'package:package_info_plus/package_info_plus.dart';
@@ -64,6 +65,8 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   String? _accountAvatarUrl;
   String? _accountAvatarUsername;
   bool _accountAvatarLoading = false;
+  /// Glow/border color derived from the account avatar image; null until extracted or when no avatar.
+  Color? _accountAvatarPaletteColor;
 
   static const List<_SettingsCategory> _categories = [
     _SettingsCategory(
@@ -190,7 +193,31 @@ class _UiSettingsPageState extends State<UiSettingsPage>
         _accountAvatarUrl = url;
         _accountAvatarUsername = username;
         _accountAvatarLoading = false;
+        _accountAvatarPaletteColor = null;
       });
+      final u = url;
+      if (u != null && u.isNotEmpty) {
+        _extractAvatarPalette(u);
+      }
+    }
+  }
+
+  Future<void> _extractAvatarPalette(String imageUrl) async {
+    try {
+      final palette = await PaletteGenerator.fromImageProvider(
+        CachedNetworkImageProvider(imageUrl),
+        size: const Size(64, 64),
+      );
+      if (!mounted || _accountAvatarUrl != imageUrl) return;
+      final color = palette.vibrantColor?.color ??
+          palette.dominantColor?.color ??
+          palette.darkVibrantColor?.color ??
+          palette.mutedColor?.color;
+      if (color != null) {
+        setState(() => _accountAvatarPaletteColor = color);
+      }
+    } catch (_) {
+      // Keep default glow on extraction failure
     }
   }
 
@@ -717,6 +744,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
           if (_accountAvatarUsername != account.username) {
             _accountAvatarUrl = null;
             _accountAvatarUsername = null;
+            _accountAvatarPaletteColor = null;
           }
           if (_accountAvatarUrl == null && !_accountAvatarLoading) {
             final username = account.username;
@@ -747,6 +775,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                         username: account?.username,
                         avatarUrl: avatarUrl,
                         isLoading: _accountAvatarLoading && !isGuest,
+                        paletteColor: _accountAvatarPaletteColor,
                       ),
                       const SizedBox(width: 20),
                       Expanded(
@@ -844,7 +873,19 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     required String? username,
     required String? avatarUrl,
     required bool isLoading,
+    Color? paletteColor,
   }) {
+    final glowColor = (!isGuest && paletteColor != null)
+        ? paletteColor
+        : (isGuest
+            ? CupertinoColors.systemGrey
+            : _DesignColors.primaryPurple);
+    final gradientColors = (!isGuest && paletteColor != null)
+        ? [
+            paletteColor.withValues(alpha: 0.9),
+            Color.lerp(paletteColor, _DesignColors.primaryPurple, 0.4)!,
+          ]
+        : null;
     return Container(
       width: 64,
       height: 64,
@@ -856,20 +897,24 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                   CupertinoColors.systemGrey.withValues(alpha: 0.2),
                 ],
               )
-            : const LinearGradient(
-                colors: [
-                  _DesignColors.primaryIndigo,
-                  _DesignColors.primaryPurple,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+            : (gradientColors != null
+                ? LinearGradient(
+                    colors: gradientColors,
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : const LinearGradient(
+                    colors: [
+                      _DesignColors.primaryIndigo,
+                      _DesignColors.primaryPurple,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: isGuest
-                ? CupertinoColors.systemGrey.withValues(alpha: 0.2)
-                : _DesignColors.primaryPurple.withValues(alpha: 0.3),
+            color: glowColor.withValues(alpha: isGuest ? 0.2 : 0.4),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
