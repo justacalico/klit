@@ -6,20 +6,28 @@ import 'package:provider/provider.dart';
 import '../../app/routes.dart';
 import '../../core/constants/constants.dart';
 import '../../core/extensions/extensions.dart';
+import '../../core/types/navigation_args.dart';
 import '../../data/models/models.dart';
 import '../../data/services/services.dart';
 import '../../providers/providers.dart';
 import '../layout/layout_scope.dart';
 import '../shell/toolbar.dart';
 import '../theme.dart';
+import '../widgets/widgets.dart';
 
 /// Unified profile page - single file for all layouts.
 /// When [username] is set, shows that user's profile (e.g. from "View profile" on a post). Otherwise shows the current account's profile.
 class UiProfilePage extends StatefulWidget {
   final void Function(String route)? onNavigate;
+  final void Function(PostDetailArguments)? onPostTap;
   final String? username;
 
-  const UiProfilePage({super.key, this.onNavigate, this.username});
+  const UiProfilePage({
+    super.key,
+    this.onNavigate,
+    this.onPostTap,
+    this.username,
+  });
 
   @override
   State<UiProfilePage> createState() => _UiProfilePageState();
@@ -30,6 +38,23 @@ class _UiProfilePageState extends State<UiProfilePage> {
   String? _avatarUrl;
   bool _isLoading = true;
   String? _error;
+  int _selectedTabIndex = 0;
+
+  // Uploads tab
+  List<Post> _uploads = [];
+  int _uploadsPage = 1;
+  bool _uploadsLoading = false;
+  bool _uploadsLoadingMore = false;
+  bool _uploadsHasMore = true;
+  String? _uploadsError;
+
+  // Favorites tab
+  List<Post> _favorites = [];
+  int _favoritesPage = 1;
+  bool _favoritesLoading = false;
+  bool _favoritesLoadingMore = false;
+  bool _favoritesHasMore = true;
+  String? _favoritesError;
 
   @override
   void initState() {
@@ -102,6 +127,99 @@ class _UiProfilePageState extends State<UiProfilePage> {
         },
       );
     }
+  }
+
+  Future<void> _loadUploads({bool refresh = false}) async {
+    if (_user == null) return;
+    if (refresh) {
+      setState(() {
+        _uploadsPage = 1;
+        _uploadsHasMore = true;
+        _uploadsLoading = true;
+        _uploadsError = null;
+      });
+    } else if (_uploadsPage > 1) {
+      setState(() => _uploadsLoadingMore = true);
+    }
+
+    final apiService = context.read<ApiService>();
+    final settingsProvider = context.read<SettingsProvider>();
+    final result = await apiService.getPosts(
+      tags: 'user:${_user!.name}',
+      order: 'desc',
+      page: _uploadsPage,
+      limit: 50,
+      safeMode: settingsProvider.safeMode,
+    );
+
+    if (!mounted) return;
+    result.when(
+      success: (posts) {
+        setState(() {
+          if (refresh || _uploadsPage == 1) {
+            _uploads = posts;
+          } else {
+            _uploads.addAll(posts);
+          }
+          _uploadsHasMore = posts.length >= 50;
+          _uploadsLoading = false;
+          _uploadsLoadingMore = false;
+        });
+      },
+      failure: (error) {
+        setState(() {
+          _uploadsError = error.message;
+          _uploadsLoading = false;
+          _uploadsLoadingMore = false;
+        });
+      },
+    );
+  }
+
+  Future<void> _loadFavorites({bool refresh = false}) async {
+    if (_user == null) return;
+    if (refresh) {
+      setState(() {
+        _favoritesPage = 1;
+        _favoritesHasMore = true;
+        _favoritesLoading = true;
+        _favoritesError = null;
+      });
+    } else if (_favoritesPage > 1) {
+      setState(() => _favoritesLoadingMore = true);
+    }
+
+    final apiService = context.read<ApiService>();
+    final settingsProvider = context.read<SettingsProvider>();
+    final result = await apiService.getFavorites(
+      username: _user!.name,
+      page: _favoritesPage,
+      limit: 50,
+      safeMode: settingsProvider.safeMode,
+    );
+
+    if (!mounted) return;
+    result.when(
+      success: (posts) {
+        setState(() {
+          if (refresh || _favoritesPage == 1) {
+            _favorites = posts;
+          } else {
+            _favorites.addAll(posts);
+          }
+          _favoritesHasMore = posts.length >= 50;
+          _favoritesLoading = false;
+          _favoritesLoadingMore = false;
+        });
+      },
+      failure: (error) {
+        setState(() {
+          _favoritesError = error.message;
+          _favoritesLoading = false;
+          _favoritesLoadingMore = false;
+        });
+      },
+    );
   }
 
   void _navigateToSettingsAccount() {
@@ -270,8 +388,91 @@ class _UiProfilePageState extends State<UiProfilePage> {
         ? context.read<SettingsProvider>().host
         : account?.host ?? context.read<SettingsProvider>().host;
 
+    return Column(
+      children: [
+        _buildProfileTabBar(isDark, isOled),
+        Expanded(
+          child: IndexedStack(
+            index: _selectedTabIndex,
+            children: [
+              _buildMainTabContent(host, isDark, isOled, isNarrow),
+              _buildUploadsTabContent(isDark),
+              _buildFavoritesTabContent(isDark),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProfileTabBar(bool isDark, bool isOled) {
+    const labels = ['Main', 'Uploads', 'Favorites'];
+    final bg = AppColors.resolveSecondaryBackground(isDark, isOled: isOled);
+    final selectedBg = isDark
+        ? CupertinoColors.systemGrey.withValues(alpha: 0.45)
+        : CupertinoColors.systemGrey4;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: (isDark ? CupertinoColors.white : CupertinoColors.black)
+                .withValues(alpha: 0.06),
+          ),
+        ),
+        child: Row(
+          children: List.generate(3, (index) {
+            final selected = _selectedTabIndex == index;
+            return Expanded(
+              child: CupertinoButton(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                onPressed: () {
+                  setState(() => _selectedTabIndex = index);
+                  if (index == 1 && _uploads.isEmpty && !_uploadsLoading) {
+                    _loadUploads(refresh: true);
+                  }
+                  if (index == 2 && _favorites.isEmpty && !_favoritesLoading) {
+                    _loadFavorites(refresh: true);
+                  }
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: selected ? selectedBg : null,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    labels[index],
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                      color: selected
+                          ? (isDark ? CupertinoColors.white : CupertinoColors.black)
+                          : CupertinoColors.systemGrey,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMainTabContent(
+    String host,
+    bool isDark,
+    bool isOled,
+    bool isNarrow,
+  ) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 720),
@@ -286,9 +487,186 @@ class _UiProfilePageState extends State<UiProfilePage> {
                 const SizedBox(height: 20),
                 _buildActionsCard(context, isDark),
               ],
+              const SizedBox(height: 24),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildUploadsTabContent(bool isDark) {
+    if (_uploads.isEmpty && _uploadsLoading) {
+      return const Center(child: CupertinoActivityIndicator(radius: 16));
+    }
+    if (_uploads.isEmpty && _uploadsError != null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              CupertinoIcons.exclamationmark_triangle,
+              size: 48,
+              color: CupertinoColors.systemGrey,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _uploadsError!,
+              style: const TextStyle(color: CupertinoColors.systemGrey),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            CupertinoButton.filled(
+              onPressed: () => _loadUploads(refresh: true),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+    if (_uploads.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              CupertinoIcons.cloud_upload_fill,
+              size: 64,
+              color: AppColors.primaryBlue.withValues(alpha: 0.5),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'No uploads',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _viewingOtherUser
+                  ? 'This user has not uploaded any posts'
+                  : 'Your uploads will appear here',
+              style: const TextStyle(
+                fontSize: 15,
+                color: CupertinoColors.systemGrey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+    return PostsGrid(
+      posts: _uploads,
+      isLoading: _uploadsLoadingMore,
+      hasMore: _uploadsHasMore,
+      onPostTap: _onUploadsPostTap,
+      onLoadMore: () async {
+        setState(() => _uploadsPage++);
+        await _loadUploads();
+      },
+      onRetry: () => _loadUploads(refresh: true),
+    );
+  }
+
+  Widget _buildFavoritesTabContent(bool isDark) {
+    if (_favorites.isEmpty && _favoritesLoading) {
+      return const Center(child: CupertinoActivityIndicator(radius: 16));
+    }
+    if (_favorites.isEmpty && _favoritesError != null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              CupertinoIcons.exclamationmark_triangle,
+              size: 48,
+              color: CupertinoColors.systemGrey,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _favoritesError!,
+              style: const TextStyle(color: CupertinoColors.systemGrey),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            CupertinoButton.filled(
+              onPressed: () => _loadFavorites(refresh: true),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+    if (_favorites.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              CupertinoIcons.heart,
+              size: 64,
+              color: AppColors.explicitColor.withValues(alpha: 0.5),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'No favorites yet',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _viewingOtherUser
+                  ? 'This user has no favorites'
+                  : 'Posts you favorite will appear here',
+              style: const TextStyle(
+                fontSize: 15,
+                color: CupertinoColors.systemGrey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+    return PostsGrid(
+      posts: _favorites,
+      isLoading: _favoritesLoadingMore,
+      hasMore: _favoritesHasMore,
+      onPostTap: _onFavoritesPostTap,
+      onLoadMore: () async {
+        setState(() => _favoritesPage++);
+        await _loadFavorites();
+      },
+      onRetry: () => _loadFavorites(refresh: true),
+    );
+  }
+
+  void _onUploadsPostTap(Post post) {
+    final index = _uploads.indexWhere((p) => p.id == post.id);
+    widget.onPostTap?.call(
+      PostDetailArguments(
+        postIds: _uploads.map((p) => p.id).toList(),
+        initialIndex: index >= 0 ? index : 0,
+        hasMore: _uploadsHasMore,
+        onLoadMore: () async {
+          setState(() => _uploadsPage++);
+          await _loadUploads();
+          return _uploads.map((p) => p.id).toList();
+        },
+      ),
+    );
+  }
+
+  void _onFavoritesPostTap(Post post) {
+    final index = _favorites.indexWhere((p) => p.id == post.id);
+    widget.onPostTap?.call(
+      PostDetailArguments(
+        postIds: _favorites.map((p) => p.id).toList(),
+        initialIndex: index >= 0 ? index : 0,
+        hasMore: _favoritesHasMore,
+        onLoadMore: () async {
+          setState(() => _favoritesPage++);
+          await _loadFavorites();
+          return _favorites.map((p) => p.id).toList();
+        },
       ),
     );
   }

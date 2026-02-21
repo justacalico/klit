@@ -372,6 +372,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
       case 5:
         return UiProfilePage(
           onNavigate: (r) => Navigator.of(context).pushNamed(r),
+          onPostTap: _onPostTap,
         );
       case 6:
         return UiFavoritesPage(onPostTap: _onPostTap);

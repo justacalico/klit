@@ -179,6 +179,10 @@ class _ProfileRoutePage extends StatelessWidget {
     return UiProfilePage(
       username: username,
       onNavigate: (r) => Navigator.of(context).pushNamed(r),
+      onPostTap: (args) => Navigator.of(context).pushNamed(
+        AppRoutes.postDetail,
+        arguments: args,
+      ),
     );
   }
 }
