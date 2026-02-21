@@ -38,13 +38,34 @@ Color? _tagColorForRating(String rating) {
   }
 }
 
-/// Converts common BBCode in post descriptions to Markdown so it renders (e.g. [b] -> **).
+/// Converts e621-style DText (and BBCode) in descriptions/comments to Markdown.
+/// Supports: [b]/[i]/[s]/[u], [spoiler], {{tag}} → tag search link, [[wiki]] → link.
 String _descriptionToMarkdown(String raw) {
-  return raw
+  var s = raw
       .replaceAll(RegExp(r'\[b\]', caseSensitive: false), '**')
       .replaceAll(RegExp(r'\[/b\]', caseSensitive: false), '**')
       .replaceAll(RegExp(r'\[i\]', caseSensitive: false), '*')
-      .replaceAll(RegExp(r'\[/i\]', caseSensitive: false), '*');
+      .replaceAll(RegExp(r'\[/i\]', caseSensitive: false), '*')
+      .replaceAll(RegExp(r'\[s\]', caseSensitive: false), '~~')
+      .replaceAll(RegExp(r'\[/s\]', caseSensitive: false), '~~')
+      .replaceAll(RegExp(r'\[u\]', caseSensitive: false), '<u>')
+      .replaceAll(RegExp(r'\[/u\]', caseSensitive: false), '</u>')
+      .replaceAll(RegExp(r'\[spoiler\]', caseSensitive: false), '||')
+      .replaceAll(RegExp(r'\[/spoiler\]', caseSensitive: false), '||');
+  // e621 tag links: {{tag name}} or {{tag -excluded}} → markdown link (tag: scheme for onTapLink)
+  s = s.replaceAllMapped(RegExp(r'\{\{(.+?)\}\}', dotAll: true), (m) {
+    final content = m.group(1)!.trim();
+    if (content.isEmpty) return m.group(0)!;
+    final encoded = Uri.encodeComponent(content);
+    return '[$content](tag:$encoded)';
+  });
+  // Wiki-style links: [[page name]] → markdown link (wiki: scheme; open in browser or no-op)
+  s = s.replaceAllMapped(RegExp(r'\[\[([^\]]+)\]\]'), (m) {
+    final page = m.group(1)!.trim().replaceAll(' ', '_');
+    final encoded = Uri.encodeComponent(page);
+    return '[$page](wiki:$encoded)';
+  });
+  return s;
 }
 
 /// Post detail page - single state preserved across layout mode changes
@@ -305,7 +326,10 @@ class _PostDetailPageState extends State<PostDetailPage>
     if (post == null) return;
     showCupertinoModalPopup(
       context: context,
-      builder: (context) => _CommentsSheet(postId: post.id),
+      builder: (context) => _CommentsSheet(
+            postId: post.id,
+            onSearchTag: _searchTag,
+          ),
     );
   }
 
@@ -1286,6 +1310,11 @@ class _MobilePostDetailContentBuilder {
                       decoration: TextDecoration.underline,
                     ),
                   ),
+                  onTapLink: (text, href, title) {
+                    if (href != null && href.startsWith('tag:')) {
+                      s._searchTag(Uri.decodeComponent(href.substring(4)));
+                    }
+                  },
                 ),
               ),
             ),
@@ -2373,6 +2402,11 @@ class _DesktopPostDetailContentBuilder {
                         decoration: TextDecoration.underline,
                       ),
                     ),
+                    onTapLink: (text, href, title) {
+                      if (href != null && href.startsWith('tag:')) {
+                        s._searchTag(Uri.decodeComponent(href.substring(4)));
+                      }
+                    },
                   ),
                 ),
               ),
@@ -2719,8 +2753,12 @@ class _FullScreenImageViewer extends StatelessWidget {
 /// Comments sheet with liquid glass design
 class _CommentsSheet extends StatefulWidget {
   final int postId;
+  final void Function(String tag)? onSearchTag;
 
-  const _CommentsSheet({required this.postId});
+  const _CommentsSheet({
+    required this.postId,
+    this.onSearchTag,
+  });
 
   @override
   State<_CommentsSheet> createState() => _CommentsSheetState();
@@ -3180,7 +3218,12 @@ class _CommentsSheetState extends State<_CommentsSheet> {
       separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final comment = _comments[index];
-        return _CommentCard(comment: comment, isDark: isDark, isOled: isOled);
+        return _CommentCard(
+          comment: comment,
+          isDark: isDark,
+          isOled: isOled,
+          onSearchTag: widget.onSearchTag,
+        );
       },
     );
   }
@@ -3191,11 +3234,13 @@ class _CommentCard extends StatelessWidget {
   final Comment comment;
   final bool isDark;
   final bool isOled;
+  final void Function(String tag)? onSearchTag;
 
   const _CommentCard({
     required this.comment,
     required this.isDark,
     required this.isOled,
+    this.onSearchTag,
   });
 
   @override
@@ -3375,7 +3420,11 @@ class _CommentCard extends StatelessWidget {
                     ),
                     blockquotePadding: const EdgeInsets.only(left: 10),
                   ),
-                    onTapLink: (text, href, title) {},
+                    onTapLink: (text, href, title) {
+                      if (href != null && href.startsWith('tag:')) {
+                        onSearchTag?.call(Uri.decodeComponent(href.substring(4)));
+                      }
+                    },
                   ),
                 ),
               ),
