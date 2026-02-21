@@ -98,13 +98,14 @@ class AppNavBar extends StatelessWidget {
   }
 
   Widget _buildLiquidGlass(BuildContext context, bool isDark, bool isOled) {
+    final compact = navOrder.length >= 6;
     final gradientColors = isOled
         ? [AppColors.oledSecondaryBackground, const Color(0xFF0F0F0F)]
         : (isDark
             ? [const Color(0xFF1C1C1E), const Color(0xFF2C2C2E)]
             : [const Color(0xFFF5F5F7), const Color(0xFFEBEBEF)]);
     return Container(
-      height: 68,
+      height: compact ? 52 : 68,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
@@ -155,6 +156,7 @@ class AppNavBar extends StatelessWidget {
     bool isOled,
     double bottomPadding,
   ) {
+    final compact = navOrder.length >= 6;
     return Container(
       padding: EdgeInsets.only(bottom: bottomPadding),
       decoration: BoxDecoration(
@@ -169,7 +171,7 @@ class AppNavBar extends StatelessWidget {
         ),
       ),
       child: SizedBox(
-        height: 60,
+        height: compact ? 48 : 60,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: _buildNavItems(context, isDark),
@@ -186,12 +188,17 @@ class AppNavBar extends StatelessWidget {
   }
 
   List<Widget> _buildNavItems(BuildContext context, bool isDark) {
+    final showLabels = navOrder.length < 6;
     final items = <Widget>[];
     for (var i = 0; i < navOrder.length; i++) {
       final id = navOrder[i];
       final isSelected = i == currentIndex;
       if (id == 4 && isGuest) {
-        items.add(_LogoutItem(isDark: isDark, onTap: onLogout));
+        items.add(_LogoutItem(
+          isDark: isDark,
+          onTap: onLogout,
+          showLabel: showLabels,
+        ));
       } else {
         final def = _navDefs[id];
         if (def != null) {
@@ -202,6 +209,7 @@ class AppNavBar extends StatelessWidget {
               label: def.label,
               isSelected: isSelected,
               isDark: isDark,
+              showLabel: showLabels,
               onTap: () {
                 HapticUtils.selectionClick();
                 onTap(i);
@@ -222,6 +230,7 @@ class _NavBarItem extends StatelessWidget {
     required this.label,
     required this.isSelected,
     required this.isDark,
+    required this.showLabel,
     required this.onTap,
   });
 
@@ -230,6 +239,7 @@ class _NavBarItem extends StatelessWidget {
   final String label;
   final bool isSelected;
   final bool isDark;
+  final bool showLabel;
   final VoidCallback onTap;
 
   @override
@@ -246,7 +256,7 @@ class _NavBarItem extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: EdgeInsets.symmetric(vertical: showLabel ? 8 : 10),
           decoration: isSelected
               ? BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
@@ -262,17 +272,24 @@ class _NavBarItem extends StatelessWidget {
               : null,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(isSelected ? activeIcon : icon, color: color, size: 24),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: color,
-                ),
+              Icon(
+                isSelected ? activeIcon : icon,
+                color: color,
+                size: showLabel ? 24 : 26,
               ),
+              if (showLabel) ...[
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: color,
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -282,10 +299,15 @@ class _NavBarItem extends StatelessWidget {
 }
 
 class _LogoutItem extends StatelessWidget {
-  const _LogoutItem({required this.isDark, required this.onTap});
+  const _LogoutItem({
+    required this.isDark,
+    required this.onTap,
+    this.showLabel = true,
+  });
 
   final bool isDark;
   final VoidCallback onTap;
+  final bool showLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -301,17 +323,24 @@ class _LogoutItem extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(CupertinoIcons.square_arrow_right, color: color, size: 24),
-            const SizedBox(height: 4),
-            Text(
-              'Sign Out',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                color: color,
-              ),
+            Icon(
+              CupertinoIcons.square_arrow_right,
+              color: color,
+              size: showLabel ? 24 : 26,
             ),
+            if (showLabel) ...[
+              const SizedBox(height: 4),
+              Text(
+                'Sign Out',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: color,
+                ),
+              ),
+            ],
           ],
         ),
       ),
