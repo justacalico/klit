@@ -14,10 +14,12 @@ import '../shell/toolbar.dart';
 import '../theme.dart';
 
 /// Unified profile page - single file for all layouts.
+/// When [username] is set, shows that user's profile (e.g. from "View profile" on a post). Otherwise shows the current account's profile.
 class UiProfilePage extends StatefulWidget {
   final void Function(String route)? onNavigate;
+  final String? username;
 
-  const UiProfilePage({super.key, this.onNavigate});
+  const UiProfilePage({super.key, this.onNavigate, this.username});
 
   @override
   State<UiProfilePage> createState() => _UiProfilePageState();
@@ -35,11 +37,15 @@ class _UiProfilePageState extends State<UiProfilePage> {
     _loadProfile();
   }
 
-  Future<void> _loadProfile() async {
-    final authProvider = context.read<AuthProvider>();
-    final account = authProvider.currentAccount;
+  bool get _viewingOtherUser => widget.username != null && widget.username!.isNotEmpty;
 
-    if (account == null) {
+  Future<void> _loadProfile() async {
+    final apiService = context.read<ApiService>();
+    final String? loadUsername = _viewingOtherUser
+        ? widget.username
+        : context.read<AuthProvider>().currentAccount?.username;
+
+    if (!_viewingOtherUser && loadUsername == null) {
       setState(() {
         _isLoading = false;
         _error = 'Not logged in';
@@ -52,13 +58,13 @@ class _UiProfilePageState extends State<UiProfilePage> {
       _error = null;
     });
 
-    final apiService = context.read<ApiService>();
-    final result = await apiService.getUserProfile(account.username);
+    final result = await apiService.getUserProfile(loadUsername!);
 
     if (mounted) {
       result.when(
         success: (user) async {
-          if (user.blacklistedTags != null &&
+          if (!_viewingOtherUser &&
+              user.blacklistedTags != null &&
               user.blacklistedTags!.isNotEmpty) {
             final settingsProvider = context.read<SettingsProvider>();
             settingsProvider.setBlacklist(user.blacklistedTags!);
@@ -118,6 +124,24 @@ class _UiProfilePageState extends State<UiProfilePage> {
   }
 
   Widget _buildToolbar(bool isDark) {
+    if (_viewingOtherUser) {
+      return PageToolbar(
+        title: widget.username ?? '',
+        icon: CupertinoIcons.person_fill,
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Icon(CupertinoIcons.back),
+        ),
+        actions: [
+          ToolbarButton(
+            icon: CupertinoIcons.refresh,
+            tooltip: 'Refresh',
+            onPressed: _loadProfile,
+          ),
+        ],
+      );
+    }
     return PageToolbar(
       title: 'Profile',
       icon: CupertinoIcons.person_fill,
@@ -140,7 +164,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
   Widget _buildContent(bool isDark) {
     final authProvider = context.watch<AuthProvider>();
 
-    if (authProvider.isGuest) {
+    if (!_viewingOtherUser && authProvider.isGuest) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -205,8 +229,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
     }
 
     final account = authProvider.currentAccount;
-
-    if (account == null || _user == null) {
+    if (!_viewingOtherUser && (account == null || _user == null)) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -236,9 +259,16 @@ class _UiProfilePageState extends State<UiProfilePage> {
       );
     }
 
+    if (_user == null) {
+      return const Center(child: CupertinoActivityIndicator(radius: 16));
+    }
+
     final mode = LayoutScope.of(context);
     final isNarrow = !mode.isDesktop;
     final isOled = context.watch<SettingsProvider>().themeMode == 3;
+    final host = _viewingOtherUser
+        ? context.read<SettingsProvider>().host
+        : account?.host ?? context.read<SettingsProvider>().host;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -247,13 +277,15 @@ class _UiProfilePageState extends State<UiProfilePage> {
           constraints: const BoxConstraints(maxWidth: 720),
           child: Column(
             children: [
-              _buildProfileHero(account, _user!, isDark),
+              _buildProfileHero(host, _user!, isDark),
               const SizedBox(height: 20),
               _buildStatsGrid(_user!, isDark, isOled, isNarrow),
               const SizedBox(height: 20),
-              _buildAccountInfoCard(account, _user!, isDark, isOled),
-              const SizedBox(height: 20),
-              _buildActionsCard(context, isDark),
+              _buildAccountInfoCard(_user!, isDark, isOled),
+              if (!_viewingOtherUser) ...[
+                const SizedBox(height: 20),
+                _buildActionsCard(context, isDark),
+              ],
             ],
           ),
         ),
@@ -261,7 +293,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
     );
   }
 
-  Widget _buildProfileHero(Account account, User user, bool isDark) {
+  Widget _buildProfileHero(String host, User user, bool isDark) {
     final initial = user.name.isNotEmpty ? user.name[0].toUpperCase() : '?';
     final levelColor = _getLevelColor(user.level);
 
@@ -329,7 +361,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    account.host.replaceAll(RegExp(r'https?://'), ''),
+                    host.replaceAll(RegExp(r'https?://'), ''),
                     style: TextStyle(
                       fontSize: 14,
                       color: isDark
@@ -480,7 +512,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
     );
   }
 
-  Widget _buildAccountInfoCard(Account account, User user, bool isDark, bool isOled) {
+  Widget _buildAccountInfoCard(User user, bool isDark, bool isOled) {
     final rows = <_InfoRow>[
       _InfoRow('User ID', '#${user.id}'),
       _InfoRow('Member Since', user.createdAt.relativeTime),

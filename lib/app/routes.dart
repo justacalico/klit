@@ -57,8 +57,9 @@ class AppRouter {
         );
 
       case AppRoutes.profile:
+        final profileUsername = settings.arguments as String?;
         return CupertinoPageRoute(
-          builder: (_) => const _ProfileRoutePage(),
+          builder: (_) => _ProfileRoutePage(username: profileUsername),
           settings: settings,
         );
 
@@ -131,11 +132,16 @@ class _SearchRoutePage extends StatelessWidget {
 }
 
 class _ProfileRoutePage extends StatelessWidget {
-  const _ProfileRoutePage();
+  const _ProfileRoutePage({this.username});
+
+  final String? username;
 
   @override
   Widget build(BuildContext context) {
-    return UiProfilePage(onNavigate: (r) => Navigator.of(context).pushNamed(r));
+    return UiProfilePage(
+      username: username,
+      onNavigate: (r) => Navigator.of(context).pushNamed(r),
+    );
   }
 }
 

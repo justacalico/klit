@@ -13,7 +13,6 @@ import 'package:flutter/material.dart'
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../app/routes.dart';
 import '../../core/constants/constants.dart';
 import '../../core/extensions/extensions.dart';
@@ -1363,10 +1362,6 @@ class _MobilePostDetailContentBuilder {
             ? displayName.replaceFirst(':', ' ').trim()[0].toUpperCase()
             : '#'
         : '?';
-    final host = context.read<SettingsProvider>().host;
-    final profileUrl = effectiveUsername != null
-        ? '$host/users/${Uri.encodeComponent(effectiveUsername)}'
-        : null;
 
     if (post.uploaderId > 0 && effectiveUsername == null &&
         !s._uploaderNameLoading.contains(post.uploaderId)) {
@@ -1429,15 +1424,15 @@ class _MobilePostDetailContentBuilder {
               ],
             ),
           ),
-          if (profileUrl != null)
+          if (effectiveUsername != null)
             CupertinoButton(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               minimumSize: Size.zero,
-              onPressed: () async {
-                final uri = Uri.parse(profileUrl);
-                if (await canLaunchUrl(uri)) {
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                }
+              onPressed: () {
+                Navigator.of(context).pushNamed(
+                  AppRoutes.profile,
+                  arguments: effectiveUsername,
+                );
               },
               child: Text(
                 'View profile',
@@ -2388,11 +2383,6 @@ class _DesktopPostDetailContentBuilder {
             ? displayName.replaceFirst(':', ' ').trim()[0].toUpperCase()
             : '#'
         : '?';
-    final host = context.read<SettingsProvider>().host;
-    final profileUrl = effectiveUsername != null
-        ? '$host/users/${Uri.encodeComponent(effectiveUsername)}'
-        : null;
-
     if (post.uploaderId > 0 && effectiveUsername == null &&
         !s._uploaderNameLoading.contains(post.uploaderId)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -2474,15 +2464,15 @@ class _DesktopPostDetailContentBuilder {
                   ],
                 ),
               ),
-              if (profileUrl != null)
+              if (effectiveUsername != null)
                 CupertinoButton(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   minimumSize: Size.zero,
-                  onPressed: () async {
-                    final uri = Uri.parse(profileUrl);
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri, mode: LaunchMode.externalApplication);
-                    }
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(
+                      AppRoutes.profile,
+                      arguments: effectiveUsername,
+                    );
                   },
                   child: Text(
                     'View profile',
