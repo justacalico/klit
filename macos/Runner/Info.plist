@@ -26,6 +26,8 @@
 	<string>$(PRODUCT_COPYRIGHT)</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Klit can take a photo when you mark a post as "I finished" (optional feature in Settings).</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>

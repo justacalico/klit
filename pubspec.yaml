@@ -36,6 +36,8 @@ dependencies:
   gal: ^2.3.2
   path_provider: ^2.1.5
   palette_generator: ^0.3.3+7
+  image_picker: ^1.0.7
+  permission_handler: ^11.3.0
 
 dev_dependencies:
   flutter_test:

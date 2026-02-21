@@ -32,6 +32,10 @@ class AppConstants {
   static const String searchHistoryEnabledKey = 'search_history_enabled';
   static const String scoreThresholdKey = 'score_threshold';
   static const String feedsKey = 'feeds';
+  static const String iFinishedEnabledKey = 'i_finished_enabled';
+  static const String iFinishedPostIdsKey = 'i_finished_post_ids';
+  static const String iFinishedAnimationEnabledKey = 'i_finished_animation_enabled';
+  static const String iFinishedAskPhotoEnabledKey = 'i_finished_ask_photo_enabled';
 
   /// Score threshold defaults
   static const int defaultScoreThreshold = 20;

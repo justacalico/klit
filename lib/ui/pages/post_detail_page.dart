@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:gal/gal.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:cached_network_image/cached_network_image.dart'
     show CachedNetworkImage, CachedNetworkImageProvider;
 import 'package:confetti/confetti.dart';
@@ -24,6 +26,82 @@ import '../layout/layout_scope.dart';
 import '../shell/toolbar.dart';
 import '../theme.dart';
 import '../widgets/widgets.dart';
+
+/// One-shot milk-style overlay: cream blobs expand and fade.
+class _MilkAnimationOverlay extends StatefulWidget {
+  const _MilkAnimationOverlay({required this.onComplete});
+
+  final VoidCallback onComplete;
+
+  @override
+  State<_MilkAnimationOverlay> createState() => _MilkAnimationOverlayState();
+}
+
+class _MilkAnimationOverlayState extends State<_MilkAnimationOverlay>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    )..forward().then((_) {
+        widget.onComplete();
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Center(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            final scale = 0.3 + 0.9 * _controller.value;
+            final opacity = 0.85 * (1 - _controller.value);
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                _milkCircle(scale * 80, opacity, 0),
+                _milkCircle(scale * 100, opacity * 0.8, 0.3),
+                _milkCircle(scale * 70, opacity * 0.7, -0.2),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _milkCircle(double size, double opacity, double offset) {
+    return Transform.translate(
+      offset: Offset(offset * 20, offset * 15),
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: const Color(0xFFF5F0E8).withValues(alpha: opacity),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFE8E0D5).withValues(alpha: opacity * 0.5),
+              blurRadius: size * 0.3,
+              spreadRadius: size * 0.05,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 /// Tag chip color from post rating: explicit=red, safe=green, other=grey, else no override.
 Color? _tagColorForRating(String rating) {
@@ -438,6 +516,84 @@ class _PostDetailPageState extends State<PostDetailPage>
             onSearchTag: _searchTag,
           ),
     );
+  }
+
+  /// I finished: remove if already finished; else optional camera then add (with optional milk animation).
+  Future<void> _onIFinishedTap(int index) async {
+    final post = _loadedPosts[index];
+    if (post == null || !mounted) return;
+    final settings = context.read<SettingsProvider>();
+    final isFinished =
+        settings.iFinishedEntries.any((e) => e.postId == post.id);
+    if (isFinished) {
+      await settings.removeIFinishedPostId(post.id);
+      return;
+    }
+    if (settings.iFinishedAskPhotoEnabled) {
+      final status = await Permission.camera.request();
+      if (!mounted) return;
+      if (status.isDenied || status.isPermanentlyDenied) {
+        final addAnyway = await showCupertinoDialog<bool>(
+          context: context,
+          builder: (ctx) => CupertinoAlertDialog(
+            title: const Text('Camera access'),
+            content: const Text(
+              'Camera access is needed to attach a photo. Add without photo?',
+            ),
+            actions: [
+              CupertinoDialogAction(
+                isDestructiveAction: true,
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text('Cancel'),
+              ),
+              CupertinoDialogAction(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: const Text('Add without photo'),
+              ),
+            ],
+          ),
+        );
+        if (addAnyway == true && mounted) {
+          if (settings.iFinishedAnimationEnabled) _showMilkAnimation();
+          await settings.addIFinishedPostId(post.id);
+        }
+        return;
+      }
+      final picker = ImagePicker();
+      final xFile = await picker.pickImage(source: ImageSource.camera);
+      if (!mounted) return;
+      String? imagePath;
+      if (xFile != null) {
+        try {
+          final dir = await getApplicationDocumentsDirectory();
+          final photosDir =
+              Directory('${dir.path}${Platform.pathSeparator}i_finished_photos');
+          await photosDir.create(recursive: true);
+          final destPath =
+              '${photosDir.path}${Platform.pathSeparator}${post.id}.jpg';
+          await File(xFile.path).copy(destPath);
+          imagePath = destPath;
+        } catch (_) {}
+      }
+      if (settings.iFinishedAnimationEnabled) _showMilkAnimation();
+      await settings.addIFinishedPostId(post.id, imagePath: imagePath);
+      return;
+    }
+    if (settings.iFinishedAnimationEnabled) _showMilkAnimation();
+    await settings.addIFinishedPostId(post.id);
+  }
+
+  void _showMilkAnimation() {
+    final overlay = Overlay.of(context);
+    late OverlayEntry entry;
+    entry = OverlayEntry(
+      builder: (ctx) => _MilkAnimationOverlay(
+        onComplete: () {
+          entry.remove();
+        },
+      ),
+    );
+    overlay.insert(entry);
   }
 
   void _openFullMedia() {
@@ -1061,12 +1217,16 @@ class _MobilePostDetailContentBuilder {
     bool isOled,
   ) {
     final authProvider = context.watch<AuthProvider>();
+    final settings = context.watch<SettingsProvider>();
     final isGuest = authProvider.isGuest;
     final isFav = s._isFavorited[index] ?? post.isFavorited;
     final userVote = s._userVote[index];
     final isVoting = s._isVoting[index] == true;
     final isTogglingFav = s._isTogglingFavorite[index] == true;
-    final leftHandedMode = context.watch<SettingsProvider>().leftHandedMode;
+    final leftHandedMode = settings.leftHandedMode;
+    final isIFinished =
+        settings.iFinishedEnabled &&
+        settings.iFinishedEntries.any((e) => e.postId == post.id);
 
     final commentBtn = _buildGlassActionButton(
       context,
@@ -1138,12 +1298,29 @@ class _MobilePostDetailContentBuilder {
       isOled,
       () => s._downloadPost(),
     );
+    final iFinishedBtn = settings.iFinishedEnabled
+        ? _buildGlassActionButton(
+            context,
+            s,
+            index,
+            CupertinoIcons.checkmark_circle,
+            CupertinoIcons.checkmark_circle_fill,
+            'I finished',
+            isIFinished,
+            false,
+            const Color(0xFF22C55E),
+            isDark,
+            isOled,
+            () => s._onIFinishedTap(index),
+          )
+        : null;
 
-    final buttons = isGuest
+    var buttons = isGuest
         ? [downloadBtn]
         : leftHandedMode
             ? [commentBtn, favoriteBtn, downvoteBtn, upvoteBtn, downloadBtn]
             : [upvoteBtn, downvoteBtn, favoriteBtn, commentBtn, downloadBtn];
+    if (iFinishedBtn != null) buttons = [...buttons, iFinishedBtn];
 
     return _buildLiquidGlassContainer(
       context,
@@ -2131,6 +2308,89 @@ class _DesktopPostDetailContentBuilder {
     bool isTogglingFav,
     bool isDark,
   ) {
+    final settings = context.watch<SettingsProvider>();
+    final post = s._loadedPosts[s._currentIndex];
+    final isIFinished = settings.iFinishedEnabled &&
+        post != null &&
+        settings.iFinishedEntries.any((e) => e.postId == post.id);
+
+    final actionButtons = <Widget>[
+      Expanded(
+        child: _buildGradientActionButton(
+          context,
+          s,
+          CupertinoIcons.arrow_up,
+          CupertinoIcons.arrow_up_circle_fill,
+          userVote == 1,
+          isVoting,
+          [const Color(0xFF22C55E), const Color(0xFF16A34A)],
+          isDark,
+          onTap: () => s._vote(s._currentIndex, userVote == 1 ? 0 : 1),
+        ),
+      ),
+      const SizedBox(width: 8),
+      Expanded(
+        child: _buildGradientActionButton(
+          context,
+          s,
+          CupertinoIcons.arrow_down,
+          CupertinoIcons.arrow_down_circle_fill,
+          userVote == -1,
+          isVoting,
+          [const Color(0xFFEF4444), const Color(0xFFDC2626)],
+          isDark,
+          onTap: () =>
+              s._vote(s._currentIndex, userVote == -1 ? 0 : -1),
+        ),
+      ),
+      const SizedBox(width: 8),
+      Expanded(
+        child: _buildGradientActionButton(
+          context,
+          s,
+          CupertinoIcons.heart,
+          CupertinoIcons.heart_fill,
+          isFav,
+          isTogglingFav,
+          [UIColors.primaryPurple, UIColors.primaryViolet],
+          isDark,
+          onTap: () => s._toggleFavorite(s._currentIndex),
+        ),
+      ),
+      const SizedBox(width: 8),
+      Expanded(
+        child: _buildGradientActionButton(
+          context,
+          s,
+          CupertinoIcons.square_arrow_down,
+          CupertinoIcons.square_arrow_down_fill,
+          false,
+          s._isDownloading[s._currentIndex] == true,
+          [UIColors.primaryIndigo, UIColors.primaryPurple],
+          isDark,
+          onTap: () => s._downloadPost(),
+        ),
+      ),
+    ];
+    if (settings.iFinishedEnabled) {
+      actionButtons.add(const SizedBox(width: 8));
+      actionButtons.add(
+        Expanded(
+          child: _buildGradientActionButton(
+            context,
+            s,
+            CupertinoIcons.checkmark_circle,
+            CupertinoIcons.checkmark_circle_fill,
+            isIFinished,
+            false,
+            [const Color(0xFF22C55E), const Color(0xFF16A34A)],
+            isDark,
+            onTap: () => s._onIFinishedTap(s._currentIndex),
+          ),
+        ),
+      );
+    }
+
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
@@ -2159,64 +2419,7 @@ class _DesktopPostDetailContentBuilder {
             ),
           ),
           child: Row(
-            children: [
-              Expanded(
-                child: _buildGradientActionButton(
-                  context,
-                  s,
-                  CupertinoIcons.arrow_up,
-                  CupertinoIcons.arrow_up_circle_fill,
-                  userVote == 1,
-                  isVoting,
-                  [const Color(0xFF22C55E), const Color(0xFF16A34A)],
-                  isDark,
-                  onTap: () => s._vote(s._currentIndex, userVote == 1 ? 0 : 1),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildGradientActionButton(
-                  context,
-                  s,
-                  CupertinoIcons.arrow_down,
-                  CupertinoIcons.arrow_down_circle_fill,
-                  userVote == -1,
-                  isVoting,
-                  [const Color(0xFFEF4444), const Color(0xFFDC2626)],
-                  isDark,
-                  onTap: () =>
-                      s._vote(s._currentIndex, userVote == -1 ? 0 : -1),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildGradientActionButton(
-                  context,
-                  s,
-                  CupertinoIcons.heart,
-                  CupertinoIcons.heart_fill,
-                  isFav,
-                  isTogglingFav,
-                  [UIColors.primaryPurple, UIColors.primaryViolet],
-                  isDark,
-                  onTap: () => s._toggleFavorite(s._currentIndex),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildGradientActionButton(
-                  context,
-                  s,
-                  CupertinoIcons.square_arrow_down,
-                  CupertinoIcons.square_arrow_down_fill,
-                  false,
-                  s._isDownloading[s._currentIndex] == true,
-                  [UIColors.primaryIndigo, UIColors.primaryPurple],
-                  isDark,
-                  onTap: () => s._downloadPost(),
-                ),
-              ),
-            ],
+            children: actionButtons,
           ),
         ),
       ),

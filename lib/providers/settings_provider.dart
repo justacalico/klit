@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
+import 'package:path_provider/path_provider.dart';
 import '../core/constants/constants.dart';
 import '../core/theme/ui_style_manager.dart';
 import '../data/models/models.dart';
@@ -37,6 +40,10 @@ class SettingsProvider extends ChangeNotifier {
   bool _videoMuteByDefault = true;
   bool _searchHistoryEnabled = true;
   int _scoreThreshold = AppConstants.defaultScoreThreshold;
+  bool _iFinishedEnabled = false;
+  List<IFinishedEntry> _iFinishedEntries = [];
+  bool _iFinishedAnimationEnabled = true;
+  bool _iFinishedAskPhotoEnabled = false;
 
   /// Callback to notify when proxy configuration changes
   ProxyChangeCallback? onProxyChanged;
@@ -72,6 +79,11 @@ class SettingsProvider extends ChangeNotifier {
   bool get videoMuteByDefault => _videoMuteByDefault;
   bool get searchHistoryEnabled => _searchHistoryEnabled;
   int get scoreThreshold => _scoreThreshold;
+  bool get iFinishedEnabled => _iFinishedEnabled;
+  List<IFinishedEntry> get iFinishedEntries => List.unmodifiable(_iFinishedEntries);
+  List<int> get iFinishedPostIds => _iFinishedEntries.map((e) => e.postId).toList();
+  bool get iFinishedAnimationEnabled => _iFinishedAnimationEnabled;
+  bool get iFinishedAskPhotoEnabled => _iFinishedAskPhotoEnabled;
 
   /// Get blacklist as a list of tag queries (each line is a filter)
   List<String> get blacklistLines {
@@ -109,6 +121,10 @@ class SettingsProvider extends ChangeNotifier {
     _videoMuteByDefault = _storageService.getVideoMuteByDefault();
     _searchHistoryEnabled = _storageService.getSearchHistoryEnabled();
     _scoreThreshold = _storageService.getScoreThreshold();
+    _iFinishedEnabled = _storageService.getIFinishedEnabled();
+    _iFinishedEntries = _storageService.getIFinishedEntries();
+    _iFinishedAnimationEnabled = _storageService.getIFinishedAnimationEnabled();
+    _iFinishedAskPhotoEnabled = _storageService.getIFinishedAskPhotoEnabled();
     notifyListeners();
   }
 
@@ -357,6 +373,73 @@ class SettingsProvider extends ChangeNotifier {
     );
     await _storageService.setScoreThreshold(_scoreThreshold);
     onScoreThresholdChanged?.call(_scoreThreshold);
+    notifyListeners();
+  }
+
+  /// Set I finished button enabled
+  Future<void> setIFinishedEnabled(bool enabled) async {
+    _iFinishedEnabled = enabled;
+    await _storageService.setIFinishedEnabled(enabled);
+    notifyListeners();
+  }
+
+  /// Set I finished animation enabled
+  Future<void> setIFinishedAnimationEnabled(bool enabled) async {
+    _iFinishedAnimationEnabled = enabled;
+    await _storageService.setIFinishedAnimationEnabled(enabled);
+    notifyListeners();
+  }
+
+  /// Set ask for photo when marking I finished
+  Future<void> setIFinishedAskPhotoEnabled(bool enabled) async {
+    _iFinishedAskPhotoEnabled = enabled;
+    await _storageService.setIFinishedAskPhotoEnabled(enabled);
+    notifyListeners();
+  }
+
+  /// Add a post to finished list (replace if same postId exists)
+  Future<void> addIFinishedPostId(int id, {String? imagePath}) async {
+    _iFinishedEntries.removeWhere((e) => e.postId == id);
+    _iFinishedEntries.add(IFinishedEntry(postId: id, imagePath: imagePath));
+    await _storageService.setIFinishedEntries(_iFinishedEntries);
+    notifyListeners();
+  }
+
+  /// Remove a post from finished list and delete its photo file if any
+  Future<void> removeIFinishedPostId(int id) async {
+    final entry = _iFinishedEntries.where((e) => e.postId == id).firstOrNull;
+    if (entry != null && entry.imagePath != null) {
+      try {
+        final file = File(entry.imagePath!);
+        if (await file.exists()) await file.delete();
+      } catch (_) {}
+    }
+    _iFinishedEntries.removeWhere((e) => e.postId == id);
+    await _storageService.setIFinishedEntries(_iFinishedEntries);
+    notifyListeners();
+  }
+
+  /// Clear all finished posts and delete their photo files
+  Future<void> clearIFinishedPostIds() async {
+    for (final entry in _iFinishedEntries) {
+      if (entry.imagePath != null) {
+        try {
+          final file = File(entry.imagePath!);
+          if (await file.exists()) await file.delete();
+        } catch (_) {}
+      }
+    }
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      final photosDir = Directory('${dir.path}/i_finished_photos');
+      if (await photosDir.exists()) {
+        await for (final entity in photosDir.list()) {
+          if (entity is File) await entity.delete();
+        }
+      }
+    } catch (_) {}
+    _iFinishedEntries = [];
+    await _storageService.setIFinishedEntries(_iFinishedEntries);
     notifyListeners();
   }
 

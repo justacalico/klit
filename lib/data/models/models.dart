@@ -1,6 +1,7 @@
 export 'account.dart';
 export 'comment.dart';
 export 'feed.dart';
+export 'i_finished_entry.dart';
 export 'post.dart';
 export 'proxy_config.dart';
 export 'tag.dart';

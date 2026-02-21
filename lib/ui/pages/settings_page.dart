@@ -1,15 +1,17 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:flutter/material.dart'
-    show Colors, Divider, InkWell, ListTile, Material, ReorderableListView;
+    show Colors, Divider, Image, InkWell, ListTile, Material, ReorderableListView;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../app/routes.dart';
 import '../../core/constants/constants.dart';
+import '../../core/types/navigation_args.dart';
 import '../layout/layout_scope.dart';
 import '../../core/theme/ui_style_manager.dart';
 import '../../data/models/models.dart';
@@ -1667,25 +1669,195 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   Widget _buildBehaviorContent(bool isDark) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        final behaviorCards = <Widget>[
+          _buildSettingsCard(
+            isDark: isDark,
+            child: Column(
+              children: [
+                _buildSettingRow(
+                  isDark: isDark,
+                  icon: CupertinoIcons.sparkles,
+                  iconColor: _DesignColors.accentOrange,
+                  title: 'Confetti on Favorite',
+                  subtitle: 'Show celebration animation when favoriting',
+                  trailing: CupertinoSwitch(
+                    value: settings.confettiOnFavorite,
+                    activeTrackColor: _DesignColors.accentOrange,
+                    onChanged: (value) =>
+                        settings.setConfettiOnFavorite(value),
+                  ),
+                ),
+                _buildSettingRow(
+                  isDark: isDark,
+                  icon: CupertinoIcons.checkmark_circle,
+                  iconColor: const Color(0xFF22C55E),
+                  title: 'I finished button',
+                  subtitle:
+                      'Mark posts as finished and track them in settings',
+                  trailing: CupertinoSwitch(
+                    value: settings.iFinishedEnabled,
+                    activeTrackColor: const Color(0xFF22C55E),
+                    onChanged: (value) => settings.setIFinishedEnabled(value),
+                  ),
+                ),
+                if (settings.iFinishedEnabled) ...[
+                  Divider(
+                    height: 1,
+                    color: isDark
+                        ? CupertinoColors.white.withValues(alpha: 0.1)
+                        : CupertinoColors.black.withValues(alpha: 0.05),
+                  ),
+                  _buildSettingRow(
+                    isDark: isDark,
+                    icon: CupertinoIcons.sparkles,
+                    iconColor: _DesignColors.accentTeal,
+                    title: 'I finished animation',
+                    subtitle:
+                        'Play a milk-style animation when marking a post as finished',
+                    trailing: CupertinoSwitch(
+                      value: settings.iFinishedAnimationEnabled,
+                      activeTrackColor: _DesignColors.accentTeal,
+                      onChanged: (value) =>
+                          settings.setIFinishedAnimationEnabled(value),
+                    ),
+                  ),
+                  Divider(
+                    height: 1,
+                    color: isDark
+                        ? CupertinoColors.white.withValues(alpha: 0.1)
+                        : CupertinoColors.black.withValues(alpha: 0.05),
+                  ),
+                  _buildSettingRow(
+                    isDark: isDark,
+                    icon: CupertinoIcons.camera,
+                    iconColor: _DesignColors.primaryIndigo,
+                    title: 'Ask for photo when marking I finished',
+                    subtitle:
+                        'Take a photo with the camera when you tap I finished (camera permission may be requested)',
+                    trailing: CupertinoSwitch(
+                      value: settings.iFinishedAskPhotoEnabled,
+                      activeTrackColor: _DesignColors.primaryIndigo,
+                      onChanged: (value) =>
+                          settings.setIFinishedAskPhotoEnabled(value),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ];
+        if (settings.iFinishedEntries.isNotEmpty) {
+          behaviorCards.add(const SizedBox(height: 16));
+          behaviorCards.add(
             _buildSettingsCard(
               isDark: isDark,
-              child: _buildSettingRow(
-                isDark: isDark,
-                icon: CupertinoIcons.sparkles,
-                iconColor: _DesignColors.accentOrange,
-                title: 'Confetti on Favorite',
-                subtitle: 'Show celebration animation when favoriting',
-                trailing: CupertinoSwitch(
-                  value: settings.confettiOnFavorite,
-                  activeTrackColor: _DesignColors.accentOrange,
-                  onChanged: (value) => settings.setConfettiOnFavorite(value),
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Finished posts (${settings.iFinishedEntries.length})',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: isDark
+                                ? CupertinoColors.white
+                                : CupertinoColors.black,
+                          ),
+                        ),
+                        CupertinoButton(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          onPressed: () async {
+                            await settings.clearIFinishedPostIds();
+                          },
+                          child: Text(
+                            'Clear all',
+                            style: TextStyle(
+                              color: CupertinoColors.destructiveRed,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  ...settings.iFinishedEntries.map((entry) {
+                    return InkWell(
+                      onTap: () {
+                        Navigator.of(context).pushNamed(
+                          AppRoutes.postDetail,
+                          arguments: PostDetailArguments(
+                            postIds: [entry.postId],
+                            initialIndex: 0,
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        child: Row(
+                          children: [
+                            if (entry.imagePath != null)
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.file(
+                                  File(entry.imagePath!),
+                                  width: 48,
+                                  height: 48,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, _, _) => const SizedBox(
+                                    width: 48,
+                                    height: 48,
+                                    child: Icon(CupertinoIcons.photo),
+                                  ),
+                                ),
+                              ),
+                            if (entry.imagePath != null)
+                              const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Post #${entry.postId}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: isDark
+                                      ? CupertinoColors.white
+                                      : CupertinoColors.black,
+                                ),
+                              ),
+                            ),
+                            Icon(
+                              CupertinoIcons.chevron_right,
+                              size: 18,
+                              color: isDark
+                                  ? CupertinoColors.systemGrey
+                                  : CupertinoColors.systemGrey2,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+                ],
               ),
             ),
-          ],
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: behaviorCards,
         );
       },
     );

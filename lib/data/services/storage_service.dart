@@ -451,6 +451,62 @@ class StorageService {
     await _prefs.setInt(AppConstants.scoreThresholdKey, threshold);
   }
 
+  // I finished
+
+  bool getIFinishedEnabled() {
+    return _prefs.getBool(AppConstants.iFinishedEnabledKey) ?? false;
+  }
+
+  Future<void> setIFinishedEnabled(bool enabled) async {
+    await _prefs.setBool(AppConstants.iFinishedEnabledKey, enabled);
+  }
+
+  List<IFinishedEntry> getIFinishedEntries() {
+    final jsonStr = _prefs.getString(AppConstants.iFinishedPostIdsKey);
+    if (jsonStr == null) return [];
+    try {
+      final decoded = json.decode(jsonStr);
+      if (decoded is List) {
+        if (decoded.isEmpty) return [];
+        final first = decoded.first;
+        if (first is int) {
+          return decoded
+              .whereType<int>()
+              .map((id) => IFinishedEntry(postId: id, imagePath: null))
+              .toList();
+        }
+        return decoded
+            .whereType<Map<String, dynamic>>()
+            .map(IFinishedEntry.fromJson)
+            .toList();
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  Future<void> setIFinishedEntries(List<IFinishedEntry> entries) async {
+    final list =
+        entries.map((e) => e.toJson()).toList();
+    await _prefs.setString(
+        AppConstants.iFinishedPostIdsKey, json.encode(list));
+  }
+
+  bool getIFinishedAnimationEnabled() {
+    return _prefs.getBool(AppConstants.iFinishedAnimationEnabledKey) ?? true;
+  }
+
+  Future<void> setIFinishedAnimationEnabled(bool enabled) async {
+    await _prefs.setBool(AppConstants.iFinishedAnimationEnabledKey, enabled);
+  }
+
+  bool getIFinishedAskPhotoEnabled() {
+    return _prefs.getBool(AppConstants.iFinishedAskPhotoEnabledKey) ?? false;
+  }
+
+  Future<void> setIFinishedAskPhotoEnabled(bool enabled) async {
+    await _prefs.setBool(AppConstants.iFinishedAskPhotoEnabledKey, enabled);
+  }
+
   // Cache
 
   Future<void> clearPreferences() async {
