@@ -267,6 +267,26 @@ class ApiService {
     }
   }
 
+  /// Get user by ID (e621/e926: GET /users/{id}.json)
+  Future<ApiResult<User>> getUserById(int id) async {
+    try {
+      final response = await _dio.get('/users/$id.json');
+
+      if (response.statusCode == 200 && response.data != null) {
+        final user = User.fromJson(response.data as Map<String, dynamic>);
+        return ApiResult.success(user);
+      }
+      return ApiResult.failure(ApiException.notFound());
+    } on DioException catch (e) {
+      if (e.error is ApiException) {
+        return ApiResult.failure(e.error as ApiException);
+      }
+      return ApiResult.failure(ApiException.unknown(e));
+    } catch (e) {
+      return ApiResult.failure(ApiException.unknown(e));
+    }
+  }
+
   /// Get posts with optional search parameters
   /// If [safeMode] is true, only safe-rated posts will be returned
   Future<ApiResult<List<Post>>> getPosts({

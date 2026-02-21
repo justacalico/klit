@@ -99,7 +99,9 @@ class Post {
       ),
       approverId: parseInt(json['approver_id']),
       uploaderId: parseIntRequired(json['uploader_id'], 0),
-      uploaderName: json['owner'] as String? ?? json['uploader'] as String?,
+      uploaderName: json['owner'] as String? ??
+          json['uploader'] as String? ??
+          json['uploader_name'] as String?,
       description: json['description'] as String? ?? '',
       commentCount: parseIntRequired(json['comment_count'], 0),
       isFavorited: json['is_favorited'] as bool? ?? false,

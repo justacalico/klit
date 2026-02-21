@@ -162,6 +162,8 @@ class _PostDetailPageState extends State<PostDetailPage>
   late FocusNode _focusNode;
   final Map<String, String?> _uploaderAvatarUrls = {};
   final Set<String> _uploaderAvatarLoading = {};
+  final Map<int, String> _uploaderNamesById = {};
+  final Set<int> _uploaderNameLoading = {};
 
   int get _currentPostId => _postIds[_currentIndex];
   Post? get _currentPost => _loadedPosts[_currentIndex];
@@ -314,6 +316,30 @@ class _PostDetailPageState extends State<PostDetailPage>
         _uploaderAvatarUrls[username] = url;
         _uploaderAvatarLoading.remove(username);
       });
+    }
+  }
+
+  /// Resolve uploader username by ID when post has no owner/uploader name, then load avatar.
+  Future<void> _loadUploaderNameAndAvatar(int uploaderId) async {
+    if (uploaderId <= 0 || _uploaderNameLoading.contains(uploaderId)) return;
+    _uploaderNameLoading.add(uploaderId);
+    final api = context.read<ApiService>();
+    String? username;
+    final userResult = await api.getUserById(uploaderId);
+    userResult.when(
+      success: (user) {
+        username = user.name.isNotEmpty ? user.name : null;
+      },
+      failure: (_) {},
+    );
+    if (mounted) {
+      setState(() {
+        _uploaderNameLoading.remove(uploaderId);
+        if (username != null) _uploaderNamesById[uploaderId] = username!;
+      });
+      if (username != null && username!.isNotEmpty) {
+        _loadUploaderAvatar(username!);
+      }
     }
   }
 
@@ -1328,31 +1354,36 @@ class _MobilePostDetailContentBuilder {
     bool isDark,
     bool isOled,
   ) {
-    final displayName =
-        post.uploaderName?.isNotEmpty == true
-            ? post.uploaderName!
-            : 'User #${post.uploaderId}';
+    final effectiveUsername = post.uploaderName?.isNotEmpty == true
+        ? post.uploaderName
+        : s._uploaderNamesById[post.uploaderId];
+    final displayName = effectiveUsername ?? 'User #${post.uploaderId}';
     final initial = displayName.isNotEmpty
         ? displayName.replaceFirst(':', ' ').trim().isNotEmpty
             ? displayName.replaceFirst(':', ' ').trim()[0].toUpperCase()
             : '#'
         : '?';
     final host = context.read<SettingsProvider>().host;
-    final profileUrl = post.uploaderName?.isNotEmpty == true
-        ? '$host/users/${Uri.encodeComponent(post.uploaderName!)}'
+    final profileUrl = effectiveUsername != null
+        ? '$host/users/${Uri.encodeComponent(effectiveUsername)}'
         : null;
 
-    if (post.uploaderName != null &&
-        post.uploaderName!.isNotEmpty &&
-        s._uploaderAvatarUrls[post.uploaderName] == null &&
-        !s._uploaderAvatarLoading.contains(post.uploaderName)) {
-      final username = post.uploaderName!;
+    if (post.uploaderId > 0 && effectiveUsername == null &&
+        !s._uploaderNameLoading.contains(post.uploaderId)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        s._loadUploaderAvatar(username);
+        s._loadUploaderNameAndAvatar(post.uploaderId);
       });
     }
-    final avatarUrl = post.uploaderName != null
-        ? s._uploaderAvatarUrls[post.uploaderName]
+    if (effectiveUsername != null &&
+        effectiveUsername.isNotEmpty &&
+        s._uploaderAvatarUrls[effectiveUsername] == null &&
+        !s._uploaderAvatarLoading.contains(effectiveUsername)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        s._loadUploaderAvatar(effectiveUsername);
+      });
+    }
+    final avatarUrl = effectiveUsername != null
+        ? s._uploaderAvatarUrls[effectiveUsername]
         : null;
 
     return _buildLiquidGlassContainer(
@@ -2348,31 +2379,36 @@ class _DesktopPostDetailContentBuilder {
     Post post,
     bool isDark,
   ) {
-    final displayName =
-        post.uploaderName?.isNotEmpty == true
-            ? post.uploaderName!
-            : 'User #${post.uploaderId}';
+    final effectiveUsername = post.uploaderName?.isNotEmpty == true
+        ? post.uploaderName
+        : s._uploaderNamesById[post.uploaderId];
+    final displayName = effectiveUsername ?? 'User #${post.uploaderId}';
     final initial = displayName.isNotEmpty
         ? displayName.replaceFirst(':', ' ').trim().isNotEmpty
             ? displayName.replaceFirst(':', ' ').trim()[0].toUpperCase()
             : '#'
         : '?';
     final host = context.read<SettingsProvider>().host;
-    final profileUrl = post.uploaderName?.isNotEmpty == true
-        ? '$host/users/${Uri.encodeComponent(post.uploaderName!)}'
+    final profileUrl = effectiveUsername != null
+        ? '$host/users/${Uri.encodeComponent(effectiveUsername)}'
         : null;
 
-    if (post.uploaderName != null &&
-        post.uploaderName!.isNotEmpty &&
-        s._uploaderAvatarUrls[post.uploaderName] == null &&
-        !s._uploaderAvatarLoading.contains(post.uploaderName)) {
-      final username = post.uploaderName!;
+    if (post.uploaderId > 0 && effectiveUsername == null &&
+        !s._uploaderNameLoading.contains(post.uploaderId)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        s._loadUploaderAvatar(username);
+        s._loadUploaderNameAndAvatar(post.uploaderId);
       });
     }
-    final avatarUrl = post.uploaderName != null
-        ? s._uploaderAvatarUrls[post.uploaderName]
+    if (effectiveUsername != null &&
+        effectiveUsername.isNotEmpty &&
+        s._uploaderAvatarUrls[effectiveUsername] == null &&
+        !s._uploaderAvatarLoading.contains(effectiveUsername)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        s._loadUploaderAvatar(effectiveUsername);
+      });
+    }
+    final avatarUrl = effectiveUsername != null
+        ? s._uploaderAvatarUrls[effectiveUsername]
         : null;
 
     return ClipRRect(
