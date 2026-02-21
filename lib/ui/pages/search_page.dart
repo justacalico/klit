@@ -7,6 +7,7 @@ import '../../data/models/models.dart';
 import '../../data/services/services.dart';
 import '../../core/types/navigation_args.dart';
 import '../../providers/providers.dart';
+import '../layout/layout_scope.dart';
 import '../widgets/widgets.dart';
 
 /// Unified search page - reused from desktop search logic.
@@ -231,10 +232,69 @@ class _UiSearchPageState extends State<UiSearchPage>
     }
   }
 
+  void _showFiltersBottomSheet(BuildContext context, bool isDark) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (ctx) => Container(
+        decoration: BoxDecoration(
+          color: isDark
+              ? const Color(0xFF1C1C1E)
+              : CupertinoColors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+        ),
+        padding: EdgeInsets.only(
+          top: 12,
+          left: 20,
+          right: 20,
+          bottom: MediaQuery.of(context).padding.bottom + 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? CupertinoColors.systemGrey
+                      : CupertinoColors.systemGrey4,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Filters',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: isDark ? CupertinoColors.white : CupertinoColors.black,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildFilters(ctx, isDark, vertical: true),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: CupertinoButton.filled(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('Done'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
     final isOled = context.watch<SettingsProvider>().themeMode == 3;
+    final mode = LayoutScope.of(context);
+    final isMobile = mode.isMobile;
 
     return KeyedSubtree(
       key: const ValueKey('search-page'),
@@ -242,22 +302,24 @@ class _UiSearchPageState extends State<UiSearchPage>
         children: [
           Column(
             children: [
-              _buildToolbar(context, isDark),
+              _buildToolbar(context, isDark, isMobile),
               Expanded(
-                child: Row(
-                  children: [
-                    _buildHistorySidebar(context, isDark, isOled),
-                    Container(
-                      width: 1,
-                      color: AppColors.resolveSeparator(isDark, isOled: isOled),
-                    ),
-                    Expanded(child: _buildResults(context)),
-                  ],
-                ),
+                child: isMobile
+                    ? _buildResults(context)
+                    : Row(
+                        children: [
+                          _buildHistorySidebar(context, isDark, isOled),
+                          Container(
+                            width: 1,
+                            color: AppColors.resolveSeparator(isDark, isOled: isOled),
+                          ),
+                          Expanded(child: _buildResults(context)),
+                        ],
+                      ),
               ),
             ],
           ),
-          if (_showFilters || _filterCtrl.isAnimating)
+          if (!isMobile && (_showFilters || _filterCtrl.isAnimating))
             AnimatedBuilder(
               animation: _filterCtrl,
               builder: (_, _) => Positioned(
@@ -279,8 +341,8 @@ class _UiSearchPageState extends State<UiSearchPage>
                   children: [
                     Positioned(
                       top: 52,
-                      left: 48,
-                      right: 150,
+                      left: isMobile ? 16 : 48,
+                      right: isMobile ? 16 : 150,
                       child: _buildTagSuggestions(isDark),
                     ),
                   ],
@@ -292,7 +354,7 @@ class _UiSearchPageState extends State<UiSearchPage>
     );
   }
 
-  Widget _buildToolbar(BuildContext context, bool isDark) {
+  Widget _buildToolbar(BuildContext context, bool isDark, bool isMobile) {
     return Container(
       height: 60,
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -398,10 +460,12 @@ class _UiSearchPageState extends State<UiSearchPage>
           ),
           const SizedBox(width: 8),
           _ToolbarBtn(
-            icon: _showFilters
+            icon: (isMobile ? false : _showFilters)
                 ? CupertinoIcons.slider_horizontal_below_rectangle
                 : CupertinoIcons.slider_horizontal_3,
-            onTap: _toggleFilters,
+            onTap: isMobile
+                ? () => _showFiltersBottomSheet(context, isDark)
+                : _toggleFilters,
           ),
         ],
       ),
@@ -499,7 +563,77 @@ class _UiSearchPageState extends State<UiSearchPage>
     );
   }
 
-  Widget _buildFilters(BuildContext context, bool isDark) {
+  Widget _buildFilters(BuildContext context, bool isDark, {bool vertical = false}) {
+    final ratingControl = CupertinoSlidingSegmentedControl<String>(
+      groupValue: _selectedRating ?? 'all',
+      children: const {
+        'all': Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          child: Text('All', style: TextStyle(fontSize: 12)),
+        ),
+        's': Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          child: Text('Safe', style: TextStyle(fontSize: 12)),
+        ),
+        'q': Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          child: Text('Questionable', style: TextStyle(fontSize: 12)),
+        ),
+        'e': Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          child: Text('Explicit', style: TextStyle(fontSize: 12)),
+        ),
+      },
+      onValueChanged: (v) {
+        setState(() => _selectedRating = v == 'all' ? null : v);
+        if (_searchController.text.isNotEmpty) _performSearch();
+      },
+    );
+    final sortControl = CupertinoSlidingSegmentedControl<String>(
+      groupValue: _selectedOrder,
+      children: {
+        for (final e in _orderOptions.entries)
+          e.key: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Text(e.value, style: const TextStyle(fontSize: 12)),
+          ),
+      },
+      onValueChanged: (v) {
+        if (v != null) {
+          setState(() => _selectedOrder = v);
+          if (_searchController.text.isNotEmpty) _performSearch();
+        }
+      },
+    );
+
+    if (vertical) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Rating',
+            style: TextStyle(
+              fontSize: 13,
+              color: isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2,
+            ),
+          ),
+          const SizedBox(height: 8),
+          ratingControl,
+          const SizedBox(height: 20),
+          Text(
+            'Sort',
+            style: TextStyle(
+              fontSize: 13,
+              color: isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2,
+            ),
+          ),
+          const SizedBox(height: 8),
+          sortControl,
+        ],
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: BoxDecoration(
@@ -520,50 +654,11 @@ class _UiSearchPageState extends State<UiSearchPage>
           children: [
             const Text('Rating:', style: TextStyle(fontSize: 13)),
             const SizedBox(width: 8),
-            CupertinoSlidingSegmentedControl<String>(
-              groupValue: _selectedRating ?? 'all',
-              children: const {
-                'all': Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Text('All', style: TextStyle(fontSize: 12)),
-                ),
-                's': Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Text('Safe', style: TextStyle(fontSize: 12)),
-                ),
-                'q': Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Text('Questionable', style: TextStyle(fontSize: 12)),
-                ),
-                'e': Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Text('Explicit', style: TextStyle(fontSize: 12)),
-                ),
-              },
-              onValueChanged: (v) {
-                setState(() => _selectedRating = v == 'all' ? null : v);
-                if (_searchController.text.isNotEmpty) _performSearch();
-              },
-            ),
+            ratingControl,
             const SizedBox(width: 24),
             const Text('Sort:', style: TextStyle(fontSize: 13)),
             const SizedBox(width: 8),
-            CupertinoSlidingSegmentedControl<String>(
-              groupValue: _selectedOrder,
-              children: {
-                for (final e in _orderOptions.entries)
-                  e.key: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Text(e.value, style: const TextStyle(fontSize: 12)),
-                  ),
-              },
-              onValueChanged: (v) {
-                if (v != null) {
-                  setState(() => _selectedOrder = v);
-                  if (_searchController.text.isNotEmpty) _performSearch();
-                }
-              },
-            ),
+            sortControl,
           ],
         ),
       ),
