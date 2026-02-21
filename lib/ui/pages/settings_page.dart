@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:palette_generator/palette_generator.dart';
 import 'package:flutter/material.dart'
     show Colors, Divider, Image, InkWell, ListTile, Material, MaterialType, ReorderableListView;
@@ -72,6 +73,12 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   bool _accountAvatarLoading = false;
   /// Glow/border color derived from the account avatar image; null until extracted or when no avatar.
   Color? _accountAvatarPaletteColor;
+
+  /// True on desktop (Linux, macOS, Windows) and web; camera option is disabled there.
+  bool get _isDesktop {
+    if (kIsWeb) return true;
+    return Platform.isLinux || Platform.isMacOS || Platform.isWindows;
+  }
 
   static const List<_SettingsCategory> _categories = [
     _SettingsCategory(
@@ -1727,18 +1734,23 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                         ? CupertinoColors.white.withValues(alpha: 0.1)
                         : CupertinoColors.black.withValues(alpha: 0.05),
                   ),
-                  _buildSettingRow(
-                    isDark: isDark,
-                    icon: CupertinoIcons.camera,
-                    iconColor: _DesignColors.primaryIndigo,
-                    title: 'Ask for photo when marking I finished',
-                    subtitle:
-                        'Take a photo with the camera when you tap I finished (camera permission may be requested)',
-                    trailing: CupertinoSwitch(
-                      value: settings.iFinishedAskPhotoEnabled,
-                      activeTrackColor: _DesignColors.primaryIndigo,
-                      onChanged: (value) =>
-                          settings.setIFinishedAskPhotoEnabled(value),
+                  Opacity(
+                    opacity: _isDesktop ? 0.5 : 1,
+                    child: _buildSettingRow(
+                      isDark: isDark,
+                      icon: CupertinoIcons.camera,
+                      iconColor: _DesignColors.primaryIndigo,
+                      title: 'Ask for photo when marking I finished',
+                      subtitle:
+                          'Take a photo with the camera when you tap I finished (camera permission may be requested)',
+                      trailing: CupertinoSwitch(
+                        value: settings.iFinishedAskPhotoEnabled,
+                        activeTrackColor: _DesignColors.primaryIndigo,
+                        onChanged: _isDesktop
+                            ? null
+                            : (value) =>
+                                settings.setIFinishedAskPhotoEnabled(value),
+                      ),
                     ),
                   ),
                 ],
