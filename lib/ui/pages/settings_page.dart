@@ -55,6 +55,9 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   String _appVersion = '...';
+  String _sidebarSearchQuery = '';
+  final _sidebarSearchController = TextEditingController();
+  final _sidebarSearchFocus = FocusNode();
 
   static const List<_SettingsCategory> _categories = [
     _SettingsCategory(
@@ -138,6 +141,8 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   @override
   void dispose() {
     _animationController.dispose();
+    _sidebarSearchController.dispose();
+    _sidebarSearchFocus.dispose();
     super.dispose();
   }
 
@@ -171,15 +176,15 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     );
   }
 
-  /// Mobile layout: category chips + content (fixes cramped layout when resizing)
+  /// Mobile layout: pill tabs (Account, Appearance, Content, Behavior style) + content
   Widget _buildMobileLayout(BuildContext context, bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Horizontal scrollable category picker
+        // Horizontal pill-shaped category tabs (reference: Account | Appearance | Content | Behavior)
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
           child: Row(
             children: _categories.map((category) {
               final isSelected = _selectedCategory == category.id;
@@ -190,33 +195,25 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
+                      horizontal: 16,
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? category.color.withValues(alpha: 0.2)
+                          ? _DesignColors.primaryPurple
                           : (isDark
-                                ? CupertinoColors.white.withValues(alpha: 0.08)
-                                : CupertinoColors.black.withValues(
-                                    alpha: 0.05,
-                                  )),
-                      borderRadius: BorderRadius.circular(12),
-                      border: isSelected
-                          ? Border.all(
-                              color: category.color.withValues(alpha: 0.4),
-                              width: 1,
-                            )
-                          : null,
+                                ? const Color(0xFF2C2C2E)
+                                : const Color(0xFFE5E5E7)),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           category.icon,
-                          size: 16,
+                          size: 18,
                           color: isSelected
-                              ? category.color
+                              ? CupertinoColors.white
                               : (isDark
                                     ? CupertinoColors.systemGrey
                                     : CupertinoColors.systemGrey2),
@@ -225,12 +222,11 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                         Text(
                           category.title,
                           style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: isSelected
-                                ? FontWeight.w600
-                                : FontWeight.w500,
+                            fontSize: 14,
+                            fontWeight:
+                                isSelected ? FontWeight.w600 : FontWeight.w500,
                             color: isSelected
-                                ? category.color
+                                ? CupertinoColors.white
                                 : (isDark
                                       ? CupertinoColors.white
                                       : CupertinoColors.black),
@@ -249,17 +245,18 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     );
   }
 
+  /// macOS-style sidebar: search at top, list with blue highlight for selected
   Widget _buildSidebar(bool isDark) {
     return Container(
-      width: 240,
+      width: 260,
       decoration: BoxDecoration(
         color: isDark
-            ? const Color(0xFF18181B).withValues(alpha: 0.8)
-            : const Color(0xFFFFFFFF).withValues(alpha: 0.8),
+            ? const Color(0xFF1C1C1E)
+            : const Color(0xFFF5F5F7),
         border: Border(
           right: BorderSide(
             color: isDark
-                ? _DesignColors.primaryPurple.withValues(alpha: 0.1)
+                ? const Color(0xFF2C2C2E)
                 : const Color(0xFFE5E5E7),
             width: 1,
           ),
@@ -268,63 +265,75 @@ class _UiSettingsPageState extends State<UiSettingsPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
+          // Search bar (macOS System Settings style)
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        _DesignColors.primaryIndigo,
-                        _DesignColors.primaryPurple,
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: _DesignColors.primaryPurple.withValues(
-                          alpha: 0.3,
-                        ),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    CupertinoIcons.gear_alt_fill,
-                    color: CupertinoColors.white,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  'Settings',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+            padding: const EdgeInsets.fromLTRB(12, 16, 12, 8),
+            child: Container(
+              height: 32,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? CupertinoColors.white.withValues(alpha: 0.08)
+                    : CupertinoColors.black.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    CupertinoIcons.search,
+                    size: 16,
                     color: isDark
-                        ? CupertinoColors.white
-                        : CupertinoColors.black,
+                        ? CupertinoColors.systemGrey
+                        : CupertinoColors.systemGrey2,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: CupertinoTextField(
+                      controller: _sidebarSearchController,
+                      focusNode: _sidebarSearchFocus,
+                      padding: EdgeInsets.zero,
+                      placeholder: 'Search',
+                      placeholderStyle: TextStyle(
+                        fontSize: 13,
+                        color: isDark
+                            ? CupertinoColors.systemGrey
+                            : CupertinoColors.systemGrey2,
+                      ),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark
+                            ? CupertinoColors.white
+                            : CupertinoColors.black,
+                      ),
+                      decoration: const BoxDecoration(),
+                      onChanged: (v) =>
+                          setState(() => _sidebarSearchQuery = v),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 8),
-          // Categories
+          // Category list (selected = light blue background); filter by search
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              itemCount: _categories.length,
-              itemBuilder: (context, index) {
-                final category = _categories[index];
-                final isSelected = _selectedCategory == category.id;
-                return _buildCategoryItem(category, isSelected, isDark);
+            child: Builder(
+              builder: (context) {
+                final query = _sidebarSearchQuery.trim().toLowerCase();
+                final list = query.isEmpty
+                    ? _categories
+                    : _categories
+                        .where((c) =>
+                            c.title.toLowerCase().contains(query))
+                        .toList();
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  itemCount: list.length,
+                  itemBuilder: (context, index) {
+                    final category = list[index];
+                    final isSelected = _selectedCategory == category.id;
+                    return _buildCategoryItem(category, isSelected, isDark);
+                  },
+                );
               },
             ),
           ),
@@ -351,77 +360,44 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     bool isSelected,
     bool isDark,
   ) {
+    const blueHighlight = Color(0xFFE8F4FC);
+    const blueHighlightDark = Color(0xFF2A3F52);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.only(bottom: 2),
       child: GestureDetector(
         onTap: () => _selectCategory(category.id),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+        child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            gradient: isSelected
-                ? LinearGradient(
-                    colors: [
-                      category.color.withValues(alpha: 0.2),
-                      category.color.withValues(alpha: 0.1),
-                    ],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  )
+            color: isSelected
+                ? (isDark ? blueHighlightDark : blueHighlight)
                 : null,
-            borderRadius: BorderRadius.circular(10),
-            border: isSelected
-                ? Border.all(
-                    color: category.color.withValues(alpha: 0.3),
-                    width: 1,
-                  )
-                : null,
+            borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? category.color.withValues(alpha: 0.2)
-                      : (isDark
-                            ? CupertinoColors.systemGrey.withValues(alpha: 0.2)
-                            : CupertinoColors.systemGrey5),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  category.icon,
-                  size: 16,
-                  color: isSelected
-                      ? category.color
-                      : (isDark
-                            ? CupertinoColors.systemGrey
-                            : CupertinoColors.systemGrey2),
-                ),
+              Icon(
+                category.icon,
+                size: 20,
+                color: isSelected
+                    ? (isDark ? category.color : CupertinoColors.activeBlue)
+                    : (isDark
+                          ? CupertinoColors.systemGrey
+                          : CupertinoColors.systemGrey2),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   category.title,
                   style: TextStyle(
                     fontSize: 14,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                    color: isSelected
-                        ? (isDark
-                              ? CupertinoColors.white
-                              : CupertinoColors.black)
-                        : (isDark
-                              ? CupertinoColors.systemGrey
-                              : CupertinoColors.systemGrey2),
+                    fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                    color: isDark
+                        ? CupertinoColors.white
+                        : CupertinoColors.black,
                   ),
                 ),
               ),
-              if (isSelected)
-                Icon(
-                  CupertinoIcons.chevron_right,
-                  size: 14,
-                  color: category.color.withValues(alpha: 0.6),
-                ),
             ],
           ),
         ),
@@ -431,18 +407,20 @@ class _UiSettingsPageState extends State<UiSettingsPage>
 
   Widget _buildMainContent(bool isDark) {
     final category = _categories.firstWhere((c) => c.id == _selectedCategory);
+    final mode = LayoutScope.of(context);
+    final contentPadding = mode.isMobile ? 16.0 : 32.0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header
+        // Section header (card on mobile, bar on desktop)
         _buildContentHeader(category, isDark),
         // Content
         Expanded(
           child: FadeTransition(
             opacity: _fadeAnimation,
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(32),
+              padding: EdgeInsets.all(contentPadding),
               child: _buildCategoryContent(isDark),
             ),
           ),
@@ -452,62 +430,67 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   }
 
   Widget _buildContentHeader(_SettingsCategory category, bool isDark) {
+    final mode = LayoutScope.of(context);
+    final isCompact = mode.isMobile;
     return Container(
-      padding: const EdgeInsets.fromLTRB(32, 24, 32, 16),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: isDark
-                ? _DesignColors.primaryPurple.withValues(alpha: 0.1)
-                : const Color(0xFFE5E5E7),
-            width: 1,
-          ),
-        ),
+      padding: EdgeInsets.fromLTRB(
+        isCompact ? 16 : 32,
+        isCompact ? 12 : 24,
+        isCompact ? 16 : 32,
+        isCompact ? 12 : 16,
       ),
+      decoration: BoxDecoration(
+        color: isCompact
+            ? (isDark ? const Color(0xFF1C1C1E) : const Color(0xFF2C2C2E))
+            : null,
+        borderRadius: isCompact ? BorderRadius.circular(16) : null,
+        border: isCompact
+            ? null
+            : Border(
+                bottom: BorderSide(
+                  color: isDark
+                      ? _DesignColors.primaryPurple.withValues(alpha: 0.1)
+                      : const Color(0xFFE5E5E7),
+                  width: 1,
+                ),
+              ),
+      ),
+      margin: isCompact
+          ? const EdgeInsets.fromLTRB(16, 0, 16, 12)
+          : EdgeInsets.zero,
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  category.color.withValues(alpha: 0.2),
-                  category.color.withValues(alpha: 0.1),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: category.color.withValues(alpha: 0.2),
-                width: 1,
-              ),
-            ),
-            child: Icon(category.icon, size: 24, color: category.color),
+          Icon(
+            category.icon,
+            size: isCompact ? 28 : 24,
+            color: category.color,
           ),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                category.title,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? CupertinoColors.white : CupertinoColors.black,
+          SizedBox(width: isCompact ? 14 : 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  category.title,
+                  style: TextStyle(
+                    fontSize: isCompact ? 20 : 24,
+                    fontWeight: FontWeight.bold,
+                    color:
+                        isDark ? CupertinoColors.white : CupertinoColors.black,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                _getCategoryDescription(category.id),
-                style: TextStyle(
-                  fontSize: 13,
-                  color: isDark
-                      ? CupertinoColors.systemGrey
-                      : CupertinoColors.systemGrey2,
+                const SizedBox(height: 2),
+                Text(
+                  _getCategoryDescription(category.id),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark
+                        ? CupertinoColors.systemGrey
+                        : CupertinoColors.systemGrey2,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -824,13 +807,15 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                 child: _buildSettingRow(
                   isDark: isDark,
                   icon: CupertinoIcons.globe,
-                  iconColor: _DesignColors.accentTeal,
+                  iconColor: _DesignColors.accentGreen,
                   title: 'Server Configuration',
                   subtitle: 'Change API host',
-                  trailing: const Icon(
+                  trailing: Icon(
                     CupertinoIcons.chevron_right,
-                    size: 16,
-                    color: CupertinoColors.systemGrey,
+                    size: 18,
+                    color: isDark
+                        ? CupertinoColors.systemGrey
+                        : CupertinoColors.systemGrey2,
                   ),
                   onTap: () => widget.onNavigate(AppRoutes.hostSettings),
                 ),
