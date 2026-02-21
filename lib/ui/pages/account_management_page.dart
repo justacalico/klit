@@ -4,6 +4,7 @@ import 'package:flutter/material.dart' show Colors;
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';
 import '../../core/constants/constants.dart';
+import '../../data/services/services.dart';
 import '../layout/layout_scope.dart';
 import '../../providers/providers.dart';
 
@@ -68,6 +69,10 @@ class AccountManagementContent extends StatelessWidget {
             account.host,
           );
         },
+        onTest: () async {
+          Navigator.of(dialogContext).pop();
+          await AccountManagementContent._testAccount(context, accountId);
+        },
         onRemove: () {
           Navigator.of(dialogContext).pop();
           AccountManagementContent._confirmRemoveAccount(context, accountId);
@@ -113,6 +118,13 @@ class AccountManagementContent extends StatelessWidget {
               },
               child: const Text('Switch to this account'),
             ),
+          CupertinoActionSheetAction(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await AccountManagementContent._testAccount(context, accountId);
+            },
+            child: const Text('Test connection'),
+          ),
           CupertinoActionSheetAction(
             isDestructiveAction: true,
             onPressed: () {
@@ -388,6 +400,42 @@ class AccountManagementContent extends StatelessWidget {
               }
             },
             child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Future<void> _testAccount(BuildContext context, String accountId) async {
+    final auth = context.read<AuthProvider>();
+    final api = context.read<ApiService>();
+    final account = auth.accounts.where((a) => a.id == accountId).firstOrNull;
+    if (account == null || !context.mounted) return;
+    final current = auth.currentAccount;
+    api.setBaseUrl(account.host);
+    api.setAuth(account.username, account.apiKey);
+    final result = await api.verifyCredentials(account.username, account.apiKey);
+    if (current != null) {
+      api.setBaseUrl(current.host);
+      api.setAuth(current.username, current.apiKey);
+    } else {
+      api.clearAuth();
+    }
+    if (!context.mounted) return;
+    showCupertinoDialog(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        title: const Text('Test account'),
+        content: Text(
+          result.when(
+            success: (_) => 'Credentials are valid for ${account.username}@${Uri.parse(account.host).host}.',
+            failure: (e) => 'Failed: ${e.message}',
+          ),
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('OK'),
+            onPressed: () => Navigator.of(ctx).pop(),
           ),
         ],
       ),
@@ -1047,6 +1095,7 @@ class _DesktopAccountOptionsDialog extends StatelessWidget {
   final bool isActive;
   final bool isDark;
   final VoidCallback onSwitch;
+  final Future<void> Function() onTest;
   final VoidCallback onRemove;
 
   const _DesktopAccountOptionsDialog({
@@ -1054,6 +1103,7 @@ class _DesktopAccountOptionsDialog extends StatelessWidget {
     required this.isActive,
     required this.isDark,
     required this.onSwitch,
+    required this.onTest,
     required this.onRemove,
   });
 
@@ -1088,6 +1138,12 @@ class _DesktopAccountOptionsDialog extends StatelessWidget {
                     isDark: isDark,
                     onTap: onSwitch,
                   ),
+                _DialogOption(
+                  icon: CupertinoIcons.checkmark_circle,
+                  label: 'Test connection',
+                  isDark: isDark,
+                  onTap: () => onTest(),
+                ),
                 _DialogOption(
                   icon: CupertinoIcons.trash,
                   label: 'Remove Account',
