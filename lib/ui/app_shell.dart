@@ -286,17 +286,12 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  child: ColoredBox(
-                    color: isDark
-                        ? const Color(0xFF0A0A0C)
-                        : const Color(0xFFF8F8FC),
-                    child: SizedBox(
-                      height: navBarHeight,
-                      child: Material(
-                        type: MaterialType.transparency,
-                        elevation: 12,
-                        child: _buildMobileNavBarContent(isDark),
-                      ),
+                  child: SizedBox(
+                    height: navBarHeight,
+                    child: Material(
+                      type: MaterialType.transparency,
+                      elevation: 12,
+                      child: _buildMobileNavBarContent(isDark),
                     ),
                   ),
                 ),
