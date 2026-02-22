@@ -139,27 +139,15 @@ class _SearchRoutePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isFeedMode = feedTitle != null && feedTitle!.isNotEmpty;
-    final title = isFeedMode
-        ? feedTitle!
-        : (initialQuery != null && initialQuery!.isNotEmpty ? initialQuery! : 'Search');
 
+    // No separate nav bar: search page is a widget with its own toolbar. When pushed as route,
+    // toolbar gets a back button via onBack so we don't duplicate a top bar that hides the search bar.
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        leading: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Icon(CupertinoIcons.back),
-        ),
-        middle: Text(
-          title,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
       child: SafeArea(
-        top: false,
         child: UiSearchPage(
           initialQuery: initialQuery,
           feedMode: isFeedMode,
+          onBack: () => Navigator.of(context).pop(),
           onPostTap: (args) => Navigator.of(
             context,
           ).pushNamed(AppRoutes.postDetail, arguments: args),

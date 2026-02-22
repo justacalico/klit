@@ -12,15 +12,19 @@ import '../widgets/widgets.dart';
 
 /// Unified search page - reused from desktop search logic.
 /// When [feedMode] is true, search toolbar and history are hidden (feed view).
+/// When [onBack] is non-null (e.g. when shown as a route), toolbar shows a back button and no extra nav bar is needed.
 class UiSearchPage extends StatefulWidget {
   final String? initialQuery;
   final bool feedMode;
   final void Function(PostDetailArguments) onPostTap;
+  /// When set, toolbar shows a back button (e.g. when page is pushed as a route). Caller should not use a separate nav bar.
+  final VoidCallback? onBack;
 
   const UiSearchPage({
     super.key,
     this.initialQuery,
     this.feedMode = false,
+    this.onBack,
     required this.onPostTap,
   });
 
@@ -398,6 +402,14 @@ class _UiSearchPageState extends State<UiSearchPage>
       ),
       child: Row(
         children: [
+          if (widget.onBack != null) ...[
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: widget.onBack,
+              child: const Icon(CupertinoIcons.back),
+            ),
+            const SizedBox(width: 8),
+          ],
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
