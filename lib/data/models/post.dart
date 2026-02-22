@@ -292,6 +292,17 @@ class PostTags {
     ...meta,
   ];
 
+  /// All tags with their category for color-coding chips (same order as [all]).
+  List<(String, String)> get allWithCategory => [
+    for (final t in artist) (t, 'artist'),
+    for (final t in copyright) (t, 'copyright'),
+    for (final t in character) (t, 'character'),
+    for (final t in species) (t, 'species'),
+    for (final t in general) (t, 'general'),
+    for (final t in lore) (t, 'lore'),
+    for (final t in meta) (t, 'meta'),
+  ];
+
   /// Get tag color by category
   static Color getColorForCategory(String category) {
     switch (category) {

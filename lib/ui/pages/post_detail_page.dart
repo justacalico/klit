@@ -103,20 +103,6 @@ class _MilkAnimationOverlayState extends State<_MilkAnimationOverlay>
   }
 }
 
-/// Tag chip color from post rating: explicit=red, safe=green, other=grey, else no override.
-Color? _tagColorForRating(String rating) {
-  switch (rating) {
-    case 'e':
-      return AppColors.explicitColor;
-    case 's':
-      return AppColors.safeColor;
-    case 'q':
-      return CupertinoColors.systemGrey;
-    default:
-      return null;
-  }
-}
-
 /// Converts e621-style DText (and BBCode) in descriptions/comments to Markdown.
 /// Supports: [b]/[i]/[s]/[u], [spoiler], {{tag}} → tag search link, [[wiki]] → link.
 String _descriptionToMarkdown(String raw) {
@@ -1720,15 +1706,11 @@ class _MobilePostDetailContentBuilder {
             child: Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: post.tags.all.take(20).map((t) {
-                final tag = t.replaceFirst(':', ' ');
-                final ratingColor = _tagColorForRating(post.rating);
-                final chipColor = ratingColor != null
-                    ? ratingColor.withValues(alpha: 0.25)
-                    : (isDark
-                            ? UIColors.primaryPurple
-                            : UIColors.primaryIndigo)
-                        .withValues(alpha: 0.2);
+              children: post.tags.allWithCategory.take(20).map((e) {
+                final tag = e.$1.replaceFirst(':', ' ');
+                final category = e.$2;
+                final baseColor = PostTags.getColorForCategory(category);
+                final chipColor = baseColor.withValues(alpha: 0.25);
                 return GestureDetector(
                   onTap: () => s._searchTag(tag),
                   child: Container(
@@ -2859,15 +2841,11 @@ class _DesktopPostDetailContentBuilder {
                 child: Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: post.tags.all.take(20).map((t) {
-                    final tag = t.replaceFirst(':', ' ');
-                    final ratingColor = _tagColorForRating(post.rating);
-                    final chipColor = ratingColor != null
-                        ? ratingColor.withValues(alpha: 0.25)
-                        : (isDark
-                                ? UIColors.primaryPurple
-                                : UIColors.primaryIndigo)
-                            .withValues(alpha: 0.2);
+                  children: post.tags.allWithCategory.take(20).map((e) {
+                    final tag = e.$1.replaceFirst(':', ' ');
+                    final category = e.$2;
+                    final baseColor = PostTags.getColorForCategory(category);
+                    final chipColor = baseColor.withValues(alpha: 0.25);
                     return GestureDetector(
                       onTap: () => s._searchTag(tag),
                       child: Container(
