@@ -20,6 +20,7 @@ import '../../data/models/proxy_config.dart';
 import '../../data/services/services.dart';
 import '../../providers/providers.dart';
 import 'account_management_page.dart';
+import 'i_finished_gallery_page.dart';
 
 /// Design constants for the settings page
 class _DesignColors {
@@ -1867,33 +1868,62 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                         children: [
                           Text(
                             'Finished posts (${settings.iFinishedEntries.length})',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                            color: isDark
-                                ? CupertinoColors.white
-                                : CupertinoColors.black,
-                          ),
-                        ),
-                        CupertinoButton(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          onPressed: () async {
-                            await settings.clearIFinishedPostIds();
-                          },
-                          child: Text(
-                            'Clear all',
                             style: TextStyle(
-                              color: CupertinoColors.destructiveRed,
-                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: isDark
+                                  ? CupertinoColors.white
+                                  : CupertinoColors.black,
                             ),
                           ),
-                        ),
-                      ],
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CupertinoButton(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    CupertinoPageRoute(
+                                      builder: (_) => IFinishedGalleryPage(
+                                        entries: settings.iFinishedEntries,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  'Gallery',
+                                  style: TextStyle(
+                                    color: isDark
+                                        ? CupertinoColors.activeBlue
+                                        : CupertinoColors.activeBlue,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              CupertinoButton(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                onPressed: () async {
+                                  await settings.clearIFinishedPostIds();
+                                },
+                                child: Text(
+                                  'Clear all',
+                                  style: TextStyle(
+                                    color: CupertinoColors.destructiveRed,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
                   const Divider(height: 1),
                   ...settings.iFinishedEntries.map((entry) {
                     return InkWell(
