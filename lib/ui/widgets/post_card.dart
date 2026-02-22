@@ -180,7 +180,11 @@ class PostCard extends StatelessWidget {
           fit: BoxFit.cover,
           memCacheWidth: memCacheWidth,
           memCacheHeight: memCacheHeight,
-          placeholder: (context, url) => const LoadingShimmer(),
+          fadeInDuration: const Duration(milliseconds: 150),
+          fadeInCurve: Curves.easeOut,
+          placeholder: (context, url) => style == PostCardStyle.grid
+              ? Container(color: CupertinoColors.systemGrey5)
+              : const LoadingShimmer(),
           errorWidget: (context, url, error) => Container(
             color: CupertinoColors.systemGrey5,
             child: Center(
