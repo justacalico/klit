@@ -429,7 +429,10 @@ class _CollapseButtonState extends State<_CollapseButton> {
         child: GestureDetector(
           onTap: widget.onTap,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            padding: EdgeInsets.symmetric(
+              horizontal: widget.isCollapsed ? 0 : 14,
+              vertical: 12,
+            ),
             decoration: BoxDecoration(
               color: _hovered
                   ? UIColors.primaryPurple.withValues(alpha: 0.1)
@@ -444,41 +447,53 @@ class _CollapseButtonState extends State<_CollapseButton> {
                 width: 1,
               ),
             ),
-            child: Row(
-              children: [
-                Icon(
-                  CupertinoIcons.sidebar_left,
-                  size: 18,
-                  color: _hovered
-                      ? UIColors.primaryPurple
-                      : (isDark
-                            ? CupertinoColors.systemGrey
-                            : CupertinoColors.systemGrey2),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Collapse',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+            child: widget.isCollapsed
+                ? Center(
+                    child: Icon(
+                      CupertinoIcons.sidebar_left,
+                      size: 18,
                       color: _hovered
                           ? UIColors.primaryPurple
                           : (isDark
                                 ? CupertinoColors.systemGrey
                                 : CupertinoColors.systemGrey2),
                     ),
+                  )
+                : Row(
+                    children: [
+                      Icon(
+                        CupertinoIcons.sidebar_left,
+                        size: 18,
+                        color: _hovered
+                            ? UIColors.primaryPurple
+                            : (isDark
+                                  ? CupertinoColors.systemGrey
+                                  : CupertinoColors.systemGrey2),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Collapse',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: _hovered
+                                ? UIColors.primaryPurple
+                                : (isDark
+                                      ? CupertinoColors.systemGrey
+                                      : CupertinoColors.systemGrey2),
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        CupertinoIcons.chevron_left,
+                        size: 14,
+                        color: _hovered
+                            ? UIColors.primaryPurple.withValues(alpha: 0.7)
+                            : CupertinoColors.systemGrey.withValues(alpha: 0.5),
+                      ),
+                    ],
                   ),
-                ),
-                Icon(
-                  CupertinoIcons.chevron_left,
-                  size: 14,
-                  color: _hovered
-                      ? UIColors.primaryPurple.withValues(alpha: 0.7)
-                      : CupertinoColors.systemGrey.withValues(alpha: 0.5),
-                ),
-              ],
-            ),
           ),
         ),
       ),
