@@ -97,8 +97,12 @@ class PostsGrid extends StatelessWidget {
                               (effectiveColumns - 1) * effectiveSpacing) /
                           effectiveColumns;
                       final dpr = MediaQuery.devicePixelRatioOf(context);
+                      final aspectRatio = post.preview.width > 0 &&
+                              post.preview.height > 0
+                          ? post.preview.width / post.preview.height
+                          : 1.0;
                       final cacheW = (cellSize * dpr).round();
-                      final cacheH = cacheW;
+                      final cacheH = (cellSize * dpr / aspectRatio).round();
                       return RepaintBoundary(
                         child: PostCard(
                           post: post,
