@@ -108,8 +108,19 @@ class _MilkAnimationOverlayState extends State<_MilkAnimationOverlay>
 }
 
 /// Stringy strand definition: end offset (frac of minDim), control offset, start/end radius (frac), taper curve.
+/// originDx/originDy = offset from main origin so strands aren't all tied to one point.
 class _StrandDef {
-  const _StrandDef(this.dx, this.dy, this.cx, this.cy, this.rStart, this.rEnd, this.taper);
+  const _StrandDef(
+    this.dx,
+    this.dy,
+    this.cx,
+    this.cy,
+    this.rStart,
+    this.rEnd,
+    this.taper, {
+    this.originDx = 0.0,
+    this.originDy = 0.0,
+  });
   final double dx;
   final double dy;
   final double cx;
@@ -117,6 +128,8 @@ class _StrandDef {
   final double rStart;
   final double rEnd;
   final double taper; // 0 = linear, >0 = thicker in middle (pinched ends), <0 = fatter at start (teardrop)
+  final double originDx;
+  final double originDy;
 }
 
 /// Paints viscous stringy milk: curved strands, teardrops, pinched and branching shapes with wobble.
@@ -137,24 +150,39 @@ class _StickyMilkPainter extends CustomPainter {
   static const Color _milkHighlight = Color(0xFFFFFBF5);
   static const Color _milkShadow = Color(0x1A000000);
 
-  /// Spread-out fan: center stream down + streams arcing left/right (wider dx, control pushes outward).
+  /// Spread-out fan; each strand has its own origin offset so they're not tied to one point.
   static const List<_StrandDef> _strands = [
-    _StrandDef(0.0, -0.42, 0.0, -0.12, 0.038, 0.03, -0.25),
-    _StrandDef(0.0, -0.32, 0.0, -0.06, 0.03, 0.022, 0.0),
-    _StrandDef(-0.42, -0.22, -0.18, 0.02, 0.028, 0.01, 0.45),
-    _StrandDef(0.4, -0.2, 0.16, 0.0, 0.026, 0.01, 0.4),
-    _StrandDef(-0.38, -0.38, -0.14, -0.12, 0.032, 0.018, 0.3),
-    _StrandDef(0.36, -0.36, 0.12, -0.1, 0.03, 0.016, 0.35),
-    _StrandDef(-0.28, -0.5, -0.1, -0.2, 0.026, 0.014, -0.2),
-    _StrandDef(0.3, -0.48, 0.08, -0.18, 0.025, 0.012, -0.15),
-    _StrandDef(-0.5, -0.08, -0.22, 0.06, 0.022, 0.012, 0.35),
-    _StrandDef(0.48, -0.1, 0.2, 0.04, 0.02, 0.01, 0.4),
-    _StrandDef(-0.22, -0.55, -0.06, -0.22, 0.024, 0.018, 0.2),
-    _StrandDef(0.24, -0.52, 0.06, -0.2, 0.023, 0.016, 0.25),
-    _StrandDef(-0.12, -0.44, -0.03, -0.14, 0.028, 0.02, -0.1),
-    _StrandDef(0.14, -0.46, 0.04, -0.16, 0.027, 0.019, -0.15),
-    _StrandDef(-0.34, -0.3, -0.12, -0.06, 0.025, 0.014, 0.4),
-    _StrandDef(0.32, -0.28, 0.1, -0.05, 0.024, 0.013, 0.38),
+    _StrandDef(0.0, -0.42, 0.0, -0.12, 0.038, 0.03, -0.25, originDx: 0.02, originDy: 0.0),
+    _StrandDef(0.0, -0.32, 0.0, -0.06, 0.03, 0.022, 0.0, originDx: -0.015, originDy: 0.01),
+    _StrandDef(-0.42, -0.22, -0.18, 0.02, 0.028, 0.01, 0.45, originDx: -0.04, originDy: -0.01),
+    _StrandDef(0.4, -0.2, 0.16, 0.0, 0.026, 0.01, 0.4, originDx: 0.035, originDy: 0.0),
+    _StrandDef(-0.38, -0.38, -0.14, -0.12, 0.032, 0.018, 0.3, originDx: -0.03, originDy: 0.02),
+    _StrandDef(0.36, -0.36, 0.12, -0.1, 0.03, 0.016, 0.35, originDx: 0.025, originDy: -0.015),
+    _StrandDef(-0.28, -0.5, -0.1, -0.2, 0.026, 0.014, -0.2, originDx: -0.02, originDy: 0.03),
+    _StrandDef(0.3, -0.48, 0.08, -0.18, 0.025, 0.012, -0.15, originDx: 0.03, originDy: 0.02),
+    _StrandDef(-0.5, -0.08, -0.22, 0.06, 0.022, 0.012, 0.35, originDx: -0.05, originDy: -0.02),
+    _StrandDef(0.48, -0.1, 0.2, 0.04, 0.02, 0.01, 0.4, originDx: 0.045, originDy: -0.01),
+    _StrandDef(-0.22, -0.55, -0.06, -0.22, 0.024, 0.018, 0.2, originDx: -0.01, originDy: 0.025),
+    _StrandDef(0.24, -0.52, 0.06, -0.2, 0.023, 0.016, 0.25, originDx: 0.02, originDy: 0.02),
+    _StrandDef(-0.12, -0.44, -0.03, -0.14, 0.028, 0.02, -0.1, originDx: -0.025, originDy: 0.0),
+    _StrandDef(0.14, -0.46, 0.04, -0.16, 0.027, 0.019, -0.15, originDx: 0.018, originDy: -0.02),
+    _StrandDef(-0.34, -0.3, -0.12, -0.06, 0.025, 0.014, 0.4, originDx: -0.035, originDy: 0.01),
+    _StrandDef(0.32, -0.28, 0.1, -0.05, 0.024, 0.013, 0.38, originDx: 0.028, originDy: -0.01),
+  ];
+
+  /// Scattered sticky droplets (dx, dy, radius frac) — not tied to strands, spread across the area.
+  static const List<({double dx, double dy, double r})> _droplets = [
+    (dx: -0.18, dy: -0.25, r: 0.018),
+    (dx: 0.22, dy: -0.2, r: 0.016),
+    (dx: -0.08, dy: -0.38, r: 0.02),
+    (dx: 0.1, dy: -0.35, r: 0.019),
+    (dx: -0.32, dy: -0.12, r: 0.014),
+    (dx: 0.28, dy: -0.15, r: 0.015),
+    (dx: -0.42, dy: -0.32, r: 0.012),
+    (dx: 0.38, dy: -0.3, r: 0.013),
+    (dx: 0.0, dy: -0.28, r: 0.017),
+    (dx: -0.25, dy: -0.42, r: 0.014),
+    (dx: 0.2, dy: -0.44, r: 0.015),
   ];
 
   static const int _segments = 16;
@@ -168,15 +196,17 @@ class _StickyMilkPainter extends CustomPainter {
     final wobblePhase = inHold ? (time - shootEnd) / (fadeStart - shootEnd) * 2 * pi * 2 : 0.0;
 
     for (final s in _strands) {
-      _drawStrand(canvas, size, minDim, origin, s, wobblePhase);
+      final strandOrigin = origin + Offset(s.originDx * minDim, s.originDy * minDim);
+      _drawStrand(canvas, size, minDim, strandOrigin, s, wobblePhase);
     }
 
-    _drawCenterBlob(canvas, origin, minDim);
+    _drawStickyCenter(canvas, origin, minDim);
+    _drawScatteredDroplets(canvas, origin, minDim);
   }
 
   void _drawStrand(Canvas canvas, Size size, double minDim, Offset origin, _StrandDef s, double wobblePhase) {
-    final target = Offset(s.dx * minDim, s.dy * minDim);
-    final control = Offset(s.cx * minDim, s.cy * minDim);
+    final target = Offset((s.dx - s.originDx) * minDim, (s.dy - s.originDy) * minDim);
+    final control = Offset((s.cx - s.originDx) * minDim, (s.cy - s.originDy) * minDim);
     final visibleLength = shootProgress;
     final baseRadius = minDim;
 
@@ -237,21 +267,54 @@ class _StickyMilkPainter extends CustomPainter {
     );
   }
 
-  void _drawCenterBlob(Canvas canvas, Offset origin, double minDim) {
-    final r = minDim * 0.055 * (0.4 + 0.6 * shootProgress);
-    final shadowPaint = Paint()
-      ..color = _milkShadow.withValues(alpha: opacity * 0.2)
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(origin, r + 2, shadowPaint);
-    final paint = Paint()
-      ..color = _milkColor.withValues(alpha: opacity * 0.95)
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(origin, r, paint);
-    final highlightR = r * 0.4;
+  /// Sticky mass at source: several overlapping blobs so it's not one single nozzle.
+  void _drawStickyCenter(Canvas canvas, Offset origin, double minDim) {
+    final scale = 0.4 + 0.6 * shootProgress;
+    final blobs = [
+      Offset(0.0, 0.0),
+      Offset(-0.022 * minDim, 0.018 * minDim),
+      Offset(0.018 * minDim, -0.012 * minDim),
+      Offset(-0.01 * minDim, -0.02 * minDim),
+      Offset(0.025 * minDim, 0.01 * minDim),
+    ];
+    for (final b in blobs) {
+      final center = origin + b;
+      final r = minDim * 0.048 * scale;
+      final shadowPaint = Paint()
+        ..color = _milkShadow.withValues(alpha: opacity * 0.18)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(center, r + 1.5, shadowPaint);
+      final paint = Paint()
+        ..color = _milkColor.withValues(alpha: opacity * 0.93)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(center, r, paint);
+    }
+    final mainR = minDim * 0.042 * scale;
     final highlightPaint = Paint()
       ..color = _milkHighlight.withValues(alpha: opacity * 0.5)
       ..style = PaintingStyle.fill;
-    canvas.drawCircle(origin + Offset(-r * 0.2, -r * 0.25), highlightR, highlightPaint);
+    canvas.drawCircle(origin + Offset(-mainR * 0.25, -mainR * 0.2), mainR * 0.4, highlightPaint);
+  }
+
+  /// Scattered droplets that aren't part of strands — sticky drips spread across the area.
+  void _drawScatteredDroplets(Canvas canvas, Offset origin, double minDim) {
+    final scale = (0.3 + 0.7 * shootProgress).clamp(0.0, 1.0);
+    for (final d in _droplets) {
+      final center = origin + Offset(d.dx * minDim, d.dy * minDim);
+      final r = d.r * minDim * scale;
+      final shadowPaint = Paint()
+        ..color = _milkShadow.withValues(alpha: opacity * 0.12)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(center, r + 1, shadowPaint);
+      final paint = Paint()
+        ..color = _milkColor.withValues(alpha: opacity * 0.9)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(center, r, paint);
+      final highlightPaint = Paint()
+        ..color = _milkHighlight.withValues(alpha: opacity * 0.4)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(center + Offset(-r * 0.3, -r * 0.25), r * 0.35, highlightPaint);
+    }
   }
 
   @override
