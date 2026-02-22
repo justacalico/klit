@@ -98,14 +98,15 @@ class AppNavBar extends StatelessWidget {
   }
 
   Widget _buildLiquidGlass(BuildContext context, bool isDark, bool isOled) {
-    final compact = navOrder.length >= 6;
+    final compact = navOrder.length >= 5;
     final gradientColors = isOled
         ? [AppColors.oledSecondaryBackground, const Color(0xFF0F0F0F)]
         : (isDark
             ? [const Color(0xFF1C1C1E), const Color(0xFF2C2C2E)]
             : [const Color(0xFFF5F5F7), const Color(0xFFEBEBEF)]);
     return Container(
-      height: compact ? 52 : 68,
+      height: compact ? 56 : 72,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
@@ -156,9 +157,9 @@ class AppNavBar extends StatelessWidget {
     bool isOled,
     double bottomPadding,
   ) {
-    final compact = navOrder.length >= 6;
+    final compact = navOrder.length >= 5;
     return Container(
-      padding: EdgeInsets.only(bottom: bottomPadding),
+      padding: EdgeInsets.fromLTRB(12, 0, 12, bottomPadding),
       decoration: BoxDecoration(
         color: isOled
             ? AppColors.oledSecondaryBackground
@@ -171,10 +172,10 @@ class AppNavBar extends StatelessWidget {
         ),
       ),
       child: SizedBox(
-        height: compact ? 48 : 60,
+        height: compact ? 52 : 64,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: _buildNavItems(context, isDark),
+          children: _buildNavItemsWithSpacing(context, isDark),
         ),
       ),
     );
@@ -183,12 +184,23 @@ class AppNavBar extends StatelessWidget {
   Widget _buildContent(BuildContext context, bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: _buildNavItems(context, isDark),
+      children: _buildNavItemsWithSpacing(context, isDark),
     );
   }
 
+  List<Widget> _buildNavItemsWithSpacing(BuildContext context, bool isDark) {
+    final items = _buildNavItems(context, isDark);
+    if (items.length <= 1) return items;
+    final spaced = <Widget>[];
+    for (var i = 0; i < items.length; i++) {
+      if (i > 0) spaced.add(const SizedBox(width: 4));
+      spaced.add(items[i]);
+    }
+    return spaced;
+  }
+
   List<Widget> _buildNavItems(BuildContext context, bool isDark) {
-    final showLabels = navOrder.length < 6;
+    final showLabels = navOrder.length < 5;
     final items = <Widget>[];
     for (var i = 0; i < navOrder.length; i++) {
       final id = navOrder[i];

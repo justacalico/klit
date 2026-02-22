@@ -320,11 +320,11 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
     final navCount = auth.isGuest
         ? rawOrder.where((id) => id != 3).length
         : rawOrder.length;
-    final compact = navCount >= 6;
+    final compact = navCount >= 5;
     if (isLiquidGlass) {
-      return (compact ? 52 : 68) + 16 + bottomPadding;
+      return (compact ? 56 : 72) + 16 + bottomPadding;
     }
-    return (compact ? 48 : 60) + bottomPadding;
+    return (compact ? 52 : 64) + bottomPadding;
   }
 
   Widget _buildMobileNavBarContent(bool isDark) {
