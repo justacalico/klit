@@ -12,6 +12,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart'
     show Colors, Theme, ThemeData, Brightness;
+import 'package:flutter/widgets.dart' show precacheImage;
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
@@ -319,6 +320,7 @@ class _PostDetailPageState extends State<PostDetailPage>
             _isFavorited[index] = post.isFavorited;
             _updatedScores[index] = post.score;
           });
+          _precachePostImages(post);
         }
       },
       failure: (error) {
@@ -330,6 +332,21 @@ class _PostDetailPageState extends State<PostDetailPage>
         }
       },
     );
+  }
+
+  /// Preload preview and main image into cache so swiping to this post shows images immediately.
+  void _precachePostImages(Post post) {
+    if (!mounted) return;
+    final previewUrl = post.preview.url;
+    final mainUrl = post.displayUrl ?? post.sample.url ?? post.preview.url;
+    if (previewUrl != null && previewUrl.isNotEmpty) {
+      precacheImage(CachedNetworkImageProvider(previewUrl), context);
+    }
+    if (mainUrl != null &&
+        mainUrl.isNotEmpty &&
+        mainUrl != previewUrl) {
+      precacheImage(CachedNetworkImageProvider(mainUrl), context);
+    }
   }
 
   void _onPageChanged(int index) {
