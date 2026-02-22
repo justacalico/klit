@@ -28,7 +28,7 @@ import '../shell/toolbar.dart';
 import '../theme.dart';
 import '../widgets/widgets.dart';
 
-/// One-shot milk-style overlay: cream blobs expand and fade.
+/// One-shot sticky milk overlay: shoots at the screen and stays ~5s then fades.
 class _MilkAnimationOverlay extends StatefulWidget {
   const _MilkAnimationOverlay({required this.onComplete});
 
@@ -40,17 +40,34 @@ class _MilkAnimationOverlay extends StatefulWidget {
 
 class _MilkAnimationOverlayState extends State<_MilkAnimationOverlay>
     with SingleTickerProviderStateMixin {
+  static const Duration _totalDuration = Duration(seconds: 5);
+  static const Duration _shootDuration = Duration(milliseconds: 400);
+  static const Duration _fadeDuration = Duration(milliseconds: 400);
+
   late AnimationController _controller;
+  late Animation<double> _shoot;
+  late Animation<double> _fadeOut;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 700),
+      duration: _totalDuration,
     )..forward().then((_) {
         widget.onComplete();
       });
+
+    final shootEnd = _shootDuration.inMilliseconds / _totalDuration.inMilliseconds;
+    final fadeStart = 1.0 - _fadeDuration.inMilliseconds / _totalDuration.inMilliseconds;
+
+    _shoot = CurvedAnimation(
+      parent: _controller,
+      curve: Interval(0.0, shootEnd, curve: Curves.easeOutBack),
+    );
+    _fadeOut = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(parent: _controller, curve: Interval(fadeStart, 1.0, curve: Curves.easeIn)),
+    );
   }
 
   @override
@@ -62,46 +79,108 @@ class _MilkAnimationOverlayState extends State<_MilkAnimationOverlay>
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
-      child: Center(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            final scale = 0.3 + 0.9 * _controller.value;
-            final opacity = 0.85 * (1 - _controller.value);
-            return Stack(
-              alignment: Alignment.center,
-              children: [
-                _milkCircle(scale * 80, opacity, 0),
-                _milkCircle(scale * 100, opacity * 0.8, 0.3),
-                _milkCircle(scale * 70, opacity * 0.7, -0.2),
-              ],
-            );
-          },
-        ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final w = constraints.maxWidth;
+          final h = constraints.maxHeight;
+          return AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              final shoot = _shoot.value;
+              final fade = _fadeOut.value;
+              final opacity = (shoot < 1.0 ? 1.0 : fade).clamp(0.0, 1.0);
+              return CustomPaint(
+                size: Size(w, h),
+                painter: _StickyMilkPainter(
+                  shootProgress: shoot,
+                  opacity: opacity,
+                ),
+              );
+            },
+          );
+        },
       ),
     );
+  }
+}
+
+/// Paints sticky milk splatter: streams shoot from center-bottom toward screen, then hold.
+class _StickyMilkPainter extends CustomPainter {
+  _StickyMilkPainter({
+    required this.shootProgress,
+    required this.opacity,
+  });
+
+  final double shootProgress;
+  final double opacity;
+
+  static const Color _milkColor = Color(0xFFF5F0E8);
+  static const Color _milkHighlight = Color(0xFFFFFBF5);
+
+  /// Splat targets: offset from origin (0,0 = center-bottom) as fraction of min dimension.
+  static const List<({double dx, double dy, double scale, double angle})> _splats = [
+    (dx: 0.0, dy: -0.35, scale: 1.2, angle: 0.0),
+    (dx: -0.25, dy: -0.15, scale: 0.9, angle: 0.2),
+    (dx: 0.28, dy: -0.12, scale: 0.85, angle: -0.15),
+    (dx: -0.12, dy: -0.45, scale: 0.7, angle: 0.1),
+    (dx: 0.15, dy: -0.5, scale: 0.65, angle: -0.2),
+    (dx: -0.35, dy: -0.05, scale: 0.55, angle: 0.25),
+    (dx: 0.38, dy: -0.22, scale: 0.5, angle: -0.3),
+    (dx: 0.0, dy: -0.28, scale: 0.45, angle: 0.0),
+  ];
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final minDim = size.shortestSide;
+    final origin = Offset(size.width * 0.5, size.height * 0.72);
+
+    for (final s in _splats) {
+      final targetOffset = Offset(s.dx * minDim, s.dy * minDim);
+      final startOffset = Offset.lerp(Offset.zero, targetOffset, shootProgress)!;
+      final pos = origin + startOffset;
+      final blobScale = s.scale * (0.3 + 0.7 * shootProgress);
+      final radius = minDim * 0.08 * blobScale;
+      final ovalW = radius * 2.2;
+      final ovalH = radius * 1.6;
+
+      canvas.save();
+      canvas.translate(pos.dx, pos.dy);
+      canvas.rotate(s.angle);
+
+      final rect = Rect.fromCenter(
+        center: Offset.zero,
+        width: ovalW,
+        height: ovalH,
+      );
+      final paint = Paint()
+        ..color = _milkColor.withValues(alpha: opacity * 0.92)
+        ..style = PaintingStyle.fill;
+      canvas.drawOval(rect, paint);
+
+      final highlightRect = Rect.fromCenter(
+        center: Offset(-ovalW * 0.15, -ovalH * 0.2),
+        width: ovalW * 0.5,
+        height: ovalH * 0.4,
+      );
+      final highlightPaint = Paint()
+        ..color = _milkHighlight.withValues(alpha: opacity * 0.4)
+        ..style = PaintingStyle.fill;
+      canvas.drawOval(highlightRect, highlightPaint);
+
+      canvas.restore();
+    }
+
+    final centerBlobRadius = minDim * 0.06 * (0.4 + 0.6 * shootProgress);
+    final centerRect = Rect.fromCircle(center: origin, radius: centerBlobRadius);
+    final centerPaint = Paint()
+      ..color = _milkColor.withValues(alpha: opacity * 0.95)
+      ..style = PaintingStyle.fill;
+    canvas.drawOval(centerRect, centerPaint);
   }
 
-  Widget _milkCircle(double size, double opacity, double offset) {
-    return Transform.translate(
-      offset: Offset(offset * 20, offset * 15),
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: const Color(0xFFF5F0E8).withValues(alpha: opacity),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFFE8E0D5).withValues(alpha: opacity * 0.5),
-              blurRadius: size * 0.3,
-              spreadRadius: size * 0.05,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  @override
+  bool shouldRepaint(covariant _StickyMilkPainter oldDelegate) =>
+      oldDelegate.shootProgress != shootProgress || oldDelegate.opacity != opacity;
 }
 
 /// Converts e621-style DText (and BBCode) in descriptions/comments to Markdown.
