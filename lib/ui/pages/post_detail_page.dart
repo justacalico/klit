@@ -12,7 +12,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart'
-    show Colors, Theme, ThemeData, Brightness;
+    show Colors, Icons, Theme, ThemeData, Brightness;
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
@@ -1507,8 +1507,8 @@ class _MobilePostDetailContentBuilder {
       context,
       s,
       index,
-      CupertinoIcons.arrow_up_circle,
-      CupertinoIcons.arrow_up_circle_fill,
+      Icons.thumb_up_off_alt,
+      Icons.thumb_up,
       'Upvote',
       userVote == 1,
       isVoting,
@@ -1521,8 +1521,8 @@ class _MobilePostDetailContentBuilder {
       context,
       s,
       index,
-      CupertinoIcons.arrow_down_circle,
-      CupertinoIcons.arrow_down_circle_fill,
+      Icons.thumb_down_off_alt,
+      Icons.thumb_down,
       'Downvote',
       userVote == -1,
       isVoting,
@@ -2644,8 +2644,8 @@ class _DesktopPostDetailContentBuilder {
         child: _buildGradientActionButton(
           context,
           s,
-          CupertinoIcons.arrow_up,
-          CupertinoIcons.arrow_up_circle_fill,
+          Icons.thumb_up_off_alt,
+          Icons.thumb_up,
           userVote == 1,
           isVoting,
           [const Color(0xFF22C55E), const Color(0xFF16A34A)],
@@ -2658,8 +2658,8 @@ class _DesktopPostDetailContentBuilder {
         child: _buildGradientActionButton(
           context,
           s,
-          CupertinoIcons.arrow_down,
-          CupertinoIcons.arrow_down_circle_fill,
+          Icons.thumb_down_off_alt,
+          Icons.thumb_down,
           userVote == -1,
           isVoting,
           [const Color(0xFFEF4444), const Color(0xFFDC2626)],
@@ -2865,7 +2865,7 @@ class _DesktopPostDetailContentBuilder {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _buildStatColumn(
-                    CupertinoIcons.arrow_up_circle_fill,
+                    Icons.thumb_up,
                     score.total.toString(),
                     'Score',
                     score.total >= 0
@@ -4099,8 +4099,8 @@ class _CommentCard extends StatelessWidget {
                       children: [
                         Icon(
                           comment.score >= 0
-                              ? CupertinoIcons.arrow_up
-                              : CupertinoIcons.arrow_down,
+                              ? Icons.thumb_up
+                              : Icons.thumb_down,
                           size: 12,
                           color: comment.score >= 0
                               ? AppColors.safeColor
