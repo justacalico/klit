@@ -124,7 +124,7 @@ class _IFinishedGalleryPageState extends State<IFinishedGalleryPage> {
         child: Image.file(
           File(path),
           fit: BoxFit.contain,
-          errorBuilder: (_, __, ___) => const Icon(CupertinoIcons.photo, size: 64),
+          errorBuilder: (_, _, _) => const Icon(CupertinoIcons.photo, size: 64),
         ),
       ),
     );
@@ -138,8 +138,8 @@ class _IFinishedGalleryPageState extends State<IFinishedGalleryPage> {
         child: CachedNetworkImage(
           imageUrl: url,
           fit: BoxFit.contain,
-          placeholder: (_, __) => const CupertinoActivityIndicator(),
-          errorWidget: (_, __, ___) => const Icon(CupertinoIcons.photo, size: 64),
+          placeholder: (_, _) => const CupertinoActivityIndicator(),
+          errorWidget: (_, _, _) => const Icon(CupertinoIcons.photo, size: 64),
         ),
       ),
     );
