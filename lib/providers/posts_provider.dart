@@ -132,37 +132,41 @@ class PostsProvider extends ChangeNotifier {
     _latestError = null;
     notifyListeners();
 
-    final result = await _apiService.getPosts(
-      page: _latestPage,
-      limit: ApiConstants.defaultPageSize,
-      tags: 'score:>$scoreThreshold',
-      order: 'id_desc',
-      safeMode: safeMode,
-    );
-
-    if (result.data != null) {
-      final posts = result.data!;
-      final filteredPosts = await compute(
-        filterBlacklistStatic,
-        BlacklistFilterInput(
-          posts: posts,
-          blacklistLines: _blacklistLines,
-          enabled: _blacklistEnabled,
-        ),
+    try {
+      final result = await _apiService.getPosts(
+        page: _latestPage,
+        limit: ApiConstants.defaultPageSize,
+        tags: 'score:>$scoreThreshold',
+        order: 'id_desc',
+        safeMode: safeMode,
       );
-      if (refresh) {
-        _latestPosts = filteredPosts;
-      } else {
-        _latestPosts = [..._latestPosts, ...filteredPosts];
-      }
-      _hasMoreLatest = posts.length >= ApiConstants.defaultPageSize;
-      _latestPage++;
-    } else {
-      _latestError = result.error!.message;
-    }
 
-    _isLoadingLatest = false;
-    notifyListeners();
+      if (result.data != null) {
+        final posts = result.data!;
+        final filteredPosts = filterBlacklistStatic(
+          BlacklistFilterInput(
+            posts: posts,
+            blacklistLines: _blacklistLines,
+            enabled: _blacklistEnabled,
+          ),
+        );
+        if (refresh) {
+          _latestPosts = filteredPosts;
+        } else {
+          _latestPosts = [..._latestPosts, ...filteredPosts];
+        }
+        _hasMoreLatest = posts.length >= ApiConstants.defaultPageSize;
+        _latestPage++;
+      } else {
+        _latestError = result.error!.message;
+      }
+    } catch (e, st) {
+      _latestError = e.toString();
+      debugPrint('loadLatestPosts error: $e\n$st');
+    } finally {
+      _isLoadingLatest = false;
+      notifyListeners();
+    }
   }
 
   /// Load hot posts (high score recent posts)
@@ -183,6 +187,7 @@ class PostsProvider extends ChangeNotifier {
     _hotError = null;
     notifyListeners();
 
+    try {
     // Hot posts are sorted by score with a time range
     String timeTag;
     if (_hotCustomDate != null) {
@@ -229,8 +234,7 @@ class PostsProvider extends ChangeNotifier {
 
     if (result.data != null) {
       final posts = result.data!;
-      final filteredPosts = await compute(
-        filterBlacklistStatic,
+      final filteredPosts = filterBlacklistStatic(
         BlacklistFilterInput(
           posts: posts,
           blacklistLines: _blacklistLines,
@@ -247,9 +251,13 @@ class PostsProvider extends ChangeNotifier {
     } else {
       _hotError = result.error!.message;
     }
-
-    _isLoadingHot = false;
-    notifyListeners();
+    } catch (e, st) {
+      _hotError = e.toString();
+      debugPrint('loadHotPosts error: $e\n$st');
+    } finally {
+      _isLoadingHot = false;
+      notifyListeners();
+    }
   }
 
   /// Set hot time range and refresh
@@ -285,6 +293,7 @@ class PostsProvider extends ChangeNotifier {
     _popularError = null;
     notifyListeners();
 
+    try {
     final result = await _apiService.getPopularPosts(
       scale: _popularTimeRange,
       page: _popularPage,
@@ -294,8 +303,7 @@ class PostsProvider extends ChangeNotifier {
 
     if (result.data != null) {
       final posts = result.data!;
-      final filteredPosts = await compute(
-        filterBlacklistStatic,
+      final filteredPosts = filterBlacklistStatic(
         BlacklistFilterInput(
           posts: posts,
           blacklistLines: _blacklistLines,
@@ -312,9 +320,13 @@ class PostsProvider extends ChangeNotifier {
     } else {
       _popularError = result.error!.message;
     }
-
-    _isLoadingPopular = false;
-    notifyListeners();
+    } catch (e, st) {
+      _popularError = e.toString();
+      debugPrint('loadPopularPosts error: $e\n$st');
+    } finally {
+      _isLoadingPopular = false;
+      notifyListeners();
+    }
   }
 
   /// Set popular time range and refresh
@@ -354,38 +366,42 @@ class PostsProvider extends ChangeNotifier {
     _searchError = null;
     notifyListeners();
 
-    final result = await _apiService.getPosts(
-      page: _searchPage,
-      limit: ApiConstants.defaultPageSize,
-      tags: query,
-      rating: rating,
-      order: order,
-      safeMode: safeMode,
-    );
-
-    if (result.data != null) {
-      final posts = result.data!;
-      final filteredPosts = await compute(
-        filterBlacklistStatic,
-        BlacklistFilterInput(
-          posts: posts,
-          blacklistLines: _blacklistLines,
-          enabled: _blacklistEnabled,
-        ),
+    try {
+      final result = await _apiService.getPosts(
+        page: _searchPage,
+        limit: ApiConstants.defaultPageSize,
+        tags: query,
+        rating: rating,
+        order: order,
+        safeMode: safeMode,
       );
-      if (refresh || _searchPage == 1) {
-        _searchResults = filteredPosts;
-      } else {
-        _searchResults = [..._searchResults, ...filteredPosts];
-      }
-      _hasMoreSearch = posts.length >= ApiConstants.defaultPageSize;
-      _searchPage++;
-    } else {
-      _searchError = result.error!.message;
-    }
 
-    _isLoadingSearch = false;
-    notifyListeners();
+      if (result.data != null) {
+        final posts = result.data!;
+        final filteredPosts = filterBlacklistStatic(
+          BlacklistFilterInput(
+            posts: posts,
+            blacklistLines: _blacklistLines,
+            enabled: _blacklistEnabled,
+          ),
+        );
+        if (refresh || _searchPage == 1) {
+          _searchResults = filteredPosts;
+        } else {
+          _searchResults = [..._searchResults, ...filteredPosts];
+        }
+        _hasMoreSearch = posts.length >= ApiConstants.defaultPageSize;
+        _searchPage++;
+      } else {
+        _searchError = result.error!.message;
+      }
+    } catch (e, st) {
+      _searchError = e.toString();
+      debugPrint('searchPosts error: $e\n$st');
+    } finally {
+      _isLoadingSearch = false;
+      notifyListeners();
+    }
   }
 
   /// Clear search results
