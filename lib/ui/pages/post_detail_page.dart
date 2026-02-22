@@ -137,15 +137,24 @@ class _StickyMilkPainter extends CustomPainter {
   static const Color _milkHighlight = Color(0xFFFFFBF5);
   static const Color _milkShadow = Color(0x1A000000);
 
+  /// Spread-out fan: center stream down + streams arcing left/right (wider dx, control pushes outward).
   static const List<_StrandDef> _strands = [
-    _StrandDef(0.0, -0.38, 0.0, -0.1, 0.035, 0.028, -0.3),
-    _StrandDef(-0.28, -0.18, -0.08, 0.02, 0.032, 0.012, 0.4),
-    _StrandDef(0.26, -0.14, 0.06, 0.0, 0.03, 0.014, 0.35),
-    _StrandDef(-0.14, -0.48, -0.04, -0.15, 0.028, 0.022, -0.2),
-    _StrandDef(0.18, -0.52, 0.05, -0.18, 0.026, 0.01, 0.5),
-    _StrandDef(-0.36, -0.06, -0.12, 0.04, 0.022, 0.018, 0.2),
-    _StrandDef(0.34, -0.24, 0.1, -0.04, 0.02, 0.008, 0.45),
-    _StrandDef(0.0, -0.3, 0.0, -0.08, 0.025, 0.02, 0.0),
+    _StrandDef(0.0, -0.42, 0.0, -0.12, 0.038, 0.03, -0.25),
+    _StrandDef(0.0, -0.32, 0.0, -0.06, 0.03, 0.022, 0.0),
+    _StrandDef(-0.42, -0.22, -0.18, 0.02, 0.028, 0.01, 0.45),
+    _StrandDef(0.4, -0.2, 0.16, 0.0, 0.026, 0.01, 0.4),
+    _StrandDef(-0.38, -0.38, -0.14, -0.12, 0.032, 0.018, 0.3),
+    _StrandDef(0.36, -0.36, 0.12, -0.1, 0.03, 0.016, 0.35),
+    _StrandDef(-0.28, -0.5, -0.1, -0.2, 0.026, 0.014, -0.2),
+    _StrandDef(0.3, -0.48, 0.08, -0.18, 0.025, 0.012, -0.15),
+    _StrandDef(-0.5, -0.08, -0.22, 0.06, 0.022, 0.012, 0.35),
+    _StrandDef(0.48, -0.1, 0.2, 0.04, 0.02, 0.01, 0.4),
+    _StrandDef(-0.22, -0.55, -0.06, -0.22, 0.024, 0.018, 0.2),
+    _StrandDef(0.24, -0.52, 0.06, -0.2, 0.023, 0.016, 0.25),
+    _StrandDef(-0.12, -0.44, -0.03, -0.14, 0.028, 0.02, -0.1),
+    _StrandDef(0.14, -0.46, 0.04, -0.16, 0.027, 0.019, -0.15),
+    _StrandDef(-0.34, -0.3, -0.12, -0.06, 0.025, 0.014, 0.4),
+    _StrandDef(0.32, -0.28, 0.1, -0.05, 0.024, 0.013, 0.38),
   ];
 
   static const int _segments = 16;
