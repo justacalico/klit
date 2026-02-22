@@ -2245,6 +2245,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
       5: {'icon': CupertinoIcons.person_fill, 'label': 'Profile'},
       6: {'icon': CupertinoIcons.heart_fill, 'label': 'Favorites'},
       7: {'icon': CupertinoIcons.square_stack_3d_up_fill, 'label': 'Feeds'},
+      8: {'icon': CupertinoIcons.ellipsis_circle_fill, 'label': 'More'},
     };
 
     List<int> currentOrder = List.from(settings.mobileNavOrder);

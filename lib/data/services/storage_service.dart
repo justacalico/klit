@@ -274,11 +274,12 @@ class StorageService {
     await _prefs.setBool(AppConstants.confettiOnFavoriteKey, enabled);
   }
 
-  static const List<int> _defaultMobileNavOrder = [0, 4, 5, 3];
+  static const List<int> _defaultMobileNavOrder = [0, 4, 5, 8, 3];
   static const List<int> _legacyMobileNavOrder = [0, 1, 2, 3, 4];
   static const List<int> _legacyMobileNavOrderWithFeeds = [0, 1, 2, 4, 5, 6, 7];
   static const List<int> _legacyMobileNavOrderNoSettings = [0, 1, 2, 4, 5, 7];
   static const List<int> _legacyMobileNavOrderFull = [0, 1, 2, 4, 5, 7, 3];
+  static const List<int> _legacyMobileNavOrderFour = [0, 4, 5, 3];
 
   List<int> getMobileNavOrder() {
     final orderJson = _prefs.getString(AppConstants.mobileNavOrderKey);
@@ -287,7 +288,8 @@ class StorageService {
     if (_listEquals(order, _legacyMobileNavOrder) ||
         _listEquals(order, _legacyMobileNavOrderWithFeeds) ||
         _listEquals(order, _legacyMobileNavOrderNoSettings) ||
-        _listEquals(order, _legacyMobileNavOrderFull)) {
+        _listEquals(order, _legacyMobileNavOrderFull) ||
+        _listEquals(order, _legacyMobileNavOrderFour)) {
       setMobileNavOrder(_defaultMobileNavOrder);
       return List.from(_defaultMobileNavOrder);
     }

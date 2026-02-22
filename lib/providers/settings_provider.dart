@@ -28,7 +28,7 @@ class SettingsProvider extends ChangeNotifier {
   bool _leftHandedMode = false;
   bool _upvoteWhenFavorited = true;
   bool _confettiOnFavorite = true;
-  List<int> _mobileNavOrder = [0, 4, 5, 3];
+  List<int> _mobileNavOrder = [0, 4, 5, 8, 3];
   List<int> _desktopNavOrder = [0, 1, 2, 4, 5, 6, 7];
   String _host = ApiConstants.defaultHost;
   List<SearchHistoryItem> _searchHistory = [];

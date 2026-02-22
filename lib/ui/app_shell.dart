@@ -336,7 +336,10 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
         ? rawOrder.where((id) => id != 3).toList()
         : rawOrder;
     final mobileIdx = nav.getMobileIndex();
-    final pos = navOrder.indexOf(mobileIdx);
+    var pos = navOrder.indexOf(mobileIdx);
+    if (pos < 0 && navOrder.contains(8)) {
+      pos = navOrder.indexOf(8);
+    }
     final currentIndex = pos >= 0 ? pos : 0;
 
     return AppNavBar(
@@ -344,10 +347,11 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
       currentIndex: currentIndex,
       onTap: (i) {
         final id = navOrder[i];
-        nav.setFromMobileIndex(id);
+        if (id != 8) nav.setFromMobileIndex(id);
       },
       isGuest: auth.isGuest,
       onLogout: _handleLogout,
+      onMoreOptionSelected: (id) => nav.setFromMobileIndex(id),
     );
   }
 
