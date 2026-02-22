@@ -5,6 +5,7 @@ import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 import '../../core/constants/constants.dart';
 import '../models/models.dart';
+import 'api_parsing.dart';
 
 /// Service for e926 API communication
 class ApiService {
@@ -314,14 +315,14 @@ class ApiService {
       final response = await _dio.get(
         ApiConstants.postsEndpoint,
         queryParameters: queryParams,
+        options: Options(responseType: ResponseType.plain),
       );
 
       if (response.statusCode == 200 && response.data != null) {
-        final postsData = response.data['posts'] as List<dynamic>;
-        final posts = postsData
-            .map((e) => Post.fromJson(e as Map<String, dynamic>))
-            .where((p) => p.file.url != null)
-            .toList();
+        final posts = await compute(
+          parsePostsFromJsonString,
+          response.data as String,
+        );
         return ApiResult.success(posts);
       }
       return ApiResult.failure(ApiException.unknown());
@@ -337,13 +338,17 @@ class ApiService {
 
   Future<ApiResult<Post>> getPostById(int id) async {
     try {
-      final response = await _dio.get('/posts/$id.json');
+      final response = await _dio.get(
+        '/posts/$id.json',
+        options: Options(responseType: ResponseType.plain),
+      );
 
       if (response.statusCode == 200 && response.data != null) {
-        final post = Post.fromJson(
-          response.data['post'] as Map<String, dynamic>,
+        final post = await compute(
+          parseSinglePostFromJsonString,
+          response.data as String,
         );
-        return ApiResult.success(post);
+        if (post != null) return ApiResult.success(post);
       }
       return ApiResult.failure(ApiException.notFound('Post'));
     } on DioException catch (e) {
@@ -430,15 +435,14 @@ class ApiService {
           'limit': ApiConstants.defaultPageSize,
           'page': page,
         },
+        options: Options(responseType: ResponseType.plain),
       );
 
       if (response.statusCode == 200 && response.data != null) {
-        final postsData = response.data['posts'] as List<dynamic>;
-        final posts = postsData
-            .where((e) => e != null && e is Map<String, dynamic>)
-            .map((e) => Post.fromJson(e as Map<String, dynamic>))
-            .where((p) => p.file.url != null)
-            .toList();
+        final posts = await compute(
+          parsePostsFromJsonString,
+          response.data as String,
+        );
         return ApiResult.success(posts);
       }
       return ApiResult.failure(ApiException.unknown());
@@ -499,14 +503,14 @@ class ApiService {
       final response = await _dio.get(
         ApiConstants.postsEndpoint,
         queryParameters: {'tags': tags, 'page': page, 'limit': limit},
+        options: Options(responseType: ResponseType.plain),
       );
 
       if (response.statusCode == 200 && response.data != null) {
-        final postsData = response.data['posts'] as List<dynamic>;
-        final posts = postsData
-            .map((e) => Post.fromJson(e as Map<String, dynamic>))
-            .where((p) => p.file.url != null)
-            .toList();
+        final posts = await compute(
+          parsePostsFromJsonString,
+          response.data as String,
+        );
         return ApiResult.success(posts);
       }
       return ApiResult.failure(ApiException.unknown());

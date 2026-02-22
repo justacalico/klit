@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../../core/constants/constants.dart';
 import '../models/models.dart';
+import 'storage_parsing.dart';
 
 /// Service for secure storage operations
 /// Falls back to SharedPreferences on Linux if libsecret fails
@@ -119,11 +121,7 @@ class StorageService {
   Future<List<Account>> getAccounts() async {
     final accountsJson = await _secureRead(AppConstants.accountsKey);
     if (accountsJson == null) return [];
-
-    final List<dynamic> accountsList = json.decode(accountsJson);
-    return accountsList
-        .map((e) => Account.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return compute(parseAccountsJson, accountsJson);
   }
 
   Future<void> saveAccounts(List<Account> accounts) async {
@@ -351,12 +349,7 @@ class StorageService {
         return [];
       }
     }
-    final List<dynamic> historyList = json.decode(historyJson);
-    final result = historyList
-        .map((e) => SearchHistoryItem.fromJson(e as Map<String, dynamic>))
-        .toList()
-      ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
-    return result;
+    return compute(parseSearchHistoryJson, historyJson);
   }
 
   Future<void> addToSearchHistory(String query) async {
@@ -409,15 +402,7 @@ class StorageService {
         return [];
       }
     }
-    try {
-      final List<dynamic> list = json.decode(feedsJson);
-      return list
-          .whereType<Map<String, dynamic>>()
-          .map(Feed.fromJson)
-          .toList();
-    } catch (_) {
-      return [];
-    }
+    return compute(parseFeedsJson, feedsJson);
   }
 
   Future<void> setFeeds(List<Feed> feeds) async {

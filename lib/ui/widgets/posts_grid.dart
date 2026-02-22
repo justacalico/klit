@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/theme/ui_style_manager.dart';
 import '../../data/models/models.dart';
 import '../../providers/providers.dart';
 import 'loading_indicator.dart';
@@ -75,6 +76,7 @@ class PostsGrid extends StatelessWidget {
           },
           child: CustomScrollView(
             controller: scrollController,
+            cacheExtent: 600,
             slivers: [
               SliverPadding(
                 padding: EdgeInsets.all(effectivePadding),
@@ -88,11 +90,24 @@ class PostsGrid extends StatelessWidget {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final post = posts[index];
+                      final isOled = settings.themeMode == 3;
+                      final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
+                      final cellSize = (screenWidth -
+                              2 * effectivePadding -
+                              (effectiveColumns - 1) * effectiveSpacing) /
+                          effectiveColumns;
+                      final dpr = MediaQuery.devicePixelRatioOf(context);
+                      final cacheW = (cellSize * dpr).round();
+                      final cacheH = cacheW;
                       return RepaintBoundary(
                         child: PostCard(
                           post: post,
                           onTap: () => onPostTap(post),
                           style: PostCardStyle.grid,
+                          isOled: isOled,
+                          isLiquidGlass: isLiquidGlass,
+                          memCacheWidth: cacheW,
+                          memCacheHeight: cacheH,
                         ),
                       );
                     },

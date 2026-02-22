@@ -70,10 +70,8 @@ class _IFinishedGalleryPageState extends State<IFinishedGalleryPage> {
           _postImageUrls[id] = null;
         },
       );
-      if (mounted) {
-        setState(() => _loadingPostIds.remove(id));
-      }
     }
+    if (mounted) setState(() => _loadingPostIds.removeAll(toLoad));
   }
 
   @override

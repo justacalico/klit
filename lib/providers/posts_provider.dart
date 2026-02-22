@@ -1,7 +1,8 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import '../core/constants/constants.dart';
 import '../data/models/models.dart';
 import '../data/services/services.dart';
+import 'blacklist_filter.dart';
 
 /// Provider for posts data
 class PostsProvider extends ChangeNotifier {
@@ -111,87 +112,6 @@ class PostsProvider extends ChangeNotifier {
     _blacklistEnabled = enabled;
   }
 
-  /// Check if a post matches any blacklist entry
-  bool _isPostBlacklisted(Post post) {
-    if (!_blacklistEnabled || _blacklistLines.isEmpty) return false;
-
-    // Get all tags from the post
-    final postTags = post.tags.all.map((t) => t.toLowerCase()).toSet();
-
-    for (final line in _blacklistLines) {
-      if (_matchesBlacklistLine(post, postTags, line)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /// Check if a post matches a single blacklist line
-  /// Supports: tag, -tag (negation), rating:s/q/e, and combinations
-  bool _matchesBlacklistLine(Post post, Set<String> postTags, String line) {
-    final parts = line.toLowerCase().split(RegExp(r'\s+'));
-    if (parts.isEmpty) return false;
-
-    for (final part in parts) {
-      if (part.isEmpty) continue;
-
-      // Handle negation
-      if (part.startsWith('-')) {
-        final tag = part.substring(1);
-        // If negated tag is present, this line doesn't match
-        if (_tagMatches(post, postTags, tag)) {
-          return false;
-        }
-      } else {
-        // Positive tag - must be present for line to match
-        if (!_tagMatches(post, postTags, part)) {
-          return false;
-        }
-      }
-    }
-
-    // All conditions in the line matched
-    return true;
-  }
-
-  /// Check if a single tag condition matches the post
-  bool _tagMatches(Post post, Set<String> postTags, String condition) {
-    // Handle rating: prefix
-    if (condition.startsWith('rating:')) {
-      final rating = condition.substring(7);
-      return post.rating.toLowerCase() == rating;
-    }
-
-    // Handle type: prefix
-    if (condition.startsWith('type:')) {
-      final type = condition.substring(5);
-      if (type == 'video' || type == 'webm' || type == 'gif') {
-        return post.isVideo || post.file.ext.toLowerCase() == 'gif';
-      }
-      return post.file.ext.toLowerCase() == type;
-    }
-
-    // Handle user: prefix (uploader)
-    if (condition.startsWith('user:')) {
-      final uploader = condition.substring(5);
-      return post.uploaderId.toString() == uploader;
-    }
-
-    // Regular tag match (with wildcard support)
-    if (condition.contains('*')) {
-      final pattern = RegExp('^${condition.replaceAll('*', '.*')}\$');
-      return postTags.any((tag) => pattern.hasMatch(tag));
-    }
-
-    return postTags.contains(condition);
-  }
-
-  /// Filter a list of posts through the blacklist
-  List<Post> _filterBlacklist(List<Post> posts) {
-    if (!_blacklistEnabled || _blacklistLines.isEmpty) return posts;
-    return posts.where((post) => !_isPostBlacklisted(post)).toList();
-  }
-
   /// Load latest posts
   /// If [safeMode] is true, only safe-rated posts will be returned
   /// [scoreThreshold] filters posts with score greater than this value (default: 20)
@@ -220,21 +140,26 @@ class PostsProvider extends ChangeNotifier {
       safeMode: safeMode,
     );
 
-    result.when(
-      success: (posts) {
-        final filteredPosts = _filterBlacklist(posts);
-        if (refresh) {
-          _latestPosts = filteredPosts;
-        } else {
-          _latestPosts = [..._latestPosts, ...filteredPosts];
-        }
-        _hasMoreLatest = posts.length >= ApiConstants.defaultPageSize;
-        _latestPage++;
-      },
-      failure: (error) {
-        _latestError = error.message;
-      },
-    );
+    if (result.data != null) {
+      final posts = result.data!;
+      final filteredPosts = await compute(
+        filterBlacklistStatic,
+        BlacklistFilterInput(
+          posts: posts,
+          blacklistLines: _blacklistLines,
+          enabled: _blacklistEnabled,
+        ),
+      );
+      if (refresh) {
+        _latestPosts = filteredPosts;
+      } else {
+        _latestPosts = [..._latestPosts, ...filteredPosts];
+      }
+      _hasMoreLatest = posts.length >= ApiConstants.defaultPageSize;
+      _latestPage++;
+    } else {
+      _latestError = result.error!.message;
+    }
 
     _isLoadingLatest = false;
     notifyListeners();
@@ -302,21 +227,26 @@ class PostsProvider extends ChangeNotifier {
       safeMode: safeMode,
     );
 
-    result.when(
-      success: (posts) {
-        final filteredPosts = _filterBlacklist(posts);
-        if (refresh) {
-          _hotPosts = filteredPosts;
-        } else {
-          _hotPosts = [..._hotPosts, ...filteredPosts];
-        }
-        _hasMoreHot = posts.length >= ApiConstants.defaultPageSize;
-        _hotPage++;
-      },
-      failure: (error) {
-        _hotError = error.message;
-      },
-    );
+    if (result.data != null) {
+      final posts = result.data!;
+      final filteredPosts = await compute(
+        filterBlacklistStatic,
+        BlacklistFilterInput(
+          posts: posts,
+          blacklistLines: _blacklistLines,
+          enabled: _blacklistEnabled,
+        ),
+      );
+      if (refresh) {
+        _hotPosts = filteredPosts;
+      } else {
+        _hotPosts = [..._hotPosts, ...filteredPosts];
+      }
+      _hasMoreHot = posts.length >= ApiConstants.defaultPageSize;
+      _hotPage++;
+    } else {
+      _hotError = result.error!.message;
+    }
 
     _isLoadingHot = false;
     notifyListeners();
@@ -362,21 +292,26 @@ class PostsProvider extends ChangeNotifier {
       customDate: _popularCustomDate,
     );
 
-    result.when(
-      success: (posts) {
-        final filteredPosts = _filterBlacklist(posts);
-        if (refresh) {
-          _popularPosts = filteredPosts;
-        } else {
-          _popularPosts = [..._popularPosts, ...filteredPosts];
-        }
-        _hasMorePopular = posts.length >= ApiConstants.defaultPageSize;
-        _popularPage++;
-      },
-      failure: (error) {
-        _popularError = error.message;
-      },
-    );
+    if (result.data != null) {
+      final posts = result.data!;
+      final filteredPosts = await compute(
+        filterBlacklistStatic,
+        BlacklistFilterInput(
+          posts: posts,
+          blacklistLines: _blacklistLines,
+          enabled: _blacklistEnabled,
+        ),
+      );
+      if (refresh) {
+        _popularPosts = filteredPosts;
+      } else {
+        _popularPosts = [..._popularPosts, ...filteredPosts];
+      }
+      _hasMorePopular = posts.length >= ApiConstants.defaultPageSize;
+      _popularPage++;
+    } else {
+      _popularError = result.error!.message;
+    }
 
     _isLoadingPopular = false;
     notifyListeners();
@@ -428,21 +363,26 @@ class PostsProvider extends ChangeNotifier {
       safeMode: safeMode,
     );
 
-    result.when(
-      success: (posts) {
-        final filteredPosts = _filterBlacklist(posts);
-        if (refresh || _searchPage == 1) {
-          _searchResults = filteredPosts;
-        } else {
-          _searchResults = [..._searchResults, ...filteredPosts];
-        }
-        _hasMoreSearch = posts.length >= ApiConstants.defaultPageSize;
-        _searchPage++;
-      },
-      failure: (error) {
-        _searchError = error.message;
-      },
-    );
+    if (result.data != null) {
+      final posts = result.data!;
+      final filteredPosts = await compute(
+        filterBlacklistStatic,
+        BlacklistFilterInput(
+          posts: posts,
+          blacklistLines: _blacklistLines,
+          enabled: _blacklistEnabled,
+        ),
+      );
+      if (refresh || _searchPage == 1) {
+        _searchResults = filteredPosts;
+      } else {
+        _searchResults = [..._searchResults, ...filteredPosts];
+      }
+      _hasMoreSearch = posts.length >= ApiConstants.defaultPageSize;
+      _searchPage++;
+    } else {
+      _searchError = result.error!.message;
+    }
 
     _isLoadingSearch = false;
     notifyListeners();

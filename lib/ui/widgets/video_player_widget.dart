@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -152,10 +153,10 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       showControls: widget.showControls,
       aspectRatio: widget.aspectRatio ?? _videoController!.value.aspectRatio,
       placeholder: widget.thumbnailUrl != null
-          ? Image.network(
-              widget.thumbnailUrl!,
+          ? CachedNetworkImage(
+              imageUrl: widget.thumbnailUrl!,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+              errorWidget: (context, url, error) => _buildPlaceholder(),
             )
           : _buildPlaceholder(),
       errorBuilder: (context, errorMessage) => _buildErrorWidget(errorMessage),
@@ -394,7 +395,10 @@ class _FullScreenVideoViewerState extends State<FullScreenVideoViewer> {
       allowFullScreen: true,
       aspectRatio: _videoController!.value.aspectRatio,
       placeholder: widget.thumbnailUrl != null
-          ? Image.network(widget.thumbnailUrl!, fit: BoxFit.cover)
+          ? CachedNetworkImage(
+              imageUrl: widget.thumbnailUrl!,
+              fit: BoxFit.cover,
+            )
           : null,
       materialProgressColors: ChewieProgressColors(
         playedColor: AppColors.primaryBlue,

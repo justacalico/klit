@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../data/services/services.dart';
@@ -20,6 +22,7 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
   late TextEditingController _blacklistController;
   bool _isSyncing = false;
   bool _hasChanges = false;
+  Timer? _debounceTimer;
 
   @override
   void initState() {
@@ -31,17 +34,22 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
     _blacklistController.removeListener(_onTextChanged);
     _blacklistController.dispose();
     super.dispose();
   }
 
   void _onTextChanged() {
-    final settings = context.read<SettingsProvider>();
-    final hasChanges = _blacklistController.text != settings.blacklist;
-    if (hasChanges != _hasChanges) {
-      setState(() => _hasChanges = hasChanges);
-    }
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 150), () {
+      if (!mounted) return;
+      final settings = context.read<SettingsProvider>();
+      final hasChanges = _blacklistController.text != settings.blacklist;
+      if (hasChanges != _hasChanges) {
+        setState(() => _hasChanges = hasChanges);
+      }
+    });
   }
 
   Future<void> _saveBlacklist() async {

@@ -20,12 +20,24 @@ class PostCard extends StatelessWidget {
     required this.onTap,
     this.style = PostCardStyle.grid,
     this.showInfo = true,
+    this.isOled,
+    this.isLiquidGlass,
+    this.memCacheWidth,
+    this.memCacheHeight,
   });
 
   final Post post;
   final VoidCallback onTap;
   final PostCardStyle style;
   final bool showInfo;
+  /// When provided, avoids watching [SettingsProvider] for theme. Pass from parent for grid/list performance.
+  final bool? isOled;
+  /// When provided, avoids reading [UIStyleManager] in card. Pass from parent for grid/list performance.
+  final bool? isLiquidGlass;
+  /// Decode image at this width for grid thumbnails (reduces memory and decode time). Pass from grid.
+  final int? memCacheWidth;
+  /// Decode image at this height for grid thumbnails. Pass from grid.
+  final int? memCacheHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -37,46 +49,32 @@ class PostCard extends StatelessWidget {
   Widget _buildGridCard(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
-    final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
+    final liquidGlass = isLiquidGlass ?? UIStyleManager.isLiquidGlass(context);
     final ratingColor = post.ratingColor;
-
-    final isOled = context.watch<SettingsProvider>().themeMode == 3;
+    final oled = isOled ?? context.read<SettingsProvider>().themeMode == 3;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
-          borderRadius: BorderRadius.circular(isLiquidGlass ? 12 : 8),
+          color: AppColors.resolveSecondaryBackground(isDark, isOled: oled),
+          borderRadius: BorderRadius.circular(liquidGlass ? 12 : 8),
           border: Border.all(
-            color: ratingColor.withValues(alpha: isLiquidGlass ? 0.7 : 0.6),
-            width: isLiquidGlass ? 1.5 : 2,
+            color: ratingColor.withValues(alpha: liquidGlass ? 0.7 : 0.6),
+            width: liquidGlass ? 1.5 : 2,
           ),
-          boxShadow: isLiquidGlass
+          boxShadow: liquidGlass
               ? [
                   BoxShadow(
-                    color: ratingColor.withValues(alpha: isDark ? 0.5 : 0.35),
-                    blurRadius: 16,
-                    spreadRadius: 2,
-                  ),
-                  BoxShadow(
-                    color: ratingColor.withValues(alpha: isDark ? 0.3 : 0.2),
-                    blurRadius: 6,
-                    spreadRadius: 0,
-                  ),
-                  BoxShadow(
-                    color: CupertinoColors.white.withValues(
-                      alpha: isDark ? 0.08 : 0.15,
-                    ),
-                    blurRadius: 2,
-                    spreadRadius: 0,
-                    offset: const Offset(0, -1),
+                    color: ratingColor.withValues(alpha: isDark ? 0.45 : 0.3),
+                    blurRadius: 12,
+                    spreadRadius: 1,
                   ),
                   BoxShadow(
                     color: CupertinoColors.black.withValues(
-                      alpha: isDark ? 0.4 : 0.12,
+                      alpha: isDark ? 0.35 : 0.1,
                     ),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
                   ),
                 ]
               : [
@@ -106,14 +104,14 @@ class PostCard extends StatelessWidget {
   Widget _buildListCard(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
-    final isOled = context.watch<SettingsProvider>().themeMode == 3;
+    final oled = isOled ?? context.read<SettingsProvider>().themeMode == 3;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
-          color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+          color: AppColors.resolveSecondaryBackground(isDark, isOled: oled),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -180,6 +178,8 @@ class PostCard extends StatelessWidget {
         CachedNetworkImage(
           imageUrl: imageUrl,
           fit: BoxFit.cover,
+          memCacheWidth: memCacheWidth,
+          memCacheHeight: memCacheHeight,
           placeholder: (context, url) => const LoadingShimmer(),
           errorWidget: (context, url, error) => Container(
             color: CupertinoColors.systemGrey5,
