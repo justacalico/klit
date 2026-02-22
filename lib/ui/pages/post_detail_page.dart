@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' show sin, pi;
 import 'dart:ui';
 import 'package:gal/gal.dart';
 import 'package:image_picker/image_picker.dart';
@@ -94,6 +95,8 @@ class _MilkAnimationOverlayState extends State<_MilkAnimationOverlay>
                 painter: _StickyMilkPainter(
                   shootProgress: shoot,
                   opacity: opacity,
+                  time: _controller.value,
+                  shootEnd: _shootDuration.inMilliseconds / _totalDuration.inMilliseconds,
                 ),
               );
             },
@@ -104,83 +107,149 @@ class _MilkAnimationOverlayState extends State<_MilkAnimationOverlay>
   }
 }
 
-/// Paints sticky milk splatter: streams shoot from center-bottom toward screen, then hold.
+/// Stringy strand definition: end offset (frac of minDim), control offset, start/end radius (frac), taper curve.
+class _StrandDef {
+  const _StrandDef(this.dx, this.dy, this.cx, this.cy, this.rStart, this.rEnd, this.taper);
+  final double dx;
+  final double dy;
+  final double cx;
+  final double cy;
+  final double rStart;
+  final double rEnd;
+  final double taper; // 0 = linear, >0 = thicker in middle (pinched ends), <0 = fatter at start (teardrop)
+}
+
+/// Paints viscous stringy milk: curved strands, teardrops, pinched and branching shapes with wobble.
 class _StickyMilkPainter extends CustomPainter {
   _StickyMilkPainter({
     required this.shootProgress,
     required this.opacity,
+    required this.time,
+    required this.shootEnd,
   });
 
   final double shootProgress;
   final double opacity;
+  final double time;
+  final double shootEnd;
 
   static const Color _milkColor = Color(0xFFF5F0E8);
   static const Color _milkHighlight = Color(0xFFFFFBF5);
+  static const Color _milkShadow = Color(0x1A000000);
 
-  /// Splat targets: offset from origin (0,0 = center-bottom) as fraction of min dimension.
-  static const List<({double dx, double dy, double scale, double angle})> _splats = [
-    (dx: 0.0, dy: -0.35, scale: 1.2, angle: 0.0),
-    (dx: -0.25, dy: -0.15, scale: 0.9, angle: 0.2),
-    (dx: 0.28, dy: -0.12, scale: 0.85, angle: -0.15),
-    (dx: -0.12, dy: -0.45, scale: 0.7, angle: 0.1),
-    (dx: 0.15, dy: -0.5, scale: 0.65, angle: -0.2),
-    (dx: -0.35, dy: -0.05, scale: 0.55, angle: 0.25),
-    (dx: 0.38, dy: -0.22, scale: 0.5, angle: -0.3),
-    (dx: 0.0, dy: -0.28, scale: 0.45, angle: 0.0),
+  static const List<_StrandDef> _strands = [
+    _StrandDef(0.0, -0.38, 0.0, -0.1, 0.035, 0.028, -0.3),
+    _StrandDef(-0.28, -0.18, -0.08, 0.02, 0.032, 0.012, 0.4),
+    _StrandDef(0.26, -0.14, 0.06, 0.0, 0.03, 0.014, 0.35),
+    _StrandDef(-0.14, -0.48, -0.04, -0.15, 0.028, 0.022, -0.2),
+    _StrandDef(0.18, -0.52, 0.05, -0.18, 0.026, 0.01, 0.5),
+    _StrandDef(-0.36, -0.06, -0.12, 0.04, 0.022, 0.018, 0.2),
+    _StrandDef(0.34, -0.24, 0.1, -0.04, 0.02, 0.008, 0.45),
+    _StrandDef(0.0, -0.3, 0.0, -0.08, 0.025, 0.02, 0.0),
   ];
+
+  static const int _segments = 16;
 
   @override
   void paint(Canvas canvas, Size size) {
     final minDim = size.shortestSide;
     final origin = Offset(size.width * 0.5, size.height * 0.72);
+    final fadeStart = 0.92;
+    final inHold = time >= shootEnd && time < fadeStart;
+    final wobblePhase = inHold ? (time - shootEnd) / (fadeStart - shootEnd) * 2 * pi * 2 : 0.0;
 
-    for (final s in _splats) {
-      final targetOffset = Offset(s.dx * minDim, s.dy * minDim);
-      final startOffset = Offset.lerp(Offset.zero, targetOffset, shootProgress)!;
-      final pos = origin + startOffset;
-      final blobScale = s.scale * (0.3 + 0.7 * shootProgress);
-      final radius = minDim * 0.08 * blobScale;
-      final ovalW = radius * 2.2;
-      final ovalH = radius * 1.6;
-
-      canvas.save();
-      canvas.translate(pos.dx, pos.dy);
-      canvas.rotate(s.angle);
-
-      final rect = Rect.fromCenter(
-        center: Offset.zero,
-        width: ovalW,
-        height: ovalH,
-      );
-      final paint = Paint()
-        ..color = _milkColor.withValues(alpha: opacity * 0.92)
-        ..style = PaintingStyle.fill;
-      canvas.drawOval(rect, paint);
-
-      final highlightRect = Rect.fromCenter(
-        center: Offset(-ovalW * 0.15, -ovalH * 0.2),
-        width: ovalW * 0.5,
-        height: ovalH * 0.4,
-      );
-      final highlightPaint = Paint()
-        ..color = _milkHighlight.withValues(alpha: opacity * 0.4)
-        ..style = PaintingStyle.fill;
-      canvas.drawOval(highlightRect, highlightPaint);
-
-      canvas.restore();
+    for (final s in _strands) {
+      _drawStrand(canvas, size, minDim, origin, s, wobblePhase);
     }
 
-    final centerBlobRadius = minDim * 0.06 * (0.4 + 0.6 * shootProgress);
-    final centerRect = Rect.fromCircle(center: origin, radius: centerBlobRadius);
-    final centerPaint = Paint()
+    _drawCenterBlob(canvas, origin, minDim);
+  }
+
+  void _drawStrand(Canvas canvas, Size size, double minDim, Offset origin, _StrandDef s, double wobblePhase) {
+    final target = Offset(s.dx * minDim, s.dy * minDim);
+    final control = Offset(s.cx * minDim, s.cy * minDim);
+    final visibleLength = shootProgress;
+    final baseRadius = minDim;
+
+    canvas.save();
+    canvas.translate(origin.dx, origin.dy);
+
+    for (var i = 0; i <= _segments; i++) {
+      final t = i / _segments;
+      if (t > visibleLength) break;
+      final tNorm = visibleLength > 0 ? t / visibleLength : 1.0;
+      final pt = _quad(Offset.zero, control, target, tNorm);
+      final wobble = 0.015 * baseRadius * sin(wobblePhase + t * 4);
+      final ptWobble = Offset(pt.dx + wobble, pt.dy + wobble * 0.5);
+      final r = _radiusAt(tNorm, s.rStart, s.rEnd, s.taper) * baseRadius * (0.4 + 0.6 * shootProgress);
+
+      final circlePath = Path()..addOval(Rect.fromCircle(center: ptWobble, radius: r));
+      final paint = Paint()
+        ..color = _milkShadow.withValues(alpha: opacity * 0.15)
+        ..style = PaintingStyle.fill;
+      canvas.drawPath(circlePath, paint);
+      paint.color = _milkColor.withValues(alpha: opacity * 0.92);
+      canvas.drawPath(circlePath, paint);
+    }
+
+    for (var i = 0; i <= _segments; i++) {
+      final t = i / _segments;
+      if (t > visibleLength) break;
+      final tNorm = visibleLength > 0 ? t / visibleLength : 1.0;
+      final pt = _quad(Offset.zero, control, target, tNorm);
+      final wobble = 0.015 * baseRadius * sin(wobblePhase + t * 4);
+      final ptWobble = Offset(pt.dx + wobble, pt.dy + wobble * 0.5);
+      final r = _radiusAt(tNorm, s.rStart, s.rEnd, s.taper) * baseRadius * (0.4 + 0.6 * shootProgress);
+      final highlightR = r * 0.35;
+      final highlightOffset = Offset(-r * 0.25, -r * 0.2);
+      final highlightPath = Path()
+        ..addOval(Rect.fromCircle(center: ptWobble + highlightOffset, radius: highlightR));
+      final highlightPaint = Paint()
+        ..color = _milkHighlight.withValues(alpha: opacity * 0.5)
+        ..style = PaintingStyle.fill;
+      canvas.drawPath(highlightPath, highlightPaint);
+    }
+
+    canvas.restore();
+  }
+
+  double _radiusAt(double t, double rStart, double rEnd, double taper) {
+    final linear = rStart + (rEnd - rStart) * t;
+    final pinch = taper > 0 ? 1.0 - 4 * (t - 0.5) * (t - 0.5) * taper : 1.0;
+    final teardrop = taper < 0 ? 1.0 - t * (-taper) : 1.0;
+    return linear * pinch * teardrop;
+  }
+
+  Offset _quad(Offset p0, Offset p1, Offset p2, double t) {
+    final u = 1.0 - t;
+    return Offset(
+      u * u * p0.dx + 2 * u * t * p1.dx + t * t * p2.dx,
+      u * u * p0.dy + 2 * u * t * p1.dy + t * t * p2.dy,
+    );
+  }
+
+  void _drawCenterBlob(Canvas canvas, Offset origin, double minDim) {
+    final r = minDim * 0.055 * (0.4 + 0.6 * shootProgress);
+    final shadowPaint = Paint()
+      ..color = _milkShadow.withValues(alpha: opacity * 0.2)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(origin, r + 2, shadowPaint);
+    final paint = Paint()
       ..color = _milkColor.withValues(alpha: opacity * 0.95)
       ..style = PaintingStyle.fill;
-    canvas.drawOval(centerRect, centerPaint);
+    canvas.drawCircle(origin, r, paint);
+    final highlightR = r * 0.4;
+    final highlightPaint = Paint()
+      ..color = _milkHighlight.withValues(alpha: opacity * 0.5)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(origin + Offset(-r * 0.2, -r * 0.25), highlightR, highlightPaint);
   }
 
   @override
   bool shouldRepaint(covariant _StickyMilkPainter oldDelegate) =>
-      oldDelegate.shootProgress != shootProgress || oldDelegate.opacity != opacity;
+      oldDelegate.shootProgress != shootProgress ||
+      oldDelegate.opacity != opacity ||
+      oldDelegate.time != time;
 }
 
 /// Converts e621-style DText (and BBCode) in descriptions/comments to Markdown.
