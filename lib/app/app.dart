@@ -24,7 +24,7 @@ class KlitApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             theme: _getTheme(settings.themeMode, null),
             onGenerateRoute: AppRouter.generateRoute,
-            initialRoute: AppRoutes.login,
+            initialRoute: AppRoutes.main,
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
