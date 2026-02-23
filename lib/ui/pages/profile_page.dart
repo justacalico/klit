@@ -411,6 +411,9 @@ class _UiProfilePageState extends State<UiProfilePage> {
     final selectedBg = isDark
         ? CupertinoColors.systemGrey.withValues(alpha: 0.45)
         : CupertinoColors.systemGrey4;
+    final unselectedBg = isDark
+        ? CupertinoColors.white.withValues(alpha: 0.06)
+        : CupertinoColors.black.withValues(alpha: 0.04);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
@@ -428,32 +431,36 @@ class _UiProfilePageState extends State<UiProfilePage> {
           children: List.generate(3, (index) {
             final selected = _selectedTabIndex == index;
             return Expanded(
-              child: CupertinoButton(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                onPressed: () {
-                  setState(() => _selectedTabIndex = index);
-                  if (index == 1 && _uploads.isEmpty && !_uploadsLoading) {
-                    _loadUploads(refresh: true);
-                  }
-                  if (index == 2 && _favorites.isEmpty && !_favoritesLoading) {
-                    _loadFavorites(refresh: true);
-                  }
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    color: selected ? selectedBg : null,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    labels[index],
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                      color: selected
-                          ? (isDark ? CupertinoColors.white : CupertinoColors.black)
-                          : CupertinoColors.systemGrey,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    setState(() => _selectedTabIndex = index);
+                    if (index == 1 && _uploads.isEmpty && !_uploadsLoading) {
+                      _loadUploads(refresh: true);
+                    }
+                    if (index == 2 && _favorites.isEmpty && !_favoritesLoading) {
+                      _loadFavorites(refresh: true);
+                    }
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: selected ? selectedBg : unselectedBg,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      labels[index],
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                        color: selected
+                            ? (isDark ? CupertinoColors.white : CupertinoColors.black)
+                            : CupertinoColors.secondaryLabel,
+                      ),
                     ),
                   ),
                 ),
