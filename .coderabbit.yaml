@@ -7,14 +7,14 @@ early_access: false
 
 reviews:
   profile: "chill"
-  request_changes_workflow: false
+  request_changes_workflow: true
   high_level_summary: true
   poem: false
   review_status: true
-  review_details: false
+  review_details: true
   auto_review:
     enabled: true
     drafts: false
 
 chat:
-  auto_reply: false
+  auto_reply: true
