@@ -447,6 +447,8 @@ class _PostDetailPageState extends State<PostDetailPage>
   final Set<String> _uploaderAvatarLoading = {};
   final Map<int, String> _uploaderNamesById = {};
   final Set<int> _uploaderNameLoading = {};
+  /// Preloaded comments per post id so comments sheet can show immediately.
+  final Map<int, List<Comment>> _commentsCache = {};
 
   int get _currentPostId => _postIds[_currentIndex];
   Post? get _currentPost => _loadedPosts[_currentIndex];
@@ -540,6 +542,7 @@ class _PostDetailPageState extends State<PostDetailPage>
             _updatedScores[index] = post.score;
           });
           _precachePostImages(post);
+          _preloadComments(post.id);
         }
       },
       failure: (error) {
@@ -566,6 +569,21 @@ class _PostDetailPageState extends State<PostDetailPage>
         mainUrl != previewUrl) {
       precacheImage(CachedNetworkImageProvider(mainUrl), context);
     }
+  }
+
+  /// Preload comments for a post so the comments sheet can show them immediately when opened.
+  void _preloadComments(int postId) {
+    if (_commentsCache.containsKey(postId)) return;
+    final apiService = context.read<ApiService>();
+    apiService.getComments(postId).then((result) {
+      if (!mounted) return;
+      result.when(
+        success: (comments) {
+          if (mounted) setState(() => _commentsCache[postId] = comments);
+        },
+        failure: (_) {},
+      );
+    });
   }
 
   void _onPageChanged(int index) {
@@ -734,10 +752,12 @@ class _PostDetailPageState extends State<PostDetailPage>
   void _showComments(int index) {
     final post = _loadedPosts[index];
     if (post == null) return;
+    final preloaded = _commentsCache[post.id];
     showCupertinoModalPopup(
       context: context,
       builder: (context) => _CommentsSheet(
             postId: post.id,
+            preloadedComments: preloaded,
             onSearchTag: _searchTag,
           ),
     );
@@ -3334,13 +3354,16 @@ class _FullScreenImageViewer extends StatelessWidget {
   }
 }
 
-/// Comments sheet with liquid glass design
+/// Comments sheet with liquid glass design.
+/// [preloadedComments] are shown immediately when provided (from post detail preload); more pages load on scroll.
 class _CommentsSheet extends StatefulWidget {
   final int postId;
+  final List<Comment>? preloadedComments;
   final void Function(String tag)? onSearchTag;
 
   const _CommentsSheet({
     required this.postId,
+    this.preloadedComments,
     this.onSearchTag,
   });
 
@@ -3354,17 +3377,39 @@ class _CommentsSheetState extends State<_CommentsSheet> {
   String? _error;
   final _commentController = TextEditingController();
   bool _isPosting = false;
+  int _page = 1;
+  bool _hasMore = true;
+  bool _isLoadingMore = false;
+  static const int _pageSize = 50;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    _loadComments();
+    final preloaded = widget.preloadedComments;
+    if (preloaded != null && preloaded.isNotEmpty) {
+      _comments = List.from(preloaded);
+      _isLoading = false;
+      _page = 1;
+      _hasMore = preloaded.length >= _pageSize;
+    } else {
+      _loadComments();
+    }
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     _commentController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_hasMore || _isLoadingMore) return;
+    final pos = _scrollController.position;
+    if (pos.pixels >= pos.maxScrollExtent - 200) _loadMoreComments();
   }
 
   Future<void> _loadComments() async {
@@ -3374,7 +3419,7 @@ class _CommentsSheetState extends State<_CommentsSheet> {
     });
 
     final apiService = context.read<ApiService>();
-    final result = await apiService.getComments(widget.postId);
+    final result = await apiService.getComments(widget.postId, page: 1);
 
     if (mounted) {
       result.when(
@@ -3382,6 +3427,8 @@ class _CommentsSheetState extends State<_CommentsSheet> {
           setState(() {
             _comments = comments;
             _isLoading = false;
+            _page = 1;
+            _hasMore = comments.length >= _pageSize;
           });
         },
         failure: (error) {
@@ -3389,6 +3436,28 @@ class _CommentsSheetState extends State<_CommentsSheet> {
             _error = error.message;
             _isLoading = false;
           });
+        },
+      );
+    }
+  }
+
+  Future<void> _loadMoreComments() async {
+    if (_isLoadingMore || !_hasMore) return;
+    setState(() => _isLoadingMore = true);
+    final apiService = context.read<ApiService>();
+    final result = await apiService.getComments(widget.postId, page: _page + 1);
+    if (mounted) {
+      result.when(
+        success: (comments) {
+          setState(() {
+            _comments.addAll(comments);
+            _page++;
+            _hasMore = comments.length >= _pageSize;
+            _isLoadingMore = false;
+          });
+        },
+        failure: (_) {
+          setState(() => _isLoadingMore = false);
         },
       );
     }
@@ -3796,11 +3865,23 @@ class _CommentsSheetState extends State<_CommentsSheet> {
       );
     }
 
+    final itemCount = _comments.length + (_hasMore ? 1 : 0);
     return ListView.separated(
+      controller: _scrollController,
       padding: const EdgeInsets.all(16),
-      itemCount: _comments.length,
+      itemCount: itemCount,
       separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
+        if (index == _comments.length) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Center(
+              child: _isLoadingMore
+                  ? const CupertinoActivityIndicator()
+                  : const SizedBox.shrink(),
+            ),
+          );
+        }
         final comment = _comments[index];
         return _CommentCard(
           comment: comment,
