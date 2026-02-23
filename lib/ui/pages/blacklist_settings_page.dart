@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
+import '../../core/constants/constants.dart';
 import '../../data/services/services.dart';
 import '../../providers/providers.dart';
 
@@ -200,6 +201,7 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
     final authProvider = context.watch<AuthProvider>();
     final isGuest = authProvider.isGuest;
 
@@ -207,9 +209,7 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
       key: const ValueKey('blacklist-settings-page'),
       child: CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-          backgroundColor: isDark
-              ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
-              : CupertinoColors.white.withValues(alpha: 0.85),
+          backgroundColor: AppColors.resolveSecondaryBackground(isDark, isOled: isOled).withValues(alpha: 0.85),
           border: Border(
             bottom: BorderSide(
               color: isDark
@@ -258,7 +258,7 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
               // Sync button section
               _buildSyncSection(isDark, isGuest),
               // Blacklist editor
-              Expanded(child: _buildEditor(isDark)),
+              Expanded(child: _buildEditor(isDark, isOled)),
               // Footer with stats
               _buildFooter(isDark),
             ],
@@ -347,7 +347,7 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
     );
   }
 
-  Widget _buildEditor(bool isDark) {
+  Widget _buildEditor(bool isDark, bool isOled) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -374,9 +374,7 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF2C2C2E)
-                    : CupertinoColors.systemGrey6,
+                color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isDark

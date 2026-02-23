@@ -314,6 +314,8 @@ class _SidebarItemState extends State<_SidebarItem> {
   @override
   Widget build(BuildContext context) {
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
+    final hoverColor = AppColors.resolveSecondaryBackground(isDark, isOled: isOled);
     return Tooltip(
       message: widget.isCollapsed ? widget.label : '',
       child: MouseRegion(
@@ -347,14 +349,8 @@ class _SidebarItemState extends State<_SidebarItem> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        (isDark
-                                ? const Color(0xFF2C2C2E)
-                                : const Color(0xFFE5E5EA))
-                            .withValues(alpha: 0.6),
-                        (isDark
-                                ? const Color(0xFF2C2C2E)
-                                : const Color(0xFFE5E5EA))
-                            .withValues(alpha: 0.4),
+                        hoverColor.withValues(alpha: 0.6),
+                        hoverColor.withValues(alpha: 0.4),
                       ],
                     )
                   : null,
@@ -421,6 +417,7 @@ class _CollapseButtonState extends State<_CollapseButton> {
   @override
   Widget build(BuildContext context) {
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
     return Tooltip(
       message: widget.isCollapsed ? 'Expand sidebar' : 'Collapse sidebar',
       child: MouseRegion(
@@ -436,8 +433,8 @@ class _CollapseButtonState extends State<_CollapseButton> {
             decoration: BoxDecoration(
               color: _hovered
                   ? UIColors.primaryPurple.withValues(alpha: 0.1)
-                  : (isDark
-                        ? const Color(0xFF2C2C2E).withValues(alpha: 0.6)
+                  : (isDark || isOled
+                        ? AppColors.resolveSecondaryBackground(isDark, isOled: isOled).withValues(alpha: 0.6)
                         : const Color(0xFFF2F2F7).withValues(alpha: 0.8)),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(

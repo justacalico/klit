@@ -301,8 +301,8 @@ class _LoginPageState extends State<LoginPage>
                     child: SlideTransition(
                       position: _slideAnimation,
                       child: isLandscape && mode.isMobile
-                          ? _buildLandscapeLayout(isDark)
-                          : _buildPortraitLayout(isDark),
+                          ? _buildLandscapeLayout(isDark, isOled)
+                          : _buildPortraitLayout(isDark, isOled),
                     ),
                   ),
                 ),
@@ -315,7 +315,7 @@ class _LoginPageState extends State<LoginPage>
                 bottom: 24,
                 left: 0,
                 right: 0,
-                child: _buildControllerHints(isDark),
+                child: _buildControllerHints(isDark, isOled),
               ),
           ],
         ),
@@ -324,12 +324,12 @@ class _LoginPageState extends State<LoginPage>
   }
 
   /// Builds the controller button hints overlay
-  Widget _buildControllerHints(bool isDark) {
+  Widget _buildControllerHints(bool isDark, bool isOled) {
     return Center(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
-          color: (isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white)
+          color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled)
               .withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
@@ -430,7 +430,7 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  Widget _buildPortraitLayout(bool isDark) {
+  Widget _buildPortraitLayout(bool isDark, bool isOled) {
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 400),
       child: Column(
@@ -441,7 +441,7 @@ class _LoginPageState extends State<LoginPage>
           const SizedBox(height: 16),
           _buildWelcomeText(isDark),
           const SizedBox(height: 40),
-          _buildForm(isDark),
+          _buildForm(isDark, isOled),
           const SizedBox(height: 24),
           _buildLoginButton(),
           const SizedBox(height: 12),
@@ -453,7 +453,7 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  Widget _buildLandscapeLayout(bool isDark) {
+  Widget _buildLandscapeLayout(bool isDark, bool isOled) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -474,7 +474,7 @@ class _LoginPageState extends State<LoginPage>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildForm(isDark),
+              _buildForm(isDark, isOled),
               const SizedBox(height: 24),
               _buildLoginButton(),
               const SizedBox(height: 12),
@@ -628,12 +628,12 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  Widget _buildForm(bool isDark) {
+  Widget _buildForm(bool isDark, bool isOled) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: isDark
-            ? const Color(0xFF1C1C1E).withValues(alpha: 0.8)
+            ? AppColors.resolveSecondaryBackground(isDark, isOled: isOled).withValues(alpha: 0.8)
             : CupertinoColors.white.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
@@ -663,6 +663,7 @@ class _LoginPageState extends State<LoginPage>
             icon: CupertinoIcons.person,
             textInputAction: TextInputAction.next,
             isDark: isDark,
+            isOled: isOled,
             isFocused: _showControllerHints && _focusedIndex == 0,
           ),
           const SizedBox(height: 12),
@@ -673,6 +674,7 @@ class _LoginPageState extends State<LoginPage>
             icon: CupertinoIcons.lock,
             obscureText: _obscureApiKey,
             isDark: isDark,
+            isOled: isOled,
             isFocused: _showControllerHints && _focusedIndex == 1,
             suffix: CupertinoButton(
               padding: EdgeInsets.zero,
@@ -686,7 +688,7 @@ class _LoginPageState extends State<LoginPage>
             ),
           ),
           const SizedBox(height: 20),
-          _buildCustomHostSection(isDark),
+          _buildCustomHostSection(isDark, isOled),
         ],
       ),
     );
@@ -722,13 +724,14 @@ class _LoginPageState extends State<LoginPage>
     required String placeholder,
     required IconData icon,
     required bool isDark,
+    required bool isOled,
     required bool isFocused,
     bool obscureText = false,
     Widget? suffix,
     TextInputType? keyboardType,
     TextInputAction? textInputAction,
   }) {
-    final bgColor = isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF3F4F6);
+    final bgColor = AppColors.resolveSecondaryBackground(isDark, isOled: isOled);
     final borderColor = isFocused
         ? const Color(0xFF8B5CF6)
         : (isDark ? const Color(0xFF3A3A3C) : const Color(0xFFE5E7EB));
@@ -787,7 +790,7 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  Widget _buildCustomHostSection(bool isDark) {
+  Widget _buildCustomHostSection(bool isDark, bool isOled) {
     final isToggleFocused = _showControllerHints && _focusedIndex == 2;
     final isHostFieldFocused =
         _showControllerHints && _focusedIndex == 3 && _useCustomHost;
@@ -800,7 +803,7 @@ class _LoginPageState extends State<LoginPage>
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF3F4F6),
+              color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: isToggleFocused
@@ -899,6 +902,7 @@ class _LoginPageState extends State<LoginPage>
               icon: CupertinoIcons.globe,
               keyboardType: TextInputType.url,
               isDark: isDark,
+              isOled: isOled,
               isFocused: isHostFieldFocused,
             ),
           ),
@@ -1002,6 +1006,7 @@ class _LoginPageState extends State<LoginPage>
 
   void _showApiKeyHelp() {
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+    final isOled = context.read<SettingsProvider>().themeMode == 3;
 
     showCupertinoModalPopup(
       context: context,
@@ -1009,7 +1014,7 @@ class _LoginPageState extends State<LoginPage>
         padding: const EdgeInsets.all(24),
         margin: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white,
+          color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(

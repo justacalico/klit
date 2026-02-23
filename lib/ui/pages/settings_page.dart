@@ -293,7 +293,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
             ? Row(
                 children: [
                   _buildSidebar(isDark, isOled),
-                  Expanded(child: _buildMainContent(isDark)),
+                  Expanded(child: _buildMainContent(isDark, isOled)),
                 ],
               )
             : PopScope(
@@ -315,11 +315,11 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     if (!_mobileShowMainList) {
       return _buildMobileSubPage(context, isDark, isOled);
     }
-    return _buildMobileMainList(context, isDark);
+    return _buildMobileMainList(context, isDark, isOled);
   }
 
   /// iOS-style main list: search + rows with icon, title, chevron
-  Widget _buildMobileMainList(BuildContext context, bool isDark) {
+  Widget _buildMobileMainList(BuildContext context, bool isDark, bool isOled) {
     final query = _mobileSearchController.text.trim().toLowerCase();
     final filtered = query.isEmpty
         ? _categories
@@ -395,9 +395,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
             onChanged: (_) => setState(() {}),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: isDark
-                  ? const Color(0xFF2C2C2E)
-                  : CupertinoColors.tertiarySystemFill,
+              color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -555,12 +553,12 @@ class _UiSettingsPageState extends State<UiSettingsPage>
       decoration: BoxDecoration(
         color: isOled
             ? AppColors.oledSecondaryBackground
-            : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F7)),
+            : AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
         border: Border(
           right: BorderSide(
             color: isOled
                 ? AppColors.oledSeparator
-                : (isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE5E5E7)),
+                : AppColors.resolveSeparator(isDark, isOled: isOled),
             width: 1,
           ),
         ),
@@ -735,7 +733,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     );
   }
 
-  Widget _buildMainContent(bool isDark) {
+  Widget _buildMainContent(bool isDark, bool isOled) {
     final category = _categories.firstWhere((c) => c.id == _selectedCategory);
     final mode = LayoutScope.of(context);
     final contentPadding = mode.isMobile ? 16.0 : 32.0;
@@ -744,7 +742,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Section header (card on mobile, bar on desktop)
-        _buildContentHeader(category, isDark),
+        _buildContentHeader(category, isDark, isOled),
         // Content
         Expanded(
           child: FadeTransition(
@@ -759,7 +757,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     );
   }
 
-  Widget _buildContentHeader(_SettingsCategory category, bool isDark) {
+  Widget _buildContentHeader(_SettingsCategory category, bool isDark, bool isOled) {
     final mode = LayoutScope.of(context);
     final isCompact = mode.isMobile;
     return Container(
@@ -771,7 +769,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
       ),
       decoration: BoxDecoration(
         color: isCompact
-            ? (isDark ? const Color(0xFF1C1C1E) : const Color(0xFF2C2C2E))
+            ? AppColors.resolveSecondaryBackground(isDark, isOled: isOled)
             : null,
         borderRadius: isCompact ? BorderRadius.circular(16) : null,
         border: isCompact
@@ -1407,6 +1405,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     required String description,
     required VoidCallback onTap,
   }) {
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -1423,7 +1422,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                 : null,
             color: isSelected
                 ? null
-                : (isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF2F2F7)),
+                : AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isSelected
@@ -1493,6 +1492,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     required String label,
     required VoidCallback onTap,
   }) {
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -1512,7 +1512,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                 : null,
             color: isSelected
                 ? null
-                : (isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF2F2F7)),
+                : AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isSelected

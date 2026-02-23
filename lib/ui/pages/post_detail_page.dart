@@ -1248,11 +1248,7 @@ class _MobilePostDetailBody extends StatelessWidget {
         }
       },
       child: CupertinoPageScaffold(
-        backgroundColor: isOled
-            ? CupertinoColors.black
-            : isDark
-            ? AppColors.darkBackground
-            : AppColors.lightSecondaryBackground,
+        backgroundColor: AppColors.resolveScaffoldBackground(isDark, isOled: isOled),
         navigationBar: CupertinoNavigationBar(
           backgroundColor: isOled
               ? CupertinoColors.black.withValues(alpha: 0.8)
@@ -2106,6 +2102,7 @@ class _DesktopPostDetailBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = state;
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
 
     if (s._isFullScreen && s._currentPost != null) {
       return _DesktopPostDetailContentBuilder.buildFullScreenView(
@@ -2148,9 +2145,7 @@ class _DesktopPostDetailBody extends StatelessWidget {
       child: Stack(
         children: [
           Container(
-            color: isDark
-                ? AppColors.darkBackground
-                : AppColors.lightBackground,
+            color: AppColors.resolveScaffoldBackground(isDark, isOled: isOled),
             child: Column(
               children: [
                 _DesktopPostDetailContentBuilder.buildTopBar(
@@ -2164,6 +2159,7 @@ class _DesktopPostDetailBody extends StatelessWidget {
                     context,
                     s,
                     isDark,
+                    isOled,
                   ),
                 ),
               ],
@@ -2348,6 +2344,7 @@ class _DesktopPostDetailContentBuilder {
     BuildContext context,
     _PostDetailPageState s,
     bool isDark,
+    bool isOled,
   ) {
     final isLoading = s._loadingStates[s._currentIndex] == true;
     final error = s._errorStates[s._currentIndex];
@@ -2391,7 +2388,7 @@ class _DesktopPostDetailContentBuilder {
             children: [
               SizedBox(
                 height: imageHeight,
-                child: buildMediaPanel(context, s, post, isDark),
+                child: buildMediaPanel(context, s, post, isDark, isOled),
               ),
               Expanded(child: buildInfoPanel(context, s, post, isDark)),
             ],
@@ -2401,12 +2398,10 @@ class _DesktopPostDetailContentBuilder {
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(flex: 3, child: buildMediaPanel(context, s, post, isDark)),
+            Expanded(flex: 3, child: buildMediaPanel(context, s, post, isDark, isOled)),
             Container(
               width: 1,
-              color: isDark
-                  ? AppColors.darkSeparator
-                  : AppColors.lightSeparator,
+              color: AppColors.resolveSeparator(isDark, isOled: isOled),
             ),
             SizedBox(
               width: 380,
@@ -2423,9 +2418,12 @@ class _DesktopPostDetailContentBuilder {
     _PostDetailPageState s,
     Post post,
     bool isDark,
+    bool isOled,
   ) {
     return Container(
-      color: isDark ? const Color(0xFF0A0A0C) : CupertinoColors.systemGrey6,
+      color: (isDark || isOled)
+          ? AppColors.resolveSecondaryBackground(isDark, isOled: isOled)
+          : CupertinoColors.systemGrey6,
       child: Stack(
         children: [
           Center(child: buildMedia(context, s, post)),
@@ -3608,8 +3606,8 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                   ? [Colors.black.withValues(alpha: 0.95), Colors.black]
                   : isDark
                   ? [
-                      AppColors.darkBackground.withValues(alpha: 0.95),
-                      AppColors.darkBackground,
+                      AppColors.resolveScaffoldBackground(isDark, isOled: isOled).withValues(alpha: 0.95),
+                      AppColors.resolveScaffoldBackground(isDark, isOled: isOled),
                     ]
                   : [
                       CupertinoColors.systemBackground.withValues(alpha: 0.95),

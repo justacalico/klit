@@ -299,11 +299,11 @@ class _UiSearchPageState extends State<UiSearchPage>
   void _showFiltersBottomSheet(BuildContext context, bool isDark) {
     showCupertinoModalPopup<void>(
       context: context,
-      builder: (ctx) => Container(
+      builder: (ctx) {
+        final isOled = ctx.watch<SettingsProvider>().themeMode == 3;
+        return Container(
         decoration: BoxDecoration(
-          color: isDark
-              ? const Color(0xFF1C1C1E)
-              : CupertinoColors.white,
+          color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
         ),
         padding: EdgeInsets.only(
@@ -349,7 +349,8 @@ class _UiSearchPageState extends State<UiSearchPage>
             ),
           ],
         ),
-      ),
+      );
+      },
     );
   }
 
@@ -1001,13 +1002,15 @@ class _ToolbarBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: CupertinoTheme.brightnessOf(context) == Brightness.dark
-              ? const Color(0xFF2C2C2E).withValues(alpha: 0.6)
+          color: (isDark || isOled)
+              ? AppColors.resolveSecondaryBackground(isDark, isOled: isOled).withValues(alpha: 0.6)
               : const Color(0xFFF3F4F6).withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(10),
         ),

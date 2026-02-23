@@ -244,12 +244,14 @@ class AccountManagementContent extends StatelessWidget {
             itemBuilder: (context, index) {
               final account = auth.accounts[index];
               final isActive = auth.currentAccount?.id == account.id;
+              final isOled = context.watch<SettingsProvider>().themeMode == 3;
 
               return _MobileAccountCard(
                 username: account.username,
                 host: Uri.parse(account.host).host,
                 isActive: isActive,
                 isDark: isDark,
+                isOled: isOled,
                 onTap: isActive
                     ? null
                     : () => _switchAccount(context, account.id, account.host),
@@ -575,14 +577,14 @@ class _AddAccountSheetState extends State<_AddAccountSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
     return Container(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       decoration: BoxDecoration(
-        color: CupertinoTheme.brightnessOf(context) == Brightness.dark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
+        color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       ),
       child: SafeArea(
@@ -991,6 +993,7 @@ class _MobileAccountCard extends StatelessWidget {
   final String host;
   final bool isActive;
   final bool isDark;
+  final bool isOled;
   final VoidCallback? onTap;
   final VoidCallback onOptions;
 
@@ -999,6 +1002,7 @@ class _MobileAccountCard extends StatelessWidget {
     required this.host,
     required this.isActive,
     required this.isDark,
+    required this.isOled,
     required this.onTap,
     required this.onOptions,
   });
@@ -1008,9 +1012,7 @@ class _MobileAccountCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkSecondaryBackground
-            : CupertinoColors.white,
+        color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
         borderRadius: BorderRadius.circular(12),
         border: isActive
             ? Border.all(color: _AccountColors.primaryIndigo, width: 2)

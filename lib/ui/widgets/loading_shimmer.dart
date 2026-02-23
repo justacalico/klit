@@ -1,5 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+
+import '../../core/constants/constants.dart';
+import '../../providers/providers.dart';
 
 /// Loading shimmer effect for content
 class LoadingShimmer extends StatelessWidget {
@@ -17,12 +21,17 @@ class LoadingShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
+    final baseColor = isOled
+        ? AppColors.oledBackground
+        : (isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE5E5EA));
+    final highlightColor = isOled
+        ? const Color(0xFF0A0A0A)
+        : (isDark ? const Color(0xFF3A3A3C) : const Color(0xFFF2F2F7));
 
     return Shimmer.fromColors(
-      baseColor: isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE5E5EA),
-      highlightColor: isDark
-          ? const Color(0xFF3A3A3C)
-          : const Color(0xFFF2F2F7),
+      baseColor: baseColor,
+      highlightColor: highlightColor,
       child: Container(
         height: height,
         width: width,

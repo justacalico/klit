@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
+import '../../core/constants/constants.dart';
+import '../../providers/providers.dart';
 import '../theme.dart';
 
 /// Page toolbar for desktop content area.
@@ -21,12 +24,15 @@ class PageToolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
 
     final content = Container(
       height: 60,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF18181B) : const Color(0xFFFAFAFC),
+        color: isOled
+            ? AppColors.oledBackground
+            : (isDark ? const Color(0xFF18181B) : const Color(0xFFFAFAFC)),
         border: Border(
           bottom: BorderSide(
             color: UIColors.primaryPurple.withValues(
@@ -98,6 +104,7 @@ class _ToolbarButtonState extends State<ToolbarButton> {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
     final disabled = widget.onPressed == null;
 
     return MouseRegion(
@@ -111,7 +118,7 @@ class _ToolbarButtonState extends State<ToolbarButton> {
           decoration: BoxDecoration(
             color: _hovered && !disabled
                 ? UIColors.primaryPurple.withValues(alpha: 0.15)
-                : (isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF3F4F6)),
+                : AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: _hovered && !disabled

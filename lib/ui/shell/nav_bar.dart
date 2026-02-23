@@ -412,11 +412,12 @@ class _MoreMenuButton extends StatelessWidget {
     if (moreIds.isEmpty) return;
     showCupertinoModalPopup<void>(
       context: context,
-      builder: (ctx) => Container(
+      builder: (ctx) {
+        final isDark = CupertinoTheme.brightnessOf(ctx) == Brightness.dark;
+        final isOled = ctx.watch<SettingsProvider>().themeMode == 3;
+        return Container(
         decoration: BoxDecoration(
-          color: CupertinoTheme.brightnessOf(context) == Brightness.dark
-              ? const Color(0xFF1C1C1E)
-              : CupertinoColors.white,
+          color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
         ),
         child: SafeArea(
@@ -458,7 +459,8 @@ class _MoreMenuButton extends StatelessWidget {
             ],
           ),
         ),
-      ),
+      );
+      },
     );
   }
 }

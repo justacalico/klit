@@ -102,17 +102,14 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
 
     return KeyedSubtree(
       key: const ValueKey('host-settings-page'),
       child: CupertinoPageScaffold(
-        backgroundColor: isDark
-            ? const Color(0xFF000000)
-            : CupertinoColors.systemGroupedBackground,
+        backgroundColor: AppColors.resolveScaffoldBackground(isDark, isOled: isOled),
         navigationBar: CupertinoNavigationBar(
-          backgroundColor: isDark
-              ? const Color(0xFF1C1C1E).withValues(alpha: 0.9)
-              : CupertinoColors.white.withValues(alpha: 0.9),
+          backgroundColor: AppColors.resolveSecondaryBackground(isDark, isOled: isOled).withValues(alpha: 0.9),
           border: Border(
             bottom: BorderSide(
               color: isDark
@@ -135,13 +132,13 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
             children: [
               _buildSectionHeader('PRESET SERVERS'),
               const SizedBox(height: 8),
-              _buildPresetHosts(context, isDark),
+              _buildPresetHosts(context, isDark, isOled),
               const SizedBox(height: 24),
               _buildSectionHeader('CUSTOM SERVER'),
               const SizedBox(height: 8),
-              _buildCustomHost(context, isDark),
+              _buildCustomHost(context, isDark, isOled),
               const SizedBox(height: 24),
-              _buildInfoCard(context, isDark),
+              _buildInfoCard(context, isDark, isOled),
             ],
           ),
         ),
@@ -164,10 +161,10 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
     );
   }
 
-  Widget _buildPresetHosts(BuildContext context, bool isDark) {
+  Widget _buildPresetHosts(BuildContext context, bool isDark, bool isOled) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white,
+        color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark
@@ -215,7 +212,7 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
                           color: isSelected
                               ? null
                               : (isDark
-                                    ? const Color(0xFF2C2C2E)
+                                    ? AppColors.resolveSecondaryBackground(isDark, isOled: isOled)
                                     : CupertinoColors.systemGrey5),
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -283,13 +280,13 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
     );
   }
 
-  Widget _buildCustomHost(BuildContext context, bool isDark) {
+  Widget _buildCustomHost(BuildContext context, bool isDark, bool isOled) {
     final isCustom = !_isPresetHost(_selectedHost);
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1C1E) : CupertinoColors.white,
+        color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isCustom
@@ -324,9 +321,7 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
               color: CupertinoColors.placeholderText.resolveFrom(context),
             ),
             decoration: BoxDecoration(
-              color: isDark
-                  ? const Color(0xFF2C2C2E)
-                  : CupertinoColors.systemGrey6,
+              color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -360,7 +355,7 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
     );
   }
 
-  Widget _buildInfoCard(BuildContext context, bool isDark) {
+  Widget _buildInfoCard(BuildContext context, bool isDark, bool isOled) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
