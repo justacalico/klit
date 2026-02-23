@@ -95,7 +95,7 @@ class PostCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Stack(
           fit: StackFit.expand,
-          children: [_buildImage(), if (showInfo) _buildOverlay(context)],
+          children: [_buildImage(context), if (showInfo) _buildOverlay(context)],
         ),
       ),
     );
@@ -126,7 +126,7 @@ class PostCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Row(
           children: [
-            SizedBox(width: 120, height: 120, child: _buildImage()),
+            SizedBox(width: 120, height: 120, child: _buildImage(context)),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(12),
@@ -154,12 +154,17 @@ class PostCard extends StatelessWidget {
     );
   }
 
-  Widget _buildImage() {
+  Widget _buildImage(BuildContext context) {
     final imageUrl = post.preview.url ?? post.displayUrl;
+    final brightness = CupertinoTheme.brightnessOf(context);
+    final isDark = brightness == Brightness.dark;
+    final oled = isOled ?? context.read<SettingsProvider>().themeMode == 3;
+    final placeholderColor =
+        AppColors.resolveSecondaryBackground(isDark, isOled: oled);
 
     if (imageUrl == null) {
       return Container(
-        color: CupertinoColors.systemGrey5,
+        color: placeholderColor,
         child: Center(
           child: Icon(
             post.isVideo
@@ -183,10 +188,10 @@ class PostCard extends StatelessWidget {
           fadeInDuration: const Duration(milliseconds: 150),
           fadeInCurve: Curves.easeOut,
           placeholder: (context, url) => style == PostCardStyle.grid
-              ? Container(color: CupertinoColors.systemGrey5)
+              ? Container(color: placeholderColor)
               : const LoadingShimmer(),
           errorWidget: (context, url, error) => Container(
-            color: CupertinoColors.systemGrey5,
+            color: placeholderColor,
             child: Center(
               child: Icon(
                 post.isVideo
