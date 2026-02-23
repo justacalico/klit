@@ -983,37 +983,6 @@ class _UiProfilePageState extends State<UiProfilePage> {
         Expanded(
           child: CupertinoButton(
             padding: const EdgeInsets.symmetric(vertical: 14),
-            onPressed: _navigateToSettingsAccount,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: UIColors.primaryIndigo.withValues(alpha: 0.5),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(CupertinoIcons.person_2, color: UIColors.primaryIndigo, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Manage Accounts',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: UIColors.primaryIndigo,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: CupertinoButton(
-            padding: const EdgeInsets.symmetric(vertical: 14),
             onPressed: () => _showSignOutConfirmation(context),
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
