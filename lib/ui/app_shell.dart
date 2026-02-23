@@ -118,6 +118,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
             onLoadMore: args.onLoadMore,
             hasMore: args.hasMore,
             postHostUrls: args.postHostUrls,
+            initialPosts: args.initialPosts,
             onCurrentIndexChanged: (index) {
               if (!mounted) return;
               setState(() {
@@ -127,6 +128,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
                   onLoadMore: _postOverlay!.onLoadMore,
                   hasMore: _postOverlay!.hasMore,
                   postHostUrls: _postOverlay!.postHostUrls,
+                  initialPosts: _postOverlay!.initialPosts,
                 );
               });
             },
@@ -207,6 +209,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
               onLoadMore: overlay.onLoadMore,
               hasMore: overlay.hasMore,
               postHostUrls: overlay.postHostUrls,
+              initialPosts: overlay.initialPosts,
               onCurrentIndexChanged: (index) {
                 if (!mounted) return;
                 setState(() {
@@ -216,6 +219,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
                     onLoadMore: _postOverlay!.onLoadMore,
                     hasMore: _postOverlay!.hasMore,
                     postHostUrls: _postOverlay!.postHostUrls,
+                    initialPosts: _postOverlay!.initialPosts,
                   );
                 });
               },
@@ -400,6 +404,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
         onLoadMore: _postOverlay!.onLoadMore,
         hasMore: _postOverlay!.hasMore,
         postHostUrls: _postOverlay!.postHostUrls,
+        initialPosts: _postOverlay!.initialPosts,
       );
     });
   }
@@ -416,6 +421,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
       onLoadMore: args.onLoadMore,
       hasMore: args.hasMore,
       postHostUrls: args.postHostUrls,
+      initialPosts: args.initialPosts,
     );
   }
 }

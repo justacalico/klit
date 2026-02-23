@@ -66,6 +66,7 @@ class _UiHomePageState extends State<UiHomePage> {
         postIds: posts.map((p) => p.id).toList(),
         initialIndex: idx >= 0 ? idx : 0,
         hasMore: pp.hasMoreLatest,
+        initialPosts: List<Post?>.from(posts),
         onLoadMore: () async {
           await pp.loadLatestPosts(
             safeMode: _safeMode(context),

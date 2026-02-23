@@ -61,6 +61,7 @@ class _UiHotPageState extends State<UiHotPage> {
         postIds: posts.map((p) => p.id).toList(),
         initialIndex: idx >= 0 ? idx : 0,
         hasMore: pp.hasMoreHot,
+        initialPosts: List<Post?>.from(posts),
         onLoadMore: () async {
           await pp.loadHotPosts(safeMode: _safeMode(context));
           return pp.hotPosts.map((p) => p.id).toList();

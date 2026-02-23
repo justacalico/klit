@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
+import '../../data/models/models.dart';
 import 'post_detail_page.dart';
 
 /// Post detail overlay for desktop - full-screen overlay with close.
@@ -14,6 +15,7 @@ class UiPostDetailOverlay extends StatelessWidget {
     this.onLoadMore,
     this.hasMore = false,
     this.postHostUrls,
+    this.initialPosts,
   });
 
   final List<int> postIds;
@@ -24,6 +26,7 @@ class UiPostDetailOverlay extends StatelessWidget {
   final Future<List<int>> Function()? onLoadMore;
   final bool hasMore;
   final List<String>? postHostUrls;
+  final List<Post?>? initialPosts;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +39,7 @@ class UiPostDetailOverlay extends StatelessWidget {
       onLoadMore: onLoadMore,
       hasMore: hasMore,
       postHostUrls: postHostUrls,
+      initialPosts: initialPosts,
     );
   }
 }

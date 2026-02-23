@@ -408,6 +408,8 @@ class PostDetailPage extends StatefulWidget {
   final VoidCallback? onClose;
   /// Host URL per post index (same length as postIds). When set, use for API calls.
   final List<String>? postHostUrls;
+  /// When non-null, same length as postIds; show these immediately without waiting for getPostById.
+  final List<Post?>? initialPosts;
 
   const PostDetailPage({
     super.key,
@@ -419,6 +421,7 @@ class PostDetailPage extends StatefulWidget {
     this.hasMore = false,
     this.onClose,
     this.postHostUrls,
+    this.initialPosts,
   });
 
   @override
@@ -483,6 +486,26 @@ class _PostDetailPageState extends State<PostDetailPage>
       duration: const Duration(seconds: 1),
     );
     _focusNode = FocusNode();
+    // Seed from initial posts so detail shows instantly when caller already has data.
+    final initial = widget.initialPosts;
+    if (initial != null && initial.length == _postIds.length) {
+      for (var i = 0; i < initial.length; i++) {
+        final post = initial[i];
+        if (post != null) {
+          _loadedPosts[i] = post;
+          _loadingStates[i] = false;
+          _isFavorited[i] = post.isFavorited;
+          _updatedScores[i] = post.score;
+        }
+      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        for (var i = 0; i < initial.length; i++) {
+          final post = initial[i];
+          if (post != null) _precachePostImages(post);
+        }
+      });
+    }
     _loadPost(_currentIndex);
     _preloadAdjacentPosts();
     WidgetsBinding.instance.addPostFrameCallback((_) {

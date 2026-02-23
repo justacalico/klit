@@ -113,6 +113,7 @@ class _UiFavoritesPageState extends State<UiFavoritesPage> {
         postIds: _favorites.map((p) => p.id).toList(),
         initialIndex: index >= 0 ? index : 0,
         hasMore: _hasMore,
+        initialPosts: List<Post?>.from(_favorites),
         onLoadMore: () async {
           await _loadMore();
           return _favorites.map((p) => p.id).toList();

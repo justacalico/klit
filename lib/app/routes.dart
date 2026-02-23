@@ -49,6 +49,7 @@ class AppRouter {
             onLoadMore: args.onLoadMore,
             hasMore: args.hasMore,
             postHostUrls: args.postHostUrls,
+            initialPosts: args.initialPosts,
           ),
           settings: settings,
         );

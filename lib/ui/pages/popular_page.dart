@@ -61,6 +61,7 @@ class _UiPopularPageState extends State<UiPopularPage> {
         postIds: posts.map((p) => p.id).toList(),
         initialIndex: idx >= 0 ? idx : 0,
         hasMore: pp.hasMorePopular,
+        initialPosts: List<Post?>.from(posts),
         onLoadMore: () async {
           await pp.loadPopularPosts(safeMode: _safeMode(context));
           return pp.popularPosts.map((p) => p.id).toList();

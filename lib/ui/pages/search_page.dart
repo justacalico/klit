@@ -236,6 +236,7 @@ class _UiSearchPageState extends State<UiSearchPage>
         postHostUrls: (postHostUrls != null && postHostUrls.length == posts.length)
             ? postHostUrls
             : null,
+        initialPosts: List<Post?>.from(posts),
         onLoadMore: () async {
           if (hostUrls != null && hostUrls.isNotEmpty) {
             await pp.searchPostsMultiHost(

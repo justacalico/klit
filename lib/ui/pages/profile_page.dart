@@ -653,6 +653,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
         postIds: _uploads.map((p) => p.id).toList(),
         initialIndex: index >= 0 ? index : 0,
         hasMore: _uploadsHasMore,
+        initialPosts: List<Post?>.from(_uploads),
         onLoadMore: () async {
           setState(() => _uploadsPage++);
           await _loadUploads();
@@ -669,6 +670,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
         postIds: _favorites.map((p) => p.id).toList(),
         initialIndex: index >= 0 ? index : 0,
         hasMore: _favoritesHasMore,
+        initialPosts: List<Post?>.from(_favorites),
         onLoadMore: () async {
           setState(() => _favoritesPage++);
           await _loadFavorites();
