@@ -1052,7 +1052,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                     AccountManagementContent(
                       isDark: isDark,
                       embeddedInSettings: true,
-                      showAddButtonAboveList: true,
+                      showAddButtonAboveList: false,
                     ),
                   ],
                 ),
