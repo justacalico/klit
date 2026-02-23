@@ -62,8 +62,10 @@ Widget _buildSourceRow({
                   Text(
                     'Account: $accountLabel',
                     style: TextStyle(
-                      fontSize: 13,
-                      color: CupertinoColors.secondaryLabel,
+                      fontSize: 14,
+                      color: isDark
+                          ? CupertinoColors.white.withValues(alpha: 0.8)
+                          : CupertinoColors.secondaryLabel,
                     ),
                   ),
                 ],
@@ -364,8 +366,10 @@ class _FeedEditPageState extends State<FeedEditPage> {
                 Text(
                   'Choose which sites to load posts from. Leave empty for current host only.',
                   style: TextStyle(
-                    fontSize: 12,
-                    color: CupertinoColors.secondaryLabel,
+                    fontSize: 13,
+                    color: isDark
+                        ? CupertinoColors.white.withValues(alpha: 0.8)
+                        : CupertinoColors.secondaryLabel,
                   ),
                 ),
                 const SizedBox(height: 10),
