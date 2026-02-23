@@ -21,17 +21,13 @@ An **E926**-compatible Flutter client with an iOS-style (Cupertino) UI. Browse, 
 ## Getting started
 
 ```bash
-git clone <repository-url>
+git clone https://gitlab.com/Openlyst/klit.git
 cd klit
 flutter pub get
-flutter run -d <device>
+flutter run -d <device eg. linux> 
 ```
 
 ## Building
-
-### Default (responsive UI)
-
-The app automatically switches between mobile and desktop layout based on screen width:
 
 ```bash
 # Run
