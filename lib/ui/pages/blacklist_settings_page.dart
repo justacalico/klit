@@ -177,10 +177,21 @@ class _BlacklistSettingsPageState extends State<BlacklistSettingsPage> {
       children: [
         Text(
           title,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+            color: CupertinoColors.label.resolveFrom(context),
+          ),
         ),
         const SizedBox(height: 4),
-        Text(content, style: const TextStyle(fontSize: 13, height: 1.4)),
+        Text(
+          content,
+          style: TextStyle(
+            fontSize: 13,
+            height: 1.4,
+            color: CupertinoColors.secondaryLabel.resolveFrom(context),
+          ),
+        ),
       ],
     );
   }

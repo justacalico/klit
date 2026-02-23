@@ -119,15 +119,22 @@ class _FeedsList extends StatelessWidget {
               color: UIColors.primaryPurple.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'No feeds yet',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: CupertinoColors.label.resolveFrom(context),
+              ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Create a feed with tags and image or video type\nto browse posts in one tap',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 15, color: CupertinoColors.systemGrey),
+              style: TextStyle(
+                fontSize: 15,
+                color: CupertinoColors.secondaryLabel.resolveFrom(context),
+              ),
             ),
             const SizedBox(height: 24),
             CupertinoButton.filled(

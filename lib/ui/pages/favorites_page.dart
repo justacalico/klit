@@ -193,14 +193,21 @@ class _UiFavoritesPageState extends State<UiFavoritesPage> {
               color: AppColors.explicitColor.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'No favorites yet',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: CupertinoColors.label.resolveFrom(context),
+              ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Posts you favorite will appear here',
-              style: TextStyle(fontSize: 15, color: CupertinoColors.systemGrey),
+              style: TextStyle(
+                fontSize: 15,
+                color: CupertinoColors.secondaryLabel.resolveFrom(context),
+              ),
             ),
           ],
         ),

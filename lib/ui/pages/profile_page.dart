@@ -293,14 +293,20 @@ class _UiProfilePageState extends State<UiProfilePage> {
               color: CupertinoColors.systemGrey,
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Guest Mode',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: CupertinoColors.label.resolveFrom(context),
+              ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Sign in to save favorites, vote, and view your profile',
-              style: TextStyle(color: CupertinoColors.systemGrey),
+              style: TextStyle(
+                color: CupertinoColors.secondaryLabel.resolveFrom(context),
+              ),
             ),
             const SizedBox(height: 24),
             CupertinoButton.filled(
@@ -334,7 +340,9 @@ class _UiProfilePageState extends State<UiProfilePage> {
             const SizedBox(height: 16),
             Text(
               _error!,
-              style: const TextStyle(color: CupertinoColors.systemGrey),
+              style: TextStyle(
+                color: CupertinoColors.secondaryLabel.resolveFrom(context),
+              ),
             ),
             const SizedBox(height: 16),
             CupertinoButton.filled(
@@ -358,14 +366,20 @@ class _UiProfilePageState extends State<UiProfilePage> {
               color: CupertinoColors.systemGrey,
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Not logged in',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: CupertinoColors.label.resolveFrom(context),
+              ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Sign in to view your profile',
-              style: TextStyle(color: CupertinoColors.systemGrey),
+              style: TextStyle(
+                color: CupertinoColors.secondaryLabel.resolveFrom(context),
+              ),
             ),
             const SizedBox(height: 24),
             CupertinoButton.filled(
@@ -519,7 +533,9 @@ class _UiProfilePageState extends State<UiProfilePage> {
             const SizedBox(height: 16),
             Text(
               _uploadsError!,
-              style: const TextStyle(color: CupertinoColors.systemGrey),
+              style: TextStyle(
+                color: CupertinoColors.secondaryLabel.resolveFrom(context),
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -542,18 +558,22 @@ class _UiProfilePageState extends State<UiProfilePage> {
               color: AppColors.primaryBlue.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'No uploads',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: CupertinoColors.label.resolveFrom(context),
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               _viewingOtherUser
                   ? 'This user has not uploaded any posts'
                   : 'Your uploads will appear here',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
-                color: CupertinoColors.systemGrey,
+                color: CupertinoColors.secondaryLabel.resolveFrom(context),
               ),
               textAlign: TextAlign.center,
             ),
@@ -591,7 +611,9 @@ class _UiProfilePageState extends State<UiProfilePage> {
             const SizedBox(height: 16),
             Text(
               _favoritesError!,
-              style: const TextStyle(color: CupertinoColors.systemGrey),
+              style: TextStyle(
+                color: CupertinoColors.secondaryLabel.resolveFrom(context),
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -614,18 +636,22 @@ class _UiProfilePageState extends State<UiProfilePage> {
               color: AppColors.explicitColor.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'No favorites yet',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: CupertinoColors.label.resolveFrom(context),
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               _viewingOtherUser
                   ? 'This user has no favorites'
                   : 'Posts you favorite will appear here',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
-                color: CupertinoColors.systemGrey,
+                color: CupertinoColors.secondaryLabel.resolveFrom(context),
               ),
               textAlign: TextAlign.center,
             ),

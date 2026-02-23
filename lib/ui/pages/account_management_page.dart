@@ -331,9 +331,13 @@ class AccountManagementContent extends StatelessWidget {
             color: CupertinoColors.secondaryLabel.resolveFrom(context),
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'No Accounts',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: CupertinoColors.label.resolveFrom(context),
+            ),
           ),
           const SizedBox(height: 8),
           Text(
