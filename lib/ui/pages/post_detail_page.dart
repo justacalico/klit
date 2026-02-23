@@ -1245,37 +1245,7 @@ class _MobilePostDetailBody extends StatelessWidget {
     final isLoading = state._loadingStates[index] == true;
     final error = state._errorStates[index];
 
-    if (isLoading) {
-      return SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AspectRatio(
-              aspectRatio: 1,
-              child: Container(
-                color: CupertinoColors.systemGrey5,
-                child: const Center(
-                  child: CupertinoActivityIndicator(radius: 14),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24),
-                child: Text(
-                  'Loading post...',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+    if (isLoading) return const FullPageLoading(message: 'Loading post...');
     if (error != null) {
       return ErrorState(message: error, onRetry: () => state._loadPost(index));
     }
@@ -2308,83 +2278,7 @@ class _DesktopPostDetailContentBuilder {
     final post = s._currentPost;
 
     if (isLoading) {
-      return LayoutBuilder(
-        builder: (context, constraints) {
-          const narrowBreakpoint = 700.0;
-          final useNarrowLayout = constraints.maxWidth < narrowBreakpoint;
-          final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
-          final bgColor = isDark ? const Color(0xFF0A0A0C) : CupertinoColors.systemGrey6;
-          final panelColor = isDark
-              ? const Color(0xFF2C2C2E).withValues(alpha: 0.7)
-              : const Color(0xFFFFFFFF).withValues(alpha: 0.7);
-          if (useNarrowLayout) {
-            final imageHeight = (constraints.maxHeight * 0.45).clamp(200.0, 500.0);
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  height: imageHeight,
-                  color: bgColor,
-                  child: const Center(
-                    child: CupertinoActivityIndicator(radius: 16),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    color: panelColor,
-                    padding: const EdgeInsets.all(24),
-                    child: const Center(
-                      child: Text(
-                        'Loading post...',
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: CupertinoColors.secondaryLabel,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          }
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 3,
-                child: Container(
-                  color: bgColor,
-                  child: const Center(
-                    child: CupertinoActivityIndicator(radius: 16),
-                  ),
-                ),
-              ),
-              Container(
-                width: 1,
-                color: isDark
-                    ? AppColors.darkSeparator
-                    : AppColors.lightSeparator,
-              ),
-              SizedBox(
-                width: 380,
-                child: Container(
-                  color: panelColor,
-                  padding: const EdgeInsets.all(24),
-                  child: const Center(
-                    child: Text(
-                      'Loading post...',
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: CupertinoColors.secondaryLabel,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
-      );
+      return const Center(child: CupertinoActivityIndicator(radius: 16));
     }
     if (error != null) {
       return Center(
