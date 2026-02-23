@@ -121,14 +121,6 @@ class AppNavBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: UIColors.primaryPurple.withValues(
-              alpha: isDark ? 0.3 : 0.15,
-            ),
-            blurRadius: 20,
-            spreadRadius: -2,
-            offset: const Offset(0, 8),
-          ),
-          BoxShadow(
             color: CupertinoColors.black.withValues(alpha: isDark ? 0.4 : 0.1),
             blurRadius: 24,
             offset: const Offset(0, 8),
@@ -148,9 +140,8 @@ class AppNavBar extends StatelessWidget {
                 colors: gradientColors,
               ),
               border: Border.all(
-                color: UIColors.primaryPurple.withValues(
-                  alpha: isDark ? 0.2 : 0.1,
-                ),
+                color: (isDark ? CupertinoColors.white : CupertinoColors.black)
+                    .withValues(alpha: isDark ? 0.08 : 0.06),
                 width: 1,
               ),
             ),
