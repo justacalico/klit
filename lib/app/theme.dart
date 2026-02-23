@@ -34,7 +34,7 @@ class AppTheme {
       primaryColor: AppColors.primaryBlue,
       primaryContrastingColor: CupertinoColors.white,
       scaffoldBackgroundColor: AppColors.oledBackground,
-      barBackgroundColor: Color(0xF0000000),
+      barBackgroundColor: AppColors.oledBackground,
     );
   }
 

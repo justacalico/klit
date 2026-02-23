@@ -101,9 +101,9 @@ class AppColors {
 
   // OLED theme backgrounds (pure black for power saving)
   static const Color oledBackground = Color(0xFF000000);
-  static const Color oledSecondaryBackground = Color(0xFF0A0A0A);
+  static const Color oledSecondaryBackground = Color(0xFF000000);
   static const Color oledGroupedBackground = Color(0xFF000000);
-  static const Color oledSeparator = Color(0xFF1C1C1C);
+  static const Color oledSeparator = Color(0xFF000000);
 
   /// Resolve scaffold/background colors; pass [isOled] true when theme is OLED.
   static Color resolveScaffoldBackground(bool isDark, {bool isOled = false}) =>

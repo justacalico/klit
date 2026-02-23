@@ -110,7 +110,7 @@ class AppNavBar extends StatelessWidget {
   Widget _buildLiquidGlass(BuildContext context, bool isDark, bool isOled) {
     final compact = navOrder.length >= 5;
     final gradientColors = isOled
-        ? [AppColors.oledSecondaryBackground, const Color(0xFF0F0F0F)]
+        ? [AppColors.oledSecondaryBackground, AppColors.oledBackground]
         : (isDark
             ? [const Color(0xFF1C1C1E), const Color(0xFF2C2C2E)]
             : [const Color(0xFFF5F5F7), const Color(0xFFEBEBEF)]);
