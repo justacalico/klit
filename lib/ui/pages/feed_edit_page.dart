@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../core/constants/constants.dart';
 import '../../data/models/models.dart';
 import '../../providers/providers.dart';
+import '../theme.dart';
 
 String _hostLabel(String url) {
   final u = url.trim();
@@ -10,6 +11,106 @@ String _hostLabel(String url) {
   final uri = Uri.tryParse(u);
   if (uri != null && uri.host.isNotEmpty) return uri.host;
   return u;
+}
+
+/// One source (host) row: checkbox, host label, and account used.
+Widget _buildSourceRow({
+  required String hostUrl,
+  required bool selected,
+  required bool isDark,
+  required bool isOled,
+  required VoidCallback onTap,
+  required Account? accountForHost,
+}) {
+  final bg = AppColors.resolveSecondaryBackground(isDark, isOled: isOled);
+  final borderColor = (isDark ? CupertinoColors.white : CupertinoColors.black).withValues(alpha: 0.08);
+  final accountLabel = accountForHost != null ? accountForHost.username : 'Guest';
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              selected ? CupertinoIcons.checkmark_square_fill : CupertinoIcons.square,
+              size: 24,
+              color: selected ? UIColors.primaryPurple : CupertinoColors.systemGrey,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _hostLabel(hostUrl),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Account: $accountLabel',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: CupertinoColors.secondaryLabel,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+/// Wraps a section with a rounded card background for visual grouping.
+Widget _sectionCard({
+  required BuildContext context,
+  required bool isDark,
+  required bool isOled,
+  required String title,
+  required List<Widget> children,
+}) {
+  final bg = AppColors.resolveSecondaryBackground(isDark, isOled: isOled);
+  final borderColor = (isDark ? CupertinoColors.white : CupertinoColors.black).withValues(alpha: 0.08);
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: bg,
+      borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: borderColor),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: CupertinoColors.systemGrey,
+          ),
+        ),
+        const SizedBox(height: 10),
+        ...children,
+      ],
+    ),
+  );
 }
 
 /// Parse tag string (newlines or spaces) into a list of non-empty trimmed tags.
@@ -137,39 +238,35 @@ class _FeedEditPageState extends State<FeedEditPage> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           children: [
             const SizedBox(height: 8),
-            Text(
-              'Name',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: CupertinoColors.systemGrey,
-              ),
-            ),
-            const SizedBox(height: 6),
-            CupertinoTextField(
-              controller: _nameController,
-              placeholder: 'e.g. My art feed',
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              decoration: BoxDecoration(
-                color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: (isDark ? CupertinoColors.white : CupertinoColors.black)
-                      .withValues(alpha: 0.08),
+            _sectionCard(
+              context: context,
+              isDark: isDark,
+              isOled: isOled,
+              title: 'Name',
+              children: [
+                CupertinoTextField(
+                  controller: _nameController,
+                  placeholder: 'e.g. My art feed',
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: (isDark ? CupertinoColors.white : CupertinoColors.black)
+                          .withValues(alpha: 0.08),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-            const SizedBox(height: 24),
-            Text(
-              'Type',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: CupertinoColors.systemGrey,
-              ),
-            ),
-            const SizedBox(height: 8),
-            CupertinoSlidingSegmentedControl<String>(
+            const SizedBox(height: 16),
+            _sectionCard(
+              context: context,
+              isDark: isDark,
+              isOled: isOled,
+              title: 'Type',
+              children: [
+                CupertinoSlidingSegmentedControl<String>(
               groupValue: _mediaType,
               children: {
                 Feed.mediaTypeImage: Padding(
@@ -252,17 +349,24 @@ class _FeedEditPageState extends State<FeedEditPage> {
                 if (v != null) setState(() => _mediaType = v);
               },
             ),
-            const SizedBox(height: 24),
-            Text(
-              'Hosts',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: CupertinoColors.systemGrey,
-              ),
+              ],
             ),
-            const SizedBox(height: 6),
-            Builder(
+            const SizedBox(height: 16),
+            _sectionCard(
+              context: context,
+              isDark: isDark,
+              isOled: isOled,
+              title: 'Sources',
+              children: [
+                Text(
+                  'Choose which sites to load posts from. Leave empty for current host only.',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: CupertinoColors.secondaryLabel,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Builder(
               builder: (context) {
                 final auth = context.watch<AuthProvider>();
                 final hosts = <String>{
@@ -274,123 +378,108 @@ class _FeedEditPageState extends State<FeedEditPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: hosts.map((url) {
                     final selected = _selectedHostUrls.contains(url);
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            if (selected) {
-                              _selectedHostUrls.remove(url);
-                            } else {
-                              _selectedHostUrls.add(url);
-                            }
-                          });
-                        },
-                        behavior: HitTestBehavior.opaque,
-                        child: Row(
-                          children: [
-                            Icon(
-                              selected ? CupertinoIcons.checkmark_square_fill : CupertinoIcons.square,
-                              size: 22,
-                              color: selected
-                                  ? CupertinoColors.activeBlue
-                                  : CupertinoColors.systemGrey,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              _hostLabel(url),
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: isDark ? CupertinoColors.white : CupertinoColors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                    final accountForHost = auth.getAccountForHost(url);
+                    return _buildSourceRow(
+                      hostUrl: url,
+                      selected: selected,
+                      isDark: isDark,
+                      isOled: isOled,
+                      onTap: () {
+                        setState(() {
+                          if (selected) {
+                            _selectedHostUrls.remove(url);
+                          } else {
+                            _selectedHostUrls.add(url);
+                          }
+                        });
+                      },
+                      accountForHost: accountForHost,
                     );
                   }).toList(),
                 );
               },
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Leave empty to use current host only.',
-              style: TextStyle(
-                fontSize: 12,
-                color: CupertinoColors.systemGrey,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'And tags',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: CupertinoColors.systemGrey,
-              ),
-            ),
-            const SizedBox(height: 6),
-            CupertinoTextField(
-              controller: _includeController,
-              placeholder: 'Post must have all of these (e.g. cat or fox)',
-              maxLines: 4,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              decoration: BoxDecoration(
-                color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: (isDark ? CupertinoColors.white : CupertinoColors.black)
-                      .withValues(alpha: 0.08),
-                ),
-              ),
+              ],
             ),
             const SizedBox(height: 16),
-            Text(
-              'Or tags',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: CupertinoColors.systemGrey,
-              ),
-            ),
-            const SizedBox(height: 6),
-            CupertinoTextField(
-              controller: _orController,
-              placeholder: 'Any of these (e.g. cat fox for cat or fox)',
-              maxLines: 4,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              decoration: BoxDecoration(
-                color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: (isDark ? CupertinoColors.white : CupertinoColors.black)
-                      .withValues(alpha: 0.08),
+            _sectionCard(
+              context: context,
+              isDark: isDark,
+              isOled: isOled,
+              title: 'Filter by tags',
+              children: [
+                Text(
+                  'And tags',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: CupertinoColors.systemGrey,
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Tags to exclude',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: CupertinoColors.systemGrey,
-              ),
-            ),
-            const SizedBox(height: 6),
-            CupertinoTextField(
-              controller: _excludeController,
-              placeholder: 'e.g. cat when viewing fox to see only fox without cat',
-              maxLines: 4,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              decoration: BoxDecoration(
-                color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: (isDark ? CupertinoColors.white : CupertinoColors.black)
-                      .withValues(alpha: 0.08),
+                const SizedBox(height: 6),
+                CupertinoTextField(
+                  controller: _includeController,
+                  placeholder: 'Post must have all of these (e.g. cat or fox)',
+                  maxLines: 4,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: (isDark ? CupertinoColors.white : CupertinoColors.black)
+                          .withValues(alpha: 0.08),
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(height: 14),
+                Text(
+                  'Or tags',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: CupertinoColors.systemGrey,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                CupertinoTextField(
+                  controller: _orController,
+                  placeholder: 'Any of these (e.g. cat fox for cat or fox)',
+                  maxLines: 4,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: (isDark ? CupertinoColors.white : CupertinoColors.black)
+                          .withValues(alpha: 0.08),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  'Tags to exclude',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: CupertinoColors.systemGrey,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                CupertinoTextField(
+                  controller: _excludeController,
+                  placeholder: 'e.g. cat when viewing fox to see only fox without cat',
+                  maxLines: 4,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: (isDark ? CupertinoColors.white : CupertinoColors.black)
+                          .withValues(alpha: 0.08),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
