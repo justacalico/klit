@@ -235,7 +235,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
       ),
       child: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
           children: [
             const SizedBox(height: 8),
             _sectionCard(
@@ -273,6 +273,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
                     children: [
                       Icon(
                         CupertinoIcons.photo_fill,
@@ -298,6 +299,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
                     children: [
                       Icon(
                         CupertinoIcons.play_rectangle_fill,
@@ -323,6 +325,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
                     children: [
                       Icon(
                         CupertinoIcons.rectangle_stack_fill,
