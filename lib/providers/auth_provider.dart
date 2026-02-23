@@ -141,6 +141,18 @@ class AuthProvider extends ChangeNotifier {
 
   bool get hasAccounts => _accounts.isNotEmpty;
 
+  /// Returns the first account that matches [hostUrl]. Used for multi-host feed actions.
+  Account? getAccountForHost(String hostUrl) {
+    final n = _normalizeHost(hostUrl);
+    return _accounts.where((a) => _normalizeHost(a.host) == n).firstOrNull;
+  }
+
+  static String _normalizeHost(String h) {
+    var s = h.trim();
+    if (s.endsWith('/')) s = s.substring(0, s.length - 1);
+    return s;
+  }
+
   void continueAsGuest() {
     _isGuest = true;
     _isInitialized = true;

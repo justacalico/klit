@@ -2,17 +2,33 @@ import 'package:flutter/foundation.dart';
 import '../core/constants/constants.dart';
 import '../data/models/models.dart';
 import '../data/services/services.dart';
+import 'auth_provider.dart';
 import 'blacklist_filter.dart';
 
 /// Provider for posts data
 class PostsProvider extends ChangeNotifier {
   final ApiService _apiService;
+  AuthProvider? _authProvider;
+
+  PostsProvider({required ApiService apiService, AuthProvider? authProvider})
+      : _apiService = apiService,
+        _authProvider = authProvider;
+
+  void setAuthProvider(AuthProvider? authProvider) {
+    _authProvider = authProvider;
+  }
 
   // Posts lists
   List<Post> _latestPosts = [];
   List<Post> _hotPosts = [];
   List<Post> _popularPosts = [];
   List<Post> _searchResults = [];
+  /// When multi-host search, host URL per index (same length as _searchResults).
+  List<String>? _searchPostHostUrls;
+  /// Per-host page index for multi-host load more.
+  final Map<String, int> _multiHostPage = {};
+  List<String>? _multiHostHostUrls;
+  String _multiHostQuery = '';
 
   // Pagination
   int _latestPage = 1;
@@ -49,13 +65,13 @@ class PostsProvider extends ChangeNotifier {
   List<String> _blacklistLines = [];
   bool _blacklistEnabled = true;
 
-  PostsProvider({required ApiService apiService}) : _apiService = apiService;
-
   // Getters
   List<Post> get latestPosts => _latestPosts;
   List<Post> get hotPosts => _hotPosts;
   List<Post> get popularPosts => _popularPosts;
   List<Post> get searchResults => _searchResults;
+  /// When multi-host search was used, host URL per result index. Null for single-host.
+  List<String>? get searchPostHostUrls => _searchPostHostUrls;
 
   bool get isLoadingLatest => _isLoadingLatest;
   bool get isLoadingHot => _isLoadingHot;
@@ -360,6 +376,7 @@ class PostsProvider extends ChangeNotifier {
       _searchPage = 1;
       _hasMoreSearch = true;
       _currentSearchQuery = query;
+      _searchPostHostUrls = null;
     }
 
     _isLoadingSearch = true;
@@ -404,11 +421,121 @@ class PostsProvider extends ChangeNotifier {
     }
   }
 
+  /// Multi-host search: run search on each host, merge by createdAt desc, apply blacklist.
+  Future<void> searchPostsMultiHost({
+    required String query,
+    required List<String> hostUrls,
+    bool refresh = false,
+    String? rating,
+    String? order,
+    bool safeMode = false,
+  }) async {
+    if (hostUrls.isEmpty) {
+      searchPosts(query: query, refresh: refresh, rating: rating, order: order, safeMode: safeMode);
+      return;
+    }
+    if (_isLoadingSearch) return;
+    final effectiveRating = safeMode ? 's' : rating;
+
+    if (refresh || query != _multiHostQuery || !_listEquals(hostUrls, _multiHostHostUrls)) {
+      _multiHostPage.clear();
+      for (final h in hostUrls) {
+        _multiHostPage[h] = 1;
+      }
+      _multiHostQuery = query;
+      _multiHostHostUrls = List.from(hostUrls);
+      _hasMoreSearch = true;
+    }
+    if (!_hasMoreSearch) return;
+
+    _isLoadingSearch = true;
+    _searchError = null;
+    _currentSearchQuery = query;
+    notifyListeners();
+
+    try {
+      final all = <PostWithSource>[];
+      var anyHasMore = false;
+      for (final hostUrl in hostUrls) {
+        final page = _multiHostPage[hostUrl] ?? 1;
+        final account = _authProvider?.getAccountForHost(hostUrl);
+        final result = await _apiService.runWithHost(
+          hostUrl,
+          account?.username,
+          account?.apiKey,
+          () => _apiService.getPosts(
+            page: page,
+            limit: ApiConstants.defaultPageSize,
+            tags: query,
+            rating: effectiveRating,
+            order: order,
+            safeMode: safeMode,
+          ),
+        );
+        result.when(
+          success: (posts) {
+            for (final p in posts) {
+              all.add(PostWithSource(post: p, hostUrl: hostUrl));
+            }
+            _multiHostPage[hostUrl] = page + 1;
+            if (posts.length >= ApiConstants.defaultPageSize) anyHasMore = true;
+          },
+          failure: (_) {},
+        );
+      }
+      _hasMoreSearch = anyHasMore;
+      all.sort((a, b) => b.post.createdAt.compareTo(a.post.createdAt));
+      final passedPosts = filterBlacklistStatic(
+        BlacklistFilterInput(
+          posts: all.map((e) => e.post).toList(),
+          blacklistLines: _blacklistLines,
+          enabled: _blacklistEnabled,
+        ),
+      );
+      final allMutable = List<PostWithSource>.from(all);
+      final filteredWithSource = <PostWithSource>[];
+      for (final p in passedPosts) {
+        var i = allMutable.indexWhere((e) => e.post.id == p.id && e.post.createdAt == p.createdAt);
+        if (i < 0) i = allMutable.indexWhere((e) => e.post.id == p.id);
+        if (i >= 0) filteredWithSource.add(allMutable.removeAt(i));
+      }
+      final hostUrlsForFiltered = filteredWithSource.map((e) => e.hostUrl).toList();
+      final filtered = filteredWithSource.map((e) => e.post).toList();
+
+      if (refresh || (_searchResults.isEmpty && _searchPostHostUrls == null)) {
+        _searchResults = filtered;
+        _searchPostHostUrls = hostUrlsForFiltered;
+      } else {
+        _searchResults = [..._searchResults, ...filtered];
+        _searchPostHostUrls = [...?_searchPostHostUrls, ...hostUrlsForFiltered];
+      }
+    } catch (e, st) {
+      _searchError = e.toString();
+      debugPrint('searchPostsMultiHost error: $e\n$st');
+    } finally {
+      _isLoadingSearch = false;
+      notifyListeners();
+    }
+  }
+
+  static bool _listEquals(List<String>? a, List<String>? b) {
+    if (a == b) return true;
+    if (a == null || b == null || a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+
   /// Clear search results
   void clearSearch() {
     _searchResults = [];
+    _searchPostHostUrls = null;
     _currentSearchQuery = '';
     _searchPage = 1;
+    _multiHostPage.clear();
+    _multiHostHostUrls = null;
+    _multiHostQuery = '';
     _hasMoreSearch = true;
     _searchError = null;
     notifyListeners();

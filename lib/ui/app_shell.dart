@@ -117,6 +117,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
             onSearchTag: _openSearch,
             onLoadMore: args.onLoadMore,
             hasMore: args.hasMore,
+            postHostUrls: args.postHostUrls,
             onCurrentIndexChanged: (index) {
               if (!mounted) return;
               setState(() {
@@ -125,6 +126,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
                   initialIndex: index,
                   onLoadMore: _postOverlay!.onLoadMore,
                   hasMore: _postOverlay!.hasMore,
+                  postHostUrls: _postOverlay!.postHostUrls,
                 );
               });
             },
@@ -204,6 +206,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
               initialIndex: overlay.initialIndex,
               onLoadMore: overlay.onLoadMore,
               hasMore: overlay.hasMore,
+              postHostUrls: overlay.postHostUrls,
               onCurrentIndexChanged: (index) {
                 if (!mounted) return;
                 setState(() {
@@ -212,6 +215,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
                     initialIndex: index,
                     onLoadMore: _postOverlay!.onLoadMore,
                     hasMore: _postOverlay!.hasMore,
+                    postHostUrls: _postOverlay!.postHostUrls,
                   );
                 });
               },
@@ -395,6 +399,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
         initialIndex: index,
         onLoadMore: _postOverlay!.onLoadMore,
         hasMore: _postOverlay!.hasMore,
+        postHostUrls: _postOverlay!.postHostUrls,
       );
     });
   }
@@ -410,6 +415,7 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
       onClose: _closePostOverlay,
       onLoadMore: args.onLoadMore,
       hasMore: args.hasMore,
+      postHostUrls: args.postHostUrls,
     );
   }
 }

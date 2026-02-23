@@ -386,14 +386,48 @@ class StorageService {
     await _prefs.setBool(AppConstants.searchHistoryEnabledKey, enabled);
   }
 
-  // Feeds (scoped by account)
+  // Feeds (global: same list for all accounts)
 
+  /// Returns feeds from global key. On first run migrates from all scoped keys into global.
+  Future<List<Feed>> getFeedsGlobal() async {
+    String? feedsJson = _prefs.getString(AppConstants.feedsKey);
+    if (feedsJson != null && feedsJson.isNotEmpty) {
+      return compute(parseFeedsJson, feedsJson);
+    }
+    // Migration: merge from all scoped keys into global
+    final accounts = await getAccounts();
+    final scopes = <String>['guest', ...accounts.map((a) => a.id)];
+    final seenIds = <String>{};
+    final merged = <Feed>[];
+    for (final scope in scopes) {
+      final key = '${AppConstants.feedsKey}_$scope';
+      final scopeJson = _prefs.getString(key);
+      if (scopeJson == null) continue;
+      try {
+        final list = parseFeedsJson(scopeJson);
+        for (final f in list) {
+          if (seenIds.add(f.id)) merged.add(f);
+        }
+      } catch (_) {}
+    }
+    if (merged.isNotEmpty) {
+      final list = merged.map((e) => e.toJson()).toList();
+      await _prefs.setString(AppConstants.feedsKey, json.encode(list));
+    }
+    return merged;
+  }
+
+  Future<void> setFeedsGlobal(List<Feed> feeds) async {
+    final list = feeds.map((e) => e.toJson()).toList();
+    await _prefs.setString(AppConstants.feedsKey, json.encode(list));
+  }
+
+  /// Legacy account-scoped get/set (kept for reference; FeedsProvider uses global).
   Future<List<Feed>> getFeeds() async {
     final scope = await _accountScope();
     final key = '${AppConstants.feedsKey}_$scope';
     String? feedsJson = _prefs.getString(key);
     if (feedsJson == null) {
-      // Migrate from legacy key
       feedsJson = _prefs.getString(AppConstants.feedsKey);
       if (feedsJson != null) {
         await _prefs.setString(key, feedsJson);

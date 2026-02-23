@@ -13,15 +13,15 @@ class FeedsProvider extends ChangeNotifier {
 
   List<Feed> get feeds => List.unmodifiable(_feeds);
 
-  /// Load feeds for current account (call on startup and after account change)
+  /// Load feeds from global storage (same list for all accounts). Call on startup only.
   Future<void> loadFeeds() async {
-    _feeds = await _storageService.getFeeds();
+    _feeds = await _storageService.getFeedsGlobal();
     notifyListeners();
   }
 
-  /// Reload feeds for current account (e.g. after account switch)
+  /// Reload feeds from global storage (e.g. after adding/editing). Not called on account change.
   Future<void> reloadFeeds() async {
-    _feeds = await _storageService.getFeeds();
+    _feeds = await _storageService.getFeedsGlobal();
     notifyListeners();
   }
 
@@ -37,7 +37,7 @@ class FeedsProvider extends ChangeNotifier {
     final id = feed.id.isEmpty ? _uuid.v4() : feed.id;
     final f = feed.id.isEmpty ? feed.copyWith(id: id) : feed;
     _feeds = [..._feeds, f];
-    await _storageService.setFeeds(_feeds);
+    await _storageService.setFeedsGlobal(_feeds);
     notifyListeners();
   }
 
@@ -45,13 +45,13 @@ class FeedsProvider extends ChangeNotifier {
     final i = _feeds.indexWhere((f) => f.id == feed.id);
     if (i < 0) return;
     _feeds = [..._feeds]..[i] = feed;
-    await _storageService.setFeeds(_feeds);
+    await _storageService.setFeedsGlobal(_feeds);
     notifyListeners();
   }
 
   Future<void> deleteFeed(String id) async {
     _feeds = _feeds.where((f) => f.id != id).toList();
-    await _storageService.setFeeds(_feeds);
+    await _storageService.setFeedsGlobal(_feeds);
     notifyListeners();
   }
 }

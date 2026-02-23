@@ -3,6 +3,7 @@ export 'comment.dart';
 export 'feed.dart';
 export 'i_finished_entry.dart';
 export 'post.dart';
+export 'post_with_source.dart';
 export 'proxy_config.dart';
 export 'tag.dart';
 export 'user.dart';

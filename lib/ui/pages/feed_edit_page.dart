@@ -4,6 +4,14 @@ import '../../core/constants/constants.dart';
 import '../../data/models/models.dart';
 import '../../providers/providers.dart';
 
+String _hostLabel(String url) {
+  final u = url.trim();
+  if (u.endsWith('/')) return _hostLabel(u.substring(0, u.length - 1));
+  final uri = Uri.tryParse(u);
+  if (uri != null && uri.host.isNotEmpty) return uri.host;
+  return u;
+}
+
 /// Parse tag string (newlines or spaces) into a list of non-empty trimmed tags.
 List<String> _parseTags(String text) {
   if (text.trim().isEmpty) return [];
@@ -31,6 +39,13 @@ class _FeedEditPageState extends State<FeedEditPage> {
   late TextEditingController _excludeController;
   late String _mediaType;
   bool _isNew = true;
+  final Set<String> _selectedHostUrls = {};
+
+  static String _normalizeHost(String h) {
+    var s = h.trim();
+    if (s.endsWith('/')) s = s.substring(0, s.length - 1);
+    return s;
+  }
 
   @override
   void initState() {
@@ -48,6 +63,9 @@ class _FeedEditPageState extends State<FeedEditPage> {
       text: f?.excludeTags.join(' ') ?? '',
     );
     _mediaType = f?.mediaType ?? Feed.mediaTypeImage;
+    if (f?.hostUrls != null) {
+      _selectedHostUrls.addAll(f!.hostUrls.map(_normalizeHost));
+    }
   }
 
   @override
@@ -64,6 +82,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
     final includeTags = _parseTags(_includeController.text);
     final orTags = _parseTags(_orController.text);
     final excludeTags = _parseTags(_excludeController.text);
+    final hostUrls = _selectedHostUrls.toList()..sort();
 
     final feedsProvider = context.read<FeedsProvider>();
     if (_isNew) {
@@ -74,6 +93,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
         includeTags: includeTags,
         orTags: orTags,
         excludeTags: excludeTags,
+        hostUrls: hostUrls,
       );
       await feedsProvider.addFeed(feed);
     } else {
@@ -85,6 +105,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
         includeTags: includeTags,
         orTags: orTags,
         excludeTags: excludeTags,
+        hostUrls: hostUrls,
       );
       await feedsProvider.updateFeed(feed);
     }
@@ -230,6 +251,74 @@ class _FeedEditPageState extends State<FeedEditPage> {
               onValueChanged: (v) {
                 if (v != null) setState(() => _mediaType = v);
               },
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Hosts',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: CupertinoColors.systemGrey,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Builder(
+              builder: (context) {
+                final auth = context.watch<AuthProvider>();
+                final hosts = <String>{
+                  ApiConstants.defaultHost,
+                  ApiConstants.nsfwHost,
+                  ...auth.accounts.map((a) => _normalizeHost(a.host)),
+                }.toList()..sort();
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: hosts.map((url) {
+                    final selected = _selectedHostUrls.contains(url);
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            if (selected) {
+                              _selectedHostUrls.remove(url);
+                            } else {
+                              _selectedHostUrls.add(url);
+                            }
+                          });
+                        },
+                        behavior: HitTestBehavior.opaque,
+                        child: Row(
+                          children: [
+                            Icon(
+                              selected ? CupertinoIcons.checkmark_square_fill : CupertinoIcons.square,
+                              size: 22,
+                              color: selected
+                                  ? CupertinoColors.activeBlue
+                                  : CupertinoColors.systemGrey,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              _hostLabel(url),
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Leave empty to use current host only.',
+              style: TextStyle(
+                fontSize: 12,
+                color: CupertinoColors.systemGrey,
+              ),
             ),
             const SizedBox(height: 24),
             Text(

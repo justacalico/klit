@@ -13,6 +13,7 @@ class UiPostDetailOverlay extends StatelessWidget {
     required this.onClose,
     this.onLoadMore,
     this.hasMore = false,
+    this.postHostUrls,
   });
 
   final List<int> postIds;
@@ -22,6 +23,7 @@ class UiPostDetailOverlay extends StatelessWidget {
   final VoidCallback onClose;
   final Future<List<int>> Function()? onLoadMore;
   final bool hasMore;
+  final List<String>? postHostUrls;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,7 @@ class UiPostDetailOverlay extends StatelessWidget {
       onClose: onClose,
       onLoadMore: onLoadMore,
       hasMore: hasMore,
+      postHostUrls: postHostUrls,
     );
   }
 }

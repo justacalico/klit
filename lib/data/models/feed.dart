@@ -12,6 +12,8 @@ class Feed {
   final List<String> includeTags;
   final List<String> orTags;
   final List<String> excludeTags;
+  /// Host URLs to load from (e.g. e926, e621, e6ai). Empty = current host only.
+  final List<String> hostUrls;
 
   const Feed({
     required this.id,
@@ -20,6 +22,7 @@ class Feed {
     required this.includeTags,
     required this.orTags,
     required this.excludeTags,
+    this.hostUrls = const [],
   });
 
   /// True if this feed is video-only (for backward compatibility).
@@ -29,6 +32,7 @@ class Feed {
     final include = json['includeTags'];
     final or = json['orTags'];
     final exclude = json['excludeTags'];
+    final hostUrlsRaw = json['hostUrls'];
     String mt = json['mediaType'] as String? ?? '';
     if (mt != mediaTypeImage && mt != mediaTypeVideo && mt != mediaTypeAll) {
       mt = json['isVideo'] == true ? mediaTypeVideo : mediaTypeImage;
@@ -46,6 +50,9 @@ class Feed {
       excludeTags: exclude is List<dynamic>
           ? (exclude).map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList()
           : [],
+      hostUrls: hostUrlsRaw is List<dynamic>
+          ? (hostUrlsRaw).map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList()
+          : [],
     );
   }
 
@@ -57,6 +64,7 @@ class Feed {
       'includeTags': includeTags,
       'orTags': orTags,
       'excludeTags': excludeTags,
+      'hostUrls': hostUrls,
     };
   }
 
@@ -67,6 +75,7 @@ class Feed {
     List<String>? includeTags,
     List<String>? orTags,
     List<String>? excludeTags,
+    List<String>? hostUrls,
   }) {
     return Feed(
       id: id ?? this.id,
@@ -75,6 +84,7 @@ class Feed {
       includeTags: includeTags ?? this.includeTags,
       orTags: orTags ?? this.orTags,
       excludeTags: excludeTags ?? this.excludeTags,
+      hostUrls: hostUrls ?? this.hostUrls,
     );
   }
 

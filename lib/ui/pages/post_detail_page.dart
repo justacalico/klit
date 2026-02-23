@@ -396,7 +396,8 @@ Widget _uploaderAvatarWidget({
   );
 }
 
-/// Post detail page - single state preserved across layout mode changes
+/// Post detail page - single state preserved across layout mode changes.
+/// When [postHostUrls] is set, API calls (load, vote, favorite, comment) use that host per post.
 class PostDetailPage extends StatefulWidget {
   final List<int> postIds;
   final int initialIndex;
@@ -405,6 +406,8 @@ class PostDetailPage extends StatefulWidget {
   final Future<List<int>> Function()? onLoadMore;
   final bool hasMore;
   final VoidCallback? onClose;
+  /// Host URL per post index (same length as postIds). When set, use for API calls.
+  final List<String>? postHostUrls;
 
   const PostDetailPage({
     super.key,
@@ -415,6 +418,7 @@ class PostDetailPage extends StatefulWidget {
     this.onLoadMore,
     this.hasMore = false,
     this.onClose,
+    this.postHostUrls,
   });
 
   @override
@@ -452,6 +456,21 @@ class _PostDetailPageState extends State<PostDetailPage>
 
   int get _currentPostId => _postIds[_currentIndex];
   Post? get _currentPost => _loadedPosts[_currentIndex];
+
+  /// Runs [fn] with the host for [index] when [postHostUrls] is set; otherwise runs [fn] with current API.
+  Future<T> _runWithHostForIndex<T>(int index, Future<T> Function() fn) async {
+    final urls = widget.postHostUrls;
+    if (urls == null || index < 0 || index >= urls.length) return await fn();
+    final hostUrl = urls[index];
+    final auth = context.read<AuthProvider>();
+    final account = auth.getAccountForHost(hostUrl);
+    return await context.read<ApiService>().runWithHost(
+      hostUrl,
+      account?.username,
+      account?.apiKey,
+      fn,
+    );
+  }
 
   @override
   void initState() {
@@ -531,7 +550,10 @@ class _PostDetailPageState extends State<PostDetailPage>
     });
     final postId = _postIds[index];
     final apiService = context.read<ApiService>();
-    final result = await apiService.getPostById(postId);
+    final result = await _runWithHostForIndex<ApiResult<Post>>(
+      index,
+      () => apiService.getPostById(postId),
+    );
     result.when(
       success: (post) {
         if (mounted) {
@@ -542,7 +564,7 @@ class _PostDetailPageState extends State<PostDetailPage>
             _updatedScores[index] = post.score;
           });
           _precachePostImages(post);
-          _preloadComments(post.id);
+          _preloadComments(post.id, index);
         }
       },
       failure: (error) {
@@ -572,10 +594,10 @@ class _PostDetailPageState extends State<PostDetailPage>
   }
 
   /// Preload comments for a post so the comments sheet can show them immediately when opened.
-  void _preloadComments(int postId) {
+  void _preloadComments(int postId, int index) {
     if (_commentsCache.containsKey(postId)) return;
     final apiService = context.read<ApiService>();
-    apiService.getComments(postId).then((result) {
+    _runWithHostForIndex(index, () => apiService.getComments(postId)).then((result) {
       if (!mounted) return;
       result.when(
         success: (comments) {
@@ -668,7 +690,10 @@ class _PostDetailPageState extends State<PostDetailPage>
     if (post == null || _isVoting[index] == true) return;
     setState(() => _isVoting[index] = true);
     final apiService = context.read<ApiService>();
-    final result = await apiService.votePost(post.id, score);
+    final result = await _runWithHostForIndex<ApiResult<PostScore>>(
+      index,
+      () => apiService.votePost(post.id, score),
+    );
     if (mounted) {
       result.when(
         success: (newScore) {
@@ -692,9 +717,12 @@ class _PostDetailPageState extends State<PostDetailPage>
     final isFav = _isFavorited[index] ?? post.isFavorited;
     setState(() => _isTogglingFavorite[index] = true);
     final apiService = context.read<ApiService>();
-    final result = isFav
-        ? await apiService.removeFavorite(post.id)
-        : await apiService.addFavorite(post.id);
+    final result = await _runWithHostForIndex<ApiResult<bool>>(
+      index,
+      () => isFav
+          ? apiService.removeFavorite(post.id)
+          : apiService.addFavorite(post.id),
+    );
     if (mounted) {
       result.when(
         success: (_) {
@@ -753,10 +781,15 @@ class _PostDetailPageState extends State<PostDetailPage>
     final post = _loadedPosts[index];
     if (post == null) return;
     final preloaded = _commentsCache[post.id];
+    final hostUrl = widget.postHostUrls != null &&
+            index < widget.postHostUrls!.length
+        ? widget.postHostUrls![index]
+        : null;
     showCupertinoModalPopup(
       context: context,
       builder: (context) => _CommentsSheet(
             postId: post.id,
+            hostUrl: hostUrl,
             preloadedComments: preloaded,
             onSearchTag: _searchTag,
           ),
@@ -3356,13 +3389,16 @@ class _FullScreenImageViewer extends StatelessWidget {
 
 /// Comments sheet with liquid glass design.
 /// [preloadedComments] are shown immediately when provided (from post detail preload); more pages load on scroll.
+/// When [hostUrl] is set (multi-host feed), API calls use that host.
 class _CommentsSheet extends StatefulWidget {
   final int postId;
+  final String? hostUrl;
   final List<Comment>? preloadedComments;
   final void Function(String tag)? onSearchTag;
 
   const _CommentsSheet({
     required this.postId,
+    this.hostUrl,
     this.preloadedComments,
     this.onSearchTag,
   });
@@ -3412,6 +3448,19 @@ class _CommentsSheetState extends State<_CommentsSheet> {
     if (pos.pixels >= pos.maxScrollExtent - 200) _loadMoreComments();
   }
 
+  Future<T> _runWithHostIfNeeded<T>(Future<T> Function() fn) async {
+    final hostUrl = widget.hostUrl;
+    if (hostUrl == null) return await fn();
+    final auth = context.read<AuthProvider>();
+    final account = auth.getAccountForHost(hostUrl);
+    return await context.read<ApiService>().runWithHost(
+      hostUrl,
+      account?.username,
+      account?.apiKey,
+      fn,
+    );
+  }
+
   Future<void> _loadComments() async {
     setState(() {
       _isLoading = true;
@@ -3419,7 +3468,9 @@ class _CommentsSheetState extends State<_CommentsSheet> {
     });
 
     final apiService = context.read<ApiService>();
-    final result = await apiService.getComments(widget.postId, page: 1);
+    final result = await _runWithHostIfNeeded(
+      () => apiService.getComments(widget.postId, page: 1),
+    );
 
     if (mounted) {
       result.when(
@@ -3445,7 +3496,9 @@ class _CommentsSheetState extends State<_CommentsSheet> {
     if (_isLoadingMore || !_hasMore) return;
     setState(() => _isLoadingMore = true);
     final apiService = context.read<ApiService>();
-    final result = await apiService.getComments(widget.postId, page: _page + 1);
+    final result = await _runWithHostIfNeeded(
+      () => apiService.getComments(widget.postId, page: _page + 1),
+    );
     if (mounted) {
       result.when(
         success: (comments) {
@@ -3472,7 +3525,9 @@ class _CommentsSheetState extends State<_CommentsSheet> {
     });
 
     final apiService = context.read<ApiService>();
-    final result = await apiService.postComment(widget.postId, body);
+    final result = await _runWithHostIfNeeded(
+      () => apiService.postComment(widget.postId, body),
+    );
 
     if (mounted) {
       result.when(

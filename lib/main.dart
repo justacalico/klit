@@ -39,7 +39,10 @@ void main() async {
   // Allow auth provider to control API service and initialize authentication
   authProvider.setApiService(apiService);
   await authProvider.initialize();
-  final postsProvider = PostsProvider(apiService: apiService);
+  final postsProvider = PostsProvider(
+    apiService: apiService,
+    authProvider: authProvider,
+  );
 
   // Listen for host changes - update API service and clear cached posts
   settingsProvider.onHostChanged = (host) {
@@ -75,14 +78,13 @@ void main() async {
   final feedsProvider = FeedsProvider(storageService: storageService);
   await feedsProvider.loadFeeds();
 
-  // Reload account-scoped data (search history, feeds) when account changes
+  // Reload account-scoped data (search history) when account changes. Feeds are global.
   String? lastAccountScope = authProvider.currentAccount?.id ?? 'guest';
   authProvider.addListener(() async {
     final scope = authProvider.currentAccount?.id ?? 'guest';
     if (scope == lastAccountScope) return;
     lastAccountScope = scope;
     await settingsProvider.reloadSearchHistory();
-    await feedsProvider.reloadFeeds();
   });
 
   runApp(

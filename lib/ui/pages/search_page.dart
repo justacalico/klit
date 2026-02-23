@@ -19,12 +19,15 @@ class UiSearchPage extends StatefulWidget {
   final void Function(PostDetailArguments) onPostTap;
   /// When set, toolbar shows a back button (e.g. when page is pushed as a route). Caller should not use a separate nav bar.
   final VoidCallback? onBack;
+  /// When non-empty, search runs on each host and results are merged (multi-host feed).
+  final List<String>? hostUrls;
 
   const UiSearchPage({
     super.key,
     this.initialQuery,
     this.feedMode = false,
     this.onBack,
+    this.hostUrls,
     required this.onPostTap,
   });
 
@@ -189,13 +192,26 @@ class _UiSearchPageState extends State<UiSearchPage>
     if (query.isEmpty) return;
     _closeTagSuggestions();
     final sp = context.read<SettingsProvider>();
-    context.read<PostsProvider>().searchPosts(
-      query: query,
-      refresh: true,
-      rating: _selectedRating,
-      order: _selectedOrder,
-      safeMode: sp.safeMode,
-    );
+    final pp = context.read<PostsProvider>();
+    final hostUrls = widget.hostUrls;
+    if (hostUrls != null && hostUrls.isNotEmpty) {
+      pp.searchPostsMultiHost(
+        query: query,
+        hostUrls: hostUrls,
+        refresh: true,
+        rating: _selectedRating,
+        order: _selectedOrder,
+        safeMode: sp.safeMode,
+      );
+    } else {
+      pp.searchPosts(
+        query: query,
+        refresh: true,
+        rating: _selectedRating,
+        order: _selectedOrder,
+        safeMode: sp.safeMode,
+      );
+    }
     if (!widget.feedMode) {
       sp.addToSearchHistory(query);
     }
@@ -206,19 +222,35 @@ class _UiSearchPageState extends State<UiSearchPage>
     final sp = context.read<SettingsProvider>();
     final posts = pp.searchResults;
     final idx = posts.indexWhere((p) => p.id == post.id);
+    final hostUrls = widget.hostUrls;
+    final postHostUrls = pp.searchPostHostUrls;
 
     widget.onPostTap(
       PostDetailArguments(
         postIds: posts.map((p) => p.id).toList(),
         initialIndex: idx >= 0 ? idx : 0,
         hasMore: pp.hasMoreSearch,
+        postHostUrls: (postHostUrls != null && postHostUrls.length == posts.length)
+            ? postHostUrls
+            : null,
         onLoadMore: () async {
-          await pp.searchPosts(
-            query: pp.currentSearchQuery,
-            rating: _selectedRating,
-            order: _selectedOrder,
-            safeMode: sp.safeMode,
-          );
+          if (hostUrls != null && hostUrls.isNotEmpty) {
+            await pp.searchPostsMultiHost(
+              query: pp.currentSearchQuery,
+              hostUrls: hostUrls,
+              refresh: false,
+              rating: _selectedRating,
+              order: _selectedOrder,
+              safeMode: sp.safeMode,
+            );
+          } else {
+            await pp.searchPosts(
+              query: pp.currentSearchQuery,
+              rating: _selectedRating,
+              order: _selectedOrder,
+              safeMode: sp.safeMode,
+            );
+          }
           return pp.searchResults.map((p) => p.id).toList();
         },
       ),
@@ -229,13 +261,26 @@ class _UiSearchPageState extends State<UiSearchPage>
     final query = _searchController.text.trim();
     if (query.isEmpty) return;
     final sp = context.read<SettingsProvider>();
-    context.read<PostsProvider>().searchPosts(
-      query: query,
-      refresh: false,
-      rating: _selectedRating,
-      order: _selectedOrder,
-      safeMode: sp.safeMode,
-    );
+    final pp = context.read<PostsProvider>();
+    final hostUrls = widget.hostUrls;
+    if (hostUrls != null && hostUrls.isNotEmpty) {
+      pp.searchPostsMultiHost(
+        query: query,
+        hostUrls: hostUrls,
+        refresh: false,
+        rating: _selectedRating,
+        order: _selectedOrder,
+        safeMode: sp.safeMode,
+      );
+    } else {
+      pp.searchPosts(
+        query: query,
+        refresh: false,
+        rating: _selectedRating,
+        order: _selectedOrder,
+        safeMode: sp.safeMode,
+      );
+    }
   }
 
   void _toggleFilters() {

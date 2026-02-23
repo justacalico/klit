@@ -217,6 +217,36 @@ class ApiService {
     _authHeader = null;
   }
 
+  void _restoreState(String baseUrl, String? authHeader) {
+    _baseUrl = baseUrl;
+    _authHeader = authHeader;
+    _dio.options.baseUrl = baseUrl;
+  }
+
+  /// Runs [fn] with [hostUrl] and optional [username]/[apiKey], then restores previous base URL and auth.
+  Future<T> runWithHost<T>(
+    String hostUrl,
+    String? username,
+    String? apiKey,
+    Future<T> Function() fn,
+  ) async {
+    final savedBase = _baseUrl;
+    final savedAuth = _authHeader;
+    var u = hostUrl.trim();
+    if (u.endsWith('/')) u = u.substring(0, u.length - 1);
+    setBaseUrl(u);
+    if (username != null && apiKey != null) {
+      setAuth(username, apiKey);
+    } else {
+      clearAuth();
+    }
+    try {
+      return await fn();
+    } finally {
+      _restoreState(savedBase, savedAuth);
+    }
+  }
+
   Future<ApiResult<bool>> verifyCredentials(
     String username,
     String apiKey,
