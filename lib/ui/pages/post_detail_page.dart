@@ -586,9 +586,6 @@ class _PostDetailPageState extends State<PostDetailPage>
     }
   }
 
-  Future<void> _refreshCurrentPost() =>
-      _loadPost(_currentIndex, forceRefresh: true);
-
   Future<void> _loadUploaderAvatar(String username) async {
     if (_uploaderAvatarLoading.contains(username)) return;
     _uploaderAvatarLoading.add(username);
@@ -1192,27 +1189,10 @@ class _MobilePostDetailBody extends StatelessWidget {
                 : 'Post #${s._currentPostId}',
           ),
           trailing: s._currentPost != null
-              ? Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: s._loadingStates[s._currentIndex] == true
-                          ? null
-                          : s._refreshCurrentPost,
-                      child: Icon(
-                        CupertinoIcons.refresh,
-                        color: s._loadingStates[s._currentIndex] == true
-                            ? CupertinoColors.systemGrey
-                            : null,
-                      ),
-                    ),
-                    CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () => s._showMoreOptions(),
-                      child: const Icon(CupertinoIcons.ellipsis),
-                    ),
-                  ],
+              ? CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () => s._showMoreOptions(),
+                  child: const Icon(CupertinoIcons.ellipsis),
                 )
               : null,
         ),
