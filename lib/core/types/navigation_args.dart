@@ -1,6 +1,7 @@
 /// Arguments for navigating to search or feed view.
 /// When [feedTitle] is non-null, the search page runs in feed mode (no search bar, no history).
 /// When [hostUrls] is non-empty, search runs on each host and results are merged.
+library;
 import '../../data/models/models.dart';
 class SearchRouteArguments {
   const SearchRouteArguments({
