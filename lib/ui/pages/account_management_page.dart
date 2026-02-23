@@ -285,6 +285,11 @@ class AccountManagementContent extends StatelessWidget {
               ],
             );
           }
+          // Embedded in settings: give list bounded height to avoid unbounded constraints
+          // (parent is Column inside SingleChildScrollView), which triggers semantics assertion.
+          if (embeddedInSettings) {
+            return SizedBox(height: 320, child: list);
+          }
           return list;
         },
       );
