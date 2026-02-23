@@ -13,24 +13,6 @@ flutter run -d linux
 flutter build linux
 ```
 
-### Force Desktop UI
-
-Build with only the desktop UI, regardless of screen size:
-
-```bash
-flutter run -d linux --dart-define=FORCE_DESKTOP=true
-flutter build linux --dart-define=FORCE_DESKTOP=true
-```
-
-### Force Mobile UI
-
-Build with only the mobile UI, regardless of screen size:
-
-```bash
-flutter run -d linux --dart-define=FORCE_MOBILE=true
-flutter build linux --dart-define=FORCE_MOBILE=true
-```
-
 ## Supported Platforms
 
 - Linux
