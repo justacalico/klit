@@ -114,4 +114,14 @@ void main() async {
       child: const KlitApp(),
     ),
   );
+
+  // Re-apply status bar hide after first frame (Android can reset it on keyboard etc.)
+  if (Platform.isAndroid) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: [SystemUiOverlay.bottom],
+      );
+    });
+  }
 }
