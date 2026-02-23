@@ -157,6 +157,7 @@ class _SearchRoutePage extends StatelessWidget {
         child: UiSearchPage(
           initialQuery: initialQuery,
           feedMode: isFeedMode,
+          feedTitle: feedTitle,
           hostUrls: hostUrls,
           onBack: () => Navigator.of(context).pop(),
           onPostTap: (args) => Navigator.of(

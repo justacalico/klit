@@ -21,6 +21,8 @@ class UiSearchPage extends StatefulWidget {
   final VoidCallback? onBack;
   /// When non-empty, search runs on each host and results are merged (multi-host feed).
   final List<String>? hostUrls;
+  /// When in feed mode, title shown in the toolbar (e.g. feed name). Ignored when not feed mode.
+  final String? feedTitle;
 
   const UiSearchPage({
     super.key,
@@ -28,6 +30,7 @@ class UiSearchPage extends StatefulWidget {
     this.feedMode = false,
     this.onBack,
     this.hostUrls,
+    this.feedTitle,
     required this.onPostTap,
   });
 
@@ -364,7 +367,10 @@ class _UiSearchPageState extends State<UiSearchPage>
         children: [
           Column(
             children: [
-              if (!feedMode) _buildToolbar(context, isDark, isMobile),
+              if (feedMode && widget.onBack != null)
+                _buildFeedToolbar(context, isDark)
+              else if (!feedMode)
+                _buildToolbar(context, isDark, isMobile),
               Expanded(
                 child: feedMode
                     ? _buildResults(context)
@@ -413,6 +419,61 @@ class _UiSearchPageState extends State<UiSearchPage>
                 ),
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  /// Toolbar for feed mode: back button + feed title so user can exit the feed.
+  Widget _buildFeedToolbar(BuildContext context, bool isDark) {
+    final title = widget.feedTitle?.isNotEmpty == true
+        ? widget.feedTitle!
+        : 'Feed';
+    return Container(
+      height: 60,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [
+                  const Color(0xFF18181B).withValues(alpha: 0.85),
+                  const Color(0xFF1F1F23).withValues(alpha: 0.9),
+                ]
+              : [
+                  const Color(0xFFFFFFFF).withValues(alpha: 0.85),
+                  const Color(0xFFFAFAFC).withValues(alpha: 0.9),
+                ],
+        ),
+        border: Border(
+          bottom: BorderSide(
+            color: isDark
+                ? const Color(0xFF3A3A3C).withValues(alpha: 0.5)
+                : const Color(0xFFE5E5E7).withValues(alpha: 0.5),
+            width: 1,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: widget.onBack,
+            child: const Icon(CupertinoIcons.back),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
+                color: isDark ? CupertinoColors.white : CupertinoColors.black,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );
