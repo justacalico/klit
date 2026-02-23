@@ -300,8 +300,9 @@ class AccountManagementContent extends StatelessWidget {
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 600),
-        child: ListView.builder(
+        child: ListView.separated(
           itemCount: auth.accounts.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 14),
           itemBuilder: (context, index) {
             final account = auth.accounts[index];
             final isActive = auth.currentAccount?.id == account.id;
@@ -797,7 +798,7 @@ class _DesktopAccountCardState extends State<_DesktopAccountCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 2),
       child: MouseRegion(
         cursor: widget.onTap != null
             ? SystemMouseCursors.click
@@ -808,41 +809,33 @@ class _DesktopAccountCardState extends State<_DesktopAccountCard> {
           onTap: widget.onTap,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: widget.isActive
-                  ? LinearGradient(
-                      colors: [
-                        _AccountColors.primaryIndigo.withValues(alpha: 0.15),
-                        _AccountColors.primaryPurple.withValues(alpha: 0.1),
-                      ],
-                    )
-                  : null,
               color: widget.isActive
-                  ? null
+                  ? _AccountColors.primaryIndigo.withValues(alpha: 0.12)
                   : (widget.isDark
                         ? CupertinoColors.white.withValues(
                             alpha: _isHovered ? 0.08 : 0.05,
                           )
                         : CupertinoColors.white),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(18),
               border: Border.all(
                 color: widget.isActive
-                    ? _AccountColors.primaryIndigo.withValues(alpha: 0.5)
+                    ? _AccountColors.primaryIndigo.withValues(alpha: 0.4)
                     : (_isHovered
-                          ? _AccountColors.primaryIndigo.withValues(alpha: 0.3)
+                          ? _AccountColors.primaryIndigo.withValues(alpha: 0.2)
                           : (widget.isDark
-                                ? CupertinoColors.white.withValues(alpha: 0.1)
+                                ? CupertinoColors.white.withValues(alpha: 0.08)
                                 : CupertinoColors.systemGrey5)),
-                width: widget.isActive ? 2 : 1,
+                width: widget.isActive ? 1.5 : 1,
               ),
               boxShadow: _isHovered && !widget.isActive
                   ? [
                       BoxShadow(
                         color: _AccountColors.primaryIndigo.withValues(
-                          alpha: 0.1,
+                          alpha: 0.08,
                         ),
-                        blurRadius: 20,
+                        blurRadius: 16,
                         offset: const Offset(0, 4),
                       ),
                     ]
@@ -852,8 +845,8 @@ class _DesktopAccountCardState extends State<_DesktopAccountCard> {
               children: [
                 // Avatar
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: 52,
+                  height: 52,
                   decoration: BoxDecoration(
                     gradient: widget.isActive
                         ? const LinearGradient(
@@ -864,20 +857,20 @@ class _DesktopAccountCardState extends State<_DesktopAccountCard> {
                           )
                         : null,
                     color: widget.isActive ? null : CupertinoColors.systemGrey,
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Center(
                     child: Text(
                       widget.username[0].toUpperCase(),
                       style: const TextStyle(
-                        fontSize: 20,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: CupertinoColors.white,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 18),
                 // Info
                 Expanded(
                   child: Column(
@@ -888,8 +881,9 @@ class _DesktopAccountCardState extends State<_DesktopAccountCard> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: widget.isActive
-                              ? FontWeight.bold
+                              ? FontWeight.w600
                               : FontWeight.w500,
+                          letterSpacing: -0.2,
                           color: widget.isDark
                               ? CupertinoColors.white
                               : CupertinoColors.black,
@@ -912,28 +906,27 @@ class _DesktopAccountCardState extends State<_DesktopAccountCard> {
                 if (widget.isActive)
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
+                      horizontal: 10,
+                      vertical: 5,
                     ),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [
-                          _AccountColors.primaryIndigo,
-                          _AccountColors.primaryPurple,
-                        ],
+                      color: _AccountColors.primaryIndigo.withValues(alpha: 0.25),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: _AccountColors.primaryIndigo.withValues(alpha: 0.5),
+                        width: 1,
                       ),
-                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Active',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: CupertinoColors.white,
+                        color: _AccountColors.primaryIndigo,
                       ),
                     ),
                   ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 // Options button
                 _DesktopOptionsButton(
                   onPressed: widget.onOptions,
@@ -975,13 +968,13 @@ class _DesktopOptionsButtonState extends State<_DesktopOptionsButton> {
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: _isHovered
-                ? _AccountColors.primaryIndigo.withValues(alpha: 0.1)
+                ? _AccountColors.primaryIndigo.withValues(alpha: 0.12)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(
             CupertinoIcons.ellipsis_circle,
-            size: 24,
+            size: 22,
             color: _isHovered
                 ? _AccountColors.primaryIndigo
                 : CupertinoColors.secondaryLabel.resolveFrom(context),

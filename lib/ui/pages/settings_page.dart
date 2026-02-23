@@ -881,39 +881,39 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     EdgeInsets? padding,
   }) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(18),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
-          padding: padding ?? const EdgeInsets.all(20),
+          padding: padding ?? const EdgeInsets.all(24),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
                   ? [
-                      const Color(0xFF1C1C1E).withValues(alpha: 0.8),
-                      const Color(0xFF2C2C2E).withValues(alpha: 0.6),
+                      const Color(0xFF1C1C1E).withValues(alpha: 0.85),
+                      const Color(0xFF252528).withValues(alpha: 0.7),
                     ]
                   : [
-                      const Color(0xFFFFFFFF).withValues(alpha: 0.9),
-                      const Color(0xFFF8F8FA).withValues(alpha: 0.8),
+                      const Color(0xFFFFFFFF).withValues(alpha: 0.95),
+                      const Color(0xFFF5F5F7).withValues(alpha: 0.9),
                     ],
             ),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: isDark
-                  ? _DesignColors.primaryPurple.withValues(alpha: 0.15)
-                  : const Color(0xFFE5E5E7),
+                  ? CupertinoColors.white.withValues(alpha: 0.06)
+                  : CupertinoColors.black.withValues(alpha: 0.04),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
                 color: isDark
-                    ? CupertinoColors.black.withValues(alpha: 0.3)
-                    : CupertinoColors.systemGrey.withValues(alpha: 0.1),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
+                    ? CupertinoColors.black.withValues(alpha: 0.35)
+                    : CupertinoColors.systemGrey.withValues(alpha: 0.08),
+                blurRadius: 24,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
@@ -1038,7 +1038,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                         isLoading: _accountAvatarLoading && !isGuest,
                         paletteColor: _accountAvatarPaletteColor,
                       ),
-                      const SizedBox(width: 20),
+                      const SizedBox(width: 24),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1048,20 +1048,22 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                                   ? 'Guest Mode'
                                   : (account?.username ?? 'Not logged in'),
                               style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.3,
                                 color: isDark
                                     ? CupertinoColors.white
                                     : CupertinoColors.black,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 6),
                             Text(
                               isGuest
                                   ? 'Sign in to access all features'
                                   : (account?.host ?? ''),
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 13,
+                                letterSpacing: 0.1,
                                 color: isDark
                                     ? CupertinoColors.systemGrey
                                     : CupertinoColors.systemGrey2,
@@ -1073,11 +1075,11 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                       if (isGuest)
                         CupertinoButton(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
+                            horizontal: 24,
+                            vertical: 12,
                           ),
                           color: _DesignColors.primaryPurple,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                           onPressed: () {
                             authProvider.logout();
                             Navigator.of(context).pushNamedAndRemoveUntil(
@@ -1099,42 +1101,68 @@ class _UiSettingsPageState extends State<UiSettingsPage>
               ),
             ),
             if (!isGuest) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               _buildSettingsCard(
                 isDark: isDark,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          'Accounts (${authProvider.accounts.length})',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: isDark
-                                ? CupertinoColors.white
-                                : CupertinoColors.black,
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Accounts (${authProvider.accounts.length})',
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: -0.2,
+                                color: isDark
+                                    ? CupertinoColors.white
+                                    : CupertinoColors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Switch or add accounts',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: isDark
+                                    ? CupertinoColors.systemGrey
+                                    : CupertinoColors.systemGrey2,
+                              ),
+                            ),
+                          ],
                         ),
                         CupertinoButton(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
+                            horizontal: 16,
+                            vertical: 8,
                           ),
+                          color: _DesignColors.primaryIndigo,
+                          borderRadius: BorderRadius.circular(10),
                           onPressed: () =>
                               AccountManagementContent.showAddAccountSheet(
                             context,
                             LayoutScope.of(context).isDesktop,
                           ),
-                          child: const Text('Add'),
+                          child: const Text(
+                            'Add',
+                            style: TextStyle(
+                              color: CupertinoColors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 16),
                     AccountManagementContent(
                       isDark: isDark,
                       embeddedInSettings: true,
@@ -1143,7 +1171,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               _buildSettingsCard(
                 isDark: isDark,
                 child: _buildSettingRow(
@@ -1189,8 +1217,8 @@ class _UiSettingsPageState extends State<UiSettingsPage>
           ]
         : null;
     return Container(
-      width: 64,
-      height: 64,
+      width: 72,
+      height: 72,
       decoration: BoxDecoration(
         gradient: isGuest
             ? LinearGradient(
@@ -1213,11 +1241,15 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   )),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: glowColor.withValues(alpha: isGuest ? 0.25 : 0.5),
+          width: 2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: glowColor.withValues(alpha: isGuest ? 0.2 : 0.4),
-            blurRadius: 12,
+            color: glowColor.withValues(alpha: isGuest ? 0.2 : 0.35),
+            blurRadius: 16,
             offset: const Offset(0, 4),
           ),
         ],
@@ -1239,7 +1271,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                           ? username[0].toUpperCase()
                           : '?',
                       style: const TextStyle(
-                        fontSize: 28,
+                        fontSize: 30,
                         fontWeight: FontWeight.bold,
                         color: CupertinoColors.white,
                       ),
@@ -1251,7 +1283,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                           ? username[0].toUpperCase()
                           : '?',
                       style: const TextStyle(
-                        fontSize: 28,
+                        fontSize: 30,
                         fontWeight: FontWeight.bold,
                         color: CupertinoColors.white,
                       ),
@@ -1270,7 +1302,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                               ? username[0].toUpperCase()
                               : '?',
                           style: const TextStyle(
-                            fontSize: 28,
+                            fontSize: 30,
                             fontWeight: FontWeight.bold,
                             color: CupertinoColors.white,
                           ),
