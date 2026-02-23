@@ -296,7 +296,15 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                   Expanded(child: _buildMainContent(isDark)),
                 ],
               )
-            : _buildMobileLayout(context, isDark),
+            : PopScope(
+                canPop: _mobileShowMainList,
+                onPopInvokedWithResult: (didPop, result) {
+                  if (!didPop && !_mobileShowMainList) {
+                    setState(() => _mobileShowMainList = true);
+                  }
+                },
+                child: _buildMobileLayout(context, isDark),
+              ),
       ),
     );
   }
