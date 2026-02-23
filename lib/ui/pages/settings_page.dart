@@ -318,10 +318,62 @@ class _UiSettingsPageState extends State<UiSettingsPage>
         : _categories
             .where((c) => c.title.toLowerCase().contains(query))
             .toList();
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
+    final canPop = Navigator.of(context).canPop();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // When opened as a route (e.g. from Profile), show back bar so user is not stuck
+        if (canPop)
+          Container(
+            height: 56,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(
+              color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+              border: Border(
+                bottom: BorderSide(
+                  color: AppColors.resolveSeparator(isDark, isOled: isOled),
+                  width: 0.5,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                CupertinoButton(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        CupertinoIcons.back,
+                        size: 22,
+                        color: CupertinoColors.activeBlue,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Back',
+                        style: TextStyle(
+                          fontSize: 17,
+                          color: CupertinoColors.activeBlue,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Settings',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                  ),
+                ),
+              ],
+            ),
+          ),
         // Search bar (iOS "Search Settings" style)
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -489,6 +541,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
 
   /// macOS-style sidebar: search at top, list with blue highlight for selected
   Widget _buildSidebar(bool isDark, bool isOled) {
+    final canPop = Navigator.of(context).canPop();
     return Container(
       width: 260,
       decoration: BoxDecoration(
@@ -507,6 +560,33 @@ class _UiSettingsPageState extends State<UiSettingsPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // When opened as a route (e.g. from Profile), show back so user is not stuck
+          if (canPop)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+              child: CupertinoButton(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                onPressed: () => Navigator.of(context).pop(),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      CupertinoIcons.back,
+                      size: 18,
+                      color: CupertinoColors.activeBlue,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Back',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: CupertinoColors.activeBlue,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           // Search bar (macOS System Settings style)
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 16, 12, 8),
