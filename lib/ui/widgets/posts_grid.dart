@@ -104,14 +104,17 @@ class PostsGrid extends StatelessWidget {
                       final cacheW = (cellSize * dpr).round();
                       final cacheH = (cellSize * dpr / aspectRatio).round();
                       return RepaintBoundary(
-                        child: PostCard(
-                          post: post,
-                          onTap: () => onPostTap(post),
-                          style: PostCardStyle.grid,
-                          isOled: isOled,
-                          isLiquidGlass: isLiquidGlass,
-                          memCacheWidth: cacheW,
-                          memCacheHeight: cacheH,
+                        child: AspectRatio(
+                          aspectRatio: 1,
+                          child: PostCard(
+                            post: post,
+                            onTap: () => onPostTap(post),
+                            style: PostCardStyle.grid,
+                            isOled: isOled,
+                            isLiquidGlass: isLiquidGlass,
+                            memCacheWidth: cacheW,
+                            memCacheHeight: cacheH,
+                          ),
                         ),
                       );
                     },
