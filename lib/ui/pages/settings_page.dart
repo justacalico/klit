@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
@@ -22,23 +21,6 @@ import '../../data/services/services.dart';
 import '../../providers/providers.dart';
 import 'account_management_page.dart';
 import 'i_finished_gallery_page.dart';
-
-// #region agent log
-void _debugLog(String location, String message, Map<String, dynamic> data, String hypothesisId) {
-  try {
-    final payload = jsonEncode({
-      'sessionId': '93b5a6',
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
-      'location': location,
-      'message': message,
-      'data': data,
-      'hypothesisId': hypothesisId,
-    });
-    File('/mnt/FUCKICE/Code/gitlab/Openlyst/klit/.cursor/debug-93b5a6.log')
-        .writeAsStringSync('$payload\n', mode: FileMode.append);
-  } catch (_) {}
-}
-// #endregion
 
 /// Design constants for the settings page
 class _DesignColors {
@@ -230,23 +212,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
 
   void _selectCategory(String id) {
     if (_selectedCategory == id) return;
-    // #region agent log
-    _debugLog(
-      'settings_page.dart:_selectCategory',
-      'Category selected (async update scheduled)',
-      {'id': id, 'currentSelected': _selectedCategory},
-      'B',
-    );
-    // #endregion
     _animationController.reverse().then((_) {
-      // #region agent log
-      _debugLog(
-        'settings_page.dart:_selectCategory_then',
-        'Applying category after animation',
-        {'id': id},
-        'B',
-      );
-      // #endregion
       setState(() => _selectedCategory = id);
       _animationController.forward();
     });
@@ -395,14 +361,6 @@ class _UiSettingsPageState extends State<UiSettingsPage>
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          // #region agent log
-          _debugLog(
-            'settings_page.dart:mobile_row_ontap',
-            'Mobile category tapped',
-            {'tappedId': category.id, 'currentSelected': _selectedCategory},
-            'A',
-          );
-          // #endregion
           // Set both in one setState so sub-page shows correct category immediately.
           // _selectCategory updates _selectedCategory only in reverse().then(), which
           // caused the wrong category to show for one frame.
@@ -454,14 +412,6 @@ class _UiSettingsPageState extends State<UiSettingsPage>
 
   /// Mobile sub-page: nav bar with back + category title, then category content
   Widget _buildMobileSubPage(BuildContext context, bool isDark, bool isOled) {
-    // #region agent log
-    _debugLog(
-      'settings_page.dart:_buildMobileSubPage',
-      'Building mobile sub-page',
-      {'_selectedCategory': _selectedCategory},
-      'A',
-    );
-    // #endregion
     final category = _categories.firstWhere((c) => c.id == _selectedCategory);
     final showContent = _mobileInitialCategoryReady;
 
