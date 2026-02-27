@@ -422,28 +422,41 @@ class _UiProfilePageState extends State<UiProfilePage> {
 
   Widget _buildProfileTabBar(bool isDark, bool isOled) {
     const labels = ['Main', 'Uploads', 'Favorites'];
-    final bg = AppColors.resolveSecondaryBackground(isDark, isOled: isOled);
-    final selectedBg = isDark
-        ? CupertinoColors.systemGrey.withValues(alpha: 0.45)
-        : CupertinoColors.systemGrey4;
+    final bg = isDark
+        ? const Color(0xFF0F1015)
+        : AppColors.resolveSecondaryBackground(isDark, isOled: isOled);
+    const selectedBg = LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+    );
     final unselectedBg = isDark
-        ? CupertinoColors.white.withValues(alpha: 0.06)
-        : CupertinoColors.black.withValues(alpha: 0.04);
+        ? CupertinoColors.white.withValues(alpha: 0.04)
+        : CupertinoColors.black.withValues(alpha: 0.03);
     final unselectedTextColor = isDark
-        ? const Color(0xFFB8B8C2)
+        ? const Color(0xFFB4B8C8)
         : const Color(0xFF6B7280);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
       child: Container(
-        padding: const EdgeInsets.all(4),
+        padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
           color: bg,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: (isDark ? CupertinoColors.white : CupertinoColors.black)
-                .withValues(alpha: 0.06),
+                .withValues(alpha: isDark ? 0.08 : 0.06),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: CupertinoColors.black.withValues(
+                alpha: isDark ? 0.32 : 0.08,
+              ),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: Row(
           children: List.generate(3, (index) {
@@ -468,8 +481,22 @@ class _UiProfilePageState extends State<UiProfilePage> {
                     duration: const Duration(milliseconds: 150),
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
-                      color: selected ? selectedBg : unselectedBg,
+                      gradient: selected ? selectedBg : null,
+                      color: selected ? null : unselectedBg,
                       borderRadius: BorderRadius.circular(10),
+                      border: selected
+                          ? Border.all(
+                              color: CupertinoColors.white.withValues(
+                                alpha: 0.2,
+                              ),
+                            )
+                          : Border.all(
+                              color:
+                                  (isDark
+                                          ? CupertinoColors.white
+                                          : CupertinoColors.black)
+                                      .withValues(alpha: 0.05),
+                            ),
                     ),
                     alignment: Alignment.center,
                     child: Text(
@@ -502,19 +529,21 @@ class _UiProfilePageState extends State<UiProfilePage> {
     bool isOled,
     bool isNarrow,
   ) {
+    final hostLabel = host.replaceAll(RegExp(r'https?://'), '');
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+      padding: const EdgeInsets.fromLTRB(20, 2, 20, 16),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 720),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildProfileHero(host, _user!, isDark),
-              const SizedBox(height: 20),
+              _buildProfileHero(hostLabel, _user!, isDark),
+              const SizedBox(height: 14),
               _buildStatsGrid(_user!, isDark, isOled, isNarrow),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
               _buildAccountInfoCard(_user!, isDark, isOled),
-              const SizedBox(height: 24),
+              const SizedBox(height: 18),
             ],
           ),
         ),
@@ -712,82 +741,123 @@ class _UiProfilePageState extends State<UiProfilePage> {
     );
   }
 
-  Widget _buildProfileHero(String host, User user, bool isDark) {
+  Widget _buildProfileHero(String hostLabel, User user, bool isDark) {
     final initial = user.name.isNotEmpty ? user.name[0].toUpperCase() : '?';
     final levelColor = _getLevelColor(user.level);
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(22),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 24),
+          padding: const EdgeInsets.fromLTRB(24, 22, 24, 20),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(22),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
-                  ? [
-                      UIColors.primaryPurple.withValues(alpha: 0.12),
-                      UIColors.primaryIndigo.withValues(alpha: 0.08),
-                    ]
+                  ? [const Color(0xFF181124), const Color(0xFF0E1020)]
                   : [
                       UIColors.primaryPurple.withValues(alpha: 0.08),
                       UIColors.primaryIndigo.withValues(alpha: 0.06),
                     ],
             ),
             border: Border.all(
-              color: UIColors.primaryPurple.withValues(
-                alpha: isDark ? 0.25 : 0.15,
-              ),
+              color: isDark
+                  ? UIColors.primaryPurple.withValues(alpha: 0.4)
+                  : UIColors.primaryPurple.withValues(alpha: 0.15),
             ),
+            boxShadow: [
+              BoxShadow(
+                color: UIColors.primaryPurple.withValues(
+                  alpha: isDark ? 0.18 : 0.08,
+                ),
+                blurRadius: 22,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
           child: Column(
             children: [
-              _buildAvatar(initial, isDark),
-              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: UIColors.primaryPurple.withValues(alpha: 0.5),
+                    width: 1.2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: UIColors.primaryPurple.withValues(alpha: 0.25),
+                      blurRadius: 18,
+                    ),
+                  ],
+                ),
+                child: _buildAvatar(initial, isDark),
+              ),
+              const SizedBox(height: 14),
               Text(
                 user.name,
                 style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 34,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.4,
                   color: isDark
                       ? CupertinoColors.white
                       : const Color(0xFF1F2937),
                 ),
               ),
               const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 8,
+                runSpacing: 8,
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 6,
+                      horizontal: 12,
+                      vertical: 5,
                     ),
                     decoration: BoxDecoration(
-                      color: levelColor.withValues(alpha: 0.25),
+                      color: levelColor.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: levelColor.withValues(alpha: 0.45),
+                      ),
                     ),
                     child: Text(
                       user.levelString,
                       style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
                         color: levelColor,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Text(
-                    host.replaceAll(RegExp(r'https?://'), ''),
-                    style: TextStyle(
-                      fontSize: 14,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
                       color: isDark
-                          ? CupertinoColors.systemGrey
-                          : CupertinoColors.systemGrey,
+                          ? CupertinoColors.white.withValues(alpha: 0.05)
+                          : CupertinoColors.black.withValues(alpha: 0.04),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Text(
+                      hostLabel,
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w500,
+                        color: isDark
+                            ? const Color(0xFFB8B8C2)
+                            : const Color(0xFF6B7280),
+                      ),
                     ),
                   ),
                 ],
@@ -915,44 +985,69 @@ class _UiProfilePageState extends State<UiProfilePage> {
 
   Widget _buildStatTile(_StatItem item, bool isDark, bool isOled) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
       decoration: BoxDecoration(
-        color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
-        borderRadius: BorderRadius.circular(14),
+        color: isDark
+            ? const Color(0xFF0E1016)
+            : AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: (isDark ? CupertinoColors.white : CupertinoColors.black)
-              .withValues(alpha: 0.06),
+          color: item.color.withValues(alpha: isDark ? 0.28 : 0.2),
+          width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: CupertinoColors.black.withValues(
+              alpha: isDark ? 0.24 : 0.06,
+            ),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
           Container(
-            width: 36,
-            height: 36,
+            width: 38,
+            height: 38,
             decoration: BoxDecoration(
-              color: item.color.withValues(alpha: 0.18),
-              borderRadius: BorderRadius.circular(10),
+              color: item.color.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(11),
+              border: Border.all(color: item.color.withValues(alpha: 0.3)),
             ),
             child: Icon(item.icon, color: item.color, size: 18),
           ),
-          const SizedBox(height: 10),
-          Text(
-            item.value,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: item.color,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            item.label,
-            style: TextStyle(
-              fontSize: 13,
-              color: isDark
-                  ? CupertinoColors.systemGrey
-                  : const Color(0xFF6B7280),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 26,
+                    height: 1,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.5,
+                    color: isDark
+                        ? CupertinoColors.white
+                        : const Color(0xFF111827),
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  item.label,
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w500,
+                    color: isDark
+                        ? const Color(0xFFA3A8B8)
+                        : const Color(0xFF6B7280),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -976,25 +1071,55 @@ class _UiProfilePageState extends State<UiProfilePage> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
-        borderRadius: BorderRadius.circular(16),
+        color: isDark
+            ? const Color(0xFF0F1118)
+            : AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: (isDark ? CupertinoColors.white : CupertinoColors.black)
-              .withValues(alpha: 0.06),
+              .withValues(alpha: isDark ? 0.08 : 0.06),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: CupertinoColors.black.withValues(alpha: isDark ? 0.2 : 0.05),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
-            child: Text(
-              'Account Info',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-                color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
-              ),
+            child: Row(
+              children: [
+                Icon(
+                  CupertinoIcons.person_crop_rectangle,
+                  size: 16,
+                  color: isDark
+                      ? const Color(0xFFB9BED0)
+                      : const Color(0xFF4B5563),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Account Info',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: isDark
+                        ? CupertinoColors.white
+                        : const Color(0xFF1F2937),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 20, right: 20),
+            child: Container(
+              height: 1,
+              color: AppColors.resolveSeparator(isDark, isOled: isOled),
             ),
           ),
           ...rows.asMap().entries.map((e) {
@@ -1009,22 +1134,32 @@ class _UiProfilePageState extends State<UiProfilePage> {
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        e.value.label,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: CupertinoColors.systemGrey,
+                      Expanded(
+                        child: Text(
+                          e.value.label,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: isDark
+                                ? const Color(0xFFA0A5B5)
+                                : const Color(0xFF6B7280),
+                          ),
                         ),
                       ),
-                      Text(
-                        e.value.value,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: isDark
-                              ? CupertinoColors.white
-                              : const Color(0xFF1F2937),
+                      const SizedBox(width: 12),
+                      Flexible(
+                        child: Text(
+                          e.value.value,
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: isDark
+                                ? CupertinoColors.white
+                                : const Color(0xFF1F2937),
+                          ),
                         ),
                       ),
                     ],
