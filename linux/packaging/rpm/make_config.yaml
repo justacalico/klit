@@ -10,10 +10,9 @@ categories:
   - Graphics
   - Network
 startup_notify: true
-summary: E926 compatible image gallery app
-group: Application/Graphics
+summary: Image Gallery
 vendor: Klit Developer
 packager: Klit Developer
 packagerEmail: dev@klit.app
 license: MIT
-url: https://github.com/klit/klit
+url: https://klit.app
