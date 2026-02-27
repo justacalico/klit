@@ -8,6 +8,7 @@ import '../../data/services/services.dart';
 import '../../core/types/navigation_args.dart';
 import '../../providers/providers.dart';
 import '../layout/layout_scope.dart';
+import '../theme.dart';
 import '../widgets/widgets.dart';
 
 /// Unified search page - reused from desktop search logic.
@@ -375,8 +376,10 @@ class _UiSearchPageState extends State<UiSearchPage>
             children: [
               if (feedMode && widget.onBack != null)
                 _buildFeedToolbar(context, isDark)
-              else if (!feedMode)
+              else if (!feedMode) ...[
+                _buildSearchTitleBar(context, isDark, isOled),
                 _buildToolbar(context, isDark, isMobile),
+              ],
               Expanded(
                 child: feedMode
                     ? _buildResults(context)
@@ -399,7 +402,7 @@ class _UiSearchPageState extends State<UiSearchPage>
             AnimatedBuilder(
               animation: _filterCtrl,
               builder: (_, _) => Positioned(
-                top: 60 + _filterSlide.value,
+                top: 120 + _filterSlide.value,
                 left: 220,
                 right: 20,
                 child: Opacity(
@@ -413,16 +416,16 @@ class _UiSearchPageState extends State<UiSearchPage>
               child: GestureDetector(
                 onTap: _closeTagSuggestions,
                 behavior: HitTestBehavior.opaque,
-                child: Stack(
-                  children: [
-                    Positioned(
-                      top: 52,
-                      left: isMobile ? 16 : 48,
-                      right: isMobile ? 16 : 150,
-                      child: _buildTagSuggestions(isDark),
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          top: 122,
+                          left: isMobile ? 16 : 48,
+                          right: isMobile ? 16 : 150,
+                          child: _buildTagSuggestions(isDark),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
               ),
             ),
         ],
@@ -478,6 +481,55 @@ class _UiSearchPageState extends State<UiSearchPage>
                 color: isDark ? CupertinoColors.white : CupertinoColors.black,
               ),
               overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchTitleBar(BuildContext context, bool isDark, bool isOled) {
+    return Container(
+      height: 60,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: isOled
+            ? AppColors.oledBackground
+            : (isDark ? const Color(0xFF18181B) : const Color(0xFFFAFAFC)),
+        border: Border(
+          bottom: BorderSide(
+            color: UIColors.primaryPurple.withValues(
+              alpha: isDark ? 0.15 : 0.1,
+            ),
+            width: 1,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [UIColors.primaryIndigo, UIColors.primaryPurple],
+              ),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(
+              CupertinoIcons.search,
+              size: 16,
+              color: CupertinoColors.white,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Text(
+            'Search',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
             ),
           ),
         ],
