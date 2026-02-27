@@ -514,10 +514,6 @@ class _UiProfilePageState extends State<UiProfilePage> {
               _buildStatsGrid(_user!, isDark, isOled, isNarrow),
               const SizedBox(height: 20),
               _buildAccountInfoCard(_user!, isDark, isOled),
-              if (!_viewingOtherUser) ...[
-                const SizedBox(height: 20),
-                _buildActionsCard(context, isDark),
-              ],
               const SizedBox(height: 24),
             ],
           ),
@@ -1045,77 +1041,6 @@ class _UiProfilePageState extends State<UiProfilePage> {
               ],
             );
           }),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionsCard(BuildContext context, bool isDark) {
-    return Row(
-      children: [
-        Expanded(
-          child: CupertinoButton(
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            onPressed: () => _showSignOutConfirmation(context),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: CupertinoColors.destructiveRed.withValues(alpha: 0.12),
-              ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    CupertinoIcons.arrow_right_square,
-                    color: CupertinoColors.destructiveRed,
-                    size: 20,
-                  ),
-                  SizedBox(width: 8),
-                  Text(
-                    'Sign Out',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: CupertinoColors.destructiveRed,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _showSignOutConfirmation(BuildContext context) {
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
-        actions: [
-          CupertinoDialogAction(
-            child: const Text('Cancel'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          CupertinoDialogAction(
-            isDestructiveAction: true,
-            onPressed: () async {
-              final navigator = Navigator.of(context);
-              navigator.pop();
-              final authProvider = context.read<AuthProvider>();
-              await authProvider.logout();
-              if (mounted) {
-                navigator.pushNamedAndRemoveUntil(
-                  AppRoutes.login,
-                  (route) => false,
-                );
-              }
-            },
-            child: const Text('Sign Out'),
-          ),
         ],
       ),
     );
