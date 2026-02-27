@@ -62,7 +62,8 @@ class _UiProfilePageState extends State<UiProfilePage> {
     _loadProfile();
   }
 
-  bool get _viewingOtherUser => widget.username != null && widget.username!.isNotEmpty;
+  bool get _viewingOtherUser =>
+      widget.username != null && widget.username!.isNotEmpty;
 
   Future<void> _loadProfile() async {
     final apiService = context.read<ApiService>();
@@ -428,6 +429,9 @@ class _UiProfilePageState extends State<UiProfilePage> {
     final unselectedBg = isDark
         ? CupertinoColors.white.withValues(alpha: 0.06)
         : CupertinoColors.black.withValues(alpha: 0.04);
+    final unselectedTextColor = isDark
+        ? const Color(0xFFB8B8C2)
+        : const Color(0xFF6B7280);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
@@ -454,7 +458,9 @@ class _UiProfilePageState extends State<UiProfilePage> {
                     if (index == 1 && _uploads.isEmpty && !_uploadsLoading) {
                       _loadUploads(refresh: true);
                     }
-                    if (index == 2 && _favorites.isEmpty && !_favoritesLoading) {
+                    if (index == 2 &&
+                        _favorites.isEmpty &&
+                        !_favoritesLoading) {
                       _loadFavorites(refresh: true);
                     }
                   },
@@ -470,10 +476,14 @@ class _UiProfilePageState extends State<UiProfilePage> {
                       labels[index],
                       style: TextStyle(
                         fontSize: 15,
-                        fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                        fontWeight: selected
+                            ? FontWeight.w600
+                            : FontWeight.w500,
                         color: selected
-                            ? (isDark ? CupertinoColors.white : CupertinoColors.black)
-                            : CupertinoColors.secondaryLabel,
+                            ? (isDark
+                                  ? CupertinoColors.white
+                                  : CupertinoColors.black)
+                            : unselectedTextColor,
                       ),
                     ),
                   ),
@@ -747,7 +757,9 @@ class _UiProfilePageState extends State<UiProfilePage> {
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+                  color: isDark
+                      ? CupertinoColors.white
+                      : const Color(0xFF1F2937),
                 ),
               ),
               const SizedBox(height: 10),
@@ -858,10 +870,30 @@ class _UiProfilePageState extends State<UiProfilePage> {
 
   Widget _buildStatsGrid(User user, bool isDark, bool isOled, bool isNarrow) {
     final stats = [
-      _StatItem(CupertinoIcons.heart_fill, 'Favorites', user.favoriteCount.compact, AppColors.explicitColor),
-      _StatItem(CupertinoIcons.cloud_upload_fill, 'Uploads', user.postUploadCount.compact, AppColors.primaryBlue),
-      _StatItem(CupertinoIcons.pencil, 'Post Edits', user.postUpdateCount.compact, AppColors.primaryGreen),
-      _StatItem(CupertinoIcons.text_badge_plus, 'Note Updates', user.noteUpdateCount.compact, UIColors.primaryPurple),
+      _StatItem(
+        CupertinoIcons.heart_fill,
+        'Favorites',
+        user.favoriteCount.compact,
+        AppColors.explicitColor,
+      ),
+      _StatItem(
+        CupertinoIcons.cloud_upload_fill,
+        'Uploads',
+        user.postUploadCount.compact,
+        AppColors.primaryBlue,
+      ),
+      _StatItem(
+        CupertinoIcons.pencil,
+        'Post Edits',
+        user.postUpdateCount.compact,
+        AppColors.primaryGreen,
+      ),
+      _StatItem(
+        CupertinoIcons.text_badge_plus,
+        'Note Updates',
+        user.noteUpdateCount.compact,
+        UIColors.primaryPurple,
+      ),
     ];
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -872,10 +904,14 @@ class _UiProfilePageState extends State<UiProfilePage> {
         return Wrap(
           spacing: spacing,
           runSpacing: spacing,
-          children: stats.map((s) => SizedBox(
-            width: itemWidth,
-            child: _buildStatTile(s, isDark, isOled),
-          )).toList(),
+          children: stats
+              .map(
+                (s) => SizedBox(
+                  width: itemWidth,
+                  child: _buildStatTile(s, isDark, isOled),
+                ),
+              )
+              .toList(),
         );
       },
     );
@@ -888,7 +924,8 @@ class _UiProfilePageState extends State<UiProfilePage> {
         color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: (isDark ? CupertinoColors.white : CupertinoColors.black).withValues(alpha: 0.06),
+          color: (isDark ? CupertinoColors.white : CupertinoColors.black)
+              .withValues(alpha: 0.06),
         ),
       ),
       child: Column(
@@ -917,7 +954,9 @@ class _UiProfilePageState extends State<UiProfilePage> {
             item.label,
             style: TextStyle(
               fontSize: 13,
-              color: isDark ? CupertinoColors.systemGrey : const Color(0xFF6B7280),
+              color: isDark
+                  ? CupertinoColors.systemGrey
+                  : const Color(0xFF6B7280),
             ),
           ),
         ],
@@ -944,7 +983,8 @@ class _UiProfilePageState extends State<UiProfilePage> {
         color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: (isDark ? CupertinoColors.white : CupertinoColors.black).withValues(alpha: 0.06),
+          color: (isDark ? CupertinoColors.white : CupertinoColors.black)
+              .withValues(alpha: 0.06),
         ),
       ),
       child: Column(
@@ -967,7 +1007,10 @@ class _UiProfilePageState extends State<UiProfilePage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -983,7 +1026,9 @@ class _UiProfilePageState extends State<UiProfilePage> {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
-                          color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+                          color: isDark
+                              ? CupertinoColors.white
+                              : const Color(0xFF1F2937),
                         ),
                       ),
                     ],
