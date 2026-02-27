@@ -66,6 +66,6 @@ cd "$OLDPWD"
 
 # --- 7. Done ---
 echo "--------------------------------"
-echo "✅ SUCCESS! Linux release build and zip created."
+echo "SUCCESS! Linux release build and zip created."
 echo "Zip file location: $PWD/$ZIP_FILENAME"
 echo "--------------------------------"

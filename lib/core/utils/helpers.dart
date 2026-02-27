@@ -1,40 +1,32 @@
 import 'package:flutter/services.dart';
 
-/// Haptic feedback utility
 class HapticUtils {
   HapticUtils._();
 
-  /// Light impact feedback
   static void lightImpact() {
     HapticFeedback.lightImpact();
   }
 
-  /// Medium impact feedback
   static void mediumImpact() {
     HapticFeedback.mediumImpact();
   }
 
-  /// Heavy impact feedback
   static void heavyImpact() {
     HapticFeedback.heavyImpact();
   }
 
-  /// Selection click feedback
   static void selectionClick() {
     HapticFeedback.selectionClick();
   }
 
-  /// Vibrate feedback
   static void vibrate() {
     HapticFeedback.vibrate();
   }
 }
 
-/// Validator utility for form validation
 class Validators {
   Validators._();
 
-  /// Validate that a field is not empty
   static String? required(String? value, [String fieldName = 'This field']) {
     if (value == null || value.trim().isEmpty) {
       return '$fieldName is required';
@@ -42,7 +34,6 @@ class Validators {
     return null;
   }
 
-  /// Validate API key format
   static String? apiKey(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'API key is required';
@@ -53,7 +44,6 @@ class Validators {
     return null;
   }
 
-  /// Validate username
   static String? username(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Username is required';
@@ -64,7 +54,6 @@ class Validators {
     return null;
   }
 
-  /// Validate URL
   static String? url(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'URL is required';

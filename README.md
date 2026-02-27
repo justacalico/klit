@@ -39,6 +39,7 @@ flutter run  # Android/iOS with device/emulator
 
 # Release
 flutter build linux
+# Or simple Linux zip: ./build_linux_zip.sh
 flutter build windows
 flutter build macos
 flutter build web
@@ -57,4 +58,4 @@ flutter build ios
 
 ## License
 
-See repository license file if present.
+See [LICENSE](LICENSE).
