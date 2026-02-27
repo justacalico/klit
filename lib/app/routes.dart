@@ -93,10 +93,12 @@ class AppRouter {
       case AppRoutes.settings:
         final initialCategory = settings.arguments as String?;
         return CupertinoPageRoute(
-          builder: (ctx) => UiSettingsPage(
-            key: ValueKey('settings-${initialCategory ?? "main"}'),
-            onNavigate: (r) => Navigator.of(ctx).pushNamed(r),
-            initialCategory: initialCategory,
+          builder: (ctx) => SafeArea(
+            child: UiSettingsPage(
+              key: ValueKey('settings-${initialCategory ?? "main"}'),
+              onNavigate: (r) => Navigator.of(ctx).pushNamed(r),
+              initialCategory: initialCategory,
+            ),
           ),
           settings: settings,
         );
@@ -137,11 +139,7 @@ class AppRouter {
 
 /// Full-page wrappers for routes pushed from shell (e.g. mobile).
 class _SearchRoutePage extends StatelessWidget {
-  const _SearchRoutePage({
-    this.initialQuery,
-    this.feedTitle,
-    this.hostUrls,
-  });
+  const _SearchRoutePage({this.initialQuery, this.feedTitle, this.hostUrls});
 
   final String? initialQuery;
   final String? feedTitle;
@@ -180,10 +178,9 @@ class _ProfileRoutePage extends StatelessWidget {
     return UiProfilePage(
       username: username,
       onNavigate: (r) => Navigator.of(context).pushNamed(r),
-      onPostTap: (args) => Navigator.of(context).pushNamed(
-        AppRoutes.postDetail,
-        arguments: args,
-      ),
+      onPostTap: (args) => Navigator.of(
+        context,
+      ).pushNamed(AppRoutes.postDetail, arguments: args),
     );
   }
 }

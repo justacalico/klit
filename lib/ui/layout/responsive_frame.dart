@@ -80,11 +80,7 @@ class _ResponsiveFrameState extends State<ResponsiveFrame> {
         Widget content = widget.child;
         if (effectiveSize != null) {
           content = MediaQuery(
-            data: MediaQuery.of(context).copyWith(
-              size: effectiveSize,
-              padding: EdgeInsets.zero,
-              viewPadding: EdgeInsets.zero,
-            ),
+            data: MediaQuery.of(context).copyWith(size: effectiveSize),
             child: SizedBox(
               width: effectiveSize.width,
               height: effectiveSize.height,

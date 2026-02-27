@@ -8,7 +8,7 @@ import '../../data/services/services.dart';
 import '../../core/types/navigation_args.dart';
 import '../../providers/providers.dart';
 import '../layout/layout_scope.dart';
-import '../theme.dart';
+import '../shell/mobile_header.dart';
 import '../widgets/widgets.dart';
 
 /// Unified search page - reused from desktop search logic.
@@ -18,10 +18,13 @@ class UiSearchPage extends StatefulWidget {
   final String? initialQuery;
   final bool feedMode;
   final void Function(PostDetailArguments) onPostTap;
+
   /// When set, toolbar shows a back button (e.g. when page is pushed as a route). Caller should not use a separate nav bar.
   final VoidCallback? onBack;
+
   /// When non-empty, search runs on each host and results are merged (multi-host feed).
   final List<String>? hostUrls;
+
   /// When in feed mode, title shown in the toolbar (e.g. feed name). Ignored when not feed mode.
   final String? feedTitle;
 
@@ -238,7 +241,8 @@ class _UiSearchPageState extends State<UiSearchPage>
         postIds: posts.map((p) => p.id).toList(),
         initialIndex: idx >= 0 ? idx : 0,
         hasMore: pp.hasMoreSearch,
-        postHostUrls: (postHostUrls != null && postHostUrls.length == posts.length)
+        postHostUrls:
+            (postHostUrls != null && postHostUrls.length == posts.length)
             ? postHostUrls
             : null,
         initialPosts: List<Post?>.from(posts),
@@ -307,54 +311,54 @@ class _UiSearchPageState extends State<UiSearchPage>
       builder: (ctx) {
         final isOled = ctx.watch<SettingsProvider>().themeMode == 3;
         return Container(
-        decoration: BoxDecoration(
-          color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
-        ),
-        padding: EdgeInsets.only(
-          top: 12,
-          left: 20,
-          right: 20,
-          bottom: MediaQuery.of(context).padding.bottom + 24,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Center(
-              child: Container(
-                width: 36,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? CupertinoColors.systemGrey
-                      : CupertinoColors.systemGrey4,
-                  borderRadius: BorderRadius.circular(2),
+          decoration: BoxDecoration(
+            color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+          ),
+          padding: EdgeInsets.only(
+            top: 12,
+            left: 20,
+            right: 20,
+            bottom: MediaQuery.of(context).padding.bottom + 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? CupertinoColors.systemGrey
+                        : CupertinoColors.systemGrey4,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Filters',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: isDark ? CupertinoColors.white : CupertinoColors.black,
+              const SizedBox(height: 20),
+              Text(
+                'Filters',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            _buildFilters(ctx, isDark, vertical: true),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: CupertinoButton.filled(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('Done'),
+              const SizedBox(height: 16),
+              _buildFilters(ctx, isDark, vertical: true),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: CupertinoButton.filled(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text('Done'),
+                ),
               ),
-            ),
-          ],
-        ),
-      );
+            ],
+          ),
+        );
       },
     );
   }
@@ -365,8 +369,12 @@ class _UiSearchPageState extends State<UiSearchPage>
     final isOled = context.watch<SettingsProvider>().themeMode == 3;
     final mode = LayoutScope.of(context);
     final isMobile = mode.isMobile;
-
     final feedMode = widget.feedMode;
+    const stackedHeaderHeight = MobileHeaderHeights.large * 2;
+    const feedHeaderHeight = MobileHeaderHeights.large;
+    final tagSuggestionsTop = feedMode
+        ? feedHeaderHeight + 2
+        : stackedHeaderHeight + 2;
 
     return KeyedSubtree(
       key: const ValueKey('search-page'),
@@ -384,17 +392,20 @@ class _UiSearchPageState extends State<UiSearchPage>
                 child: feedMode
                     ? _buildResults(context)
                     : (isMobile
-                        ? _buildResults(context)
-                        : Row(
-                            children: [
-                              _buildHistorySidebar(context, isDark, isOled),
-                              Container(
-                                width: 1,
-                                color: AppColors.resolveSeparator(isDark, isOled: isOled),
-                              ),
-                              Expanded(child: _buildResults(context)),
-                            ],
-                          )),
+                          ? _buildResults(context)
+                          : Row(
+                              children: [
+                                _buildHistorySidebar(context, isDark, isOled),
+                                Container(
+                                  width: 1,
+                                  color: AppColors.resolveSeparator(
+                                    isDark,
+                                    isOled: isOled,
+                                  ),
+                                ),
+                                Expanded(child: _buildResults(context)),
+                              ],
+                            )),
               ),
             ],
           ),
@@ -402,7 +413,7 @@ class _UiSearchPageState extends State<UiSearchPage>
             AnimatedBuilder(
               animation: _filterCtrl,
               builder: (_, _) => Positioned(
-                top: 120 + _filterSlide.value,
+                top: stackedHeaderHeight + _filterSlide.value,
                 left: 220,
                 right: 20,
                 child: Opacity(
@@ -416,16 +427,16 @@ class _UiSearchPageState extends State<UiSearchPage>
               child: GestureDetector(
                 onTap: _closeTagSuggestions,
                 behavior: HitTestBehavior.opaque,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          top: 122,
-                          left: isMobile ? 16 : 48,
-                          right: isMobile ? 16 : 150,
-                          child: _buildTagSuggestions(isDark),
-                        ),
-                      ],
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: tagSuggestionsTop,
+                      left: isMobile ? 16 : 48,
+                      right: isMobile ? 16 : 150,
+                      child: _buildTagSuggestions(isDark),
                     ),
+                  ],
+                ),
               ),
             ),
         ],
@@ -438,32 +449,13 @@ class _UiSearchPageState extends State<UiSearchPage>
     final title = widget.feedTitle?.isNotEmpty == true
         ? widget.feedTitle!
         : 'Feed';
-    return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [
-                  const Color(0xFF18181B).withValues(alpha: 0.85),
-                  const Color(0xFF1F1F23).withValues(alpha: 0.9),
-                ]
-              : [
-                  const Color(0xFFFFFFFF).withValues(alpha: 0.85),
-                  const Color(0xFFFAFAFC).withValues(alpha: 0.9),
-                ],
-        ),
-        border: Border(
-          bottom: BorderSide(
-            color: isDark
-                ? const Color(0xFF3A3A3C).withValues(alpha: 0.5)
-                : const Color(0xFFE5E5E7).withValues(alpha: 0.5),
-            width: 1,
-          ),
-        ),
-      ),
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
+    return MobileHeaderSection(
+      barHeight: MobileHeaderHeights.large,
+      variant: MobileHeaderVariant.glass,
+      isDark: isDark,
+      isOled: isOled,
+      applySafeTopInset: false,
       child: Row(
         children: [
           CupertinoButton(
@@ -489,81 +481,25 @@ class _UiSearchPageState extends State<UiSearchPage>
   }
 
   Widget _buildSearchTitleBar(BuildContext context, bool isDark, bool isOled) {
-    return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: isOled
-            ? AppColors.oledBackground
-            : (isDark ? const Color(0xFF18181B) : const Color(0xFFFAFAFC)),
-        border: Border(
-          bottom: BorderSide(
-            color: UIColors.primaryPurple.withValues(
-              alpha: isDark ? 0.15 : 0.1,
-            ),
-            width: 1,
-          ),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [UIColors.primaryIndigo, UIColors.primaryPurple],
-              ),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(
-              CupertinoIcons.search,
-              size: 16,
-              color: CupertinoColors.white,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Text(
-            'Search',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
-            ),
-          ),
-        ],
-      ),
+    return MobileHeader(
+      title: 'Search',
+      icon: CupertinoIcons.search,
+      barHeight: MobileHeaderHeights.large,
+      variant: MobileHeaderVariant.solid,
+      isDark: isDark,
+      isOled: isOled,
+      applySafeTopInset: false,
     );
   }
 
   Widget _buildToolbar(BuildContext context, bool isDark, bool isMobile) {
-    return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [
-                  const Color(0xFF18181B).withValues(alpha: 0.85),
-                  const Color(0xFF1F1F23).withValues(alpha: 0.9),
-                ]
-              : [
-                  const Color(0xFFFFFFFF).withValues(alpha: 0.85),
-                  const Color(0xFFFAFAFC).withValues(alpha: 0.9),
-                ],
-        ),
-        border: Border(
-          bottom: BorderSide(
-            color: isDark
-                ? const Color(0xFF3A3A3C).withValues(alpha: 0.5)
-                : const Color(0xFFE5E5E7).withValues(alpha: 0.5),
-            width: 1,
-          ),
-        ),
-      ),
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
+    return MobileHeaderSection(
+      barHeight: MobileHeaderHeights.large,
+      variant: MobileHeaderVariant.glass,
+      isDark: isDark,
+      isOled: isOled,
+      applySafeTopInset: false,
       child: Row(
         children: [
           if (widget.onBack != null) ...[
@@ -754,7 +690,11 @@ class _UiSearchPageState extends State<UiSearchPage>
     );
   }
 
-  Widget _buildFilters(BuildContext context, bool isDark, {bool vertical = false}) {
+  Widget _buildFilters(
+    BuildContext context,
+    bool isDark, {
+    bool vertical = false,
+  }) {
     final textColor = isDark ? CupertinoColors.white : CupertinoColors.black;
     final ratingControl = CupertinoSlidingSegmentedControl<String>(
       groupValue: _selectedRating ?? 'all',
@@ -769,11 +709,17 @@ class _UiSearchPageState extends State<UiSearchPage>
         ),
         'q': Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Text('Questionable', style: TextStyle(fontSize: 12, color: textColor)),
+          child: Text(
+            'Questionable',
+            style: TextStyle(fontSize: 12, color: textColor),
+          ),
         ),
         'e': Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Text('Explicit', style: TextStyle(fontSize: 12, color: textColor)),
+          child: Text(
+            'Explicit',
+            style: TextStyle(fontSize: 12, color: textColor),
+          ),
         ),
       },
       onValueChanged: (v) {
@@ -787,7 +733,10 @@ class _UiSearchPageState extends State<UiSearchPage>
         for (final e in _orderOptions.entries)
           e.key: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Text(e.value, style: TextStyle(fontSize: 12, color: textColor)),
+            child: Text(
+              e.value,
+              style: TextStyle(fontSize: 12, color: textColor),
+            ),
           ),
       },
       onValueChanged: (v) {
@@ -803,17 +752,11 @@ class _UiSearchPageState extends State<UiSearchPage>
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            'Rating',
-            style: TextStyle(fontSize: 13, color: textColor),
-          ),
+          Text('Rating', style: TextStyle(fontSize: 13, color: textColor)),
           const SizedBox(height: 8),
           ratingControl,
           const SizedBox(height: 20),
-          Text(
-            'Sort',
-            style: TextStyle(fontSize: 13, color: textColor),
-          ),
+          Text('Sort', style: TextStyle(fontSize: 13, color: textColor)),
           const SizedBox(height: 8),
           sortControl,
         ],
@@ -964,7 +907,9 @@ class _UiSearchPageState extends State<UiSearchPage>
                     'No posts in this feed',
                     style: TextStyle(
                       fontSize: 18,
-                      color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                      color: CupertinoColors.secondaryLabel.resolveFrom(
+                        context,
+                      ),
                     ),
                   ),
                 ],
@@ -1061,7 +1006,10 @@ class _ToolbarBtn extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: (isDark || isOled)
-              ? AppColors.resolveSecondaryBackground(isDark, isOled: isOled).withValues(alpha: 0.6)
+              ? AppColors.resolveSecondaryBackground(
+                  isDark,
+                  isOled: isOled,
+                ).withValues(alpha: 0.6)
               : const Color(0xFFF3F4F6).withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(10),
         ),

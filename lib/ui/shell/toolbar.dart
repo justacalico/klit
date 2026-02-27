@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../core/constants/constants.dart';
 import '../../providers/providers.dart';
+import '../layout/layout_scope.dart';
+import 'mobile_header.dart';
 import '../theme.dart';
 
 /// Page toolbar for desktop content area.
@@ -25,6 +27,21 @@ class PageToolbar extends StatelessWidget {
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
     final isOled = context.watch<SettingsProvider>().themeMode == 3;
+    final mode = LayoutScope.of(context);
+
+    if (mode.isMobile) {
+      return MobileHeader(
+        title: title,
+        icon: icon,
+        leading: leading,
+        actions: actions,
+        barHeight: MobileHeaderHeights.large,
+        variant: MobileHeaderVariant.solid,
+        isDark: isDark,
+        isOled: isOled,
+        applySafeTopInset: false,
+      );
+    }
 
     final content = Container(
       height: 60,

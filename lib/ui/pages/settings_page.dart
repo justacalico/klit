@@ -6,7 +6,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:palette_generator/palette_generator.dart';
 import 'package:flutter/material.dart'
-    show Colors, Divider, Image, InkWell, ListTile, Material, MaterialType, ReorderableListView;
+    show
+        Colors,
+        Divider,
+        Image,
+        InkWell,
+        ListTile,
+        Material,
+        MaterialType,
+        ReorderableListView;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -19,6 +27,7 @@ import '../../data/models/models.dart';
 import '../../data/models/proxy_config.dart';
 import '../../data/services/services.dart';
 import '../../providers/providers.dart';
+import '../shell/mobile_header.dart';
 import 'account_management_page.dart';
 import 'i_finished_gallery_page.dart';
 
@@ -50,6 +59,7 @@ class _SettingsCategory {
 /// Unified settings page - single file for all layouts.
 class UiSettingsPage extends StatefulWidget {
   final Function(String) onNavigate;
+
   /// When opening Settings via route (e.g. from Profile), preselect this category.
   final String? initialCategory;
 
@@ -66,8 +76,10 @@ class UiSettingsPage extends StatefulWidget {
 class _UiSettingsPageState extends State<UiSettingsPage>
     with SingleTickerProviderStateMixin {
   String _selectedCategory = 'account';
+
   /// On mobile: true = show main list (iOS style), false = show selected category sub-page.
   bool _mobileShowMainList = true;
+
   /// When opening with initialCategory on mobile, wait one frame before showing content to avoid flashing wrong category.
   bool _mobileInitialCategoryReady = true;
   final _mobileSearchController = TextEditingController();
@@ -81,6 +93,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   String? _accountAvatarUrl;
   String? _accountAvatarUsername;
   bool _accountAvatarLoading = false;
+
   /// Glow/border color derived from the account avatar image; null until extracted or when no avatar.
   Color? _accountAvatarPaletteColor;
 
@@ -264,7 +277,8 @@ class _UiSettingsPageState extends State<UiSettingsPage>
         size: const Size(64, 64),
       );
       if (!mounted || _accountAvatarUrl != imageUrl) return;
-      final color = palette.vibrantColor?.color ??
+      final color =
+          palette.vibrantColor?.color ??
           palette.dominantColor?.color ??
           palette.darkVibrantColor?.color ??
           palette.mutedColor?.color;
@@ -324,9 +338,8 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     final filtered = query.isEmpty
         ? _categories
         : _categories
-            .where((c) => c.title.toLowerCase().contains(query))
-            .toList();
-    final isOled = context.watch<SettingsProvider>().themeMode == 3;
+              .where((c) => c.title.toLowerCase().contains(query))
+              .toList();
     final canPop = Navigator.of(context).canPop();
 
     return Column(
@@ -334,18 +347,12 @@ class _UiSettingsPageState extends State<UiSettingsPage>
       children: [
         // When opened as a route (e.g. from Profile), show back bar so user is not stuck
         if (canPop)
-          Container(
-            height: 56,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            decoration: BoxDecoration(
-              color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
-              border: Border(
-                bottom: BorderSide(
-                  color: AppColors.resolveSeparator(isDark, isOled: isOled),
-                  width: 0.5,
-                ),
-              ),
-            ),
+          MobileHeaderSection(
+            barHeight: MobileHeaderHeights.compact,
+            isDark: isDark,
+            isOled: isOled,
+            applySafeTopInset: true,
+            horizontalPadding: 8,
             child: Row(
               children: [
                 CupertinoButton(
@@ -376,7 +383,9 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                    color: isDark
+                        ? CupertinoColors.white
+                        : CupertinoColors.black,
                   ),
                 ),
               ],
@@ -395,7 +404,10 @@ class _UiSettingsPageState extends State<UiSettingsPage>
             onChanged: (_) => setState(() {}),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+              color: AppColors.resolveSecondaryBackground(
+                isDark,
+                isOled: isOled,
+              ),
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -476,18 +488,12 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     return Column(
       children: [
         // Nav bar: back + title (iOS style)
-        Container(
-          height: 56,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          decoration: BoxDecoration(
-            color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
-            border: Border(
-              bottom: BorderSide(
-                color: AppColors.resolveSeparator(isDark, isOled: isOled),
-                width: 0.5,
-              ),
-            ),
-          ),
+        MobileHeaderSection(
+          barHeight: MobileHeaderHeights.compact,
+          isDark: isDark,
+          isOled: isOled,
+          applySafeTopInset: true,
+          horizontalPadding: 8,
           child: Row(
             children: [
               CupertinoButton(
@@ -535,10 +541,11 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                   child: _buildCategoryContent(isDark),
                 )
               : Container(
-                  color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
-                  child: const Center(
-                    child: CupertinoActivityIndicator(),
+                  color: AppColors.resolveSecondaryBackground(
+                    isDark,
+                    isOled: isOled,
                   ),
+                  child: const Center(child: CupertinoActivityIndicator()),
                 ),
         ),
       ],
@@ -634,8 +641,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                             : CupertinoColors.black,
                       ),
                       decoration: const BoxDecoration(),
-                      onChanged: (v) =>
-                          setState(() => _sidebarSearchQuery = v),
+                      onChanged: (v) => setState(() => _sidebarSearchQuery = v),
                     ),
                   ),
                 ],
@@ -650,11 +656,13 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                 final list = query.isEmpty
                     ? _categories
                     : _categories
-                        .where((c) =>
-                            c.title.toLowerCase().contains(query))
-                        .toList();
+                          .where((c) => c.title.toLowerCase().contains(query))
+                          .toList();
                 return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   itemCount: list.length,
                   itemBuilder: (context, index) {
                     final category = list[index];
@@ -719,7 +727,9 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                   category.title,
                   style: TextStyle(
                     fontSize: 14,
-                    fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+                    fontWeight: isSelected
+                        ? FontWeight.w500
+                        : FontWeight.normal,
                     color: isDark
                         ? CupertinoColors.white
                         : CupertinoColors.black,
@@ -757,7 +767,11 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     );
   }
 
-  Widget _buildContentHeader(_SettingsCategory category, bool isDark, bool isOled) {
+  Widget _buildContentHeader(
+    _SettingsCategory category,
+    bool isDark,
+    bool isOled,
+  ) {
     final mode = LayoutScope.of(context);
     final isCompact = mode.isMobile;
     return Container(
@@ -788,11 +802,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
           : EdgeInsets.zero,
       child: Row(
         children: [
-          Icon(
-            category.icon,
-            size: isCompact ? 28 : 24,
-            color: category.color,
-          ),
+          Icon(category.icon, size: isCompact ? 28 : 24, color: category.color),
           SizedBox(width: isCompact ? 14 : 16),
           Expanded(
             child: Column(
@@ -803,8 +813,9 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                   style: TextStyle(
                     fontSize: isCompact ? 20 : 24,
                     fontWeight: FontWeight.bold,
-                    color:
-                        isDark ? CupertinoColors.white : CupertinoColors.black,
+                    color: isDark
+                        ? CupertinoColors.white
+                        : CupertinoColors.black,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -1017,7 +1028,10 @@ class _UiSettingsPageState extends State<UiSettingsPage>
           }
         }
 
-        final avatarUrl = (!isGuest && account != null && _accountAvatarUsername == account.username)
+        final avatarUrl =
+            (!isGuest &&
+                account != null &&
+                _accountAvatarUsername == account.username)
             ? _accountAvatarUrl
             : null;
 
@@ -1104,7 +1118,10 @@ class _UiSettingsPageState extends State<UiSettingsPage>
               const SizedBox(height: 20),
               _buildSettingsCard(
                 isDark: isDark,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -1148,9 +1165,9 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                           borderRadius: BorderRadius.circular(10),
                           onPressed: () =>
                               AccountManagementContent.showAddAccountSheet(
-                            context,
-                            LayoutScope.of(context).isDesktop,
-                          ),
+                                context,
+                                LayoutScope.of(context).isDesktop,
+                              ),
                           child: const Text(
                             'Add',
                             style: TextStyle(
@@ -1207,9 +1224,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   }) {
     final glowColor = (!isGuest && paletteColor != null)
         ? paletteColor
-        : (isGuest
-            ? CupertinoColors.systemGrey
-            : _DesignColors.primaryPurple);
+        : (isGuest ? CupertinoColors.systemGrey : _DesignColors.primaryPurple);
     final gradientColors = (!isGuest && paletteColor != null)
         ? [
             paletteColor.withValues(alpha: 0.9),
@@ -1228,19 +1243,19 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                 ],
               )
             : (gradientColors != null
-                ? LinearGradient(
-                    colors: gradientColors,
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  )
-                : const LinearGradient(
-                    colors: [
-                      _DesignColors.primaryIndigo,
-                      _DesignColors.primaryPurple,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  )),
+                  ? LinearGradient(
+                      colors: gradientColors,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : const LinearGradient(
+                      colors: [
+                        _DesignColors.primaryIndigo,
+                        _DesignColors.primaryPurple,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: glowColor.withValues(alpha: isGuest ? 0.25 : 0.5),
@@ -1257,57 +1272,55 @@ class _UiSettingsPageState extends State<UiSettingsPage>
       clipBehavior: Clip.antiAlias,
       child: isLoading
           ? const Center(
-              child: CupertinoActivityIndicator(
-                color: CupertinoColors.white,
-              ),
+              child: CupertinoActivityIndicator(color: CupertinoColors.white),
             )
           : (avatarUrl != null && avatarUrl.isNotEmpty)
-              ? CachedNetworkImage(
-                  imageUrl: avatarUrl,
-                  fit: BoxFit.cover,
-                  placeholder: (_, _) => Center(
-                    child: Text(
-                      (username != null && username.isNotEmpty)
-                          ? username[0].toUpperCase()
-                          : '?',
-                      style: const TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: CupertinoColors.white,
-                      ),
-                    ),
+          ? CachedNetworkImage(
+              imageUrl: avatarUrl,
+              fit: BoxFit.cover,
+              placeholder: (_, _) => Center(
+                child: Text(
+                  (username != null && username.isNotEmpty)
+                      ? username[0].toUpperCase()
+                      : '?',
+                  style: const TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: CupertinoColors.white,
                   ),
-                  errorWidget: (_, _, _) => Center(
-                    child: Text(
-                      (username != null && username.isNotEmpty)
-                          ? username[0].toUpperCase()
-                          : '?',
-                      style: const TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: CupertinoColors.white,
-                      ),
-                    ),
-                  ),
-                )
-              : Center(
-                  child: isGuest
-                      ? const Icon(
-                          CupertinoIcons.person_badge_plus_fill,
-                          color: CupertinoColors.white,
-                          size: 28,
-                        )
-                      : Text(
-                          (username != null && username.isNotEmpty)
-                              ? username[0].toUpperCase()
-                              : '?',
-                          style: const TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            color: CupertinoColors.white,
-                          ),
-                        ),
                 ),
+              ),
+              errorWidget: (_, _, _) => Center(
+                child: Text(
+                  (username != null && username.isNotEmpty)
+                      ? username[0].toUpperCase()
+                      : '?',
+                  style: const TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: CupertinoColors.white,
+                  ),
+                ),
+              ),
+            )
+          : Center(
+              child: isGuest
+                  ? const Icon(
+                      CupertinoIcons.person_badge_plus_fill,
+                      color: CupertinoColors.white,
+                      size: 28,
+                    )
+                  : Text(
+                      (username != null && username.isNotEmpty)
+                          ? username[0].toUpperCase()
+                          : '?',
+                      style: const TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: CupertinoColors.white,
+                      ),
+                    ),
+            ),
     );
   }
 
@@ -1905,8 +1918,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                   trailing: CupertinoSwitch(
                     value: settings.confettiOnFavorite,
                     activeTrackColor: _DesignColors.accentOrange,
-                    onChanged: (value) =>
-                        settings.setConfettiOnFavorite(value),
+                    onChanged: (value) => settings.setConfettiOnFavorite(value),
                   ),
                 ),
                 _buildSettingRow(
@@ -1914,8 +1926,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                   icon: CupertinoIcons.checkmark_circle,
                   iconColor: const Color(0xFF22C55E),
                   title: 'I finished button',
-                  subtitle:
-                      'Mark posts as finished and track them in settings',
+                  subtitle: 'Mark posts as finished and track them in settings',
                   trailing: CupertinoSwitch(
                     value: settings.iFinishedEnabled,
                     activeTrackColor: const Color(0xFF22C55E),
@@ -1964,7 +1975,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                         onChanged: _isDesktop
                             ? null
                             : (value) =>
-                                settings.setIFinishedAskPhotoEnabled(value),
+                                  settings.setIFinishedAskPhotoEnabled(value),
                       ),
                     ),
                   ),
@@ -2049,66 +2060,66 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                         ],
                       ),
                     ),
-                  const Divider(height: 1),
-                  ...settings.iFinishedEntries.map((entry) {
-                    return InkWell(
-                      onTap: () {
-                        Navigator.of(context).pushNamed(
-                          AppRoutes.postDetail,
-                          arguments: PostDetailArguments(
-                            postIds: [entry.postId],
-                            initialIndex: 0,
+                    const Divider(height: 1),
+                    ...settings.iFinishedEntries.map((entry) {
+                      return InkWell(
+                        onTap: () {
+                          Navigator.of(context).pushNamed(
+                            AppRoutes.postDetail,
+                            arguments: PostDetailArguments(
+                              postIds: [entry.postId],
+                              initialIndex: 0,
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
                           ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        child: Row(
-                          children: [
-                            if (entry.imagePath != null)
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.file(
-                                  File(entry.imagePath!),
-                                  width: 48,
-                                  height: 48,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, _, _) => const SizedBox(
+                          child: Row(
+                            children: [
+                              if (entry.imagePath != null)
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.file(
+                                    File(entry.imagePath!),
                                     width: 48,
                                     height: 48,
-                                    child: Icon(CupertinoIcons.photo),
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, _, _) => const SizedBox(
+                                      width: 48,
+                                      height: 48,
+                                      child: Icon(CupertinoIcons.photo),
+                                    ),
+                                  ),
+                                ),
+                              if (entry.imagePath != null)
+                                const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  'Post #${entry.postId}',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: isDark
+                                        ? CupertinoColors.white
+                                        : CupertinoColors.black,
                                   ),
                                 ),
                               ),
-                            if (entry.imagePath != null)
-                              const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                'Post #${entry.postId}',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: isDark
-                                      ? CupertinoColors.white
-                                      : CupertinoColors.black,
-                                ),
+                              Icon(
+                                CupertinoIcons.chevron_right,
+                                size: 18,
+                                color: isDark
+                                    ? CupertinoColors.systemGrey
+                                    : CupertinoColors.systemGrey2,
                               ),
-                            ),
-                            Icon(
-                              CupertinoIcons.chevron_right,
-                              size: 18,
-                              color: isDark
-                                  ? CupertinoColors.systemGrey
-                                  : CupertinoColors.systemGrey2,
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  }),
-                ],
+                      );
+                    }),
+                  ],
                 ),
               ),
             ),
