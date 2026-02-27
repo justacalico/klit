@@ -83,9 +83,13 @@ class _UiSearchPageState extends State<UiSearchPage>
       _performSearch();
     }
     if (!widget.feedMode) {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) => _focusNode.requestFocus(),
-      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final mode = LayoutScope.maybeOf(context);
+        if (mode != null && !mode.isMobile) {
+          _focusNode.requestFocus();
+        }
+      });
     }
   }
 
@@ -699,24 +703,25 @@ class _UiSearchPageState extends State<UiSearchPage>
   }
 
   Widget _buildFilters(BuildContext context, bool isDark, {bool vertical = false}) {
+    final textColor = isDark ? CupertinoColors.white : CupertinoColors.black;
     final ratingControl = CupertinoSlidingSegmentedControl<String>(
       groupValue: _selectedRating ?? 'all',
-      children: const {
+      children: {
         'all': Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
-          child: Text('All', style: TextStyle(fontSize: 12)),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Text('All', style: TextStyle(fontSize: 12, color: textColor)),
         ),
         's': Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
-          child: Text('Safe', style: TextStyle(fontSize: 12)),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Text('Safe', style: TextStyle(fontSize: 12, color: textColor)),
         ),
         'q': Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
-          child: Text('Questionable', style: TextStyle(fontSize: 12)),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Text('Questionable', style: TextStyle(fontSize: 12, color: textColor)),
         ),
         'e': Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
-          child: Text('Explicit', style: TextStyle(fontSize: 12)),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Text('Explicit', style: TextStyle(fontSize: 12, color: textColor)),
         ),
       },
       onValueChanged: (v) {
@@ -730,7 +735,7 @@ class _UiSearchPageState extends State<UiSearchPage>
         for (final e in _orderOptions.entries)
           e.key: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Text(e.value, style: const TextStyle(fontSize: 12)),
+            child: Text(e.value, style: TextStyle(fontSize: 12, color: textColor)),
           ),
       },
       onValueChanged: (v) {
@@ -748,20 +753,14 @@ class _UiSearchPageState extends State<UiSearchPage>
         children: [
           Text(
             'Rating',
-            style: TextStyle(
-              fontSize: 13,
-              color: isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2,
-            ),
+            style: TextStyle(fontSize: 13, color: textColor),
           ),
           const SizedBox(height: 8),
           ratingControl,
           const SizedBox(height: 20),
           Text(
             'Sort',
-            style: TextStyle(
-              fontSize: 13,
-              color: isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2,
-            ),
+            style: TextStyle(fontSize: 13, color: textColor),
           ),
           const SizedBox(height: 8),
           sortControl,
@@ -787,11 +786,11 @@ class _UiSearchPageState extends State<UiSearchPage>
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            const Text('Rating:', style: TextStyle(fontSize: 13)),
+            Text('Rating:', style: TextStyle(fontSize: 13, color: textColor)),
             const SizedBox(width: 8),
             ratingControl,
             const SizedBox(width: 24),
-            const Text('Sort:', style: TextStyle(fontSize: 13)),
+            Text('Sort:', style: TextStyle(fontSize: 13, color: textColor)),
             const SizedBox(width: 8),
             sortControl,
           ],

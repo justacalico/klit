@@ -275,7 +275,15 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
                 top: 0,
                 right: 0,
                 bottom: mode.isDesktop ? 0 : navBarHeight,
-                child: content,
+                child: mode.isDesktop
+                    ? content
+                    : SafeArea(
+                        top: true,
+                        bottom: false,
+                        left: true,
+                        right: true,
+                        child: content,
+                      ),
               ),
               if (mode.isDesktop)
                 Positioned(
