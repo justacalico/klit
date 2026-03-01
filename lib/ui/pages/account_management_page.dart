@@ -292,33 +292,28 @@ class AccountManagementContent extends StatelessWidget {
   }
 
   Widget _buildDesktopAccountList(BuildContext context, AuthProvider auth) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 600),
-        child: ListView.separated(
-          itemCount: auth.accounts.length,
-          separatorBuilder: (_, _) => const SizedBox(height: 14),
-          itemBuilder: (context, index) {
-            final account = auth.accounts[index];
-            final isActive = auth.currentAccount?.id == account.id;
-            return _DesktopAccountCard(
-              username: account.username,
-              host: Uri.parse(account.host).host,
-              isActive: isActive,
-              isDark: isDark,
-              onTap: isActive
-                  ? null
-                  : () => _switchAccount(context, account.id, account.host),
-              onOptions: () => AccountManagementContent._showDesktopAccountOptions(
-                context,
-                account.id,
-                isActive,
-                isDark,
-              ),
-            );
-          },
-        ),
-      ),
+    return ListView.separated(
+      itemCount: auth.accounts.length,
+      separatorBuilder: (_, _) => const SizedBox(height: 14),
+      itemBuilder: (context, index) {
+        final account = auth.accounts[index];
+        final isActive = auth.currentAccount?.id == account.id;
+        return _DesktopAccountCard(
+          username: account.username,
+          host: Uri.parse(account.host).host,
+          isActive: isActive,
+          isDark: isDark,
+          onTap: isActive
+              ? null
+              : () => _switchAccount(context, account.id, account.host),
+          onOptions: () => AccountManagementContent._showDesktopAccountOptions(
+            context,
+            account.id,
+            isActive,
+            isDark,
+          ),
+        );
+      },
     );
   }
 
