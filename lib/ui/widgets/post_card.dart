@@ -60,21 +60,43 @@ class _VisibilityAwareGifImageState extends State<_VisibilityAwareGifImage> {
         memCacheHeight: widget.memCacheHeight,
         fadeInDuration: const Duration(milliseconds: 150),
         fadeInCurve: Curves.easeOut,
-        placeholder: (context, url) => widget.style == PostCardStyle.grid
-            ? Container(color: widget.placeholderColor)
-            : const LoadingShimmer(),
-        errorWidget: (context, url, error) => Container(
-          color: widget.placeholderColor,
-          child: Center(
-            child: Icon(
-              widget.post.isVideo
-                  ? CupertinoIcons.play_rectangle_fill
-                  : CupertinoIcons.exclamationmark_triangle,
-              size: 30,
-              color: CupertinoColors.systemGrey,
+        placeholder: (context, url) {
+          if (url == widget.animatedUrl) {
+            return CachedNetworkImage(
+              imageUrl: widget.staticUrl,
+              cacheKey: '${widget.postId}_${widget.staticUrl}',
+              fit: BoxFit.cover,
+              memCacheWidth: widget.memCacheWidth,
+              memCacheHeight: widget.memCacheHeight,
+            );
+          }
+          return widget.style == PostCardStyle.grid
+              ? Container(color: widget.placeholderColor)
+              : const LoadingShimmer();
+        },
+        errorWidget: (context, url, error) {
+          if (url == widget.animatedUrl) {
+            return CachedNetworkImage(
+              imageUrl: widget.staticUrl,
+              cacheKey: '${widget.postId}_${widget.staticUrl}',
+              fit: BoxFit.cover,
+              memCacheWidth: widget.memCacheWidth,
+              memCacheHeight: widget.memCacheHeight,
+            );
+          }
+          return Container(
+            color: widget.placeholderColor,
+            child: Center(
+              child: Icon(
+                widget.post.isVideo
+                    ? CupertinoIcons.play_rectangle_fill
+                    : CupertinoIcons.exclamationmark_triangle,
+                size: 30,
+                color: CupertinoColors.systemGrey,
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
