@@ -151,7 +151,7 @@ class AccountManagementContent extends StatelessWidget {
         padding: EdgeInsets.all(embeddedInSettings ? 0 : 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: embeddedInSettings ? MainAxisSize.min : MainAxisSize.max,
+          mainAxisSize: MainAxisSize.max,
           children: [
             if (!embeddedInSettings) ...[
               // Header with back button and title
@@ -207,8 +207,7 @@ class AccountManagementContent extends StatelessWidget {
             ],
             // Account list
             embeddedInSettings
-                ? SizedBox(
-                    height: 400,
+                ? Expanded(
                     child: Consumer<AuthProvider>(
                       builder: (context, auth, _) {
                         if (auth.accounts.isEmpty) {
@@ -285,11 +284,7 @@ class AccountManagementContent extends StatelessWidget {
               ],
             );
           }
-          // Embedded in settings: give list bounded height to avoid unbounded constraints
-          // (parent is Column inside SingleChildScrollView), which triggers semantics assertion.
-          if (embeddedInSettings) {
-            return SizedBox(height: 320, child: list);
-          }
+          if (embeddedInSettings) return list;
           return list;
         },
       );

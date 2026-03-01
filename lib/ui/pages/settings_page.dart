@@ -1,10 +1,8 @@
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:palette_generator/palette_generator.dart';
 import 'package:flutter/material.dart'
     show
         Colors,
@@ -90,13 +88,6 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   String _sidebarSearchQuery = '';
   final _sidebarSearchController = TextEditingController();
   final _sidebarSearchFocus = FocusNode();
-  String? _accountAvatarUrl;
-  String? _accountAvatarUsername;
-  bool _accountAvatarLoading = false;
-
-  /// Glow/border color derived from the account avatar image; null until extracted or when no avatar.
-  Color? _accountAvatarPaletteColor;
-
   /// True on desktop (Linux, macOS, Windows) and web; camera option is disabled there.
   bool get _isDesktop {
     if (kIsWeb) return true;
@@ -229,65 +220,6 @@ class _UiSettingsPageState extends State<UiSettingsPage>
       setState(() => _selectedCategory = id);
       _animationController.forward();
     });
-  }
-
-  Future<void> _loadAccountAvatar(BuildContext context, String username) async {
-    final api = context.read<ApiService>();
-    String? url;
-    final userResult = await api.getUserProfile(username);
-    await userResult.when(
-      success: (user) async {
-        if (user.avatarUrl != null && user.avatarUrl!.isNotEmpty) {
-          url = user.avatarUrl!.startsWith(RegExp(r'https?://'))
-              ? user.avatarUrl
-              : '${api.baseUrl}/${user.avatarUrl!.startsWith('/') ? user.avatarUrl!.substring(1) : user.avatarUrl}';
-        } else if (user.avatarId != null && user.avatarId!.isNotEmpty) {
-          final postId = int.tryParse(user.avatarId!);
-          if (postId != null) {
-            final postResult = await api.getPostById(postId);
-            postResult.when(
-              success: (post) {
-                url = post.preview.url ?? post.sample.url;
-              },
-              failure: (_) {},
-            );
-          }
-        }
-      },
-      failure: (_) {},
-    );
-    if (mounted) {
-      setState(() {
-        _accountAvatarUrl = url;
-        _accountAvatarUsername = username;
-        _accountAvatarLoading = false;
-        _accountAvatarPaletteColor = null;
-      });
-      final u = url;
-      if (u != null && u.isNotEmpty) {
-        _extractAvatarPalette(u);
-      }
-    }
-  }
-
-  Future<void> _extractAvatarPalette(String imageUrl) async {
-    try {
-      final palette = await PaletteGenerator.fromImageProvider(
-        CachedNetworkImageProvider(imageUrl),
-        size: const Size(64, 64),
-      );
-      if (!mounted || _accountAvatarUrl != imageUrl) return;
-      final color =
-          palette.vibrantColor?.color ??
-          palette.dominantColor?.color ??
-          palette.darkVibrantColor?.color ??
-          palette.mutedColor?.color;
-      if (color != null) {
-        setState(() => _accountAvatarPaletteColor = color);
-      }
-    } catch (_) {
-      // Keep default glow on extraction failure
-    }
   }
 
   @override
@@ -536,10 +468,15 @@ class _UiSettingsPageState extends State<UiSettingsPage>
         ),
         Expanded(
           child: showContent
-              ? SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: _buildCategoryContent(isDark, isOled),
-                )
+              ? (_selectedCategory == 'account'
+                  ? Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: _buildAccountContent(isDark, isOled),
+                    )
+                  : SingleChildScrollView(
+                      padding: const EdgeInsets.all(16),
+                      child: _buildCategoryContent(isDark, isOled),
+                    ))
               : Container(
                   color: AppColors.resolveSecondaryBackground(
                     isDark,
@@ -759,10 +696,15 @@ class _UiSettingsPageState extends State<UiSettingsPage>
         Expanded(
           child: FadeTransition(
             opacity: _fadeAnimation,
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(contentPadding),
-              child: _buildCategoryContent(isDark, isOled),
-            ),
+            child: _selectedCategory == 'account'
+                ? Padding(
+                    padding: EdgeInsets.all(contentPadding),
+                    child: _buildAccountContent(isDark, isOled),
+                  )
+                : SingleChildScrollView(
+                    padding: EdgeInsets.all(contentPadding),
+                    child: _buildCategoryContent(isDark, isOled),
+                  ),
           ),
         ),
       ],
@@ -1024,115 +966,54 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   Widget _buildAccountContent(bool isDark, bool isOled) {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, _) {
-        final account = authProvider.currentAccount;
         final isGuest = authProvider.isGuest;
-
-        if (!isGuest && account != null) {
-          if (_accountAvatarUsername != account.username) {
-            _accountAvatarUrl = null;
-            _accountAvatarUsername = null;
-            _accountAvatarPaletteColor = null;
-          }
-          if (_accountAvatarUrl == null && !_accountAvatarLoading) {
-            final username = account.username;
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (!mounted || _accountAvatarLoading) return;
-              setState(() => _accountAvatarLoading = true);
-              _loadAccountAvatar(context, username);
-            });
-          }
-        }
-
-        final avatarUrl =
-            (!isGuest &&
-                account != null &&
-                _accountAvatarUsername == account.username)
-            ? _accountAvatarUrl
-            : null;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSettingsCard(
-              isDark: isDark,
-              isOled: isOled,
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      _buildAccountAvatar(
-                        isDark: isDark,
-                        isGuest: isGuest,
-                        username: account?.username,
-                        avatarUrl: avatarUrl,
-                        isLoading: _accountAvatarLoading && !isGuest,
-                        paletteColor: _accountAvatarPaletteColor,
+            if (isGuest)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Row(
+                  children: [
+                    Text(
+                      'Guest mode',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: isDark
+                            ? CupertinoColors.secondaryLabel
+                            : CupertinoColors.secondaryLabel,
                       ),
-                      const SizedBox(width: 24),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isGuest
-                                  ? 'Guest Mode'
-                                  : (account?.username ?? 'Not logged in'),
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -0.3,
-                                color: isDark
-                                    ? CupertinoColors.white
-                                    : CupertinoColors.black,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              isGuest
-                                  ? 'Sign in to access all features'
-                                  : (account?.host ?? ''),
-                              style: TextStyle(
-                                fontSize: 13,
-                                letterSpacing: 0.1,
-                                color: isDark
-                                    ? CupertinoColors.systemGrey
-                                    : CupertinoColors.systemGrey2,
-                              ),
-                            ),
-                          ],
+                    ),
+                    const SizedBox(width: 12),
+                    CupertinoButton(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      color: _DesignColors.primaryPurple,
+                      borderRadius: BorderRadius.circular(10),
+                      onPressed: () {
+                        authProvider.logout();
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          AppRoutes.login,
+                          (route) => false,
+                        );
+                      },
+                      child: const Text(
+                        'Sign In',
+                        style: TextStyle(
+                          color: CupertinoColors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
                         ),
                       ),
-                      if (isGuest)
-                        CupertinoButton(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                          color: _DesignColors.primaryPurple,
-                          borderRadius: BorderRadius.circular(12),
-                          onPressed: () {
-                            authProvider.logout();
-                            Navigator.of(context).pushNamedAndRemoveUntil(
-                              AppRoutes.login,
-                              (route) => false,
-                            );
-                          },
-                          child: const Text(
-                            'Sign In',
-                            style: TextStyle(
-                              color: CupertinoColors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            if (!isGuest) ...[
-              const SizedBox(height: 20),
-              _buildSettingsCard(
+            Expanded(
+              child: _buildSettingsCard(
                 isDark: isDark,
                 isOled: isOled,
                 padding: const EdgeInsets.symmetric(
@@ -1141,7 +1022,6 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1197,128 +1077,20 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                       ],
                     ),
                     const SizedBox(height: 16),
-                    AccountManagementContent(
-                      isDark: isDark,
-                      embeddedInSettings: true,
-                      showAddButtonAboveList: false,
+                    Expanded(
+                      child: AccountManagementContent(
+                        isDark: isDark,
+                        embeddedInSettings: true,
+                        showAddButtonAboveList: false,
+                      ),
                     ),
                   ],
                 ),
               ),
-            ],
+            ),
           ],
         );
       },
-    );
-  }
-
-  Widget _buildAccountAvatar({
-    required bool isDark,
-    required bool isGuest,
-    required String? username,
-    required String? avatarUrl,
-    required bool isLoading,
-    Color? paletteColor,
-  }) {
-    final glowColor = (!isGuest && paletteColor != null)
-        ? paletteColor
-        : (isGuest ? CupertinoColors.systemGrey : _DesignColors.primaryPurple);
-    final gradientColors = (!isGuest && paletteColor != null)
-        ? [
-            paletteColor.withValues(alpha: 0.9),
-            Color.lerp(paletteColor, _DesignColors.primaryPurple, 0.4)!,
-          ]
-        : null;
-    return Container(
-      width: 72,
-      height: 72,
-      decoration: BoxDecoration(
-        gradient: isGuest
-            ? LinearGradient(
-                colors: [
-                  CupertinoColors.systemGrey.withValues(alpha: 0.3),
-                  CupertinoColors.systemGrey.withValues(alpha: 0.2),
-                ],
-              )
-            : (gradientColors != null
-                  ? LinearGradient(
-                      colors: gradientColors,
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                  : const LinearGradient(
-                      colors: [
-                        _DesignColors.primaryIndigo,
-                        _DesignColors.primaryPurple,
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: glowColor.withValues(alpha: isGuest ? 0.25 : 0.5),
-          width: 2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: glowColor.withValues(alpha: isGuest ? 0.2 : 0.35),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: isLoading
-          ? const Center(
-              child: CupertinoActivityIndicator(color: CupertinoColors.white),
-            )
-          : (avatarUrl != null && avatarUrl.isNotEmpty)
-          ? CachedNetworkImage(
-              imageUrl: avatarUrl,
-              fit: BoxFit.cover,
-              placeholder: (_, _) => Center(
-                child: Text(
-                  (username != null && username.isNotEmpty)
-                      ? username[0].toUpperCase()
-                      : '?',
-                  style: const TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: CupertinoColors.white,
-                  ),
-                ),
-              ),
-              errorWidget: (_, _, _) => Center(
-                child: Text(
-                  (username != null && username.isNotEmpty)
-                      ? username[0].toUpperCase()
-                      : '?',
-                  style: const TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: CupertinoColors.white,
-                  ),
-                ),
-              ),
-            )
-          : Center(
-              child: isGuest
-                  ? const Icon(
-                      CupertinoIcons.person_badge_plus_fill,
-                      color: CupertinoColors.white,
-                      size: 28,
-                    )
-                  : Text(
-                      (username != null && username.isNotEmpty)
-                          ? username[0].toUpperCase()
-                          : '?',
-                      style: const TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: CupertinoColors.white,
-                      ),
-                    ),
-            ),
     );
   }
 
