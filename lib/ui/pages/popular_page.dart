@@ -5,6 +5,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../core/types/navigation_args.dart';
 import '../../data/models/models.dart';
 import '../../providers/providers.dart';
+import '../layout/layout_scope.dart';
 import '../shell/toolbar.dart';
 import '../widgets/selectors.dart';
 import '../widgets/widgets.dart';
@@ -76,21 +77,22 @@ class _UiPopularPageState extends State<UiPopularPage> {
       key: const ValueKey('popular-page'),
       child: Column(
         children: [
-          PageToolbar(
-            title: 'Popular Posts',
-            icon: CupertinoIcons.star_fill,
-            actions: [
-              ToolbarButton(
-                icon: CupertinoIcons.search,
-                onPressed: widget.onSearchTap,
-              ),
-              const SizedBox(width: 8),
-              ToolbarButton(
-                icon: CupertinoIcons.refresh,
-                onPressed: () => _load(refresh: true),
-              ),
-            ],
-          ),
+          if (LayoutScope.of(context).isMobile)
+            PageToolbar(
+              title: 'Popular Posts',
+              icon: CupertinoIcons.star_fill,
+              actions: [
+                ToolbarButton(
+                  icon: CupertinoIcons.search,
+                  onPressed: widget.onSearchTap,
+                ),
+                const SizedBox(width: 8),
+                ToolbarButton(
+                  icon: CupertinoIcons.refresh,
+                  onPressed: () => _load(refresh: true),
+                ),
+              ],
+            ),
           Expanded(
             child: Consumer<PostsProvider>(
               builder: (_, pp, _) => Column(

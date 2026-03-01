@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../core/constants/constants.dart';
 import '../../data/models/models.dart';
 import '../../providers/providers.dart';
+import '../layout/layout_scope.dart';
 import '../shell/toolbar.dart';
 import '../theme.dart';
 
@@ -95,17 +96,18 @@ class _UiFeedsPageState extends State<UiFeedsPage> {
       key: const ValueKey('feeds-page'),
       child: Column(
         children: [
-          PageToolbar(
-            title: 'Feeds',
-            icon: CupertinoIcons.rectangle_stack_fill,
-            actions: [
-              ToolbarButton(
-                icon: CupertinoIcons.add,
-                tooltip: 'New feed',
-                onPressed: () => _openFeedEdit(context, null),
-              ),
-            ],
-          ),
+          if (LayoutScope.of(context).isMobile)
+            PageToolbar(
+              title: 'Feeds',
+              icon: CupertinoIcons.rectangle_stack_fill,
+              actions: [
+                ToolbarButton(
+                  icon: CupertinoIcons.add,
+                  tooltip: 'New feed',
+                  onPressed: () => _openFeedEdit(context, null),
+                ),
+              ],
+            ),
           Expanded(
             child: _FeedsList(
               isDark: isDark,

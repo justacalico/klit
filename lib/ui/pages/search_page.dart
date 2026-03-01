@@ -9,6 +9,7 @@ import '../../core/types/navigation_args.dart';
 import '../../providers/providers.dart';
 import '../layout/layout_scope.dart';
 import '../shell/mobile_header.dart';
+import '../theme.dart';
 import '../widgets/widgets.dart';
 
 /// Unified search page - reused from desktop search logic.
@@ -429,7 +430,9 @@ class _UiSearchPageState extends State<UiSearchPage>
         !feedMode &&
         settings.searchHistoryEnabled &&
         settings.searchHistory.isNotEmpty;
-    const headerHeight = MobileHeaderHeights.large;
+    final headerHeight = (!feedMode && isMobile)
+        ? 120.0
+        : MobileHeaderHeights.large;
     final tagSuggestionsTop = headerHeight + 2;
 
     final nav = context.watch<NavigationProvider>();
@@ -447,8 +450,10 @@ class _UiSearchPageState extends State<UiSearchPage>
               if (feedMode && widget.onBack != null) ...[
                 _buildFeedToolbar(context, isDark),
                 if (hasSubfeedTabs) _buildFeedSubfeedTabs(context, isDark),
-              ] else if (!feedMode)
+              ] else if (!feedMode) ...[
+                if (isMobile) _buildSearchTitleBar(context, isDark, isOled),
                 _buildToolbar(context, isDark, isMobile),
+              ],
               Expanded(
                 child: feedMode
                     ? _buildResults(context)
@@ -502,6 +507,55 @@ class _UiSearchPageState extends State<UiSearchPage>
                 ),
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchTitleBar(BuildContext context, bool isDark, bool isOled) {
+    return Container(
+      height: 60,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: isOled
+            ? AppColors.oledBackground
+            : (isDark ? const Color(0xFF18181B) : const Color(0xFFFAFAFC)),
+        border: Border(
+          bottom: BorderSide(
+            color: UIColors.primaryPurple.withValues(
+              alpha: isDark ? 0.15 : 0.1,
+            ),
+            width: 1,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [UIColors.primaryIndigo, UIColors.primaryPurple],
+              ),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(
+              CupertinoIcons.search,
+              size: 16,
+              color: CupertinoColors.white,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Text(
+            'Search',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+            ),
+          ),
         ],
       ),
     );

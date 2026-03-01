@@ -5,6 +5,7 @@ import '../../data/models/models.dart';
 import '../../data/services/services.dart';
 import '../../providers/providers.dart';
 import '../../core/types/navigation_args.dart';
+import '../layout/layout_scope.dart';
 import '../shell/toolbar.dart';
 import '../widgets/widgets.dart';
 
@@ -131,7 +132,7 @@ class _UiFavoritesPageState extends State<UiFavoritesPage> {
       key: const ValueKey('favorites-page'),
       child: Column(
         children: [
-          _buildToolbar(isDark),
+          if (LayoutScope.of(context).isMobile) _buildToolbar(isDark),
           Expanded(child: _buildContent(isDark)),
         ],
       ),

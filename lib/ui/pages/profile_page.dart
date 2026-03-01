@@ -257,7 +257,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
       key: const ValueKey('profile-page'),
       child: Column(
         children: [
-          _buildToolbar(isDark),
+          if (LayoutScope.of(context).isMobile) _buildToolbar(isDark),
           Expanded(child: _buildContent(isDark)),
         ],
       ),
