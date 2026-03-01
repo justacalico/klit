@@ -1,12 +1,14 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/constants.dart';
 import '../../core/utils/helpers.dart';
 import '../../providers/providers.dart';
 
-/// Design constants for the purple/indigo mobile theme
-class _ThemeColors {
+class _ServerPageColors {
   static const Color primaryPurple = Color(0xFF8B5CF6);
+  static const Color accentGreen = Color(0xFF22C55E);
 }
 
 /// Host settings page
@@ -45,10 +47,6 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
   void dispose() {
     _customHostController.dispose();
     super.dispose();
-  }
-
-  bool _isPresetHost(String url) {
-    return _presetHosts.any((h) => h['url'] == url);
   }
 
   Future<void> _saveHost(String host) async {
@@ -113,13 +111,13 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
           border: Border(
             bottom: BorderSide(
               color: isDark
-                  ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
-                  : _ThemeColors.primaryPurple.withValues(alpha: 0.1),
+                  ? _ServerPageColors.primaryPurple.withValues(alpha: 0.15)
+                  : _ServerPageColors.primaryPurple.withValues(alpha: 0.1),
               width: 0.5,
             ),
           ),
           middle: Text(
-            'Server Configuration',
+            'Server',
             style: TextStyle(
               fontWeight: FontWeight.w600,
               color: isDark ? CupertinoColors.white : CupertinoColors.black,
@@ -130,14 +128,24 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              _buildSectionHeader('PRESET SERVERS'),
-              const SizedBox(height: 8),
-              _buildPresetHosts(context, isDark, isOled),
-              const SizedBox(height: 24),
-              _buildSectionHeader('CUSTOM SERVER'),
-              const SizedBox(height: 8),
+              _buildContentHeader(isDark),
+              const SizedBox(height: 20),
+              _buildCard(
+                isDark: isDark,
+                isOled: isOled,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildCardTitle('Preset servers', 'Choose default or NSFW instance', isDark),
+                    const SizedBox(height: 16),
+                    _buildPresetHosts(context, isDark, isOled),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
               _buildCustomHost(context, isDark, isOled),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               _buildInfoCard(context, isDark, isOled),
             ],
           ),
@@ -146,169 +154,240 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildContentHeader(bool isDark) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16, bottom: 4),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w500,
-          letterSpacing: 0.5,
-          color: CupertinoColors.secondaryLabel.resolveFrom(context),
+      padding: const EdgeInsets.only(top: 8, bottom: 4),
+      child: Row(
+        children: [
+          Icon(
+            CupertinoIcons.globe,
+            size: 28,
+            color: _ServerPageColors.accentGreen,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Server',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? CupertinoColors.white : CupertinoColors.black,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Choose API host or enter a custom URL',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCard({
+    required bool isDark,
+    required bool isOled,
+    required Widget child,
+    EdgeInsets? padding,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          padding: padding ?? const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [
+                      const Color(0xFF1C1C1E).withValues(alpha: 0.85),
+                      const Color(0xFF252528).withValues(alpha: 0.7),
+                    ]
+                  : [
+                      const Color(0xFFFFFFFF).withValues(alpha: 0.95),
+                      const Color(0xFFF5F5F7).withValues(alpha: 0.9),
+                    ],
+            ),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: isDark
+                  ? CupertinoColors.white.withValues(alpha: 0.06)
+                  : CupertinoColors.black.withValues(alpha: 0.04),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: isDark
+                    ? CupertinoColors.black.withValues(alpha: 0.35)
+                    : CupertinoColors.systemGrey.withValues(alpha: 0.08),
+                blurRadius: 24,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: child,
         ),
       ),
+    );
+  }
+
+  Widget _buildCardTitle(String title, String subtitle, bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.2,
+            color: isDark ? CupertinoColors.white : CupertinoColors.black,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          subtitle,
+          style: TextStyle(
+            fontSize: 13,
+            color: isDark ? CupertinoColors.systemGrey : CupertinoColors.systemGrey2,
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildPresetHosts(BuildContext context, bool isDark, bool isOled) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark
-              ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
-              : CupertinoColors.systemGrey5,
-          width: 0.5,
-        ),
-      ),
-      child: Column(
-        children: _presetHosts.asMap().entries.map((entry) {
-          final index = entry.key;
-          final host = entry.value;
-          final isSelected = _selectedHost == host['url'];
-          final isLast = index == _presetHosts.length - 1;
+    return Column(
+      children: _presetHosts.asMap().entries.map((entry) {
+        final index = entry.key;
+        final host = entry.value;
+        final isSelected = _selectedHost == host['url'];
+        final isLast = index == _presetHosts.length - 1;
 
-          return Column(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  HapticUtils.selectionClick();
-                  setState(() => _selectedHost = host['url']!);
-                  _saveHost(host['url']!);
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  color: CupertinoColors.transparent,
-                  child: Row(
-                    children: [
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GestureDetector(
+              onTap: () {
+                HapticUtils.selectionClick();
+                setState(() => _selectedHost = host['url']!);
+                _saveHost(host['url']!);
+              },
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        gradient: isSelected
+                            ? const LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  _ServerPageColors.primaryPurple,
+                                  _ServerPageColors.primaryPurple,
+                                ],
+                              )
+                            : null,
+                        color: isSelected
+                            ? null
+                            : (isDark
+                                ? CupertinoColors.tertiarySystemFill
+                                : CupertinoColors.systemGrey5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        CupertinoIcons.globe,
+                        size: 22,
+                        color: isSelected
+                            ? CupertinoColors.white
+                            : CupertinoColors.secondaryLabel.resolveFrom(context),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            host['name']!,
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: isDark
+                                  ? CupertinoColors.white
+                                  : CupertinoColors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            host['description']!,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (isSelected)
                       Container(
-                        width: 40,
-                        height: 40,
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          gradient: isSelected
-                              ? LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    _ThemeColors.primaryPurple,
-                                    _ThemeColors.primaryPurple.withValues(
-                                      alpha: 0.8,
-                                    ),
-                                  ],
-                                )
-                              : null,
-                          color: isSelected
-                              ? null
-                              : (isDark
-                                    ? AppColors.resolveSecondaryBackground(isDark, isOled: isOled)
-                                    : CupertinoColors.systemGrey5),
-                          borderRadius: BorderRadius.circular(10),
+                          color: _ServerPageColors.primaryPurple.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(
-                          CupertinoIcons.globe,
-                          size: 20,
-                          color: isSelected
-                              ? CupertinoColors.white
-                              : CupertinoColors.secondaryLabel.resolveFrom(
-                                  context,
-                                ),
+                        child: Text(
+                          'Active',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: _ServerPageColors.primaryPurple,
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              host['name']!,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: isDark
-                                    ? CupertinoColors.white
-                                    : CupertinoColors.black,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              host['description']!,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: CupertinoColors.secondaryLabel
-                                    .resolveFrom(context),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (isSelected)
-                        Icon(
-                          CupertinoIcons.checkmark_circle_fill,
-                          color: _ThemeColors.primaryPurple,
-                          size: 24,
-                        ),
-                    ],
-                  ),
+                  ],
                 ),
               ),
-              if (!isLast)
-                Padding(
-                  padding: const EdgeInsets.only(left: 70),
-                  child: Container(
-                    height: 0.5,
-                    color: isDark
-                        ? CupertinoColors.white.withValues(alpha: 0.1)
-                        : CupertinoColors.systemGrey4,
-                  ),
-                ),
-            ],
-          );
-        }).toList(),
-      ),
+            ),
+            if (!isLast)
+              Container(
+                height: 0.5,
+                margin: const EdgeInsets.only(left: 60),
+                color: isDark
+                    ? CupertinoColors.white.withValues(alpha: 0.08)
+                    : CupertinoColors.systemGrey5,
+              ),
+          ],
+        );
+      }).toList(),
     );
   }
 
   Widget _buildCustomHost(BuildContext context, bool isDark, bool isOled) {
-    final isCustom = !_isPresetHost(_selectedHost);
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isCustom
-              ? _ThemeColors.primaryPurple
-              : (isDark
-                    ? _ThemeColors.primaryPurple.withValues(alpha: 0.15)
-                    : CupertinoColors.systemGrey5),
-          width: isCustom ? 2 : 0.5,
-        ),
-      ),
+    return _buildCard(
+      isDark: isDark,
+      isOled: isOled,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            'Custom Host URL',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: isDark ? CupertinoColors.white : CupertinoColors.black,
-            ),
-          ),
-          const SizedBox(height: 12),
+          _buildCardTitle('Custom server', 'Use your own API host', isDark),
+          const SizedBox(height: 16),
           CupertinoTextField(
             controller: _customHostController,
             placeholder: 'https://example.com',
@@ -321,7 +400,9 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
               color: CupertinoColors.placeholderText.resolveFrom(context),
             ),
             decoration: BoxDecoration(
-              color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+              color: isDark
+                  ? CupertinoColors.tertiarySystemFill
+                  : CupertinoColors.systemGrey6,
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -330,7 +411,7 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
             width: double.infinity,
             child: CupertinoButton(
               padding: const EdgeInsets.symmetric(vertical: 14),
-              color: _ThemeColors.primaryPurple,
+              color: _ServerPageColors.primaryPurple,
               borderRadius: BorderRadius.circular(10),
               onPressed: () {
                 HapticUtils.selectionClick();
@@ -359,13 +440,13 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _ThemeColors.primaryPurple.withValues(
-          alpha: isDark ? 0.15 : 0.1,
+        color: _ServerPageColors.primaryPurple.withValues(
+          alpha: isDark ? 0.12 : 0.08,
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: _ThemeColors.primaryPurple.withValues(alpha: 0.2),
-          width: 0.5,
+          color: _ServerPageColors.primaryPurple.withValues(alpha: 0.15),
+          width: 1,
         ),
       ),
       child: Row(
@@ -373,7 +454,7 @@ class _HostSettingsPageState extends State<HostSettingsPage> {
         children: [
           Icon(
             CupertinoIcons.info_circle_fill,
-            color: _ThemeColors.primaryPurple,
+            color: _ServerPageColors.primaryPurple,
             size: 22,
           ),
           const SizedBox(width: 12),
