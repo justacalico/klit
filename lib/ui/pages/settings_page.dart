@@ -538,7 +538,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
           child: showContent
               ? SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
-                  child: _buildCategoryContent(isDark),
+                  child: _buildCategoryContent(isDark, isOled),
                 )
               : Container(
                   color: AppColors.resolveSecondaryBackground(
@@ -607,8 +607,8 @@ class _UiSettingsPageState extends State<UiSettingsPage>
               height: 32,
               padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
-                color: isDark
-                    ? CupertinoColors.white.withValues(alpha: 0.08)
+                color: (isDark || isOled)
+                    ? AppColors.resolveSecondaryBackground(isDark, isOled: isOled)
                     : CupertinoColors.black.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -667,7 +667,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                   itemBuilder: (context, index) {
                     final category = list[index];
                     final isSelected = _selectedCategory == category.id;
-                    return _buildCategoryItem(category, isSelected, isDark);
+                    return _buildCategoryItem(category, isSelected, isDark, isOled);
                   },
                 );
               },
@@ -695,9 +695,13 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     _SettingsCategory category,
     bool isSelected,
     bool isDark,
+    bool isOled,
   ) {
     const blueHighlight = Color(0xFFE8F4FC);
     const blueHighlightDark = Color(0xFF2A3F52);
+    final selectedColor = isOled
+        ? AppColors.oledSecondaryBackground
+        : (isDark ? blueHighlightDark : blueHighlight);
     return Padding(
       padding: const EdgeInsets.only(bottom: 2),
       child: GestureDetector(
@@ -705,9 +709,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected
-                ? (isDark ? blueHighlightDark : blueHighlight)
-                : null,
+            color: isSelected ? selectedColor : null,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
@@ -759,7 +761,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
             opacity: _fadeAnimation,
             child: SingleChildScrollView(
               padding: EdgeInsets.all(contentPadding),
-              child: _buildCategoryContent(isDark),
+              child: _buildCategoryContent(isDark, isOled),
             ),
           ),
         ),
@@ -790,9 +792,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
             ? null
             : Border(
                 bottom: BorderSide(
-                  color: isDark
-                      ? _DesignColors.primaryPurple.withValues(alpha: 0.1)
-                      : const Color(0xFFE5E5E7),
+                  color: AppColors.resolveSeparator(isDark, isOled: isOled),
                   width: 1,
                 ),
               ),
@@ -861,26 +861,26 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     }
   }
 
-  Widget _buildCategoryContent(bool isDark) {
+  Widget _buildCategoryContent(bool isDark, bool isOled) {
     switch (_selectedCategory) {
       case 'account':
-        return _buildAccountContent(isDark);
+        return _buildAccountContent(isDark, isOled);
       case 'appearance':
-        return _buildAppearanceContent(isDark);
+        return _buildAppearanceContent(isDark, isOled);
       case 'content':
-        return _buildContentSettings(isDark);
+        return _buildContentSettings(isDark, isOled);
       case 'behavior':
-        return _buildBehaviorContent(isDark);
+        return _buildBehaviorContent(isDark, isOled);
       case 'video':
-        return _buildVideoContent(isDark);
+        return _buildVideoContent(isDark, isOled);
       case 'customization':
-        return _buildCustomizationContent(isDark);
+        return _buildCustomizationContent(isDark, isOled);
       case 'data':
-        return _buildDataContent(isDark);
+        return _buildDataContent(isDark, isOled);
       case 'network':
-        return _buildNetworkContent(isDark);
+        return _buildNetworkContent(isDark, isOled);
       case 'about':
-        return _buildAboutContent(isDark);
+        return _buildAboutContent(isDark, isOled);
       default:
         return const SizedBox.shrink();
     }
@@ -888,9 +888,24 @@ class _UiSettingsPageState extends State<UiSettingsPage>
 
   Widget _buildSettingsCard({
     required bool isDark,
+    required bool isOled,
     required Widget child,
     EdgeInsets? padding,
   }) {
+    if (isOled) {
+      return Container(
+        padding: padding ?? const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: AppColors.oledSecondaryBackground,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: AppColors.resolveSeparator(isDark, isOled: true),
+            width: 1,
+          ),
+        ),
+        child: child,
+      );
+    }
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
       child: BackdropFilter(
@@ -1006,7 +1021,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   }
 
   // Account Content
-  Widget _buildAccountContent(bool isDark) {
+  Widget _buildAccountContent(bool isDark, bool isOled) {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, _) {
         final account = authProvider.currentAccount;
@@ -1040,6 +1055,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
           children: [
             _buildSettingsCard(
               isDark: isDark,
+              isOled: isOled,
               child: Column(
                 children: [
                   Row(
@@ -1118,6 +1134,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
               const SizedBox(height: 20),
               _buildSettingsCard(
                 isDark: isDark,
+                isOled: isOled,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 16,
@@ -1306,7 +1323,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   }
 
   // Appearance Content
-  Widget _buildAppearanceContent(bool isDark) {
+  Widget _buildAppearanceContent(bool isDark, bool isOled) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
         return Column(
@@ -1314,6 +1331,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
           children: [
             _buildSettingsCard(
               isDark: isDark,
+              isOled: isOled,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1369,6 +1387,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
             const SizedBox(height: 20),
             _buildSettingsCard(
               isDark: isDark,
+              isOled: isOled,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1590,7 +1609,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   }
 
   // Content Settings
-  Widget _buildContentSettings(bool isDark) {
+  Widget _buildContentSettings(bool isDark, bool isOled) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
         final isAutoMode = settings.gridAutoMode;
@@ -1602,6 +1621,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
             const SizedBox(height: 12),
             _buildSettingsCard(
               isDark: isDark,
+              isOled: isOled,
               child: Column(
                 children: [
                   _buildSettingRow(
@@ -1795,6 +1815,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
             const SizedBox(height: 12),
             _buildSettingsCard(
               isDark: isDark,
+              isOled: isOled,
               child: _buildSettingRow(
                 isDark: isDark,
                 icon: CupertinoIcons.shield_fill,
@@ -1814,6 +1835,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
             const SizedBox(height: 12),
             _buildSettingsCard(
               isDark: isDark,
+              isOled: isOled,
               child: Column(
                 children: [
                   _buildSettingRow(
@@ -1882,12 +1904,13 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   }
 
   // Behavior Content
-  Widget _buildBehaviorContent(bool isDark) {
+  Widget _buildBehaviorContent(bool isDark, bool isOled) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
         final behaviorCards = <Widget>[
           _buildSettingsCard(
             isDark: isDark,
+            isOled: isOled,
             child: Column(
               children: [
                 _buildSettingRow(
@@ -1970,6 +1993,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
           behaviorCards.add(
             _buildSettingsCard(
               isDark: isDark,
+              isOled: isOled,
               child: Material(
                 type: MaterialType.transparency,
                 child: Column(
@@ -2115,7 +2139,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   }
 
   // Video Content
-  Widget _buildVideoContent(bool isDark) {
+  Widget _buildVideoContent(bool isDark, bool isOled) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
         return Column(
@@ -2123,6 +2147,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
           children: [
             _buildSettingsCard(
               isDark: isDark,
+              isOled: isOled,
               child: Column(
                 children: [
                   _buildSettingRow(
@@ -2184,7 +2209,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   }
 
   // Customization Content
-  Widget _buildCustomizationContent(bool isDark) {
+  Widget _buildCustomizationContent(bool isDark, bool isOled) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
         return Column(
@@ -2192,6 +2217,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
           children: [
             _buildSettingsCard(
               isDark: isDark,
+              isOled: isOled,
               child: _buildSettingRow(
                 isDark: isDark,
                 icon: CupertinoIcons.sidebar_left,
@@ -2221,6 +2247,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
             const SizedBox(height: 16),
             _buildSettingsCard(
               isDark: isDark,
+              isOled: isOled,
               child: _buildSettingRow(
                 isDark: isDark,
                 icon: CupertinoIcons.list_bullet,
@@ -2312,9 +2339,10 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                             key: ValueKey(itemId),
                             margin: const EdgeInsets.only(bottom: 4),
                             decoration: BoxDecoration(
-                              color: isDark
-                                  ? const Color(0xFF2C2C2E)
-                                  : const Color(0xFFF2F2F7),
+                              color: AppColors.resolveSecondaryBackground(
+                                isDark,
+                                isOled: context.watch<SettingsProvider>().themeMode == 3,
+                              ),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: ListTile(
@@ -2427,9 +2455,10 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                             key: ValueKey(itemId),
                             margin: const EdgeInsets.only(bottom: 4),
                             decoration: BoxDecoration(
-                              color: isDark
-                                  ? const Color(0xFF2C2C2E)
-                                  : const Color(0xFFF2F2F7),
+                              color: AppColors.resolveSecondaryBackground(
+                                isDark,
+                                isOled: context.watch<SettingsProvider>().themeMode == 3,
+                              ),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: ListTile(
@@ -2482,7 +2511,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   }
 
   // Data Content
-  Widget _buildDataContent(bool isDark) {
+  Widget _buildDataContent(bool isDark, bool isOled) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
         return Column(
@@ -2490,6 +2519,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
           children: [
             _buildSettingsCard(
               isDark: isDark,
+              isOled: isOled,
               child: Column(
                 children: [
                   _buildSettingRow(
@@ -2592,7 +2622,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   }
 
   // Network Content
-  Widget _buildNetworkContent(bool isDark) {
+  Widget _buildNetworkContent(bool isDark, bool isOled) {
     return Consumer<SettingsProvider>(
       builder: (context, settings, _) {
         final proxyConfig = settings.proxyConfig;
@@ -2601,6 +2631,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
           children: [
             _buildSettingsCard(
               isDark: isDark,
+              isOled: isOled,
               child: Column(
                 children: [
                   _buildSettingRow(
@@ -2654,6 +2685,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
 
   void _showProxySettingsDialog(BuildContext context, bool isDark) {
     final settings = context.read<SettingsProvider>();
+    final isOled = settings.themeMode == 3;
     final proxyConfig = settings.proxyConfig;
 
     final hostController = TextEditingController(text: proxyConfig.host);
@@ -2683,9 +2715,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                   placeholder: 'Proxy Host (e.g., 127.0.0.1)',
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF2C2C2E)
-                        : CupertinoColors.systemGrey6,
+                    color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
@@ -2696,9 +2726,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                   keyboardType: TextInputType.number,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF2C2C2E)
-                        : CupertinoColors.systemGrey6,
+                    color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
@@ -2729,9 +2757,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                     placeholder: 'Username',
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFF2C2C2E)
-                          : CupertinoColors.systemGrey6,
+                      color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
@@ -2742,9 +2768,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                     obscureText: true,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFF2C2C2E)
-                          : CupertinoColors.systemGrey6,
+                      color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
@@ -2787,12 +2811,13 @@ class _UiSettingsPageState extends State<UiSettingsPage>
   }
 
   // About Content
-  Widget _buildAboutContent(bool isDark) {
+  Widget _buildAboutContent(bool isDark, bool isOled) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSettingsCard(
           isDark: isDark,
+          isOled: isOled,
           padding: const EdgeInsets.all(32),
           child: Column(
             children: [
@@ -2879,7 +2904,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                 ],
               ),
               const SizedBox(height: 24),
-              _buildCheckForUpdatesButton(isDark),
+              _buildCheckForUpdatesButton(isDark, isOled),
             ],
           ),
         ),
@@ -2887,11 +2912,11 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     );
   }
 
-  Widget _buildCheckForUpdatesButton(bool isDark) {
+  Widget _buildCheckForUpdatesButton(bool isDark, bool isOled) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () => _checkForUpdates(isDark),
+        onTap: () => _checkForUpdates(isDark, isOled),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           decoration: BoxDecoration(
@@ -2936,40 +2961,67 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     );
   }
 
-  Future<void> _checkForUpdates(bool isDark) async {
-    // Show loading dialog
+  Future<void> _checkForUpdates(bool isDark, bool isOled) async {
     showCupertinoDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => Center(
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-            child: Container(
-              padding: const EdgeInsets.all(32),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: isDark
-                      ? [
-                          const Color(0xFF1C1C1E).withValues(alpha: 0.9),
-                          const Color(0xFF2C2C2E).withValues(alpha: 0.8),
-                        ]
-                      : [
-                          CupertinoColors.white.withValues(alpha: 0.95),
-                          const Color(0xFFF8F8FA).withValues(alpha: 0.9),
-                        ],
-                ),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isDark
-                      ? _DesignColors.primaryPurple.withValues(alpha: 0.2)
-                      : const Color(0xFFE5E5E7),
-                  width: 1,
-                ),
-              ),
+          child: isOled
+              ? Container(
+                  padding: const EdgeInsets.all(32),
+                  decoration: BoxDecoration(
+                    color: AppColors.oledSecondaryBackground,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppColors.resolveSeparator(isDark, isOled: true),
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const CupertinoActivityIndicator(radius: 14),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Checking for updates...',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: CupertinoColors.white,
+                          decoration: TextDecoration.none,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  child: Container(
+                    padding: const EdgeInsets.all(32),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: isDark
+                            ? [
+                                const Color(0xFF1C1C1E).withValues(alpha: 0.9),
+                                const Color(0xFF2C2C2E).withValues(alpha: 0.8),
+                              ]
+                            : [
+                                CupertinoColors.white.withValues(alpha: 0.95),
+                                const Color(0xFFF8F8FA).withValues(alpha: 0.9),
+                              ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark
+                            ? _DesignColors.primaryPurple.withValues(alpha: 0.2)
+                            : const Color(0xFFE5E5E7),
+                        width: 1,
+                      ),
+                    ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -3004,13 +3056,14 @@ class _UiSettingsPageState extends State<UiSettingsPage>
       Navigator.of(context).pop();
 
       // Show result dialog
-      _showUpdateResultDialog(isDark, result);
+      _showUpdateResultDialog(isDark, isOled, result);
     } catch (e) {
       if (!mounted) return;
       Navigator.of(context).pop();
 
       _showUpdateResultDialog(
         isDark,
+        isOled,
         UpdateCheckResult(
           updateAvailable: false,
           currentVersion: _appVersion,
@@ -3020,50 +3073,80 @@ class _UiSettingsPageState extends State<UiSettingsPage>
     }
   }
 
-  void _showUpdateResultDialog(bool isDark, UpdateCheckResult result) {
+  void _showUpdateResultDialog(bool isDark, bool isOled, UpdateCheckResult result) {
     showCupertinoDialog(
       context: context,
-      builder: (dialogContext) => Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-            child: Container(
-              width: 400,
-              padding: const EdgeInsets.all(28),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: isDark
-                      ? [
-                          const Color(0xFF1C1C1E).withValues(alpha: 0.95),
-                          const Color(0xFF2C2C2E).withValues(alpha: 0.9),
-                        ]
-                      : [
-                          CupertinoColors.white.withValues(alpha: 0.98),
-                          const Color(0xFFF8F8FA).withValues(alpha: 0.95),
-                        ],
-                ),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: isDark
-                      ? _DesignColors.primaryPurple.withValues(alpha: 0.25)
-                      : const Color(0xFFE5E5E7),
-                  width: 1.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: CupertinoColors.black.withValues(alpha: 0.2),
-                    blurRadius: 40,
-                    offset: const Offset(0, 16),
+      builder: (dialogContext) {
+        final content = _buildUpdateResultDialogContent(dialogContext, isDark, result);
+        return Center(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: isOled
+                ? Container(
+                    width: 400,
+                    padding: const EdgeInsets.all(28),
+                    decoration: BoxDecoration(
+                      color: AppColors.oledSecondaryBackground,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: AppColors.resolveSeparator(isDark, isOled: true),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: content,
+                  )
+                : BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                  child: Container(
+                    width: 400,
+                    padding: const EdgeInsets.all(28),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: isDark
+                            ? [
+                                const Color(0xFF1C1C1E).withValues(alpha: 0.95),
+                                const Color(0xFF2C2C2E).withValues(alpha: 0.9),
+                              ]
+                            : [
+                                CupertinoColors.white.withValues(alpha: 0.98),
+                                const Color(0xFFF8F8FA).withValues(alpha: 0.95),
+                              ],
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: isDark
+                            ? _DesignColors.primaryPurple.withValues(alpha: 0.25)
+                            : const Color(0xFFE5E5E7),
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: CupertinoColors.black.withValues(alpha: 0.2),
+                          blurRadius: 40,
+                          offset: const Offset(0, 16),
+                        ),
+                      ],
+                    ),
+                    child: content,
                   ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Icon
+                ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildUpdateResultDialogContent(
+    BuildContext dialogContext,
+    bool isDark,
+    UpdateCheckResult result,
+  ) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Icon
                   Container(
                     width: 56,
                     height: 56,
@@ -3278,12 +3361,7 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                         ),
                       ),
                     ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+      ],
     );
   }
 
