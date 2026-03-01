@@ -401,11 +401,8 @@ class _UiSearchPageState extends State<UiSearchPage>
     final mode = LayoutScope.of(context);
     final isMobile = mode.isMobile;
     final feedMode = widget.feedMode;
-    const stackedHeaderHeight = MobileHeaderHeights.large * 2;
-    const feedHeaderHeight = MobileHeaderHeights.large;
-    final tagSuggestionsTop = feedMode
-        ? feedHeaderHeight + 2
-        : stackedHeaderHeight + 2;
+    const headerHeight = MobileHeaderHeights.large;
+    final tagSuggestionsTop = headerHeight + 2;
 
     return KeyedSubtree(
       key: const ValueKey('search-page'),
@@ -415,10 +412,8 @@ class _UiSearchPageState extends State<UiSearchPage>
             children: [
               if (feedMode && widget.onBack != null)
                 _buildFeedToolbar(context, isDark)
-              else if (!feedMode) ...[
-                _buildSearchTitleBar(context, isDark, isOled),
+              else if (!feedMode)
                 _buildToolbar(context, isDark, isMobile),
-              ],
               Expanded(
                 child: feedMode
                     ? _buildResults(context)
@@ -444,7 +439,7 @@ class _UiSearchPageState extends State<UiSearchPage>
             AnimatedBuilder(
               animation: _filterCtrl,
               builder: (_, _) => Positioned(
-                top: stackedHeaderHeight + _filterSlide.value,
+                top: headerHeight + _filterSlide.value,
                 left: 220,
                 right: 20,
                 child: Opacity(
@@ -508,18 +503,6 @@ class _UiSearchPageState extends State<UiSearchPage>
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildSearchTitleBar(BuildContext context, bool isDark, bool isOled) {
-    return MobileHeader(
-      title: 'Search',
-      icon: CupertinoIcons.search,
-      barHeight: MobileHeaderHeights.large,
-      variant: MobileHeaderVariant.solid,
-      isDark: isDark,
-      isOled: isOled,
-      applySafeTopInset: false,
     );
   }
 
