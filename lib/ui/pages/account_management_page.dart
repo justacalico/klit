@@ -302,7 +302,7 @@ class AccountManagementContent extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: 600),
         child: ListView.separated(
           itemCount: auth.accounts.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 14),
+          separatorBuilder: (_, _) => const SizedBox(height: 14),
           itemBuilder: (context, index) {
             final account = auth.accounts[index];
             final isActive = auth.currentAccount?.id == account.id;
