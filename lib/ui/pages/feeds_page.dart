@@ -21,7 +21,7 @@ class _UiFeedsPageState extends State<UiFeedsPage> {
   bool _showEditForm = false;
   Feed? _editingFeed;
 
-  void _openFeed(BuildContext context, Feed feed) {
+  void _openFeed(BuildContext context, Feed feed, {int subfeedIndex = 0}) {
     var query = feed.toSearchQuery();
     if (feed.excludeFavorites) {
       final username = context.read<AuthProvider>().currentAccount?.username;
@@ -36,6 +36,7 @@ class _UiFeedsPageState extends State<UiFeedsPage> {
       rating: feed.rating,
       order: feed.order,
       subfeeds: feed.subfeeds.isNotEmpty ? feed.subfeeds : null,
+      initialSubfeedIndex: subfeedIndex,
     );
   }
 
@@ -109,7 +110,8 @@ class _UiFeedsPageState extends State<UiFeedsPage> {
             child: _FeedsList(
               isDark: isDark,
               isOled: isOled,
-              onOpenFeed: _openFeed,
+              onOpenFeed: (context, feed, [subfeedIndex = 0]) =>
+                  _openFeed(context, feed, subfeedIndex: subfeedIndex),
               onEditFeed: _openFeedEdit,
               onDeleteFeed: _confirmDeleteFeed,
             ),
@@ -123,7 +125,7 @@ class _UiFeedsPageState extends State<UiFeedsPage> {
 class _FeedsList extends StatelessWidget {
   final bool isDark;
   final bool isOled;
-  final void Function(BuildContext, Feed) onOpenFeed;
+  final void Function(BuildContext, Feed, [int subfeedIndex]) onOpenFeed;
   final void Function(BuildContext, Feed?) onEditFeed;
   final void Function(BuildContext, Feed) onDeleteFeed;
 
@@ -190,7 +192,7 @@ class _FeedsList extends StatelessWidget {
             isDark: isDark,
             isOled: isOled,
             backgroundColor: bg,
-            onTap: () => onOpenFeed(context, feed),
+            onOpenFeed: onOpenFeed,
             onEdit: () => onEditFeed(context, feed),
             onDelete: () => onDeleteFeed(context, feed),
           ),
@@ -205,7 +207,7 @@ class _FeedCard extends StatelessWidget {
   final bool isDark;
   final bool isOled;
   final Color backgroundColor;
-  final VoidCallback onTap;
+  final void Function(BuildContext, Feed, [int subfeedIndex]) onOpenFeed;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
@@ -214,7 +216,7 @@ class _FeedCard extends StatelessWidget {
     required this.isDark,
     required this.isOled,
     required this.backgroundColor,
-    required this.onTap,
+    required this.onOpenFeed,
     required this.onEdit,
     required this.onDelete,
   });
@@ -240,6 +242,7 @@ class _FeedCard extends StatelessWidget {
     final excludeStr = feed.excludeTags.isEmpty
         ? ''
         : '− ${feed.excludeTags.take(2).join(', ')}${feed.excludeTags.length > 2 ? '…' : ''}';
+    final hasSubfeeds = feed.subfeeds.isNotEmpty;
 
     return CupertinoContextMenu(
       actions: [
@@ -259,91 +262,153 @@ class _FeedCard extends StatelessWidget {
           child: const Text('Delete'),
         ),
       ],
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: (isDark ? CupertinoColors.white : CupertinoColors.black)
-                  .withValues(alpha: 0.06),
-            ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: (isDark ? CupertinoColors.white : CupertinoColors.black)
+                .withValues(alpha: 0.06),
           ),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: typeColor.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  feed.mediaType == Feed.mediaTypeVideo
-                      ? CupertinoIcons.play_rectangle_fill
-                      : feed.mediaType == Feed.mediaTypeAll
-                          ? CupertinoIcons.rectangle_stack_fill
-                          : CupertinoIcons.photo_fill,
-                  color: typeColor,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            GestureDetector(
+              onTap: () => onOpenFeed(context, feed),
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
                   children: [
-                    Text(
-                      feed.name.isEmpty ? 'Unnamed feed' : feed.name,
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                        color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: typeColor.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        feed.mediaType == Feed.mediaTypeVideo
+                            ? CupertinoIcons.play_rectangle_fill
+                            : feed.mediaType == Feed.mediaTypeAll
+                                ? CupertinoIcons.rectangle_stack_fill
+                                : CupertinoIcons.photo_fill,
+                        color: typeColor,
+                        size: 22,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      [
-                        if (includeStr.isNotEmpty) includeStr,
-                        if (orStr.isNotEmpty) orStr,
-                        if (excludeStr.isNotEmpty) excludeStr,
-                      ].join('  '),
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: CupertinoColors.systemGrey,
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            feed.name.isEmpty ? 'Unnamed feed' : feed.name,
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? CupertinoColors.white : const Color(0xFF1F2937),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            [
+                              if (includeStr.isNotEmpty) includeStr,
+                              if (orStr.isNotEmpty) orStr,
+                              if (excludeStr.isNotEmpty) excludeStr,
+                            ].join('  '),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: CupertinoColors.systemGrey,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: typeColor.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        typeLabel,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: typeColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    CupertinoButton(
+                      padding: const EdgeInsets.all(8),
+                      minimumSize: Size.zero,
+                      onPressed: onEdit,
+                      child: const Icon(CupertinoIcons.pencil, size: 20),
                     ),
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: typeColor.withValues(alpha: 0.18),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  typeLabel,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: typeColor,
-                  ),
+            ),
+            if (hasSubfeeds) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  height: 1,
+                  color: (isDark ? CupertinoColors.white : CupertinoColors.black)
+                      .withValues(alpha: 0.08),
                 ),
               ),
-              const SizedBox(width: 8),
-              CupertinoButton(
-                padding: const EdgeInsets.all(8),
-                minimumSize: Size.zero,
-                onPressed: onEdit,
-                child: const Icon(CupertinoIcons.pencil, size: 20),
+              Padding(
+                padding: const EdgeInsets.only(left: 24, right: 16, top: 6, bottom: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (var i = 0; i < feed.subfeeds.length; i++) ...[
+                      if (i > 0) const SizedBox(height: 4),
+                      GestureDetector(
+                        onTap: () => onOpenFeed(context, feed, i + 1),
+                        behavior: HitTestBehavior.opaque,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                          child: Row(
+                            children: [
+                              Icon(
+                                CupertinoIcons.arrow_turn_down_right,
+                                size: 14,
+                                color: CupertinoColors.systemGrey,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  feed.subfeeds[i].name.isEmpty
+                                      ? 'Sub ${i + 1}'
+                                      : feed.subfeeds[i].name,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: isDark
+                                        ? CupertinoColors.white.withValues(alpha: 0.85)
+                                        : CupertinoColors.black.withValues(alpha: 0.85),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
             ],
-          ),
+          ],
         ),
       ),
     );

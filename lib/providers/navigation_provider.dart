@@ -55,6 +55,7 @@ class NavigationProvider extends ChangeNotifier {
     String? rating,
     String? order,
     List<SubFeed>? subfeeds,
+    int initialSubfeedIndex = 0,
   }) {
     _searchQuery = query;
     _feedTitle = feedTitle;
@@ -62,7 +63,8 @@ class NavigationProvider extends ChangeNotifier {
     _initialRating = rating;
     _initialOrder = order ?? 'id_desc';
     _feedSubfeeds = subfeeds != null && subfeeds.isNotEmpty ? List.from(subfeeds) : null;
-    _feedActiveSubfeedIndex = 0;
+    final maxIndex = _feedSubfeeds?.length ?? 0;
+    _feedActiveSubfeedIndex = initialSubfeedIndex.clamp(0, maxIndex);
     _currentIndex = 4;
     notifyListeners();
   }
