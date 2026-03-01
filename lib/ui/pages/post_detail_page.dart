@@ -28,6 +28,13 @@ import '../shell/toolbar.dart';
 import '../theme.dart';
 import '../widgets/widgets.dart';
 
+void _postDetailHapticTap(BuildContext context, VoidCallback action) {
+  if (LayoutScope.of(context).isMobile) {
+    HapticFeedback.selectionClick();
+  }
+  action();
+}
+
 /// One-shot sticky milk overlay: shoots at the screen and stays ~5s then fades.
 class _MilkAnimationOverlay extends StatefulWidget {
   const _MilkAnimationOverlay({required this.onComplete});
@@ -1275,7 +1282,7 @@ class _MobilePostDetailBody extends StatelessWidget {
           trailing: s._currentPost != null
               ? CupertinoButton(
                   padding: EdgeInsets.zero,
-                  onPressed: () => s._showMoreOptions(),
+                  onPressed: () => _postDetailHapticTap(context, s._showMoreOptions),
                   child: const Icon(CupertinoIcons.ellipsis),
                 )
               : null,
@@ -1477,7 +1484,7 @@ class _MobilePostDetailContentBuilder {
     if (imageUrl == null) return const Icon(CupertinoIcons.photo, size: 64);
     final aspectRatio = post.file.aspectRatio.clamp(0.3, 3.0);
     return GestureDetector(
-      onTap: () => s._openFullMedia(),
+      onTap: () => _postDetailHapticTap(context, s._openFullMedia),
       child: Hero(
         tag: 'post_${post.id}',
         child: AspectRatio(
@@ -1892,12 +1899,12 @@ class _MobilePostDetailContentBuilder {
             CupertinoButton(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               minimumSize: Size.zero,
-              onPressed: () {
+              onPressed: () => _postDetailHapticTap(context, () {
                 Navigator.of(context).pushNamed(
                   AppRoutes.profile,
                   arguments: effectiveUsername,
                 );
-              },
+              }),
               child: Text(
                 'View profile',
                 style: TextStyle(
@@ -1966,7 +1973,7 @@ class _MobilePostDetailContentBuilder {
                   ),
                   onTapLink: (text, href, title) {
                     if (href != null && href.startsWith('tag:')) {
-                      s._searchTag(Uri.decodeComponent(href.substring(4)));
+                      _postDetailHapticTap(context, () => s._searchTag(Uri.decodeComponent(href.substring(4))));
                     }
                   },
                 ),
@@ -2012,7 +2019,7 @@ class _MobilePostDetailContentBuilder {
                 final baseColor = PostTags.getColorForCategory(category);
                 final chipColor = baseColor.withValues(alpha: 0.25);
                 return GestureDetector(
-                  onTap: () => s._searchTag(tag),
+                  onTap: () => _postDetailHapticTap(context, () => s._searchTag(tag)),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -2233,7 +2240,7 @@ class _DesktopPostDetailContentBuilder {
     final imageUrl = post.file.url ?? post.sample.url ?? post.preview.url;
     if (imageUrl == null) return const SizedBox();
     return GestureDetector(
-      onTap: () => s._setFullScreen(false),
+      onTap: () => _postDetailHapticTap(context, () => s._setFullScreen(false)),
       child: Container(
         color: CupertinoColors.black,
         child: InteractiveViewer(
@@ -2291,7 +2298,7 @@ class _DesktopPostDetailContentBuilder {
               ToolbarButton(
                 icon: CupertinoIcons.back,
                 tooltip: 'Back',
-                onPressed: onClose,
+                onPressed: () => _postDetailHapticTap(context, onClose),
               ),
               const SizedBox(width: 8),
               Text(
@@ -2338,7 +2345,7 @@ class _DesktopPostDetailContentBuilder {
                   icon: CupertinoIcons.chevron_left,
                   tooltip: 'Previous',
                   onPressed: s._currentIndex > 0
-                      ? () => s._navigatePost(-1)
+                      ? () => _postDetailHapticTap(context, () => s._navigatePost(-1))
                       : null,
                 ),
                 const SizedBox(width: 8),
@@ -2346,7 +2353,7 @@ class _DesktopPostDetailContentBuilder {
                   icon: CupertinoIcons.chevron_right,
                   tooltip: 'Next',
                   onPressed: s._currentIndex < s._postIds.length - 1
-                      ? () => s._navigatePost(1)
+                      ? () => _postDetailHapticTap(context, () => s._navigatePost(1))
                       : null,
                 ),
               ],
@@ -2380,7 +2387,7 @@ class _DesktopPostDetailContentBuilder {
             Text(error),
             const SizedBox(height: 16),
             CupertinoButton.filled(
-              onPressed: () => s._loadPost(s._currentIndex),
+              onPressed: () => _postDetailHapticTap(context, () => s._loadPost(s._currentIndex)),
               child: const Text('Retry'),
             ),
           ],
@@ -2449,7 +2456,7 @@ class _DesktopPostDetailContentBuilder {
               bottom: 20,
               right: 20,
               child: GestureDetector(
-                onTap: () => s._setFullScreen(true),
+                onTap: () => _postDetailHapticTap(context, () => s._setFullScreen(true)),
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -2618,7 +2625,7 @@ class _DesktopPostDetailContentBuilder {
           isVoting,
           [const Color(0xFF22C55E), const Color(0xFF16A34A)],
           isDark,
-          onTap: () => s._vote(s._currentIndex, userVote == 1 ? 0 : 1),
+          onTap: () => _postDetailHapticTap(context, () => s._vote(s._currentIndex, userVote == 1 ? 0 : 1)),
         ),
       ),
       const SizedBox(width: 8),
@@ -2632,8 +2639,7 @@ class _DesktopPostDetailContentBuilder {
           isVoting,
           [const Color(0xFFEF4444), const Color(0xFFDC2626)],
           isDark,
-          onTap: () =>
-              s._vote(s._currentIndex, userVote == -1 ? 0 : -1),
+          onTap: () => _postDetailHapticTap(context, () => s._vote(s._currentIndex, userVote == -1 ? 0 : -1)),
         ),
       ),
       const SizedBox(width: 8),
@@ -2647,7 +2653,7 @@ class _DesktopPostDetailContentBuilder {
           isTogglingFav,
           [UIColors.primaryPurple, UIColors.primaryViolet],
           isDark,
-          onTap: () => s._toggleFavorite(s._currentIndex),
+          onTap: () => _postDetailHapticTap(context, () => s._toggleFavorite(s._currentIndex)),
         ),
       ),
       const SizedBox(width: 8),
@@ -2661,7 +2667,7 @@ class _DesktopPostDetailContentBuilder {
           s._isDownloading[s._currentIndex] == true,
           [UIColors.primaryIndigo, UIColors.primaryPurple],
           isDark,
-          onTap: () => s._downloadPost(),
+          onTap: () => _postDetailHapticTap(context, () => s._downloadPost()),
         ),
       ),
     ];
@@ -2678,7 +2684,7 @@ class _DesktopPostDetailContentBuilder {
             false,
             [const Color(0xFF22C55E), const Color(0xFF16A34A)],
             isDark,
-            onTap: () => s._onIFinishedTap(s._currentIndex),
+            onTap: () => _postDetailHapticTap(context, () => s._onIFinishedTap(s._currentIndex)),
           ),
         ),
       );
@@ -3086,7 +3092,7 @@ class _DesktopPostDetailContentBuilder {
                     ),
                     onTapLink: (text, href, title) {
                       if (href != null && href.startsWith('tag:')) {
-                        s._searchTag(Uri.decodeComponent(href.substring(4)));
+                        _postDetailHapticTap(context, () => s._searchTag(Uri.decodeComponent(href.substring(4))));
                       }
                     },
                   ),
@@ -3157,7 +3163,7 @@ class _DesktopPostDetailContentBuilder {
                     final baseColor = PostTags.getColorForCategory(category);
                     final chipColor = baseColor.withValues(alpha: 0.25);
                     return GestureDetector(
-                      onTap: () => s._searchTag(tag),
+                      onTap: () => _postDetailHapticTap(context, () => s._searchTag(tag)),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -3404,7 +3410,7 @@ class _FullScreenImageViewer extends StatelessWidget {
         backgroundColor: CupertinoColors.black.withValues(alpha: 0.5),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => _postDetailHapticTap(context, () => Navigator.of(context).pop()),
           child: const Icon(CupertinoIcons.xmark, color: CupertinoColors.white),
         ),
       ),
@@ -3713,7 +3719,7 @@ class _CommentsSheetState extends State<_CommentsSheet> {
                     ),
                     CupertinoButton(
                       padding: EdgeInsets.zero,
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () => _postDetailHapticTap(context, () => Navigator.of(context).pop()),
                       child: Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
@@ -3829,7 +3835,7 @@ class _CommentsSheetState extends State<_CommentsSheet> {
               const SizedBox(width: 12),
               CupertinoButton(
                 padding: EdgeInsets.zero,
-                onPressed: _isPosting ? null : _postComment,
+                onPressed: _isPosting ? null : () => _postDetailHapticTap(context, _postComment),
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -3910,7 +3916,7 @@ class _CommentsSheetState extends State<_CommentsSheet> {
             ),
             const SizedBox(height: 16),
             CupertinoButton(
-              onPressed: _loadComments,
+              onPressed: () => _postDetailHapticTap(context, _loadComments),
               child: const Text('Retry'),
             ),
           ],
