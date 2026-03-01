@@ -881,7 +881,7 @@ class _DesktopAddButtonState extends State<_DesktopAddButton> {
   }
 }
 
-Widget _AccountAvatar({
+Widget _accountAvatar({
   required double size,
   required String username,
   required String? avatarUrl,
@@ -1024,7 +1024,7 @@ class _DesktopAccountCardState extends State<_DesktopAccountCard> {
             child: Row(
               children: [
                 // Avatar
-                _AccountAvatar(
+                _accountAvatar(
                   size: 52,
                   username: widget.username,
                   avatarUrl: widget.avatarUrl,
@@ -1179,7 +1179,7 @@ class _MobileAccountCard extends StatelessWidget {
             : null,
       ),
       child: CupertinoListTile(
-        leading: _AccountAvatar(
+        leading: _accountAvatar(
           size: 44,
           username: username,
           avatarUrl: avatarUrl,
