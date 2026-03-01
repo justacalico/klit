@@ -1263,7 +1263,7 @@ class _MobilePostDetailBody extends StatelessWidget {
         backgroundColor: AppColors.resolveScaffoldBackground(isDark, isOled: isOled),
         navigationBar: CupertinoNavigationBar(
           backgroundColor: isOled
-              ? CupertinoColors.black.withValues(alpha: 0.8)
+              ? AppColors.oledBackground
               : isDark
               ? CupertinoColors.darkBackgroundGray.withValues(alpha: 0.8)
               : CupertinoColors.systemBackground.withValues(alpha: 0.8),
@@ -2165,6 +2165,7 @@ class _DesktopPostDetailBody extends StatelessWidget {
                   s,
                   onClose,
                   isDark,
+                  isOled,
                 ),
                 Expanded(
                   child: _DesktopPostDetailContentBuilder.buildContent(
@@ -2206,6 +2207,7 @@ class _DesktopPostDetailBody extends StatelessWidget {
                 context,
                 s,
                 isDark,
+                isOled,
               ),
             ),
         ],
@@ -2250,6 +2252,7 @@ class _DesktopPostDetailContentBuilder {
     _PostDetailPageState s,
     VoidCallback onClose,
     bool isDark,
+    bool isOled,
   ) {
     final hasMultiple = s._postIds.length > 1;
     return ClipRect(
@@ -2262,7 +2265,9 @@ class _DesktopPostDetailContentBuilder {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: isDark
+              colors: isOled
+                  ? [AppColors.oledBackground, AppColors.oledBackground]
+                  : isDark
                   ? [
                       const Color(0xFF18181B).withValues(alpha: 0.85),
                       const Color(0xFF1F1F23).withValues(alpha: 0.9),
@@ -2275,7 +2280,7 @@ class _DesktopPostDetailContentBuilder {
             border: Border(
               bottom: BorderSide(
                 color: UIColors.primaryPurple.withValues(
-                  alpha: isDark ? 0.15 : 0.1,
+                  alpha: isOled ? 0.08 : (isDark ? 0.15 : 0.1),
                 ),
                 width: 1,
               ),
@@ -2402,7 +2407,7 @@ class _DesktopPostDetailContentBuilder {
                 height: imageHeight,
                 child: buildMediaPanel(context, s, post, isDark, isOled),
               ),
-              Expanded(child: buildInfoPanel(context, s, post, isDark)),
+              Expanded(child: buildInfoPanel(context, s, post, isDark, isOled)),
             ],
           );
         }
@@ -2417,7 +2422,7 @@ class _DesktopPostDetailContentBuilder {
             ),
             SizedBox(
               width: 380,
-              child: buildInfoPanel(context, s, post, isDark),
+              child: buildInfoPanel(context, s, post, isDark, isOled),
             ),
           ],
         );
@@ -2516,6 +2521,7 @@ class _DesktopPostDetailContentBuilder {
     _PostDetailPageState s,
     Post post,
     bool isDark,
+    bool isOled,
   ) {
     final score = s._updatedScores[s._currentIndex] ?? post.score;
     final isFav = s._isFavorited[s._currentIndex] ?? post.isFavorited;
@@ -2531,7 +2537,9 @@ class _DesktopPostDetailContentBuilder {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: isDark
+              colors: isOled
+                  ? [AppColors.oledSecondaryBackground, AppColors.oledSecondaryBackground]
+                  : isDark
                   ? [
                       const Color(0xFF2C2C2E).withValues(alpha: 0.7),
                       const Color(0xFF1C1C1E).withValues(alpha: 0.8),
@@ -3258,9 +3266,19 @@ class _DesktopPostDetailContentBuilder {
     BuildContext context,
     _PostDetailPageState s,
     bool isDark,
+    bool isOled,
   ) {
     final currentVote = s._userVote[s._currentIndex];
     final isFavorited = s._isFavorited[s._currentIndex] ?? false;
+    final bgColor = isOled
+        ? AppColors.oledBackground
+        : (isDark ? const Color(0xFF18181B) : const Color(0xFFFFFFFF)).withValues(alpha: 0.85);
+    final borderColor = isOled
+        ? AppColors.resolveSeparator(true, isOled: true)
+        : (isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7));
+    final dividerColor = isOled
+        ? AppColors.resolveSeparator(true, isOled: true)
+        : (isDark ? const Color(0xFF3F3F46) : const Color(0xFFD4D4D8));
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
@@ -3269,19 +3287,18 @@ class _DesktopPostDetailContentBuilder {
           margin: const EdgeInsets.symmetric(horizontal: 24),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           decoration: BoxDecoration(
-            color: (isDark ? const Color(0xFF18181B) : const Color(0xFFFFFFFF))
-                .withValues(alpha: 0.85),
+            color: bgColor,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            border: Border.all(color: borderColor),
+            boxShadow: isOled
+                ? null
+                : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -3294,9 +3311,7 @@ class _DesktopPostDetailContentBuilder {
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 width: 1,
                 height: 20,
-                color: isDark
-                    ? const Color(0xFF3F3F46)
-                    : const Color(0xFFD4D4D8),
+                color: dividerColor,
               ),
               _buildHintButton(
                 'Y',
@@ -3322,9 +3337,7 @@ class _DesktopPostDetailContentBuilder {
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 width: 1,
                 height: 20,
-                color: isDark
-                    ? const Color(0xFF3F3F46)
-                    : const Color(0xFFD4D4D8),
+                color: dividerColor,
               ),
               _buildHintButton('B', 'Close', isDark),
               const SizedBox(width: 16),
