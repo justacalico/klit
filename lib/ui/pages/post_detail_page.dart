@@ -606,13 +606,16 @@ class _PostDetailPageState extends State<PostDetailPage>
     if (!mounted) return;
     final previewUrl = post.preview.url;
     final mainUrl = post.displayUrl ?? post.sample.url ?? post.preview.url;
+    void safePrecache(String url) {
+      precacheImage(CachedNetworkImageProvider(url), context).catchError((_) {});
+    }
     if (previewUrl != null && previewUrl.isNotEmpty) {
-      precacheImage(CachedNetworkImageProvider(previewUrl), context);
+      safePrecache(previewUrl);
     }
     if (mainUrl != null &&
         mainUrl.isNotEmpty &&
         mainUrl != previewUrl) {
-      precacheImage(CachedNetworkImageProvider(mainUrl), context);
+      safePrecache(mainUrl);
     }
   }
 
