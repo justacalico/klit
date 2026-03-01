@@ -155,7 +155,10 @@ class PostCard extends StatelessWidget {
   }
 
   Widget _buildImage(BuildContext context) {
-    final imageUrl = post.preview.url ?? post.displayUrl;
+    final gifAutoplay = context.watch<SettingsProvider>().gifAutoplay;
+    final imageUrl = (post.isGif && gifAutoplay)
+        ? (post.sample.url ?? post.file.url ?? post.preview.url)
+        : (post.preview.url ?? post.displayUrl);
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
     final oled = isOled ?? context.read<SettingsProvider>().themeMode == 3;

@@ -38,6 +38,7 @@ class SettingsProvider extends ChangeNotifier {
   UIStyle _uiStyle = UIStyle.material;
   bool _videoAutoPlay = true;
   bool _videoMuteByDefault = true;
+  bool _gifAutoplay = true;
   bool _searchHistoryEnabled = true;
   int _scoreThreshold = AppConstants.defaultScoreThreshold;
   bool _iFinishedEnabled = false;
@@ -77,6 +78,7 @@ class SettingsProvider extends ChangeNotifier {
   UIStyle get uiStyle => _uiStyle;
   bool get videoAutoPlay => _videoAutoPlay;
   bool get videoMuteByDefault => _videoMuteByDefault;
+  bool get gifAutoplay => _gifAutoplay;
   bool get searchHistoryEnabled => _searchHistoryEnabled;
   int get scoreThreshold => _scoreThreshold;
   bool get iFinishedEnabled => _iFinishedEnabled;
@@ -119,6 +121,7 @@ class SettingsProvider extends ChangeNotifier {
         )];
     _videoAutoPlay = _storageService.getVideoAutoPlay();
     _videoMuteByDefault = _storageService.getVideoMuteByDefault();
+    _gifAutoplay = _storageService.getGifAutoplay();
     _searchHistoryEnabled = _storageService.getSearchHistoryEnabled();
     _scoreThreshold = _storageService.getScoreThreshold();
     _iFinishedEnabled = _storageService.getIFinishedEnabled();
@@ -368,6 +371,12 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> setVideoMuteByDefault(bool enabled) async {
     _videoMuteByDefault = enabled;
     await _storageService.setVideoMuteByDefault(enabled);
+    notifyListeners();
+  }
+
+  Future<void> setGifAutoplay(bool enabled) async {
+    _gifAutoplay = enabled;
+    await _storageService.setGifAutoplay(enabled);
     notifyListeners();
   }
 

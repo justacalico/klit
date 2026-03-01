@@ -496,6 +496,14 @@ class StorageService {
     await _prefs.setBool(AppConstants.videoMuteByDefaultKey, enabled);
   }
 
+  bool getGifAutoplay() {
+    return _prefs.getBool(AppConstants.gifAutoplayKey) ?? true;
+  }
+
+  Future<void> setGifAutoplay(bool enabled) async {
+    await _prefs.setBool(AppConstants.gifAutoplayKey, enabled);
+  }
+
   int getScoreThreshold() {
     return _prefs.getInt(AppConstants.scoreThresholdKey) ??
         AppConstants.defaultScoreThreshold;

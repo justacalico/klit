@@ -2156,6 +2156,24 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                           settings.setVideoMuteByDefault(value),
                     ),
                   ),
+                  Divider(
+                    height: 1,
+                    color: isDark
+                        ? CupertinoColors.white.withValues(alpha: 0.1)
+                        : CupertinoColors.black.withValues(alpha: 0.05),
+                  ),
+                  _buildSettingRow(
+                    isDark: isDark,
+                    icon: CupertinoIcons.photo_fill,
+                    iconColor: _DesignColors.accentTeal,
+                    title: 'Autoplay GIFs',
+                    subtitle: 'Animate GIFs in home, search, and other grids',
+                    trailing: CupertinoSwitch(
+                      value: settings.gifAutoplay,
+                      activeTrackColor: _DesignColors.accentTeal,
+                      onChanged: (value) => settings.setGifAutoplay(value),
+                    ),
+                  ),
                 ],
               ),
             ),
