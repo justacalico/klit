@@ -146,6 +146,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
   late String _mediaType;
   String? _rating;
   late String _order;
+  bool _excludeFavorites = false;
   bool _isNew = true;
   final Set<String> _selectedHostUrls = {};
 
@@ -180,6 +181,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
     _mediaType = f?.mediaType ?? Feed.mediaTypeImage;
     _rating = f?.rating;
     _order = f?.order ?? 'id_desc';
+    _excludeFavorites = f?.excludeFavorites ?? false;
     if (f?.hostUrls != null) {
       _selectedHostUrls.addAll(f!.hostUrls.map(_normalizeHost));
     }
@@ -213,6 +215,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
         hostUrls: hostUrls,
         rating: _rating,
         order: _order,
+        excludeFavorites: _excludeFavorites,
       );
       await feedsProvider.addFeed(feed);
     } else {
@@ -227,6 +230,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
         hostUrls: hostUrls,
         rating: _rating,
         order: _order,
+        excludeFavorites: _excludeFavorites,
       );
       await feedsProvider.updateFeed(feed);
     }
@@ -495,6 +499,47 @@ class _FeedEditPageState extends State<FeedEditPage> {
                   onValueChanged: (v) {
                     if (v != null) setState(() => _order = v);
                   },
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Icon(
+                      CupertinoIcons.heart_slash,
+                      size: 20,
+                      color: CupertinoColors.systemGrey,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Exclude my favorites',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: isDark
+                                  ? CupertinoColors.white
+                                  : CupertinoColors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Don\'t show posts you\'ve favorited in this feed',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: CupertinoColors.secondaryLabel,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    CupertinoSwitch(
+                      value: _excludeFavorites,
+                      onChanged: (v) => setState(() => _excludeFavorites = v),
+                    ),
+                  ],
                 ),
               ],
             ),

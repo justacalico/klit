@@ -18,6 +18,8 @@ class Feed {
   final String? rating;
   /// Sort order: e.g. 'id_desc', 'id_asc', 'score', 'favcount'.
   final String order;
+  /// When true, exclude posts the user has favorited from this feed.
+  final bool excludeFavorites;
 
   const Feed({
     required this.id,
@@ -29,6 +31,7 @@ class Feed {
     this.hostUrls = const [],
     this.rating,
     this.order = 'id_desc',
+    this.excludeFavorites = false,
   });
 
   /// True if this feed is video-only (for backward compatibility).
@@ -61,6 +64,7 @@ class Feed {
           : [],
       rating: json['rating'] as String?,
       order: json['order'] as String? ?? 'id_desc',
+      excludeFavorites: json['excludeFavorites'] as bool? ?? false,
     );
   }
 
@@ -75,6 +79,7 @@ class Feed {
       'hostUrls': hostUrls,
       if (rating != null) 'rating': rating,
       'order': order,
+      'excludeFavorites': excludeFavorites,
     };
   }
 
@@ -88,6 +93,7 @@ class Feed {
     List<String>? hostUrls,
     String? rating,
     String? order,
+    bool? excludeFavorites,
   }) {
     return Feed(
       id: id ?? this.id,
@@ -99,6 +105,7 @@ class Feed {
       hostUrls: hostUrls ?? this.hostUrls,
       rating: rating ?? this.rating,
       order: order ?? this.order,
+      excludeFavorites: excludeFavorites ?? this.excludeFavorites,
     );
   }
 

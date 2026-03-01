@@ -22,8 +22,15 @@ class _UiFeedsPageState extends State<UiFeedsPage> {
   Feed? _editingFeed;
 
   void _openFeed(BuildContext context, Feed feed) {
+    var query = feed.toSearchQuery();
+    if (feed.excludeFavorites) {
+      final username = context.read<AuthProvider>().currentAccount?.username;
+      if (username != null && username.isNotEmpty) {
+        query = '$query -fav:$username';
+      }
+    }
     context.read<NavigationProvider>().openFeed(
-      query: feed.toSearchQuery(),
+      query: query,
       feedTitle: feed.name.isEmpty ? 'Feed' : feed.name,
       hostUrls: feed.hostUrls.isNotEmpty ? feed.hostUrls : null,
       rating: feed.rating,
