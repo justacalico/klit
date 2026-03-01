@@ -30,11 +30,16 @@ class ApiConstants {
   static const String userAgent =
       'Klit/2.0.0 (by Openlyst on GitLab; gitlab.com/Openlyst/klit)';
 
-  /// API headers
+  /// API headers (desktop/mobile)
   static Map<String, String> get defaultHeaders => {
     'User-Agent': userAgent,
     'Accept': 'application/json',
     'Content-Type': 'application/json',
+  };
+
+  /// Headers for web: no User-Agent (browser-forbidden) or Content-Type (CORS)
+  static Map<String, String> get webHeaders => {
+    'Accept': 'application/json',
   };
 
   /// Popular time ranges

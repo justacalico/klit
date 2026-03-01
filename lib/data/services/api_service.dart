@@ -25,7 +25,7 @@ class ApiService {
         baseUrl: _baseUrl,
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
-        headers: ApiConstants.defaultHeaders,
+        headers: kIsWeb ? ApiConstants.webHeaders : ApiConstants.defaultHeaders,
       ),
     );
 

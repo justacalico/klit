@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'storage_service_platform_stub.dart'
+    if (dart.library.io) 'storage_service_platform_io.dart' as platform;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -28,8 +29,7 @@ class StorageService {
     _prefs = await SharedPreferences.getInstance();
 
     // Test if secure storage works on Linux by doing a write+read cycle
-    // Reading alone may not detect libsecret failures
-    if (Platform.isLinux) {
+    if (platform.isLinuxPlatform) {
       try {
         const testKey = '_klit_secure_storage_test_';
         const testValue = 'test_value';
