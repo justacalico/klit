@@ -112,12 +112,6 @@ class _UiSearchPageState extends State<UiSearchPage>
   @override
   void didUpdateWidget(covariant UiSearchPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.initialQuery != widget.initialQuery &&
-        widget.initialQuery != null &&
-        widget.initialQuery != _searchController.text) {
-      _searchController.text = widget.initialQuery!;
-      _performSearch();
-    }
     if (oldWidget.initialRating != widget.initialRating) {
       _selectedRating = widget.initialRating == null || widget.initialRating == 'all'
           ? null
@@ -125,6 +119,12 @@ class _UiSearchPageState extends State<UiSearchPage>
     }
     if (oldWidget.initialOrder != widget.initialOrder && widget.initialOrder != null) {
       _selectedOrder = widget.initialOrder!;
+    }
+    if (oldWidget.initialQuery != widget.initialQuery &&
+        widget.initialQuery != null &&
+        widget.initialQuery != _searchController.text) {
+      _searchController.text = widget.initialQuery!;
+      _performSearch();
     }
   }
 

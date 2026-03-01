@@ -4,10 +4,18 @@ import 'package:flutter/foundation.dart';
 class NavigationProvider extends ChangeNotifier {
   int _currentIndex = 0;
   String? _searchQuery;
+  String? _feedTitle;
+  List<String>? _hostUrls;
+  String? _initialRating;
+  String? _initialOrder;
   bool _sidebarCollapsed = false;
 
   int get currentIndex => _currentIndex;
   String? get searchQuery => _searchQuery;
+  String? get feedTitle => _feedTitle;
+  List<String>? get hostUrls => _hostUrls;
+  String? get initialRating => _initialRating;
+  String? get initialOrder => _initialOrder;
   bool get sidebarCollapsed => _sidebarCollapsed;
 
   void setIndex(int index) {
@@ -24,6 +32,26 @@ class NavigationProvider extends ChangeNotifier {
 
   void openSearch([String? query]) {
     _searchQuery = query;
+    _feedTitle = null;
+    _hostUrls = null;
+    _initialRating = null;
+    _initialOrder = null;
+    _currentIndex = 4;
+    notifyListeners();
+  }
+
+  void openFeed({
+    required String query,
+    required String feedTitle,
+    List<String>? hostUrls,
+    String? rating,
+    String? order,
+  }) {
+    _searchQuery = query;
+    _feedTitle = feedTitle;
+    _hostUrls = hostUrls != null && hostUrls.isNotEmpty ? hostUrls : null;
+    _initialRating = rating;
+    _initialOrder = order ?? 'id_desc';
     _currentIndex = 4;
     notifyListeners();
   }
@@ -59,10 +87,19 @@ class NavigationProvider extends ChangeNotifier {
     }
   }
 
-  /// Clear search query (e.g. when switching nav tabs)
+  /// Clear search query and feed params (e.g. when switching nav tabs)
   void clearSearch() {
-    if (_searchQuery != null) {
+    final changed = _searchQuery != null ||
+        _feedTitle != null ||
+        _hostUrls != null ||
+        _initialRating != null ||
+        _initialOrder != null;
+    if (changed) {
       _searchQuery = null;
+      _feedTitle = null;
+      _hostUrls = null;
+      _initialRating = null;
+      _initialOrder = null;
       notifyListeners();
     }
   }

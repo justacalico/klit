@@ -127,10 +127,12 @@ List<String> _parseTags(String text) {
 }
 
 /// Feed create/edit page: name, type (image/video), and/or/exclude tags.
+/// When [onComplete] is set (e.g. when embedded in Feeds tab), calls it instead of popping.
 class FeedEditPage extends StatefulWidget {
   final Feed? feed;
+  final VoidCallback? onComplete;
 
-  const FeedEditPage({super.key, this.feed});
+  const FeedEditPage({super.key, this.feed, this.onComplete});
 
   @override
   State<FeedEditPage> createState() => _FeedEditPageState();
@@ -229,7 +231,21 @@ class _FeedEditPageState extends State<FeedEditPage> {
       await feedsProvider.updateFeed(feed);
     }
 
-    if (mounted) Navigator.of(context).pop();
+    if (mounted) {
+      if (widget.onComplete != null) {
+        widget.onComplete!();
+      } else {
+        Navigator.of(context).pop();
+      }
+    }
+  }
+
+  void _cancel() {
+    if (widget.onComplete != null) {
+      widget.onComplete!();
+    } else {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -241,7 +257,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
       navigationBar: CupertinoNavigationBar(
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: _cancel,
           child: const Text('Cancel'),
         ),
         middle: Text(_isNew ? 'New feed' : 'Edit feed'),

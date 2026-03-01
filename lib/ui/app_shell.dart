@@ -400,6 +400,11 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
         key: const ValueKey('tab-4'),
         child: UiSearchPage(
           initialQuery: nav.searchQuery,
+          feedMode: nav.feedTitle != null && nav.feedTitle!.isNotEmpty,
+          feedTitle: nav.feedTitle,
+          hostUrls: nav.hostUrls,
+          initialRating: nav.initialRating,
+          initialOrder: nav.initialOrder,
           onPostTap: _onPostTap,
         ),
       ),

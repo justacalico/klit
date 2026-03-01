@@ -1,19 +1,83 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import '../../app/routes.dart';
 import '../../core/constants/constants.dart';
-import '../../core/types/navigation_args.dart';
 import '../../data/models/models.dart';
 import '../../providers/providers.dart';
 import '../shell/toolbar.dart';
 import '../theme.dart';
 
+import 'feed_edit_page.dart';
+
 /// Feeds list page: create and open feeds (saved tag filters + image/video type).
-class UiFeedsPage extends StatelessWidget {
+/// Shows list or embedded feed edit so nav bar/sidebar stay visible.
+class UiFeedsPage extends StatefulWidget {
   const UiFeedsPage({super.key});
 
   @override
+  State<UiFeedsPage> createState() => _UiFeedsPageState();
+}
+
+class _UiFeedsPageState extends State<UiFeedsPage> {
+  bool _showEditForm = false;
+  Feed? _editingFeed;
+
+  void _openFeed(BuildContext context, Feed feed) {
+    context.read<NavigationProvider>().openFeed(
+      query: feed.toSearchQuery(),
+      feedTitle: feed.name.isEmpty ? 'Feed' : feed.name,
+      hostUrls: feed.hostUrls.isNotEmpty ? feed.hostUrls : null,
+      rating: feed.rating,
+      order: feed.order,
+    );
+  }
+
+  void _openFeedEdit(BuildContext context, Feed? feed) {
+    setState(() {
+      _showEditForm = true;
+      _editingFeed = feed;
+    });
+  }
+
+  void _confirmDeleteFeed(BuildContext context, Feed feed) {
+    showCupertinoDialog(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        title: const Text('Delete feed'),
+        content: Text('Delete "${feed.name}"?'),
+        actions: [
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.read<FeedsProvider>().deleteFeed(feed.id);
+            },
+            child: const Text('Delete'),
+          ),
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_showEditForm) {
+      return KeyedSubtree(
+        key: const ValueKey('feeds-edit'),
+        child: FeedEditPage(
+          feed: _editingFeed,
+          onComplete: () => setState(() {
+            _showEditForm = false;
+            _editingFeed = null;
+          }),
+        ),
+      );
+    }
+
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
     final isOled = context.watch<SettingsProvider>().themeMode == 3;
@@ -41,49 +105,6 @@ class UiFeedsPage extends StatelessWidget {
               onEditFeed: _openFeedEdit,
               onDeleteFeed: _confirmDeleteFeed,
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _openFeed(BuildContext context, Feed feed) {
-    final args = SearchRouteArguments(
-      query: feed.toSearchQuery(),
-      feedTitle: feed.name.isEmpty ? 'Feed' : feed.name,
-      hostUrls: feed.hostUrls.isNotEmpty ? feed.hostUrls : null,
-      initialRating: feed.rating,
-      initialOrder: feed.order,
-    );
-    Navigator.of(context).pushNamed(AppRoutes.search, arguments: args);
-  }
-
-  void _openFeedEdit(BuildContext context, Feed? feed) {
-    Navigator.of(context).pushNamed(
-      AppRoutes.feedEdit,
-      arguments: feed,
-    );
-  }
-
-  void _confirmDeleteFeed(BuildContext context, Feed feed) {
-    showCupertinoDialog(
-      context: context,
-      builder: (ctx) => CupertinoAlertDialog(
-        title: const Text('Delete feed'),
-        content: Text('Delete "${feed.name}"?'),
-        actions: [
-          CupertinoDialogAction(
-            isDestructiveAction: true,
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              context.read<FeedsProvider>().deleteFeed(feed.id);
-            },
-            child: const Text('Delete'),
-          ),
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
           ),
         ],
       ),
