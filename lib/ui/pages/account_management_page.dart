@@ -1,9 +1,11 @@
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Colors;
 import 'package:provider/provider.dart';
 import '../../app/routes.dart';
 import '../../core/constants/constants.dart';
+import '../../data/models/models.dart';
 import '../../data/services/services.dart';
 import '../layout/layout_scope.dart';
 import '../../providers/providers.dart';
@@ -231,36 +233,19 @@ class AccountManagementContent extends StatelessWidget {
         ),
       );
     } else {
+      final isOled = context.watch<SettingsProvider>().themeMode == 3;
       return Consumer<AuthProvider>(
         builder: (context, auth, _) {
           if (auth.accounts.isEmpty) {
             return _buildEmptyState(context);
           }
           final isDesktop = false;
-          final list = ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: auth.accounts.length,
-            itemBuilder: (context, index) {
-              final account = auth.accounts[index];
-              final isActive = auth.currentAccount?.id == account.id;
-              final isOled = context.watch<SettingsProvider>().themeMode == 3;
-
-              return _MobileAccountCard(
-                username: account.username,
-                host: Uri.parse(account.host).host,
-                isActive: isActive,
-                isDark: isDark,
-                isOled: isOled,
-                onTap: isActive
-                    ? null
-                    : () => _switchAccount(context, account.id, account.host),
-                onOptions: () => AccountManagementContent._showAccountOptions(
-                  context,
-                  account.id,
-                  isActive,
-                ),
-              );
-            },
+          final list = _AccountListWithAvatarCache(
+            accounts: auth.accounts,
+            currentAccountId: auth.currentAccount?.id,
+            isDark: isDark,
+            isOled: isOled,
+            isDesktop: false,
           );
           if (embeddedInSettings && showAddButtonAboveList) {
             return Column(
@@ -292,28 +277,12 @@ class AccountManagementContent extends StatelessWidget {
   }
 
   Widget _buildDesktopAccountList(BuildContext context, AuthProvider auth) {
-    return ListView.separated(
-      itemCount: auth.accounts.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 14),
-      itemBuilder: (context, index) {
-        final account = auth.accounts[index];
-        final isActive = auth.currentAccount?.id == account.id;
-        return _DesktopAccountCard(
-          username: account.username,
-          host: Uri.parse(account.host).host,
-          isActive: isActive,
-          isDark: isDark,
-          onTap: isActive
-              ? null
-              : () => _switchAccount(context, account.id, account.host),
-          onOptions: () => AccountManagementContent._showDesktopAccountOptions(
-            context,
-            account.id,
-            isActive,
-            isDark,
-          ),
-        );
-      },
+    return _AccountListWithAvatarCache(
+      accounts: auth.accounts,
+      currentAccountId: auth.currentAccount?.id,
+      isDark: isDark,
+      isOled: false,
+      isDesktop: true,
     );
   }
 
@@ -441,6 +410,158 @@ class AccountManagementContent extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _AccountListWithAvatarCache extends StatefulWidget {
+  const _AccountListWithAvatarCache({
+    required this.accounts,
+    required this.currentAccountId,
+    required this.isDark,
+    required this.isOled,
+    required this.isDesktop,
+  });
+
+  final List<Account> accounts;
+  final String? currentAccountId;
+  final bool isDark;
+  final bool isOled;
+  final bool isDesktop;
+
+  @override
+  State<_AccountListWithAvatarCache> createState() =>
+      _AccountListWithAvatarCacheState();
+}
+
+class _AccountListWithAvatarCacheState extends State<_AccountListWithAvatarCache> {
+  final Map<String, String> _avatarCache = {};
+  final Set<String> _loadingIds = {};
+
+  Future<void> _loadAvatar(Account account) async {
+    if (_avatarCache.containsKey(account.id) || _loadingIds.contains(account.id)) {
+      return;
+    }
+    _loadingIds.add(account.id);
+    if (mounted) setState(() {});
+
+    final api = context.read<ApiService>();
+    final auth = context.read<AuthProvider>();
+    final current = auth.currentAccount;
+
+    api.setBaseUrl(account.host);
+    api.setAuth(account.username, account.apiKey);
+
+    String? avatarUrl;
+    final result = await api.getUserProfile(account.username);
+    await result.when(
+      success: (user) async {
+        if (user.avatarUrl != null && user.avatarUrl!.isNotEmpty) {
+          avatarUrl = user.avatarUrl!.startsWith(RegExp(r'https?://'))
+              ? user.avatarUrl
+              : '${api.baseUrl}/${user.avatarUrl!.startsWith('/') ? user.avatarUrl!.substring(1) : user.avatarUrl}';
+        } else if (user.avatarId != null && user.avatarId!.isNotEmpty) {
+          final postId = int.tryParse(user.avatarId!);
+          if (postId != null) {
+            final postResult = await api.getPostById(postId);
+            postResult.when(
+              success: (post) {
+                avatarUrl = post.preview.url ?? post.sample.url;
+              },
+              failure: (_) {},
+            );
+          }
+        }
+      },
+      failure: (_) {},
+    );
+
+    if (current != null) {
+      api.setBaseUrl(current.host);
+      api.setAuth(current.username, current.apiKey);
+    } else {
+      api.clearAuth();
+    }
+
+    if (mounted) {
+      _loadingIds.remove(account.id);
+      if (avatarUrl != null) {
+        setState(() => _avatarCache[account.id] = avatarUrl!);
+      }
+    }
+  }
+
+  void _loadMissingAvatars() {
+    for (final account in widget.accounts) {
+      if (!_avatarCache.containsKey(account.id) && !_loadingIds.contains(account.id)) {
+        _loadAvatar(account);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadMissingAvatars());
+    if (widget.isDesktop) {
+      return ListView.separated(
+        itemCount: widget.accounts.length,
+        separatorBuilder: (_, _) => const SizedBox(height: 14),
+        itemBuilder: (context, index) {
+          final account = widget.accounts[index];
+          final isActive = widget.currentAccountId == account.id;
+          final avatarUrl = _avatarCache[account.id];
+          return _DesktopAccountCard(
+            username: account.username,
+            host: Uri.parse(account.host).host,
+            isActive: isActive,
+            isDark: widget.isDark,
+            avatarUrl: avatarUrl,
+            onTap: isActive
+                ? null
+                : () => AccountManagementContent._switchAccount(
+                      context,
+                      account.id,
+                      account.host,
+                    ),
+            onOptions: () =>
+                AccountManagementContent._showDesktopAccountOptions(
+                  context,
+                  account.id,
+                  isActive,
+                  widget.isDark,
+                ),
+          );
+        },
+      );
+    }
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: widget.accounts.length,
+      itemBuilder: (context, index) {
+        final account = widget.accounts[index];
+        final isActive = widget.currentAccountId == account.id;
+        final avatarUrl = _avatarCache[account.id];
+        return _MobileAccountCard(
+          username: account.username,
+          host: Uri.parse(account.host).host,
+          isActive: isActive,
+          isDark: widget.isDark,
+          isOled: widget.isOled,
+          avatarUrl: avatarUrl,
+          onTap: isActive
+              ? null
+              : () => AccountManagementContent._switchAccount(
+                    context,
+                    account.id,
+                    account.host,
+                  ),
+          onOptions: () => AccountManagementContent._showAccountOptions(
+            context,
+            account.id,
+            isActive,
+          ),
+        );
+      },
     );
   }
 }
@@ -760,12 +881,80 @@ class _DesktopAddButtonState extends State<_DesktopAddButton> {
   }
 }
 
+Widget _AccountAvatar({
+  required double size,
+  required String username,
+  required String? avatarUrl,
+  required bool isActive,
+}) {
+  final fallback = Center(
+    child: Text(
+      username.isNotEmpty ? username[0].toUpperCase() : '?',
+      style: TextStyle(
+        fontSize: size * 0.42,
+        fontWeight: FontWeight.bold,
+        color: CupertinoColors.white,
+      ),
+    ),
+  );
+  if (avatarUrl == null || avatarUrl.isEmpty) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        gradient: isActive
+            ? const LinearGradient(
+                colors: [
+                  _AccountColors.primaryIndigo,
+                  _AccountColors.primaryPurple,
+                ],
+              )
+            : null,
+        color: isActive ? null : CupertinoColors.systemGrey,
+        borderRadius: BorderRadius.circular(size * 0.3),
+      ),
+      child: fallback,
+    );
+  }
+  return Container(
+    width: size,
+    height: size,
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(size * 0.3),
+      boxShadow: isActive
+          ? [
+              BoxShadow(
+                color: _AccountColors.primaryIndigo.withValues(alpha: 0.3),
+                blurRadius: 8,
+                spreadRadius: 0,
+              ),
+            ]
+          : null,
+    ),
+    clipBehavior: Clip.antiAlias,
+    child: CachedNetworkImage(
+      imageUrl: avatarUrl,
+      fit: BoxFit.cover,
+      cacheKey: 'account_avatar_$avatarUrl',
+      placeholder: (_, _) => Container(
+        color: isActive ? null : CupertinoColors.systemGrey,
+        child: fallback,
+      ),
+      errorWidget: (_, _, _) => Container(
+        color: isActive ? null : CupertinoColors.systemGrey,
+        child: fallback,
+      ),
+    ),
+  );
+}
+
 /// Desktop account card with glassmorphic design
 class _DesktopAccountCard extends StatefulWidget {
   final String username;
   final String host;
   final bool isActive;
   final bool isDark;
+  final String? avatarUrl;
   final VoidCallback? onTap;
   final VoidCallback onOptions;
 
@@ -774,6 +963,7 @@ class _DesktopAccountCard extends StatefulWidget {
     required this.host,
     required this.isActive,
     required this.isDark,
+    this.avatarUrl,
     required this.onTap,
     required this.onOptions,
   });
@@ -834,31 +1024,11 @@ class _DesktopAccountCardState extends State<_DesktopAccountCard> {
             child: Row(
               children: [
                 // Avatar
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    gradient: widget.isActive
-                        ? const LinearGradient(
-                            colors: [
-                              _AccountColors.primaryIndigo,
-                              _AccountColors.primaryPurple,
-                            ],
-                          )
-                        : null,
-                    color: widget.isActive ? null : CupertinoColors.systemGrey,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Center(
-                    child: Text(
-                      widget.username[0].toUpperCase(),
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: CupertinoColors.white,
-                      ),
-                    ),
-                  ),
+                _AccountAvatar(
+                  size: 52,
+                  username: widget.username,
+                  avatarUrl: widget.avatarUrl,
+                  isActive: widget.isActive,
                 ),
                 const SizedBox(width: 18),
                 // Info
@@ -982,6 +1152,7 @@ class _MobileAccountCard extends StatelessWidget {
   final bool isActive;
   final bool isDark;
   final bool isOled;
+  final String? avatarUrl;
   final VoidCallback? onTap;
   final VoidCallback onOptions;
 
@@ -991,6 +1162,7 @@ class _MobileAccountCard extends StatelessWidget {
     required this.isActive,
     required this.isDark,
     required this.isOled,
+    this.avatarUrl,
     required this.onTap,
     required this.onOptions,
   });
@@ -1007,31 +1179,11 @@ class _MobileAccountCard extends StatelessWidget {
             : null,
       ),
       child: CupertinoListTile(
-        leading: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            gradient: isActive
-                ? const LinearGradient(
-                    colors: [
-                      _AccountColors.primaryIndigo,
-                      _AccountColors.primaryPurple,
-                    ],
-                  )
-                : null,
-            color: isActive ? null : CupertinoColors.systemGrey,
-            borderRadius: BorderRadius.circular(22),
-          ),
-          child: Center(
-            child: Text(
-              username[0].toUpperCase(),
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: CupertinoColors.white,
-              ),
-            ),
-          ),
+        leading: _AccountAvatar(
+          size: 44,
+          username: username,
+          avatarUrl: avatarUrl,
+          isActive: isActive,
         ),
         title: Text(
           username,
