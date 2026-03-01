@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../core/constants/constants.dart';
 import '../../core/extensions/extensions.dart';
@@ -8,6 +9,76 @@ import '../../core/theme/ui_style_manager.dart';
 import '../../data/models/models.dart';
 import '../../providers/providers.dart';
 import 'loading_shimmer.dart';
+
+/// When a GIF is only shown animated when [visibleFraction] > threshold, to reduce lag.
+const double _kGifVisibleThreshold = 0.15;
+
+class _VisibilityAwareGifImage extends StatefulWidget {
+  const _VisibilityAwareGifImage({
+    required this.staticUrl,
+    required this.animatedUrl,
+    required this.postId,
+    required this.placeholderColor,
+    required this.style,
+    required this.post,
+    this.memCacheWidth,
+    this.memCacheHeight,
+  });
+
+  final String staticUrl;
+  final String animatedUrl;
+  final int postId;
+  final Color placeholderColor;
+  final PostCardStyle style;
+  final Post post;
+  final int? memCacheWidth;
+  final int? memCacheHeight;
+
+  @override
+  State<_VisibilityAwareGifImage> createState() => _VisibilityAwareGifImageState();
+}
+
+class _VisibilityAwareGifImageState extends State<_VisibilityAwareGifImage> {
+  double _visibleFraction = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final useAnimated = _visibleFraction >= _kGifVisibleThreshold;
+    final imageUrl = useAnimated ? widget.animatedUrl : widget.staticUrl;
+    return VisibilityDetector(
+      key: Key('gif_${widget.postId}'),
+      onVisibilityChanged: (info) {
+        if (mounted && info.visibleFraction != _visibleFraction) {
+          setState(() => _visibleFraction = info.visibleFraction);
+        }
+      },
+      child: CachedNetworkImage(
+        imageUrl: imageUrl,
+        cacheKey: '${widget.postId}_$imageUrl',
+        fit: BoxFit.cover,
+        memCacheWidth: widget.memCacheWidth,
+        memCacheHeight: widget.memCacheHeight,
+        fadeInDuration: const Duration(milliseconds: 150),
+        fadeInCurve: Curves.easeOut,
+        placeholder: (context, url) => widget.style == PostCardStyle.grid
+            ? Container(color: widget.placeholderColor)
+            : const LoadingShimmer(),
+        errorWidget: (context, url, error) => Container(
+          color: widget.placeholderColor,
+          child: Center(
+            child: Icon(
+              widget.post.isVideo
+                  ? CupertinoIcons.play_rectangle_fill
+                  : CupertinoIcons.exclamationmark_triangle,
+              size: 30,
+              color: CupertinoColors.systemGrey,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 /// Post card display style
 enum PostCardStyle { grid, list }
@@ -156,16 +227,14 @@ class PostCard extends StatelessWidget {
 
   Widget _buildImage(BuildContext context) {
     final gifAutoplay = context.watch<SettingsProvider>().gifAutoplay;
-    final imageUrl = (post.isGif && gifAutoplay)
-        ? (post.sample.url ?? post.file.url ?? post.preview.url)
-        : (post.preview.url ?? post.displayUrl);
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
     final oled = isOled ?? context.read<SettingsProvider>().themeMode == 3;
     final placeholderColor =
         AppColors.resolveSecondaryBackground(isDark, isOled: oled);
 
-    if (imageUrl == null) {
+    final staticUrl = post.preview.url ?? post.displayUrl;
+    if (staticUrl == null) {
       return Container(
         color: placeholderColor,
         child: Center(
@@ -180,33 +249,56 @@ class PostCard extends StatelessWidget {
       );
     }
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        CachedNetworkImage(
-          imageUrl: imageUrl,
-          cacheKey: '${post.id}_$imageUrl',
-          fit: BoxFit.cover,
-          memCacheWidth: memCacheWidth,
-          memCacheHeight: memCacheHeight,
-          fadeInDuration: const Duration(milliseconds: 150),
-          fadeInCurve: Curves.easeOut,
-          placeholder: (context, url) => style == PostCardStyle.grid
-              ? Container(color: placeholderColor)
-              : const LoadingShimmer(),
-          errorWidget: (context, url, error) => Container(
-            color: placeholderColor,
-            child: Center(
-              child: Icon(
-                post.isVideo
-                    ? CupertinoIcons.play_rectangle_fill
-                    : CupertinoIcons.exclamationmark_triangle,
-                size: 30,
-                color: CupertinoColors.systemGrey,
-              ),
+    final useVisibilityAwareGif =
+        post.isGif && gifAutoplay && (post.sample.url != null || post.file.url != null);
+    final animatedUrl = post.sample.url ?? post.file.url ?? post.preview.url;
+
+    Widget imageChild;
+    if (useVisibilityAwareGif && animatedUrl != null) {
+      imageChild = _VisibilityAwareGifImage(
+        staticUrl: staticUrl,
+        animatedUrl: animatedUrl,
+        postId: post.id,
+        placeholderColor: placeholderColor,
+        style: style,
+        post: post,
+        memCacheWidth: memCacheWidth,
+        memCacheHeight: memCacheHeight,
+      );
+    } else {
+      final imageUrl = (post.isGif && gifAutoplay)
+          ? (post.sample.url ?? post.file.url ?? post.preview.url)
+          : staticUrl;
+      imageChild = CachedNetworkImage(
+        imageUrl: imageUrl ?? staticUrl,
+        cacheKey: '${post.id}_$imageUrl',
+        fit: BoxFit.cover,
+        memCacheWidth: memCacheWidth,
+        memCacheHeight: memCacheHeight,
+        fadeInDuration: const Duration(milliseconds: 150),
+        fadeInCurve: Curves.easeOut,
+        placeholder: (context, url) => style == PostCardStyle.grid
+            ? Container(color: placeholderColor)
+            : const LoadingShimmer(),
+        errorWidget: (context, url, error) => Container(
+          color: placeholderColor,
+          child: Center(
+            child: Icon(
+              post.isVideo
+                  ? CupertinoIcons.play_rectangle_fill
+                  : CupertinoIcons.exclamationmark_triangle,
+              size: 30,
+              color: CupertinoColors.systemGrey,
             ),
           ),
         ),
+      );
+    }
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        imageChild,
         if (post.isVideo)
           Center(
             child: Container(
