@@ -35,6 +35,7 @@ class _UiFeedsPageState extends State<UiFeedsPage> {
       hostUrls: feed.hostUrls.isNotEmpty ? feed.hostUrls : null,
       rating: feed.rating,
       order: feed.order,
+      subfeeds: feed.subfeeds.isNotEmpty ? feed.subfeeds : null,
     );
   }
 

@@ -147,6 +147,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
   String? _rating;
   late String _order;
   bool _excludeFavorites = false;
+  List<SubFeed> _subfeeds = [];
   bool _isNew = true;
   final Set<String> _selectedHostUrls = {};
 
@@ -182,6 +183,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
     _rating = f?.rating;
     _order = f?.order ?? 'id_desc';
     _excludeFavorites = f?.excludeFavorites ?? false;
+    _subfeeds = f?.subfeeds != null ? List.from(f!.subfeeds) : [];
     if (f?.hostUrls != null) {
       _selectedHostUrls.addAll(f!.hostUrls.map(_normalizeHost));
     }
@@ -216,6 +218,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
         rating: _rating,
         order: _order,
         excludeFavorites: _excludeFavorites,
+        subfeeds: _subfeeds,
       );
       await feedsProvider.addFeed(feed);
     } else {
@@ -231,6 +234,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
         rating: _rating,
         order: _order,
         excludeFavorites: _excludeFavorites,
+        subfeeds: _subfeeds,
       );
       await feedsProvider.updateFeed(feed);
     }
@@ -548,6 +552,81 @@ class _FeedEditPageState extends State<FeedEditPage> {
               context: context,
               isDark: isDark,
               isOled: isOled,
+              title: 'Subfeeds',
+              children: [
+                Text(
+                  'Optional filters; only one can be active at a time when viewing the feed.',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark
+                        ? CupertinoColors.white.withValues(alpha: 0.8)
+                        : CupertinoColors.secondaryLabel,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ...List.generate(_subfeeds.length, (i) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _SubfeedEditCard(
+                      key: ValueKey(_subfeeds[i].id),
+                      subfeed: _subfeeds[i],
+                      isDark: isDark,
+                      isOled: isOled,
+                      onChanged: (s) {
+                        setState(() {
+                          _subfeeds = List.from(_subfeeds)..[i] = s;
+                        });
+                      },
+                      onDelete: () {
+                        setState(() {
+                          _subfeeds = List.from(_subfeeds)..removeAt(i);
+                        });
+                      },
+                    ),
+                  );
+                }),
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    setState(() {
+                      _subfeeds = [
+                        ..._subfeeds,
+                        SubFeed(
+                          id: DateTime.now().millisecondsSinceEpoch.toString(),
+                          name: '',
+                          includeTags: [],
+                          excludeTags: [],
+                        ),
+                      ];
+                    });
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        CupertinoIcons.plus_circle_fill,
+                        size: 20,
+                        color: CupertinoColors.activeBlue,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Add subfeed',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: CupertinoColors.activeBlue,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _sectionCard(
+              context: context,
+              isDark: isDark,
+              isOled: isOled,
               title: 'Sources',
               children: [
                 Text(
@@ -674,6 +753,162 @@ class _FeedEditPageState extends State<FeedEditPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SubfeedEditCard extends StatefulWidget {
+  final SubFeed subfeed;
+  final bool isDark;
+  final bool isOled;
+  final ValueChanged<SubFeed> onChanged;
+  final VoidCallback onDelete;
+
+  const _SubfeedEditCard({
+    super.key,
+    required this.subfeed,
+    required this.isDark,
+    required this.isOled,
+    required this.onChanged,
+    required this.onDelete,
+  });
+
+  @override
+  State<_SubfeedEditCard> createState() => _SubfeedEditCardState();
+}
+
+class _SubfeedEditCardState extends State<_SubfeedEditCard> {
+  late TextEditingController _nameController;
+  late TextEditingController _includeController;
+  late TextEditingController _excludeController;
+
+  static List<String> _parseTags(String text) {
+    if (text.trim().isEmpty) return [];
+    return text
+        .split(RegExp(r'[\s\n]+'))
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+  }
+
+  void _notifyChanged() {
+    widget.onChanged(SubFeed(
+      id: widget.subfeed.id,
+      name: _nameController.text.trim(),
+      includeTags: _parseTags(_includeController.text),
+      excludeTags: _parseTags(_excludeController.text),
+    ));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.subfeed.name);
+    _includeController = TextEditingController(
+      text: widget.subfeed.includeTags.join(' '),
+    );
+    _excludeController = TextEditingController(
+      text: widget.subfeed.excludeTags.join(' '),
+    );
+    _nameController.addListener(_notifyChanged);
+    _includeController.addListener(_notifyChanged);
+    _excludeController.addListener(_notifyChanged);
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _includeController.dispose();
+    _excludeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = widget.isDark;
+    final isOled = widget.isOled;
+    final borderColor = (isDark ? CupertinoColors.white : CupertinoColors.black)
+        .withValues(alpha: 0.08);
+    final bg = AppColors.resolveSecondaryBackground(isDark, isOled: isOled);
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: CupertinoTextField(
+                  controller: _nameController,
+                  placeholder: 'Subfeed name',
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: borderColor),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              CupertinoButton(
+                padding: const EdgeInsets.all(8),
+                minimumSize: Size.zero,
+                onPressed: widget.onDelete,
+                child: Icon(
+                  CupertinoIcons.trash,
+                  size: 20,
+                  color: CupertinoColors.destructiveRed,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Extra include tags',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: CupertinoColors.systemGrey,
+            ),
+          ),
+          const SizedBox(height: 4),
+          TagSuggestionField(
+            controller: _includeController,
+            placeholder: 'Additional tags (all required)',
+            maxLines: 2,
+            decoration: BoxDecoration(
+              color: bg,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: borderColor),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Extra exclude tags',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: CupertinoColors.systemGrey,
+            ),
+          ),
+          const SizedBox(height: 4),
+          TagSuggestionField(
+            controller: _excludeController,
+            placeholder: 'Tags to exclude in this subfeed',
+            maxLines: 2,
+            decoration: BoxDecoration(
+              color: bg,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: borderColor),
+            ),
+          ),
+        ],
       ),
     );
   }

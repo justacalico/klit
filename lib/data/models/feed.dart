@@ -1,3 +1,53 @@
+/// Optional subfeed attached to a feed: adds extra include/exclude tags when active.
+class SubFeed {
+  final String id;
+  final String name;
+  final List<String> includeTags;
+  final List<String> excludeTags;
+
+  const SubFeed({
+    required this.id,
+    required this.name,
+    this.includeTags = const [],
+    this.excludeTags = const [],
+  });
+
+  factory SubFeed.fromJson(Map<String, dynamic> json) {
+    final include = json['includeTags'];
+    final exclude = json['excludeTags'];
+    return SubFeed(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      includeTags: include is List<dynamic>
+          ? (include).map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList()
+          : [],
+      excludeTags: exclude is List<dynamic>
+          ? (exclude).map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList()
+          : [],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'includeTags': includeTags,
+        'excludeTags': excludeTags,
+      };
+
+  SubFeed copyWith({
+    String? id,
+    String? name,
+    List<String>? includeTags,
+    List<String>? excludeTags,
+  }) =>
+      SubFeed(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        includeTags: includeTags ?? this.includeTags,
+        excludeTags: excludeTags ?? this.excludeTags,
+      );
+}
+
 /// User-defined feed: saved tag filters and media type (image, video, or both).
 /// Used like an RSS feed: open a feed to browse posts matching and/or/exclude tags and type.
 class Feed {
@@ -20,6 +70,8 @@ class Feed {
   final String order;
   /// When true, exclude posts the user has favorited from this feed.
   final bool excludeFavorites;
+  /// Subfeeds: only one can be active at a time; each adds extra include/exclude tags.
+  final List<SubFeed> subfeeds;
 
   const Feed({
     required this.id,
@@ -32,6 +84,7 @@ class Feed {
     this.rating,
     this.order = 'id_desc',
     this.excludeFavorites = false,
+    this.subfeeds = const [],
   });
 
   /// True if this feed is video-only (for backward compatibility).
@@ -65,7 +118,16 @@ class Feed {
       rating: json['rating'] as String?,
       order: json['order'] as String? ?? 'id_desc',
       excludeFavorites: json['excludeFavorites'] as bool? ?? false,
+      subfeeds: _parseSubfeeds(json['subfeeds']),
     );
+  }
+
+  static List<SubFeed> _parseSubfeeds(dynamic raw) {
+    if (raw is! List) return [];
+    return raw
+        .map((e) => e is Map<String, dynamic> ? SubFeed.fromJson(e) : null)
+        .whereType<SubFeed>()
+        .toList();
   }
 
   Map<String, dynamic> toJson() {
@@ -80,6 +142,7 @@ class Feed {
       if (rating != null) 'rating': rating,
       'order': order,
       'excludeFavorites': excludeFavorites,
+      'subfeeds': subfeeds.map((s) => s.toJson()).toList(),
     };
   }
 
@@ -94,6 +157,7 @@ class Feed {
     String? rating,
     String? order,
     bool? excludeFavorites,
+    List<SubFeed>? subfeeds,
   }) {
     return Feed(
       id: id ?? this.id,
@@ -106,6 +170,7 @@ class Feed {
       rating: rating ?? this.rating,
       order: order ?? this.order,
       excludeFavorites: excludeFavorites ?? this.excludeFavorites,
+      subfeeds: subfeeds ?? this.subfeeds,
     );
   }
 
@@ -137,5 +202,21 @@ class Feed {
         parts.add('( ~type:jpg ~type:png ~type:gif ~type:webp )');
     }
     return parts.join(' ').trim();
+  }
+
+  /// Base query plus optional subfeed: when [subfeed] is non-null, appends its include/exclude tags.
+  String toSearchQueryWithSubfeed(SubFeed? subfeed) {
+    var q = toSearchQuery();
+    if (subfeed == null) return q;
+    final extra = <String>[];
+    if (subfeed.includeTags.isNotEmpty) {
+      extra.add(subfeed.includeTags.join(' '));
+    }
+    for (final t in subfeed.excludeTags) {
+      if (t.trim().isEmpty) continue;
+      extra.add('-${t.trim()}');
+    }
+    if (extra.isEmpty) return q;
+    return '$q ${extra.join(' ')}'.trim();
   }
 }

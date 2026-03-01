@@ -229,8 +229,31 @@ class _UiSearchPageState extends State<UiSearchPage>
     _focusNode.requestFocus();
   }
 
+  String _getEffectiveQuery() {
+    var base = _searchController.text.trim();
+    if (!widget.feedMode) return base;
+    final nav = context.read<NavigationProvider>();
+    final subfeeds = nav.feedSubfeeds;
+    final idx = nav.feedActiveSubfeedIndex;
+    if (subfeeds == null ||
+        subfeeds.isEmpty ||
+        idx <= 0 ||
+        idx > subfeeds.length) {
+      return base;
+    }
+    final sub = subfeeds[idx - 1];
+    final extra = <String>[];
+    if (sub.includeTags.isNotEmpty) extra.add(sub.includeTags.join(' '));
+    for (final t in sub.excludeTags) {
+      if (t.trim().isEmpty) continue;
+      extra.add('-${t.trim()}');
+    }
+    if (extra.isEmpty) return base;
+    return '$base ${extra.join(' ')}'.trim();
+  }
+
   void _performSearch() {
-    final query = _searchController.text.trim();
+    final query = _getEffectiveQuery();
     if (query.isEmpty) return;
     _closeTagSuggestions();
     final sp = context.read<SettingsProvider>();
@@ -302,7 +325,7 @@ class _UiSearchPageState extends State<UiSearchPage>
   }
 
   void _loadMore() {
-    final query = _searchController.text.trim();
+    final query = _getEffectiveQuery();
     if (query.isEmpty) return;
     final sp = context.read<SettingsProvider>();
     final pp = context.read<PostsProvider>();
@@ -409,15 +432,22 @@ class _UiSearchPageState extends State<UiSearchPage>
     const headerHeight = MobileHeaderHeights.large;
     final tagSuggestionsTop = headerHeight + 2;
 
+    final nav = context.watch<NavigationProvider>();
+    final feedSubfeeds = nav.feedSubfeeds;
+    final hasSubfeedTabs = feedMode &&
+        feedSubfeeds != null &&
+        feedSubfeeds.isNotEmpty;
+
     return KeyedSubtree(
       key: const ValueKey('search-page'),
       child: Stack(
         children: [
           Column(
             children: [
-              if (feedMode && widget.onBack != null)
-                _buildFeedToolbar(context, isDark)
-              else if (!feedMode)
+              if (feedMode && widget.onBack != null) ...[
+                _buildFeedToolbar(context, isDark),
+                if (hasSubfeedTabs) _buildFeedSubfeedTabs(context, isDark),
+              ] else if (!feedMode)
                 _buildToolbar(context, isDark, isMobile),
               Expanded(
                 child: feedMode
@@ -508,6 +538,62 @@ class _UiSearchPageState extends State<UiSearchPage>
               overflow: TextOverflow.ellipsis,
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeedSubfeedTabs(BuildContext context, bool isDark) {
+    final nav = context.read<NavigationProvider>();
+    final subfeeds = nav.feedSubfeeds!;
+    final activeIndex = nav.feedActiveSubfeedIndex;
+    final isOled = context.watch<SettingsProvider>().themeMode == 3;
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: isOled
+            ? AppColors.oledSecondaryBackground
+            : (isDark
+                ? CupertinoColors.white.withValues(alpha: 0.06)
+                : CupertinoColors.black.withValues(alpha: 0.04)),
+        border: Border(
+          bottom: BorderSide(
+            color: AppColors.resolveSeparator(isDark, isOled: isOled),
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: [
+          _FeedSubfeedChip(
+            label: 'Main',
+            isSelected: activeIndex == 0,
+            isDark: isDark,
+            isOled: isOled,
+            onTap: () {
+              nav.setFeedActiveSubfeedIndex(0);
+              _performSearch();
+            },
+          ),
+          const SizedBox(width: 8),
+          ...List.generate(subfeeds.length, (i) {
+            final sub = subfeeds[i];
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: _FeedSubfeedChip(
+                label: sub.name.isEmpty ? 'Sub ${i + 1}' : sub.name,
+                isSelected: activeIndex == i + 1,
+                isDark: isDark,
+                isOled: isOled,
+                onTap: () {
+                  nav.setFeedActiveSubfeedIndex(i + 1);
+                  _performSearch();
+                },
+              ),
+            );
+          }),
         ],
       ),
     );
@@ -1035,6 +1121,58 @@ class _ToolbarBtn extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(icon, size: 18),
+      ),
+    );
+  }
+}
+
+class _FeedSubfeedChip extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final bool isDark;
+  final bool isOled;
+  final VoidCallback onTap;
+
+  const _FeedSubfeedChip({
+    required this.label,
+    required this.isSelected,
+    required this.isDark,
+    required this.isOled,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (isOled
+                  ? AppColors.oledBackground
+                  : (isDark
+                      ? CupertinoColors.white.withValues(alpha: 0.15)
+                      : CupertinoColors.black.withValues(alpha: 0.08)))
+              : null,
+          borderRadius: BorderRadius.circular(20),
+          border: isSelected
+              ? Border.all(
+                  color: CupertinoColors.activeBlue.withValues(alpha: 0.6),
+                  width: 1,
+                )
+              : null,
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              color: isDark ? CupertinoColors.white : CupertinoColors.black,
+            ),
+          ),
+        ),
       ),
     );
   }

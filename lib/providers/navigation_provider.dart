@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import '../data/models/models.dart';
+
 /// Manages navigation state that persists across mobile/desktop UI switches
 class NavigationProvider extends ChangeNotifier {
   int _currentIndex = 0;
@@ -8,6 +10,8 @@ class NavigationProvider extends ChangeNotifier {
   List<String>? _hostUrls;
   String? _initialRating;
   String? _initialOrder;
+  List<SubFeed>? _feedSubfeeds;
+  int _feedActiveSubfeedIndex = 0;
   bool _sidebarCollapsed = false;
 
   int get currentIndex => _currentIndex;
@@ -16,6 +20,8 @@ class NavigationProvider extends ChangeNotifier {
   List<String>? get hostUrls => _hostUrls;
   String? get initialRating => _initialRating;
   String? get initialOrder => _initialOrder;
+  List<SubFeed>? get feedSubfeeds => _feedSubfeeds;
+  int get feedActiveSubfeedIndex => _feedActiveSubfeedIndex;
   bool get sidebarCollapsed => _sidebarCollapsed;
 
   void setIndex(int index) {
@@ -36,6 +42,8 @@ class NavigationProvider extends ChangeNotifier {
     _hostUrls = null;
     _initialRating = null;
     _initialOrder = null;
+    _feedSubfeeds = null;
+    _feedActiveSubfeedIndex = 0;
     _currentIndex = 4;
     notifyListeners();
   }
@@ -46,13 +54,22 @@ class NavigationProvider extends ChangeNotifier {
     List<String>? hostUrls,
     String? rating,
     String? order,
+    List<SubFeed>? subfeeds,
   }) {
     _searchQuery = query;
     _feedTitle = feedTitle;
     _hostUrls = hostUrls != null && hostUrls.isNotEmpty ? hostUrls : null;
     _initialRating = rating;
     _initialOrder = order ?? 'id_desc';
+    _feedSubfeeds = subfeeds != null && subfeeds.isNotEmpty ? List.from(subfeeds) : null;
+    _feedActiveSubfeedIndex = 0;
     _currentIndex = 4;
+    notifyListeners();
+  }
+
+  void setFeedActiveSubfeedIndex(int index) {
+    if (_feedActiveSubfeedIndex == index) return;
+    _feedActiveSubfeedIndex = index.clamp(0, (_feedSubfeeds?.length ?? 0));
     notifyListeners();
   }
 
@@ -93,13 +110,17 @@ class NavigationProvider extends ChangeNotifier {
         _feedTitle != null ||
         _hostUrls != null ||
         _initialRating != null ||
-        _initialOrder != null;
+        _initialOrder != null ||
+        _feedSubfeeds != null ||
+        _feedActiveSubfeedIndex != 0;
     if (changed) {
       _searchQuery = null;
       _feedTitle = null;
       _hostUrls = null;
       _initialRating = null;
       _initialOrder = null;
+      _feedSubfeeds = null;
+      _feedActiveSubfeedIndex = 0;
       notifyListeners();
     }
   }
