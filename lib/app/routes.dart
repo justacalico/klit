@@ -15,7 +15,6 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String favorites = '/favorites';
   static const String settings = '/settings';
-  static const String hostSettings = '/settings/host';
   static const String blacklistSettings = '/settings/blacklist';
   static const String feeds = '/feeds';
   static const String feedEdit = '/feeds/edit';
@@ -100,12 +99,6 @@ class AppRouter {
               initialCategory: initialCategory,
             ),
           ),
-          settings: settings,
-        );
-
-      case AppRoutes.hostSettings:
-        return CupertinoPageRoute(
-          builder: (_) => const HostSettingsPage(),
           settings: settings,
         );
 

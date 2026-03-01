@@ -1188,25 +1188,6 @@ class _UiSettingsPageState extends State<UiSettingsPage>
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
-              _buildSettingsCard(
-                isDark: isDark,
-                child: _buildSettingRow(
-                  isDark: isDark,
-                  icon: CupertinoIcons.globe,
-                  iconColor: _DesignColors.accentGreen,
-                  title: 'Server Configuration',
-                  subtitle: 'Change API host',
-                  trailing: Icon(
-                    CupertinoIcons.chevron_right,
-                    size: 18,
-                    color: isDark
-                        ? CupertinoColors.systemGrey
-                        : CupertinoColors.systemGrey2,
-                  ),
-                  onTap: () => widget.onNavigate(AppRoutes.hostSettings),
-                ),
-              ),
             ],
           ],
         );
@@ -2604,32 +2585,6 @@ class _UiSettingsPageState extends State<UiSettingsPage>
               isDark: isDark,
               child: Column(
                 children: [
-                  _buildSettingRow(
-                    isDark: isDark,
-                    icon: CupertinoIcons.link,
-                    iconColor: _DesignColors.accentGreen,
-                    title: 'API Host',
-                    subtitle: settings.host,
-                    trailing: CupertinoButton(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      color: _DesignColors.accentGreen.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(8),
-                      onPressed: () =>
-                          widget.onNavigate(AppRoutes.hostSettings),
-                      child: const Text(
-                        'Configure',
-                        style: TextStyle(
-                          color: _DesignColors.accentGreen,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                  ),
-                  _buildDivider(isDark),
                   _buildSettingRow(
                     isDark: isDark,
                     icon: CupertinoIcons.arrow_right_arrow_left,
