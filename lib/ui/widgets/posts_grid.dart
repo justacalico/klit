@@ -1,12 +1,25 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/constants/constants.dart';
 import '../../core/theme/ui_style_manager.dart';
 import '../../data/models/models.dart';
 import '../../providers/providers.dart';
 import 'loading_indicator.dart';
 import 'loading_shimmer.dart';
 import 'post_card.dart';
+
+int _effectiveGridSize(double screenWidth, int gridSize, bool gridAutoMode) {
+  if (!gridAutoMode) return gridSize;
+  if (screenWidth >= 2400) return 8;
+  if (screenWidth >= 2000) return 7;
+  if (screenWidth >= 1800) return 6;
+  if (screenWidth >= 1400) return 5;
+  if (screenWidth >= 1100) return 4;
+  if (screenWidth >= 800) return 3;
+  if (screenWidth >= 500) return 2;
+  return 2;
+}
 
 /// Grid view for posts with infinite scroll support
 class PostsGrid extends StatelessWidget {
@@ -39,97 +52,131 @@ class PostsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final settings = context.watch<SettingsProvider>();
-
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenWidth = constraints.maxWidth;
-        final effectiveColumns =
-            columns ?? settings.getEffectiveGridSize(screenWidth);
-        final effectiveSpacing = spacing ?? settings.getEffectiveGridSpacing();
-        final effectivePadding = padding ?? settings.getEffectiveGridPadding();
-
-        if (posts.isEmpty && isLoading) {
-          return PostGridShimmer(columns: effectiveColumns);
-        }
-
-        if (posts.isEmpty && error != null) {
-          return _buildErrorView(context);
-        }
-
-        if (posts.isEmpty) {
-          return _buildEmptyView(context);
-        }
-
-        return NotificationListener<ScrollNotification>(
-          onNotification: (notification) {
-            if (notification is ScrollUpdateNotification ||
-                notification is ScrollEndNotification) {
-              final metrics = notification.metrics;
-              if (metrics.pixels >= metrics.maxScrollExtent - 800) {
-                if (hasMore && !isLoading && onLoadMore != null) {
-                  onLoadMore!();
-                }
-              }
-            }
-            return false;
-          },
-          child: CustomScrollView(
-            controller: scrollController,
-            cacheExtent: 600,
-            slivers: [
-              SliverPadding(
-                padding: EdgeInsets.all(effectivePadding),
-                sliver: SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: effectiveColumns,
-                    mainAxisSpacing: effectiveSpacing,
-                    crossAxisSpacing: effectiveSpacing,
-                    childAspectRatio: 1,
-                  ),
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final post = posts[index];
-                      final isOled = settings.themeMode == 3;
-                      final isLiquidGlass = UIStyleManager.isLiquidGlass(context);
-                      final cellSize = (screenWidth -
-                              2 * effectivePadding -
-                              (effectiveColumns - 1) * effectiveSpacing) /
-                          effectiveColumns;
-                      final dpr = MediaQuery.devicePixelRatioOf(context);
-                      final aspectRatio = post.preview.width > 0 &&
-                              post.preview.height > 0
-                          ? post.preview.width / post.preview.height
-                          : 1.0;
-                      final cacheW = (cellSize * dpr).round();
-                      final cacheH = (cellSize * dpr / aspectRatio).round();
-                      return RepaintBoundary(
-                        child: AspectRatio(
-                          aspectRatio: 1,
-                          child: PostCard(
-                            post: post,
-                            onTap: () => onPostTap(post),
-                            style: PostCardStyle.grid,
-                            isOled: isOled,
-                            isLiquidGlass: isLiquidGlass,
-                            memCacheWidth: cacheW,
-                            memCacheHeight: cacheH,
-                          ),
-                        ),
-                      );
-                    },
-                    childCount: posts.length,
-                    addAutomaticKeepAlives: false,
-                    addRepaintBoundaries: true,
-                  ),
-                ),
-              ),
-              if (isLoading && hasMore)
-                const SliverToBoxAdapter(
-                  child: InfiniteScrollLoading(isLoading: true),
-                ),
-            ],
+        return Selector<SettingsProvider,
+            ({
+              int themeMode,
+              int gridSize,
+              double gridSpacing,
+              double gridPadding,
+              bool gridAutoMode,
+              UIStyle uiStyle,
+              bool gifAutoplay,
+            })>(
+          selector: (_, s) => (
+            themeMode: s.themeMode,
+            gridSize: s.gridSize,
+            gridSpacing: s.gridSpacing,
+            gridPadding: s.gridPadding,
+            gridAutoMode: s.gridAutoMode,
+            uiStyle: s.uiStyle,
+            gifAutoplay: s.gifAutoplay,
           ),
+          builder: (context, gs, _) {
+            final effectiveColumns = columns ??
+                _effectiveGridSize(screenWidth, gs.gridSize, gs.gridAutoMode);
+            final effectiveSpacing = spacing ??
+                (gs.gridAutoMode
+                    ? AppConstants.defaultGridSpacing
+                    : gs.gridSpacing);
+            final effectivePadding = padding ??
+                (gs.gridAutoMode
+                    ? AppConstants.defaultGridPadding
+                    : gs.gridPadding);
+            final isOled = gs.themeMode == 3;
+            final isLiquidGlass = gs.uiStyle == UIStyle.liquidGlass;
+
+            if (posts.isEmpty && isLoading) {
+              return PostGridShimmer(
+                columns: effectiveColumns,
+                isOled: isOled,
+              );
+            }
+
+            if (posts.isEmpty && error != null) {
+              return _buildErrorView(context);
+            }
+
+            if (posts.isEmpty) {
+              return _buildEmptyView(context);
+            }
+
+            return NotificationListener<ScrollNotification>(
+              onNotification: (notification) {
+                if (notification is ScrollUpdateNotification ||
+                    notification is ScrollEndNotification) {
+                  final metrics = notification.metrics;
+                  if (metrics.pixels >= metrics.maxScrollExtent - 800) {
+                    if (hasMore && !isLoading && onLoadMore != null) {
+                      onLoadMore!();
+                    }
+                  }
+                }
+                return false;
+              },
+              child: CustomScrollView(
+                controller: scrollController,
+                cacheExtent: 1200,
+                slivers: [
+                  SliverPadding(
+                    padding: EdgeInsets.all(effectivePadding),
+                    sliver: SliverGrid(
+                      gridDelegate:
+                          SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: effectiveColumns,
+                        mainAxisSpacing: effectiveSpacing,
+                        crossAxisSpacing: effectiveSpacing,
+                        childAspectRatio: 1,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final post = posts[index];
+                          final cellSize = (screenWidth -
+                                  2 * effectivePadding -
+                                  (effectiveColumns - 1) * effectiveSpacing) /
+                              effectiveColumns;
+                          final dpr =
+                              MediaQuery.devicePixelRatioOf(context);
+                          final aspectRatio = post.preview.width > 0 &&
+                                  post.preview.height > 0
+                              ? post.preview.width / post.preview.height
+                              : 1.0;
+                          final cacheW = (cellSize * dpr).round();
+                          final cacheH =
+                              (cellSize * dpr / aspectRatio).round();
+                          return RepaintBoundary(
+                            key: ValueKey(post.id),
+                            child: AspectRatio(
+                              aspectRatio: 1,
+                              child: PostCard(
+                                post: post,
+                                onTap: () => onPostTap(post),
+                                style: PostCardStyle.grid,
+                                isOled: isOled,
+                                isLiquidGlass: isLiquidGlass,
+                                gifAutoplay: gs.gifAutoplay,
+                                memCacheWidth: cacheW,
+                                memCacheHeight: cacheH,
+                              ),
+                            ),
+                          );
+                        },
+                        childCount: posts.length,
+                        addAutomaticKeepAlives: false,
+                        addRepaintBoundaries: true,
+                      ),
+                    ),
+                  ),
+                  if (isLoading && hasMore)
+                    const SliverToBoxAdapter(
+                      child: InfiniteScrollLoading(isLoading: true),
+                    ),
+                ],
+              ),
+            );
+          },
         );
       },
     );

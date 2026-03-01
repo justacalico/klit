@@ -115,6 +115,7 @@ class PostCard extends StatelessWidget {
     this.showInfo = true,
     this.isOled,
     this.isLiquidGlass,
+    this.gifAutoplay,
     this.memCacheWidth,
     this.memCacheHeight,
   });
@@ -127,6 +128,8 @@ class PostCard extends StatelessWidget {
   final bool? isOled;
   /// When provided, avoids reading [UIStyleManager] in card. Pass from parent for grid/list performance.
   final bool? isLiquidGlass;
+  /// When provided, avoids watching [SettingsProvider] for gifAutoplay. Pass from parent for grid performance.
+  final bool? gifAutoplay;
   /// Decode image at this width for grid thumbnails (reduces memory and decode time). Pass from grid.
   final int? memCacheWidth;
   /// Decode image at this height for grid thumbnails. Pass from grid.
@@ -248,7 +251,8 @@ class PostCard extends StatelessWidget {
   }
 
   Widget _buildImage(BuildContext context) {
-    final gifAutoplay = context.watch<SettingsProvider>().gifAutoplay;
+    final effectiveGifAutoplay =
+        gifAutoplay ?? context.watch<SettingsProvider>().gifAutoplay;
     final brightness = CupertinoTheme.brightnessOf(context);
     final isDark = brightness == Brightness.dark;
     final oled = isOled ?? context.read<SettingsProvider>().themeMode == 3;
@@ -272,7 +276,7 @@ class PostCard extends StatelessWidget {
     }
 
     final useVisibilityAwareGif =
-        post.isGif && gifAutoplay && (post.sample.url != null || post.file.url != null);
+        post.isGif && effectiveGifAutoplay && (post.sample.url != null || post.file.url != null);
     final animatedUrl = post.sample.url ?? post.file.url ?? post.preview.url;
 
     Widget imageChild;
@@ -288,7 +292,7 @@ class PostCard extends StatelessWidget {
         memCacheHeight: memCacheHeight,
       );
     } else {
-      final imageUrl = (post.isGif && gifAutoplay)
+      final imageUrl = (post.isGif && effectiveGifAutoplay)
           ? (post.sample.url ?? post.file.url ?? post.preview.url)
           : staticUrl;
       imageChild = CachedNetworkImage(
