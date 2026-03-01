@@ -397,10 +397,15 @@ class _UiSearchPageState extends State<UiSearchPage>
   @override
   Widget build(BuildContext context) {
     final isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
-    final isOled = context.watch<SettingsProvider>().themeMode == 3;
+    final settings = context.watch<SettingsProvider>();
+    final isOled = settings.themeMode == 3;
     final mode = LayoutScope.of(context);
     final isMobile = mode.isMobile;
     final feedMode = widget.feedMode;
+    final showHistorySidebar = !isMobile &&
+        !feedMode &&
+        settings.searchHistoryEnabled &&
+        settings.searchHistory.isNotEmpty;
     const headerHeight = MobileHeaderHeights.large;
     final tagSuggestionsTop = headerHeight + 2;
 
@@ -419,19 +424,21 @@ class _UiSearchPageState extends State<UiSearchPage>
                     ? _buildResults(context)
                     : (isMobile
                           ? _buildResults(context)
-                          : Row(
-                              children: [
-                                _buildHistorySidebar(context, isDark, isOled),
-                                Container(
-                                  width: 1,
-                                  color: AppColors.resolveSeparator(
-                                    isDark,
-                                    isOled: isOled,
-                                  ),
-                                ),
-                                Expanded(child: _buildResults(context)),
-                              ],
-                            )),
+                          : showHistorySidebar
+                              ? Row(
+                                  children: [
+                                    _buildHistorySidebar(context, isDark, isOled),
+                                    Container(
+                                      width: 1,
+                                      color: AppColors.resolveSeparator(
+                                        isDark,
+                                        isOled: isOled,
+                                      ),
+                                    ),
+                                    Expanded(child: _buildResults(context)),
+                                  ],
+                                )
+                              : _buildResults(context)),
               ),
             ],
           ),
@@ -440,7 +447,7 @@ class _UiSearchPageState extends State<UiSearchPage>
               animation: _filterCtrl,
               builder: (_, _) => Positioned(
                 top: headerHeight + _filterSlide.value,
-                left: 220,
+                left: showHistorySidebar ? 220 : 20,
                 right: 20,
                 child: Opacity(
                   opacity: _filterFade.value,
