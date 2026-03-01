@@ -66,6 +66,19 @@ class MobileHeaderSection extends StatelessWidget {
     );
 
     if (variant == MobileHeaderVariant.glass) {
+      if (isOled) {
+        return Container(
+          height: safeTop + barHeight,
+          padding: EdgeInsets.only(top: safeTop),
+          decoration: BoxDecoration(
+            color: AppColors.oledBackground,
+            border: showBottomBorder
+                ? Border(bottom: BorderSide(color: borderColor, width: 0.5))
+                : null,
+          ),
+          child: childContent,
+        );
+      }
       return ClipRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),

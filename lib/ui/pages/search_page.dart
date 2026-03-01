@@ -565,8 +565,8 @@ class _UiSearchPageState extends State<UiSearchPage>
                     : CupertinoColors.systemGrey2,
               ),
               decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF27272A).withValues(alpha: 0.6)
+                color: (isDark || isOled)
+                    ? AppColors.resolveSecondaryBackground(isDark, isOled: isOled)
                     : const Color(0xFFF4F4F5).withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
