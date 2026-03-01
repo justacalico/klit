@@ -41,6 +41,9 @@ class PostsProvider extends ChangeNotifier {
   bool _isLoadingHot = false;
   bool _isLoadingPopular = false;
   bool _isLoadingSearch = false;
+  bool _isLoadingMoreLatest = false;
+  bool _isLoadingMoreHot = false;
+  bool _isLoadingMorePopular = false;
 
   // Has more
   bool _hasMoreLatest = true;
@@ -77,6 +80,9 @@ class PostsProvider extends ChangeNotifier {
   bool get isLoadingHot => _isLoadingHot;
   bool get isLoadingPopular => _isLoadingPopular;
   bool get isLoadingSearch => _isLoadingSearch;
+  bool get isLoadingMoreLatest => _isLoadingMoreLatest;
+  bool get isLoadingMoreHot => _isLoadingMoreHot;
+  bool get isLoadingMorePopular => _isLoadingMorePopular;
 
   bool get hasMoreLatest => _hasMoreLatest;
   bool get hasMoreHot => _hasMoreHot;
@@ -144,7 +150,12 @@ class PostsProvider extends ChangeNotifier {
       _hasMoreLatest = true;
     }
 
-    _isLoadingLatest = true;
+    final hasExisting = _latestPosts.isNotEmpty;
+    if (refresh || !hasExisting) {
+      _isLoadingLatest = true;
+    } else {
+      _isLoadingMoreLatest = true;
+    }
     _latestError = null;
     notifyListeners();
 
@@ -181,6 +192,7 @@ class PostsProvider extends ChangeNotifier {
       debugPrint('loadLatestPosts error: $e\n$st');
     } finally {
       _isLoadingLatest = false;
+      _isLoadingMoreLatest = false;
       notifyListeners();
     }
   }
@@ -199,7 +211,12 @@ class PostsProvider extends ChangeNotifier {
       _hasMoreHot = true;
     }
 
-    _isLoadingHot = true;
+    final hasExistingHot = _hotPosts.isNotEmpty;
+    if (refresh || !hasExistingHot) {
+      _isLoadingHot = true;
+    } else {
+      _isLoadingMoreHot = true;
+    }
     _hotError = null;
     notifyListeners();
 
@@ -272,6 +289,7 @@ class PostsProvider extends ChangeNotifier {
       debugPrint('loadHotPosts error: $e\n$st');
     } finally {
       _isLoadingHot = false;
+      _isLoadingMoreHot = false;
       notifyListeners();
     }
   }
@@ -305,7 +323,12 @@ class PostsProvider extends ChangeNotifier {
       _hasMorePopular = true;
     }
 
-    _isLoadingPopular = true;
+    final hasExistingPopular = _popularPosts.isNotEmpty;
+    if (refresh || !hasExistingPopular) {
+      _isLoadingPopular = true;
+    } else {
+      _isLoadingMorePopular = true;
+    }
     _popularError = null;
     notifyListeners();
 
@@ -341,6 +364,7 @@ class PostsProvider extends ChangeNotifier {
       debugPrint('loadPopularPosts error: $e\n$st');
     } finally {
       _isLoadingPopular = false;
+      _isLoadingMorePopular = false;
       notifyListeners();
     }
   }

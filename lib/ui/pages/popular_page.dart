@@ -123,7 +123,7 @@ class _UiPopularPageState extends State<UiPopularPage> {
                       onLoading: () => _load(),
                       child: PostsGrid(
                         posts: pp.popularPosts,
-                        isLoading: pp.isLoadingPopular,
+                        isLoading: pp.isLoadingPopular || pp.isLoadingMorePopular,
                         hasMore: pp.hasMorePopular,
                         error: pp.popularError,
                         onPostTap: _onPostTap,

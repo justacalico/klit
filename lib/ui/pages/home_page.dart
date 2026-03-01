@@ -109,7 +109,7 @@ class _UiHomePageState extends State<UiHomePage> {
                 onLoading: () => _load(),
                 child: PostsGrid(
                   posts: pp.latestPosts,
-                  isLoading: pp.isLoadingLatest,
+                  isLoading: pp.isLoadingLatest || pp.isLoadingMoreLatest,
                   hasMore: pp.hasMoreLatest,
                   error: pp.latestError,
                   onPostTap: _onPostTap,

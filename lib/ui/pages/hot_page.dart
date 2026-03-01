@@ -119,7 +119,7 @@ class _UiHotPageState extends State<UiHotPage> {
                       onLoading: () => _load(),
                       child: PostsGrid(
                         posts: pp.hotPosts,
-                        isLoading: pp.isLoadingHot,
+                        isLoading: pp.isLoadingHot || pp.isLoadingMoreHot,
                         hasMore: pp.hasMoreHot,
                         error: pp.hotError,
                         onPostTap: _onPostTap,

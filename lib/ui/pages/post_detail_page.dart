@@ -711,7 +711,17 @@ class _PostDetailPageState extends State<PostDetailPage>
   Future<void> _vote(int index, int score) async {
     final post = _loadedPosts[index];
     if (post == null || _isVoting[index] == true) return;
-    setState(() => _isVoting[index] = true);
+    final oldVote = _userVote[index] ?? 0;
+    final current = _updatedScores[index] ?? post.score;
+    final newUp = current.up + (score == 1 ? 1 : 0) - (oldVote == 1 ? 1 : 0);
+    final newDown = current.down + (score == -1 ? 1 : 0) - (oldVote == -1 ? 1 : 0);
+    final newTotal = current.total + (score - oldVote);
+    final optimisticScore = PostScore(up: newUp, down: newDown, total: newTotal);
+    setState(() {
+      _userVote[index] = score;
+      _updatedScores[index] = optimisticScore;
+      _isVoting[index] = false;
+    });
     final apiService = context.read<ApiService>();
     final result = await _runWithHostForIndex<ApiResult<PostScore>>(
       index,
@@ -722,12 +732,13 @@ class _PostDetailPageState extends State<PostDetailPage>
         success: (newScore) {
           setState(() {
             _updatedScores[index] = newScore;
-            _userVote[index] = score;
-            _isVoting[index] = false;
           });
         },
         failure: (error) {
-          setState(() => _isVoting[index] = false);
+          setState(() {
+            _userVote[index] = oldVote;
+            _updatedScores[index] = current;
+          });
           _showError(error.message);
         },
       );
@@ -738,7 +749,17 @@ class _PostDetailPageState extends State<PostDetailPage>
     final post = _loadedPosts[index];
     if (post == null || _isTogglingFavorite[index] == true) return;
     final isFav = _isFavorited[index] ?? post.isFavorited;
-    setState(() => _isTogglingFavorite[index] = true);
+    setState(() {
+      _isFavorited[index] = !isFav;
+      _isTogglingFavorite[index] = false;
+    });
+    if (!isFav) {
+      final settings = context.read<SettingsProvider>();
+      if (settings.confettiOnFavorite) _confettiController.play();
+      if (settings.upvoteWhenFavorited && _userVote[index] != 1) {
+        _vote(index, 1);
+      }
+    }
     final apiService = context.read<ApiService>();
     final result = await _runWithHostForIndex<ApiResult<bool>>(
       index,
@@ -748,21 +769,9 @@ class _PostDetailPageState extends State<PostDetailPage>
     );
     if (mounted) {
       result.when(
-        success: (_) {
-          setState(() {
-            _isFavorited[index] = !isFav;
-            _isTogglingFavorite[index] = false;
-          });
-          if (!isFav) {
-            final settings = context.read<SettingsProvider>();
-            if (settings.confettiOnFavorite) _confettiController.play();
-            if (settings.upvoteWhenFavorited && _userVote[index] != 1) {
-              _vote(index, 1);
-            }
-          }
-        },
+        success: (_) {},
         failure: (error) {
-          setState(() => _isTogglingFavorite[index] = false);
+          setState(() => _isFavorited[index] = isFav);
           _showError(error.message);
         },
       );

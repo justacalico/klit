@@ -182,6 +182,7 @@ class PostCard extends StatelessWidget {
       children: [
         CachedNetworkImage(
           imageUrl: imageUrl,
+          cacheKey: '${post.id}_$imageUrl',
           fit: BoxFit.cover,
           memCacheWidth: memCacheWidth,
           memCacheHeight: memCacheHeight,

@@ -252,9 +252,14 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
     }
     _previousMode = mode;
 
-    final content = KeyedSubtree(
-      key: ValueKey('shell-content-$selected'),
-      child: RepaintBoundary(child: ClipRect(child: _buildContent(selected))),
+    final tabChildren = _buildTabChildren(nav);
+    final content = RepaintBoundary(
+      child: ClipRect(
+        child: IndexedStack(
+          index: selected.clamp(0, tabChildren.length - 1),
+          children: tabChildren,
+        ),
+      ),
     );
 
     final navBarHeight = _getMobileNavBarHeight(context);
@@ -371,36 +376,49 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
     );
   }
 
-  Widget _buildContent(int selected) {
-    final nav = context.watch<NavigationProvider>();
-    switch (selected) {
-      case 0:
-        return UiHomePage(onPostTap: _onPostTap, onSearchTap: _openSearch);
-      case 1:
-        return UiHotPage(onPostTap: _onPostTap, onSearchTap: _openSearch);
-      case 2:
-        return UiPopularPage(onPostTap: _onPostTap, onSearchTap: _openSearch);
-      case 3:
-        return UiSettingsPage(
+  List<Widget> _buildTabChildren(NavigationProvider nav) {
+    return [
+      KeyedSubtree(
+        key: const ValueKey('tab-0'),
+        child: UiHomePage(onPostTap: _onPostTap, onSearchTap: _openSearch),
+      ),
+      KeyedSubtree(
+        key: const ValueKey('tab-1'),
+        child: UiHotPage(onPostTap: _onPostTap, onSearchTap: _openSearch),
+      ),
+      KeyedSubtree(
+        key: const ValueKey('tab-2'),
+        child: UiPopularPage(onPostTap: _onPostTap, onSearchTap: _openSearch),
+      ),
+      KeyedSubtree(
+        key: const ValueKey('tab-3'),
+        child: UiSettingsPage(
           onNavigate: (r) => Navigator.of(context).pushNamed(r),
-        );
-      case 4:
-        return UiSearchPage(
+        ),
+      ),
+      KeyedSubtree(
+        key: const ValueKey('tab-4'),
+        child: UiSearchPage(
           initialQuery: nav.searchQuery,
           onPostTap: _onPostTap,
-        );
-      case 5:
-        return UiProfilePage(
+        ),
+      ),
+      KeyedSubtree(
+        key: const ValueKey('tab-5'),
+        child: UiProfilePage(
           onNavigate: (r) => Navigator.of(context).pushNamed(r),
           onPostTap: _onPostTap,
-        );
-      case 6:
-        return UiFavoritesPage(onPostTap: _onPostTap);
-      case 7:
-        return UiFeedsPage();
-      default:
-        return UiHomePage(onPostTap: _onPostTap, onSearchTap: _openSearch);
-    }
+        ),
+      ),
+      KeyedSubtree(
+        key: const ValueKey('tab-6'),
+        child: UiFavoritesPage(onPostTap: _onPostTap),
+      ),
+      KeyedSubtree(
+        key: const ValueKey('tab-7'),
+        child: UiFeedsPage(),
+      ),
+    ];
   }
 
   void _onOverlayCurrentIndexChanged(int index) {

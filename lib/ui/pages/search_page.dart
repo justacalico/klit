@@ -98,6 +98,17 @@ class _UiSearchPageState extends State<UiSearchPage>
   }
 
   @override
+  void didUpdateWidget(covariant UiSearchPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialQuery != widget.initialQuery &&
+        widget.initialQuery != null &&
+        widget.initialQuery != _searchController.text) {
+      _searchController.text = widget.initialQuery!;
+      _performSearch();
+    }
+  }
+
+  @override
   void dispose() {
     _filterCtrl.dispose();
     _searchController.dispose();

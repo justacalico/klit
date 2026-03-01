@@ -15,6 +15,14 @@ import '../shell/toolbar.dart';
 import '../theme.dart';
 import '../widgets/widgets.dart';
 
+class _ProfileCacheEntry {
+  final User user;
+  final String? avatarUrl;
+  _ProfileCacheEntry(this.user, this.avatarUrl);
+}
+
+final Map<String, _ProfileCacheEntry> _profileCache = {};
+
 /// Unified profile page - single file for all layouts.
 /// When [username] is set, shows that user's profile (e.g. from "View profile" on a post). Otherwise shows the current account's profile.
 class UiProfilePage extends StatefulWidget {
@@ -59,6 +67,17 @@ class _UiProfilePageState extends State<UiProfilePage> {
   @override
   void initState() {
     super.initState();
+    final loadUsername = _viewingOtherUser
+        ? widget.username
+        : context.read<AuthProvider>().currentAccount?.username;
+    if (loadUsername != null) {
+      final cached = _profileCache[loadUsername];
+      if (cached != null) {
+        _user = cached.user;
+        _avatarUrl = cached.avatarUrl;
+        _isLoading = false;
+      }
+    }
     _loadProfile();
   }
 
@@ -79,10 +98,12 @@ class _UiProfilePageState extends State<UiProfilePage> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
+    if (_user == null) {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+    }
 
     final result = await apiService.getUserProfile(loadUsername!);
 
@@ -113,6 +134,7 @@ class _UiProfilePageState extends State<UiProfilePage> {
             }
           }
           if (mounted) {
+            _profileCache[loadUsername] = _ProfileCacheEntry(user, avatarUrl);
             setState(() {
               _user = user;
               _avatarUrl = avatarUrl;
