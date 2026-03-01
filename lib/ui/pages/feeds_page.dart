@@ -52,6 +52,8 @@ class UiFeedsPage extends StatelessWidget {
       query: feed.toSearchQuery(),
       feedTitle: feed.name.isEmpty ? 'Feed' : feed.name,
       hostUrls: feed.hostUrls.isNotEmpty ? feed.hostUrls : null,
+      initialRating: feed.rating,
+      initialOrder: feed.order,
     );
     Navigator.of(context).pushNamed(AppRoutes.search, arguments: args);
   }

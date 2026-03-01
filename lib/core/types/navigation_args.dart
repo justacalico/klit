@@ -8,12 +8,18 @@ class SearchRouteArguments {
     this.query,
     this.feedTitle,
     this.hostUrls,
+    this.initialRating,
+    this.initialOrder,
   });
 
   final String? query;
   final String? feedTitle;
   /// When non-empty, multi-host search is used (e.g. e926 + e621).
   final List<String>? hostUrls;
+  /// Rating filter for feed view: null/'all', 's', 'q', 'e'.
+  final String? initialRating;
+  /// Sort order for feed view: e.g. 'id_desc', 'id_asc', 'score', 'favcount'.
+  final String? initialOrder;
 }
 
 /// Arguments for navigating to post detail with swipe support.

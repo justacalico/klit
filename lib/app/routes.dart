@@ -58,20 +58,28 @@ class AppRouter {
         final String? initialQuery;
         final String? feedTitle;
         final List<String>? hostUrls;
+        final String? initialRating;
+        final String? initialOrder;
         if (args is SearchRouteArguments) {
           initialQuery = args.query;
           feedTitle = args.feedTitle;
           hostUrls = args.hostUrls;
+          initialRating = args.initialRating;
+          initialOrder = args.initialOrder;
         } else {
           initialQuery = args as String?;
           feedTitle = null;
           hostUrls = null;
+          initialRating = null;
+          initialOrder = null;
         }
         return CupertinoPageRoute(
           builder: (_) => _SearchRoutePage(
             initialQuery: initialQuery,
             feedTitle: feedTitle,
             hostUrls: hostUrls,
+            initialRating: initialRating,
+            initialOrder: initialOrder,
           ),
           settings: settings,
         );
@@ -132,11 +140,19 @@ class AppRouter {
 
 /// Full-page wrappers for routes pushed from shell (e.g. mobile).
 class _SearchRoutePage extends StatelessWidget {
-  const _SearchRoutePage({this.initialQuery, this.feedTitle, this.hostUrls});
+  const _SearchRoutePage({
+    this.initialQuery,
+    this.feedTitle,
+    this.hostUrls,
+    this.initialRating,
+    this.initialOrder,
+  });
 
   final String? initialQuery;
   final String? feedTitle;
   final List<String>? hostUrls;
+  final String? initialRating;
+  final String? initialOrder;
 
   @override
   Widget build(BuildContext context) {
@@ -151,6 +167,8 @@ class _SearchRoutePage extends StatelessWidget {
           feedMode: isFeedMode,
           feedTitle: feedTitle,
           hostUrls: hostUrls,
+          initialRating: initialRating,
+          initialOrder: initialOrder,
           onBack: () => Navigator.of(context).pop(),
           onPostTap: (args) => Navigator.of(
             context,

@@ -142,8 +142,17 @@ class _FeedEditPageState extends State<FeedEditPage> {
   late TextEditingController _orController;
   late TextEditingController _excludeController;
   late String _mediaType;
+  String? _rating;
+  late String _order;
   bool _isNew = true;
   final Set<String> _selectedHostUrls = {};
+
+  static const Map<String, String> _orderOptions = {
+    'id_desc': 'Newest',
+    'id_asc': 'Oldest',
+    'score': 'Score',
+    'favcount': 'Favorites',
+  };
 
   static String _normalizeHost(String h) {
     var s = h.trim();
@@ -167,6 +176,8 @@ class _FeedEditPageState extends State<FeedEditPage> {
       text: f?.excludeTags.join(' ') ?? '',
     );
     _mediaType = f?.mediaType ?? Feed.mediaTypeImage;
+    _rating = f?.rating;
+    _order = f?.order ?? 'id_desc';
     if (f?.hostUrls != null) {
       _selectedHostUrls.addAll(f!.hostUrls.map(_normalizeHost));
     }
@@ -198,6 +209,8 @@ class _FeedEditPageState extends State<FeedEditPage> {
         orTags: orTags,
         excludeTags: excludeTags,
         hostUrls: hostUrls,
+        rating: _rating,
+        order: _order,
       );
       await feedsProvider.addFeed(feed);
     } else {
@@ -210,6 +223,8 @@ class _FeedEditPageState extends State<FeedEditPage> {
         orTags: orTags,
         excludeTags: excludeTags,
         hostUrls: hostUrls,
+        rating: _rating,
+        order: _order,
       );
       await feedsProvider.updateFeed(feed);
     }
@@ -355,6 +370,116 @@ class _FeedEditPageState extends State<FeedEditPage> {
                 if (v != null) setState(() => _mediaType = v);
               },
             ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _sectionCard(
+              context: context,
+              isDark: isDark,
+              isOled: isOled,
+              title: 'Rating & sort',
+              children: [
+                Text(
+                  'Rating',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: CupertinoColors.systemGrey,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                CupertinoSlidingSegmentedControl<String>(
+                  groupValue: _rating ?? 'all',
+                  children: {
+                    'all': Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Text(
+                        'All',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: (_rating == null || _rating == 'all')
+                              ? CupertinoColors.white
+                              : CupertinoColors.systemGrey,
+                        ),
+                      ),
+                    ),
+                    's': Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Text(
+                        'Safe',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: _rating == 's'
+                              ? CupertinoColors.white
+                              : CupertinoColors.systemGrey,
+                        ),
+                      ),
+                    ),
+                    'q': Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Text(
+                        'Q',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: _rating == 'q'
+                              ? CupertinoColors.white
+                              : CupertinoColors.systemGrey,
+                        ),
+                      ),
+                    ),
+                    'e': Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Text(
+                        'E',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: _rating == 'e'
+                              ? CupertinoColors.white
+                              : CupertinoColors.systemGrey,
+                        ),
+                      ),
+                    ),
+                  },
+                  onValueChanged: (v) {
+                    if (v != null) setState(() => _rating = v == 'all' ? null : v);
+                  },
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  'Sort',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: CupertinoColors.systemGrey,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                CupertinoSlidingSegmentedControl<String>(
+                  groupValue: _order,
+                  children: {
+                    for (final e in _orderOptions.entries)
+                      e.key: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Text(
+                          e.value,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: _order == e.key
+                                ? CupertinoColors.white
+                                : CupertinoColors.systemGrey,
+                          ),
+                        ),
+                      ),
+                  },
+                  onValueChanged: (v) {
+                    if (v != null) setState(() => _order = v);
+                  },
+                ),
               ],
             ),
             const SizedBox(height: 16),

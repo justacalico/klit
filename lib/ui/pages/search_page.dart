@@ -27,6 +27,10 @@ class UiSearchPage extends StatefulWidget {
 
   /// When in feed mode, title shown in the toolbar (e.g. feed name). Ignored when not feed mode.
   final String? feedTitle;
+  /// Initial rating filter when opened as feed: null/'all', 's', 'q', 'e'.
+  final String? initialRating;
+  /// Initial sort order when opened as feed: e.g. 'id_desc', 'score'.
+  final String? initialOrder;
 
   const UiSearchPage({
     super.key,
@@ -35,6 +39,8 @@ class UiSearchPage extends StatefulWidget {
     this.onBack,
     this.hostUrls,
     this.feedTitle,
+    this.initialRating,
+    this.initialOrder,
     required this.onPostTap,
   });
 
@@ -82,6 +88,12 @@ class _UiSearchPageState extends State<UiSearchPage>
       end: 1,
     ).animate(CurvedAnimation(parent: _filterCtrl, curve: Curves.easeOutCubic));
 
+    if (widget.initialRating != null) {
+      _selectedRating = widget.initialRating == 'all' ? null : widget.initialRating;
+    }
+    if (widget.initialOrder != null) {
+      _selectedOrder = widget.initialOrder!;
+    }
     if (widget.initialQuery != null) {
       _searchController.text = widget.initialQuery!;
       _performSearch();
@@ -105,6 +117,14 @@ class _UiSearchPageState extends State<UiSearchPage>
         widget.initialQuery != _searchController.text) {
       _searchController.text = widget.initialQuery!;
       _performSearch();
+    }
+    if (oldWidget.initialRating != widget.initialRating) {
+      _selectedRating = widget.initialRating == null || widget.initialRating == 'all'
+          ? null
+          : widget.initialRating;
+    }
+    if (oldWidget.initialOrder != widget.initialOrder && widget.initialOrder != null) {
+      _selectedOrder = widget.initialOrder!;
     }
   }
 

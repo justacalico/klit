@@ -14,6 +14,10 @@ class Feed {
   final List<String> excludeTags;
   /// Host URLs to load from (e.g. e926, e621, e6ai). Empty = current host only.
   final List<String> hostUrls;
+  /// Rating filter: null or 'all' = all, 's' = safe, 'q' = questionable, 'e' = explicit.
+  final String? rating;
+  /// Sort order: e.g. 'id_desc', 'id_asc', 'score', 'favcount'.
+  final String order;
 
   const Feed({
     required this.id,
@@ -23,6 +27,8 @@ class Feed {
     required this.orTags,
     required this.excludeTags,
     this.hostUrls = const [],
+    this.rating,
+    this.order = 'id_desc',
   });
 
   /// True if this feed is video-only (for backward compatibility).
@@ -53,6 +59,8 @@ class Feed {
       hostUrls: hostUrlsRaw is List<dynamic>
           ? (hostUrlsRaw).map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList()
           : [],
+      rating: json['rating'] as String?,
+      order: json['order'] as String? ?? 'id_desc',
     );
   }
 
@@ -65,6 +73,8 @@ class Feed {
       'orTags': orTags,
       'excludeTags': excludeTags,
       'hostUrls': hostUrls,
+      if (rating != null) 'rating': rating,
+      'order': order,
     };
   }
 
@@ -76,6 +86,8 @@ class Feed {
     List<String>? orTags,
     List<String>? excludeTags,
     List<String>? hostUrls,
+    String? rating,
+    String? order,
   }) {
     return Feed(
       id: id ?? this.id,
@@ -85,6 +97,8 @@ class Feed {
       orTags: orTags ?? this.orTags,
       excludeTags: excludeTags ?? this.excludeTags,
       hostUrls: hostUrls ?? this.hostUrls,
+      rating: rating ?? this.rating,
+      order: order ?? this.order,
     );
   }
 
