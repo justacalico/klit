@@ -31,8 +31,24 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
   bool _postDetailRoutePushed = false;
   /// Previous layout mode to detect desktop <-> mobile transitions.
   LayoutMode? _previousMode;
+  final GlobalKey<NavigatorState> _contentNavKey = GlobalKey<NavigatorState>();
+  int? _lastContentIndex;
 
   static const List<int> _desktopOrder = [0, 1, 2, 6, 7, 4, 5, 3];
+
+  static const List<String> _contentRoutes = [
+    '/shell/home',
+    '/shell/hot',
+    '/shell/popular',
+    '/shell/settings',
+    '/shell/search',
+    '/shell/profile',
+    '/shell/favorites',
+    '/shell/feeds',
+  ];
+
+  static String _contentRouteForIndex(int index) =>
+      _contentRoutes[index.clamp(0, _contentRoutes.length - 1)];
 
   @override
   void initState() {
@@ -252,12 +268,28 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
     }
     _previousMode = mode;
 
-    final tabChildren = _buildTabChildren(nav);
+    final contentIndex = selected <= 7 ? selected : (_lastContentIndex ?? 0);
+    if (_lastContentIndex == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        setState(() => _lastContentIndex = contentIndex);
+      });
+    } else if (_lastContentIndex != contentIndex) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _contentNavKey.currentState?.pushReplacementNamed(
+          _contentRouteForIndex(contentIndex),
+        );
+        setState(() => _lastContentIndex = contentIndex);
+      });
+    }
+
     final content = RepaintBoundary(
       child: ClipRect(
-        child: IndexedStack(
-          index: selected.clamp(0, tabChildren.length - 1),
-          children: tabChildren,
+        child: Navigator(
+          key: _contentNavKey,
+          initialRoute: _contentRouteForIndex(contentIndex),
+          onGenerateRoute: _onGenerateContentRoute,
         ),
       ),
     );
@@ -376,29 +408,29 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
     );
   }
 
-  List<Widget> _buildTabChildren(NavigationProvider nav) {
-    return [
-      KeyedSubtree(
-        key: const ValueKey('tab-0'),
-        child: UiHomePage(onPostTap: _onPostTap, onSearchTap: _openSearch),
-      ),
-      KeyedSubtree(
-        key: const ValueKey('tab-1'),
-        child: UiHotPage(onPostTap: _onPostTap, onSearchTap: _openSearch),
-      ),
-      KeyedSubtree(
-        key: const ValueKey('tab-2'),
-        child: UiPopularPage(onPostTap: _onPostTap, onSearchTap: _openSearch),
-      ),
-      KeyedSubtree(
-        key: const ValueKey('tab-3'),
-        child: UiSettingsPage(
-          onNavigate: (r) => Navigator.of(context).pushNamed(r),
-        ),
-      ),
-      KeyedSubtree(
-        key: const ValueKey('tab-4'),
-        child: UiSearchPage(
+  Route<dynamic> _onGenerateContentRoute(RouteSettings settings) {
+    return CupertinoPageRoute<void>(
+      settings: settings,
+      builder: (ctx) => _buildContentPage(settings.name, ctx),
+    );
+  }
+
+  Widget _buildContentPage(String? name, BuildContext ctx) {
+    switch (name) {
+      case '/shell/home':
+        return UiHomePage(onPostTap: _onPostTap, onSearchTap: _openSearch);
+      case '/shell/hot':
+        return UiHotPage(onPostTap: _onPostTap, onSearchTap: _openSearch);
+      case '/shell/popular':
+        return UiPopularPage(onPostTap: _onPostTap, onSearchTap: _openSearch);
+      case '/shell/settings':
+        return UiSettingsPage(
+          onNavigate: (r) =>
+              Navigator.of(ctx, rootNavigator: true).pushNamed(r),
+        );
+      case '/shell/search':
+        final nav = ctx.read<NavigationProvider>();
+        return UiSearchPage(
           initialQuery: nav.searchQuery,
           feedMode: nav.feedTitle != null && nav.feedTitle!.isNotEmpty,
           feedTitle: nav.feedTitle,
@@ -406,24 +438,20 @@ class _AppShellState extends State<AppShell> with GamepadInputMixin {
           initialRating: nav.initialRating,
           initialOrder: nav.initialOrder,
           onPostTap: _onPostTap,
-        ),
-      ),
-      KeyedSubtree(
-        key: const ValueKey('tab-5'),
-        child: UiProfilePage(
-          onNavigate: (r) => Navigator.of(context).pushNamed(r),
+        );
+      case '/shell/profile':
+        return UiProfilePage(
+          onNavigate: (r) =>
+              Navigator.of(ctx, rootNavigator: true).pushNamed(r),
           onPostTap: _onPostTap,
-        ),
-      ),
-      KeyedSubtree(
-        key: const ValueKey('tab-6'),
-        child: UiFavoritesPage(onPostTap: _onPostTap),
-      ),
-      KeyedSubtree(
-        key: const ValueKey('tab-7'),
-        child: UiFeedsPage(),
-      ),
-    ];
+        );
+      case '/shell/favorites':
+        return UiFavoritesPage(onPostTap: _onPostTap);
+      case '/shell/feeds':
+        return UiFeedsPage();
+      default:
+        return UiHomePage(onPostTap: _onPostTap, onSearchTap: _openSearch);
+    }
   }
 
   void _onOverlayCurrentIndexChanged(int index) {
