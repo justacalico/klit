@@ -4,6 +4,7 @@ import '../../core/constants/constants.dart';
 import '../../data/models/models.dart';
 import '../../providers/providers.dart';
 import '../theme.dart';
+import '../widgets/widgets.dart';
 
 String _hostLabel(String url) {
   final u = url.trim();
@@ -424,11 +425,10 @@ class _FeedEditPageState extends State<FeedEditPage> {
                   ),
                 ),
                 const SizedBox(height: 6),
-                CupertinoTextField(
+                TagSuggestionField(
                   controller: _includeController,
                   placeholder: 'Post must have all of these (e.g. cat or fox)',
                   maxLines: 4,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
                     color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
                     borderRadius: BorderRadius.circular(10),
@@ -448,11 +448,10 @@ class _FeedEditPageState extends State<FeedEditPage> {
                   ),
                 ),
                 const SizedBox(height: 6),
-                CupertinoTextField(
+                TagSuggestionField(
                   controller: _orController,
                   placeholder: 'Any of these (e.g. cat fox for cat or fox)',
                   maxLines: 4,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
                     color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
                     borderRadius: BorderRadius.circular(10),
@@ -472,11 +471,10 @@ class _FeedEditPageState extends State<FeedEditPage> {
                   ),
                 ),
                 const SizedBox(height: 6),
-                CupertinoTextField(
+                TagSuggestionField(
                   controller: _excludeController,
                   placeholder: 'e.g. cat when viewing fox to see only fox without cat',
                   maxLines: 4,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
                     color: AppColors.resolveSecondaryBackground(isDark, isOled: isOled),
                     borderRadius: BorderRadius.circular(10),

@@ -6,3 +6,4 @@ export 'loading_shimmer.dart';
 export 'post_card.dart';
 export 'posts_grid.dart';
 export 'tag_chip.dart';
+export 'tag_suggestion_field.dart';
