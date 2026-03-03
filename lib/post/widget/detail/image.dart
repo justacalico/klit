@@ -49,6 +49,24 @@ class PostDetailVideo extends StatelessWidget {
               ),
             ),
           ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: SafeArea(
+              minimum: const EdgeInsets.only(bottom: 4),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: InlineVideoTimeline(player: player),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -276,46 +294,10 @@ class PostDetailImageDisplay extends StatelessWidget {
     );
 
     if (post.type == PostType.video) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          content,
-          const SizedBox(height: 8),
-          _PostDetailInlineVideoControls(post: post),
-        ],
-      );
+      return content;
     }
 
     return content;
-  }
-}
-
-class _PostDetailInlineVideoControls extends StatelessWidget {
-  const _PostDetailInlineVideoControls({required this.post});
-
-  final Post post;
-
-  @override
-  Widget build(BuildContext context) {
-    final player = post.getVideo(context);
-    if (player == null) return const SizedBox.shrink();
-
-    return GlassCard(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      borderRadius: 18,
-      child: Row(
-        children: [
-          VideoButton(
-            player: player,
-            size: 40,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: InlineVideoTimeline(player: player),
-          ),
-        ],
-      ),
-    );
   }
 }
 

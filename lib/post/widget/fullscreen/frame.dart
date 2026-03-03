@@ -44,9 +44,6 @@ class PostFullscreenFrame extends StatelessWidget {
                 ),
                 drawer: drawer,
                 endDrawer: endDrawer,
-                bottomNavigationBar: player != null
-                    ? VideoBar(player: player)
-                    : null,
                 body: GestureDetector(
                   behavior: HitTestBehavior.translucent,
                   onTap: () {
@@ -67,6 +64,13 @@ class PostFullscreenFrame extends StatelessWidget {
                     children: [
                       child,
                       if (player != null) VideoButton(player: player),
+                      if (player != null)
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: VideoBar(player: player),
+                        ),
                     ],
                   ),
                 ),
