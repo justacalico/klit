@@ -359,7 +359,7 @@ class SettingsPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             const Text('Video resolution', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: gapS),
                             ...VideoResolution.values.map(
                               (resolution) => CupertinoListTile(
                                 title: Text(resolution.title),

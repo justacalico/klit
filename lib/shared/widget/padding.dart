@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 
 const double kContentPadding = 4;
 
+// Spacing tokens
+const double gapXS = kContentPadding;
+const double gapS = kContentPadding * 2;
+const double gapM = kContentPadding * 3;
+const double gapL = kContentPadding * 4;
+
 const double defaultAppBarTopPadding = kContentPadding;
 const double defaultAppBarHorizontalPadding = kContentPadding * 2;
 const double defaultAppBarHeight = kToolbarHeight + defaultAppBarTopPadding;

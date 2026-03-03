@@ -188,25 +188,8 @@ class _FeedCardSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isOled = theme.scaffoldBackgroundColor == Colors.black;
-
-    if (isOled) {
-      return GlassCard(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        borderRadius: 16,
-        child: child,
-      );
-    }
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: child,
-      ),
+    return ThemedSectionCard(
+      child: child,
     );
   }
 }

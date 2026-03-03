@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import 'glass.dart';
 
@@ -109,6 +110,48 @@ class IndentedCard extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class ThemedSectionCard extends StatelessWidget {
+  const ThemedSectionCard({
+    super.key,
+    required this.child,
+    this.margin,
+    this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    this.borderRadius = 16,
+  });
+
+  final Widget child;
+  final EdgeInsetsGeometry? margin;
+  final EdgeInsetsGeometry padding;
+  final double borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isOled = theme.scaffoldBackgroundColor == Colors.black;
+    final resolvedMargin = margin ?? const EdgeInsets.only(bottom: 8);
+
+    if (isOled) {
+      return GlassCard(
+        margin: resolvedMargin,
+        padding: padding,
+        borderRadius: borderRadius,
+        child: child,
+      );
+    }
+
+    return Card(
+      margin: resolvedMargin,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
+      child: Padding(
+        padding: padding,
+        child: child,
       ),
     );
   }
