@@ -1,0 +1,121 @@
+import 'package:klit/app/routes/app_routes.dart';
+import 'package:klit/comment/widget/commenter_avatar.dart';
+import 'package:klit/post/post.dart';
+import 'package:klit/tag/tag.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+
+class ArtistDisplay extends StatelessWidget {
+  const ArtistDisplay({super.key, required this.post});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: ArtistName(post: post)),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                InkWell(
+                  borderRadius: BorderRadius.circular(4),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text('#${post.id}'),
+                  ),
+                  onLongPress: () {
+                    Clipboard.setData(ClipboardData(text: post.id.toString()));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        duration: const Duration(seconds: 1),
+                        content: Text('Copied post id #${post.id}'),
+                      ),
+                    );
+                  },
+                ),
+                InkWell(
+                  borderRadius: BorderRadius.circular(4),
+                  onTap: () => Get.offAllNamed(AppRoutes.home, arguments: {
+                    'path': AppRoutes.profile,
+                    'userId': post.uploaderId,
+                  }),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CommenterAvatar(userId: post.uploaderId, radius: 10),
+                        const SizedBox(width: 4),
+                        Text(post.uploaderId.toString()),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const Divider(),
+      ],
+    );
+  }
+
+  final Post post;
+}
+
+class ArtistName extends StatelessWidget {
+  const ArtistName({super.key, required this.post});
+
+  final Post post;
+
+  @override
+  Widget build(BuildContext context) {
+    List<String> artists = filterArtists(post.tags['artist'] ?? []);
+    if (artists.isNotEmpty) {
+      return OverflowBar(
+        children: [
+          for (String artist in artists)
+            TagGesture(
+              tag: artist,
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(right: 8),
+                      child: Icon(Icons.account_circle),
+                    ),
+                    Flexible(
+                      child: Text(
+                        tagToName(artist),
+                        overflow: TextOverflow.fade,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.all(8),
+        child: Text(
+          'no artist',
+          style: TextStyle(
+            color: Theme.of(context).textTheme.titleSmall!.color,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      );
+    }
+  }
+}

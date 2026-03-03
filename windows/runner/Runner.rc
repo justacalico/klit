@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "klit" "\0"
+            VALUE "CompanyName", "Openlyst" "\0"
+            VALUE "FileDescription", "Klit" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "klit" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "klit.exe" "\0"
-            VALUE "ProductName", "klit" "\0"
+            VALUE "InternalName", "Klit" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2025 Openlyst. All rights reserved." "\0"
+            VALUE "OriginalFilename", "Klit.exe" "\0"
+            VALUE "ProductName", "Klit" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -1,0 +1,160 @@
+import 'package:klit/client/client.dart';
+import 'package:klit/follow/follow.dart';
+import 'package:klit/history/history.dart';
+import 'package:klit/pool/pool.dart';
+import 'package:klit/post/post.dart';
+import 'package:klit/shared/shared.dart';
+import 'package:klit/tag/tag.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_sub/flutter_sub.dart';
+import 'package:get/get.dart';
+
+class PostsSearchPage extends StatefulWidget {
+  const PostsSearchPage({
+    super.key,
+    this.query,
+    this.orderPoolsByOldest = true,
+    this.readerMode = false,
+  });
+
+  final QueryMap? query;
+  final bool orderPoolsByOldest;
+  final bool readerMode;
+
+  @override
+  State<PostsSearchPage> createState() => _PostsSearchPageState();
+}
+
+class _PostsSearchPageState extends State<PostsSearchPage> {
+  late bool readerMode = widget.readerMode;
+  bool loadingInfo = true;
+  Pool? pool;
+  Follow? follow;
+  QueryMap? lastQuery;
+
+  @override
+  Widget build(BuildContext context) {
+    return PostProvider(
+      query: widget.query,
+      orderPools: widget.orderPoolsByOldest,
+      child: Consumer2<PostController, Client>(
+        builder: (context, controller, client, child) {
+          Future<void> updateFollow() async {
+            String? tags = controller.query['tags'];
+            if (tags?.nullWhenEmpty != null) {
+              follow = await client.follows.getByTags(tags: tags!);
+            } else {
+              follow = null;
+            }
+            if (follow != null) {
+              await client.followServer.syncWith(
+                id: follow!.id,
+                posts: controller.items,
+                pool: pool,
+              );
+              if (!context.mounted) return;
+              Follow updated = await client.follows.get(id: follow!.id);
+              if (follow == updated) return;
+              if (!context.mounted) return;
+              setState(() => follow = updated);
+            }
+          }
+
+          Future<void> updatePool() async {
+            if (!mounted) return;
+            setState(() {
+              loadingInfo = true;
+            });
+            RegExpMatch? match = poolRegex().firstMatch(
+              controller.query['tags'] ?? '',
+            );
+            if (match != null) {
+              if (match.namedGroup('id')! != pool?.id.toString()) {
+                try {
+                  pool = await client.pools.get(
+                    id: int.parse(match.namedGroup('id')!),
+                  );
+                } on ClientException {
+                  pool = null;
+                }
+              }
+            } else {
+              pool = null;
+            }
+            if (!mounted) return;
+            setState(() {
+              loadingInfo = false;
+            });
+          }
+
+          Future<void> updateSearch() async {
+            if (!mounted) return;
+            if (mapEquals(lastQuery, controller.query)) return;
+            lastQuery = controller.query;
+            final client = context.read<Client>();
+            await updatePool();
+            await controller.waitForNextPage();
+            if (controller.error != null) return;
+            await updateFollow();
+            if (pool != null) {
+              client.histories.add(
+                PoolHistoryRequest.item(pool: pool!, posts: controller.items),
+              );
+            } else {
+              client.histories.add(
+                PostHistoryRequest.search(
+                  query: controller.query,
+                  posts: controller.items,
+                ),
+              );
+            }
+          }
+
+          return SubListener(
+            initialize: true,
+            listenable: controller,
+            listener: () => WidgetsBinding.instance.addPostFrameCallback(
+              (_) => updateSearch(),
+            ),
+            builder: (context) {
+              final nav = Get.find<NavigationController>();
+              return PostsPage(
+                controller: controller,
+                appBar: const DefaultAppBar(title: Text('Search')),
+                bodyTop: FloatingSearchBar(
+                  controller: controller,
+                  requestFocus: nav.takeRequestSearchFocus(),
+                ),
+                displayType: readerMode ? PostDisplayType.comic : null,
+                drawerActions: [
+                if (pool != null)
+                  Builder(
+                    builder: (context) => PoolReaderSwitch(
+                      readerMode: readerMode,
+                      onChange: (value) {
+                        setState(() => readerMode = value);
+                        Scaffold.of(context).closeEndDrawer();
+                      },
+                    ),
+                  ),
+                if (pool != null)
+                  AnimatedBuilder(
+                    animation: controller,
+                    builder: (context, child) => PoolOrderSwitch(
+                      oldestFirst: controller.orderPools,
+                      onChange: (value) {
+                        controller.orderPools = value;
+                        Scaffold.of(context).closeEndDrawer();
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}

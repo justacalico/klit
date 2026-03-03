@@ -1,0 +1,94 @@
+import 'dart:io';
+
+import 'package:klit/app/app.dart';
+import 'package:klit/client/client.dart';
+import 'package:klit/identity/identity.dart';
+import 'package:klit/shared/shared.dart';
+import 'package:flutter/material.dart';
+import 'package:webview_cookie_manager_plus/webview_cookie_manager_plus.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
+class CookieCapturePage extends StatefulWidget {
+  const CookieCapturePage({super.key, this.title});
+
+  final Widget? title;
+
+  @override
+  State<CookieCapturePage> createState() => _CookieCapturePageState();
+}
+
+class _CookieCapturePageState extends State<CookieCapturePage> {
+  late final WebViewController controller = WebViewController()
+    ..setUserAgent(AppInfo.instance.userAgent)
+    ..setJavaScriptMode(JavaScriptMode.unrestricted)
+    ..setBackgroundColor(Theme.of(context).colorScheme.surface)
+    ..loadRequest(Uri.https(context.read<Client>().host));
+
+  Future<void> setCookies(BuildContext context) async {
+    IdentityClient client = context.read<IdentityClient>();
+    WebviewCookieManager cookieManager = WebviewCookieManager();
+    List<Cookie> cookies = await cookieManager.getCookies(client.identity.host);
+    Map<String, String> headers = client.identity.headers ?? {};
+    String? cookieHeader = headers['Cookie'];
+    if (cookieHeader != null) {
+      cookieHeader.split('; ').forEach((String cookie) {
+        List<String> splitCookie = cookie.split('=');
+        if (splitCookie.length == 2) {
+          headers[splitCookie[0]] = splitCookie[1];
+        }
+      });
+    }
+    for (final cookie in cookies) {
+      headers[cookie.name] = cookie.value;
+    }
+    List<String> cookieList = [];
+    for (final cookie in headers.entries) {
+      cookieList.add('${cookie.key}=${cookie.value}');
+    }
+    String newCookieHeader = cookieList.join('; ');
+    headers[HttpHeaders.cookieHeader] = newCookieHeader;
+    client.replace(client.identity.copyWith(headers: headers));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!PlatformCapabilities.supportsWebViewLogin) {
+      final host = context.read<Client>().host;
+      final loginUrl = Uri.https(host, 'users/sign_in');
+      return Scaffold(
+        appBar: AppBar(leading: const CloseButton(), title: widget.title),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'On desktop, log in using your browser and add an API key in Settings.',
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                FilledButton.icon(
+                  onPressed: () => launch(loginUrl.toString()),
+                  icon: const Icon(Icons.open_in_browser),
+                  label: const Text('Open login in browser'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    return Scaffold(
+      appBar: AppBar(leading: const CloseButton(), title: widget.title),
+      body: WebViewWidget(controller: controller),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.check),
+        onPressed: () async {
+          setCookies(context);
+          Navigator.of(context).maybePop();
+        },
+      ),
+    );
+  }
+}

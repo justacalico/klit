@@ -1,0 +1,5 @@
+import 'package:klit/reply/reply.dart';
+
+extension Transitioning on Reply {
+  String get hero => 'reply_$id';
+}

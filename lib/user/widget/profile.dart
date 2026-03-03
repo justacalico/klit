@@ -1,0 +1,181 @@
+import 'package:klit/client/client.dart';
+import 'package:klit/post/post.dart';
+import 'package:klit/shared/shared.dart';
+import 'package:klit/user/user.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final client = context.watch<Client>();
+    final nav = Get.find<NavigationController>();
+    final viewUserId = nav.profileViewUserId.value;
+    final viewUsername = nav.profileViewUsername.value;
+    final Future<User> userFuture;
+    if (viewUserId != null) {
+      userFuture = client.users.get(id: viewUserId.toString());
+    } else if (viewUsername != null) {
+      userFuture = client.users.get(id: viewUsername);
+    } else {
+      if (!client.hasLogin) {
+        return Scaffold(
+          body: Center(
+            child: IconMessage(
+              icon: const Icon(Icons.person_off_outlined),
+              title: const Text('Profile is not available for anonymous users'),
+            ),
+          ),
+        );
+      }
+      userFuture = client.users.get(id: client.identity.username!);
+    }
+    return FutureBuilder<User>(
+      future: userFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        final user = snapshot.data;
+        if (user == null || snapshot.hasError) {
+          return Scaffold(
+            body: Center(
+              child: IconMessage(
+                icon: const Icon(Icons.warning_amber_outlined),
+                title: Text(snapshot.hasError ? 'Failed to load profile' : 'User not found'),
+              ),
+            ),
+          );
+        }
+        return _ProfileProvider(
+          user: user,
+          child: _ProfileTabs(user: user),
+        );
+      },
+    );
+  }
+}
+
+class _ProfileControllers {
+  _ProfileControllers({
+    required this.favoritePosts,
+    required this.uploadedPosts,
+  });
+
+  final PostController favoritePosts;
+  final PostController uploadedPosts;
+
+  void dispose() {
+    favoritePosts.dispose();
+    uploadedPosts.dispose();
+  }
+}
+
+class _ProfileProvider extends SubProvider<Client, _ProfileControllers> {
+  _ProfileProvider({required User user, required super.child})
+      : super(
+          create: (context, client) => _ProfileControllers(
+            favoritePosts: UserFavoritesController(client: client, user: user.name),
+            uploadedPosts: UserUploadsController(client: client, user: user.name),
+          ),
+          dispose: (context, value) => value.dispose(),
+        );
+}
+
+class _ProfileTabs extends StatelessWidget {
+  const _ProfileTabs({required this.user});
+
+  final User user;
+
+  @override
+  Widget build(BuildContext context) {
+    final stats = user.stats;
+    final showUploads = (stats?.postUploadCount ?? 0) > 0;
+    final showFavorites = (stats?.favoriteCount ?? 0) > 0;
+
+    return Consumer<_ProfileControllers>(
+      builder: (context, controllers, _) {
+        final tabs = <Widget>[const Tab(text: 'Main')];
+        if (showUploads) tabs.add(const Tab(text: 'Uploads'));
+        if (showFavorites) tabs.add(const Tab(text: 'Favorites'));
+
+        final children = <Widget>[
+          SingleChildScrollView(
+            padding: defaultListPadding,
+            child: UserInfo(
+              user: user,
+              compact: true,
+              aboutLeading: SizedBox(
+                width: 48,
+                height: 48,
+                child: FittedBox(
+                  fit: BoxFit.contain,
+                  child: PostAvatar(id: user.avatarId),
+                ),
+              ),
+            ),
+          ),
+        ];
+        if (showUploads) {
+          children.add(
+            ChangeNotifierProvider<PostController>.value(
+              value: controllers.uploadedPosts,
+              child: LimitedWidthLayout(
+                child: TileLayout(
+                  child: CustomScrollView(
+                    primary: true,
+                    slivers: [
+                      SliverPadding(
+                        padding: defaultListPadding,
+                        sliver: PostSliverDisplay(
+                          controller: controllers.uploadedPosts,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+        if (showFavorites) {
+          children.add(
+            ChangeNotifierProvider<PostController>.value(
+              value: controllers.favoritePosts,
+              child: LimitedWidthLayout(
+                child: TileLayout(
+                  child: CustomScrollView(
+                    primary: true,
+                    slivers: [
+                      SliverPadding(
+                        padding: defaultListPadding,
+                        sliver: PostSliverDisplay(
+                          controller: controllers.favoritePosts,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+
+        return DefaultTabController(
+          length: tabs.length,
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(user.name),
+              bottom: TabBar(tabs: tabs),
+            ),
+            body: TabBarView(children: children),
+          ),
+        );
+      },
+    );
+  }
+}

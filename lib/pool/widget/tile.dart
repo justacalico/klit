@@ -1,0 +1,117 @@
+import 'dart:math';
+
+import 'package:collection/collection.dart';
+import 'package:klit/markup/markup.dart';
+import 'package:klit/pool/pool.dart';
+import 'package:klit/post/post.dart';
+import 'package:klit/shared/shared.dart';
+import 'package:klit/tag/tag.dart';
+import 'package:flutter/material.dart';
+
+class PoolTile extends StatelessWidget {
+  const PoolTile({super.key, required this.pool, this.onPressed});
+
+  final Pool pool;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget title() {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                tagToName(pool.name),
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleMedium,
+                maxLines: 1,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              pool.postIds.length.toString(),
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ],
+        ),
+      );
+    }
+
+    Widget? image;
+    PoolController? controller = context.watch<PoolController?>();
+
+    if (pool.postIds.isNotEmpty && controller != null) {
+      int thumbnail = pool.postIds.first;
+      Post? post = controller.thumbnails.items?.firstWhereOrNull(
+        (e) => e.id == thumbnail,
+      );
+      if (post != null) {
+        image = ChangeNotifierProvider<PostController>.value(
+          value: controller.thumbnails,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 400),
+              child: AspectRatio(
+                aspectRatio: max(post.width / post.height, 0.9),
+                child: PostImageTile(post: post),
+              ),
+            ),
+          ),
+        );
+      }
+    }
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(4),
+          child: Stack(
+            fit: StackFit.passthrough,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: AnimatedSize(
+                  duration: defaultAnimationDuration,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      title(),
+                      if (pool.description.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Opacity(
+                            opacity: 0.5,
+                            child: DText(
+                              pool.description.ellipse(
+                                image == null ? 400 : 200,
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (image != null) image,
+                    ],
+                  ),
+                ),
+              ),
+              Positioned.fill(
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: InkWell(
+                    onTap: onPressed,
+                    onLongPress: () =>
+                        showPoolPrompt(context: context, pool: pool),
+                    onSecondaryTap: () =>
+                        showPoolPrompt(context: context, pool: pool),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const Divider(indent: 8, endIndent: 8),
+      ],
+    );
+  }
+}
