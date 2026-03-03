@@ -23,9 +23,14 @@ class PostDetailImage extends StatelessWidget {
 }
 
 class PostDetailVideo extends StatelessWidget {
-  const PostDetailVideo({super.key, required this.post});
+  const PostDetailVideo({
+    super.key,
+    required this.post,
+    this.onOpen,
+  });
 
   final Post post;
+  final VoidCallback? onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +67,33 @@ class PostDetailVideo extends StatelessWidget {
                     color: Colors.black54,
                     borderRadius: BorderRadius.circular(999),
                   ),
-                  child: InlineVideoTimeline(player: player),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Row(
+                      children: [
+                        const VideoServiceVolumeControl(),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: InlineVideoTimeline(player: player),
+                        ),
+                        const SizedBox(width: 8),
+                        if (onOpen != null)
+                          IconButton(
+                            icon: const Icon(
+                              Icons.fullscreen,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(
+                              minWidth: 32,
+                              minHeight: 32,
+                            ),
+                            onPressed: onOpen,
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -244,7 +275,10 @@ class PostDetailImageDisplay extends StatelessWidget {
     Widget media = ImageCacheSizeProvider(
       size: context.watch<ImageCacheSize?>()?.size,
       child: post.type == PostType.video
-          ? PostDetailVideo(post: post)
+          ? PostDetailVideo(
+              post: post,
+              onOpen: onTap,
+            )
           : PostDetailImage(post: post),
     );
 
