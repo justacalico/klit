@@ -313,9 +313,7 @@ class SettingsPage extends StatelessWidget {
                   title: const Text('Video volume'),
                   subtitle: Text(value ? 'muted' : 'with sound'),
                   leading: Icon(
-                    value
-                        ? CupertinoIcons.volume_off
-                        : CupertinoIcons.volume_up,
+                    value ? Icons.volume_off : Icons.volume_up,
                   ),
                   trailing: CupertinoSwitch(
                     value: value,
@@ -333,7 +331,7 @@ class SettingsPage extends StatelessWidget {
                   subtitle: Text(
                     value ? 'play automatically' : 'play on tap',
                   ),
-                  leading: const Icon(CupertinoIcons.play_circle),
+                  leading: const Icon(Icons.play_circle_outline),
                   trailing: CupertinoSwitch(
                     value: value,
                     onChanged: (v) {
