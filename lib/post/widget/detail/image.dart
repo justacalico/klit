@@ -245,9 +245,12 @@ class PostDetailImageActions extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Row(
                   children: [
-                    muteButton(),
-                    const Spacer(),
-                    fullscreenButton(),
+                    if (post.type != PostType.video) ...[
+                      muteButton(),
+                      const Spacer(),
+                      fullscreenButton(),
+                    ] else
+                      const Spacer(),
                     PostDetailImageToggle(post: post),
                   ],
                 ),
