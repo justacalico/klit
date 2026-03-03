@@ -312,12 +312,33 @@ class SettingsPage extends StatelessWidget {
                 builder: (context, value, child) => CupertinoListTile(
                   title: const Text('Video volume'),
                   subtitle: Text(value ? 'muted' : 'with sound'),
-                  leading: Icon(value ? CupertinoIcons.volume_mute : CupertinoIcons.volume_up),
+                  leading: Icon(
+                    value
+                        ? CupertinoIcons.volume_off
+                        : CupertinoIcons.volume_up,
+                  ),
                   trailing: CupertinoSwitch(
                     value: value,
                     onChanged: (v) {
                       HapticFeedback.selectionClick();
                       settings.muteVideos.value = v;
+                    },
+                  ),
+                ),
+              ),
+              ValueListenableBuilder<bool>(
+                valueListenable: settings.autoplayVideos,
+                builder: (context, value, child) => CupertinoListTile(
+                  title: const Text('Autoplay videos'),
+                  subtitle: Text(
+                    value ? 'play automatically' : 'play on tap',
+                  ),
+                  leading: const Icon(CupertinoIcons.play_circle),
+                  trailing: CupertinoSwitch(
+                    value: value,
+                    onChanged: (v) {
+                      HapticFeedback.selectionClick();
+                      settings.autoplayVideos.value = v;
                     },
                   ),
                 ),

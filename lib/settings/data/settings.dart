@@ -64,6 +64,10 @@ class Settings extends NotifiedSettings {
     key: 'muteVideos',
     initialValue: true,
   );
+  late final ValueNotifier<bool> autoplayVideos = createSetting<bool>(
+    key: 'autoplayVideos',
+    initialValue: true,
+  );
   late final ValueNotifier<VideoResolution> videoResolution = createEnumSetting(
     key: 'videoResolution',
     initialValue: VideoResolution.source,

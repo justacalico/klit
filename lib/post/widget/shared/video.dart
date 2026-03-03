@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:klit/post/post.dart';
+import 'package:klit/settings/settings.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
@@ -541,6 +542,7 @@ class PostVideoRouteState extends State<PostVideoRoute>
   late VideoPlayer? player;
   late final bool _wasPlaying;
   bool _keepPlaying = false;
+  bool _startedAutoplay = false;
 
   void keepPlaying() => _keepPlaying = true;
 
@@ -568,6 +570,13 @@ class PostVideoRouteState extends State<PostVideoRoute>
   void didChangeDependencies() {
     super.didChangeDependencies();
     player = widget.post.getVideo(context);
+    if (!_startedAutoplay && player != null) {
+      final settings = context.read<Settings>();
+      if (settings.autoplayVideos.value && !player!.state.playing) {
+        player!.play();
+        _startedAutoplay = true;
+      }
+    }
   }
 
   @override
