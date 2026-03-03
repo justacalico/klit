@@ -9,8 +9,14 @@ import java.util.Properties
 import java.io.FileInputStream
 
 val keystoreProperties = Properties()
-val keystorePropertiesFile = rootProject.file("keys/key.properties")
-if (keystorePropertiesFile.exists()) {
+val keysFile = rootProject.file("keys/key.properties")
+val rootKeyFile = rootProject.file("key.properties")
+val keystorePropertiesFile = when {
+    keysFile.exists() -> keysFile
+    rootKeyFile.exists() -> rootKeyFile
+    else -> null
+}
+if (keystorePropertiesFile != null) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
