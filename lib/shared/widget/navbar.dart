@@ -127,7 +127,7 @@ class _BottomNavBar extends StatelessWidget {
         color: barBgTranslucent,
         child: SafeArea(
           top: false,
-          minimum: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+          bottom: false,
           child: _AnimatedBottomNavBar(
             selectedIndex: selectedIndex,
             destinationCount: destinationCount,
