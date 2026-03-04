@@ -64,13 +64,6 @@ class PostFullscreenFrame extends StatelessWidget {
                     children: [
                       child,
                       if (player != null) VideoButton(player: player),
-                      if (player != null)
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          child: VideoBar(player: player),
-                        ),
                     ],
                   ),
                 ),

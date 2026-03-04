@@ -58,41 +58,38 @@ class PostDetailVideo extends StatelessWidget {
             left: 0,
             right: 0,
             bottom: 0,
-            child: SafeArea(
-              minimum: const EdgeInsets.only(bottom: 4),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Row(
-                      children: [
-                        const VideoServiceVolumeControl(),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: InlineVideoTimeline(player: player),
-                        ),
-                        const SizedBox(width: 8),
-                        if (onOpen != null)
-                          IconButton(
-                            icon: const Icon(
-                              Icons.fullscreen,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(
-                              minWidth: 32,
-                              minHeight: 32,
-                            ),
-                            onPressed: onOpen,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 4),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: [
+                      const VideoServiceVolumeControl(),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: InlineVideoTimeline(player: player),
+                      ),
+                      const SizedBox(width: 8),
+                      if (onOpen != null)
+                        IconButton(
+                          icon: const Icon(
+                            Icons.fullscreen,
+                            color: Colors.white,
+                            size: 20,
                           ),
-                      ],
-                    ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
+                          onPressed: onOpen,
+                        ),
+                    ],
                   ),
                 ),
               ),
@@ -337,4 +334,3 @@ class PostDetailImageDisplay extends StatelessWidget {
     return content;
   }
 }
-
