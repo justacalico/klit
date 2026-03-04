@@ -121,12 +121,13 @@ class _BottomNavBar extends StatelessWidget {
       final destinationCount =
           primaryVisible.length + (moreVisible.isNotEmpty ? 1 : 0);
       return GlassSurface(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 0),
         borderRadius: 28,
         padding: EdgeInsets.zero,
         color: barBgTranslucent,
         child: SafeArea(
           top: false,
+          minimum: const EdgeInsets.fromLTRB(0, 0, 0, 8),
           child: _AnimatedBottomNavBar(
             selectedIndex: selectedIndex,
             destinationCount: destinationCount,
