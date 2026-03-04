@@ -52,6 +52,26 @@ class SourceCard extends StatelessWidget {
 
   final String url;
 
+  Widget _buildSourceIcon(String url) {
+    final hostIcon = getHostIcon(url);
+    const color = Colors.grey;
+    const size = 16.0;
+
+    if (hostIcon != null) {
+      return FaIcon(
+        hostIcon,
+        size: size,
+        color: color,
+      );
+    }
+
+    return const Icon(
+      Icons.link,
+      size: size,
+      color: color,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     String url = this.url;
@@ -74,13 +94,7 @@ class SourceCard extends StatelessWidget {
                   constraints: const BoxConstraints(minWidth: 24),
                   child: Padding(
                     padding: const EdgeInsets.only(left: 8),
-                    child: Center(
-                      child: FaIcon(
-                        getHostIcon(url) ?? Icons.link,
-                        size: 16,
-                        color: Colors.grey,
-                      ),
-                    ),
+                    child: Center(child: _buildSourceIcon(url)),
                   ),
                 ),
                 const VerticalDivider(indent: 4, endIndent: 4),
