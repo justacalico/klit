@@ -25,11 +25,16 @@ class CommentDisplay extends StatelessWidget {
             child: CupertinoButton(
               onPressed: () {
                 HapticFeedback.selectionClick();
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => PostCommentsPage(postId: post.id),
-                  ),
-                );
+                final width = MediaQuery.sizeOf(context).width;
+                if (width < 900) {
+                  showPostCommentsDrawer(context, postId: post.id);
+                } else {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => PostCommentsPage(postId: post.id),
+                    ),
+                  );
+                }
               },
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               child: Row(
