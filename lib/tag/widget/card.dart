@@ -5,23 +5,32 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class TagCard extends StatelessWidget {
-  const TagCard({super.key, required this.tag, this.category, this.onRemove});
+  const TagCard({
+    super.key,
+    required this.tag,
+    this.category,
+    this.onTap,
+    this.onRemove,
+  });
 
   final String tag;
   final String? category;
+  final VoidCallback? onTap;
   final VoidCallback? onRemove;
 
   @override
   Widget build(BuildContext context) {
+    void defaultOnTap() {
+      final nav = Get.find<NavigationController>();
+      nav.searchInitialQuery.value = tag;
+      nav.currentPath.value = AppRoutes.search;
+    }
+
     return ColoredCard(
       color:
           (category != null ? TagCategory.byName(category!)?.color : null) ??
           Colors.grey,
-      onTap: () {
-        final nav = Get.find<NavigationController>();
-        nav.searchInitialQuery.value = tag;
-        nav.currentPath.value = AppRoutes.search;
-      },
+      onTap: onTap ?? defaultOnTap,
       onLongPress: () => showTagSearchPrompt(context: context, tag: tag),
       onSecondaryTap: () => showTagSearchPrompt(context: context, tag: tag),
       leading: onRemove != null

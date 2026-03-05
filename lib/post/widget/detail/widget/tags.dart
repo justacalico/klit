@@ -1,6 +1,9 @@
+import 'package:klit/app/routes/app_routes.dart';
 import 'package:klit/post/post.dart';
+import 'package:klit/shared/shared.dart';
 import 'package:klit/tag/tag.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class TagDisplay extends StatelessWidget {
   const TagDisplay({super.key, required this.post});
@@ -18,6 +21,13 @@ class TagDisplay extends StatelessWidget {
             (tag) => TagCard(
               tag: tag,
               category: category,
+              onTap: () {
+                Navigator.maybePop(context).whenComplete(() {
+                  final nav = Get.find<NavigationController>();
+                  nav.searchInitialQuery.value = tag;
+                  nav.currentPath.value = AppRoutes.search;
+                });
+              },
             ),
           ),
         ],
