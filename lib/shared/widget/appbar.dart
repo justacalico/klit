@@ -179,28 +179,23 @@ class AppHeaderBar extends StatelessWidget implements PreferredSizeWidget {
           border: null,
         );
         if (secondary == null) {
-          return PreferredSize(
-            preferredSize: preferredSize,
-            child: ScrollToTop(child: bar),
-          );
+          return PreferredSize(preferredSize: preferredSize, child: bar);
         }
         return PreferredSize(
           preferredSize: preferredSize,
-          child: ScrollToTop(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                bar,
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
-                  child: Material(
-                    color: secondaryFill,
-                    borderRadius: BorderRadius.circular(14),
-                    child: SizedBox(height: _secondaryHeight, child: secondary),
-                  ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              bar,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
+                child: Material(
+                  color: secondaryFill,
+                  borderRadius: BorderRadius.circular(14),
+                  child: SizedBox(height: _secondaryHeight, child: secondary),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },
