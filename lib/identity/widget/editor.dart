@@ -44,8 +44,7 @@ class _IdentityEditorDialogState extends State<_IdentityEditorDialog> {
         ? OmittedPasswordTextInputFormatter.passwordOmitted
         : null,
   );
-  late bool withAuth =
-      widget.identity == null || widget.identity!.username != null;
+  late bool withAuth = widget.identity?.username != null;
   String? error;
 
   late final Listenable allFields = Listenable.merge([
