@@ -426,15 +426,15 @@ class _SidebarState extends State<_Sidebar> {
     final newWidth = widget.layoutWidth;
 
     if (previousWidth != null && newWidth != null && previousWidth != newWidth) {
-      final wasAutoCollapsed = _isAutoCollapseWidth(previousWidth);
-      final isAutoCollapsed = _isAutoCollapseWidth(newWidth);
+      final wasNarrow = previousWidth < sidebarAutoCollapseBreakpoint;
+      final isNarrow = _isAutoCollapseWidth(newWidth);
 
-      if (wasAutoCollapsed && !isAutoCollapsed && newWidth >= sidebarAutoCollapseBreakpoint) {
+      if (newWidth >= sidebarAutoCollapseBreakpoint && wasNarrow) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
           widget.controller.sidebarCollapsed.value = false;
         });
-      } else if (!wasAutoCollapsed && isAutoCollapsed) {
+      } else if (!wasNarrow && isNarrow) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
           widget.controller.sidebarCollapsed.value = true;
@@ -442,14 +442,31 @@ class _SidebarState extends State<_Sidebar> {
       }
     }
 
-    _lastLayoutWidth = newWidth;
+    final transitioningToWide = newWidth != null &&
+        previousWidth != null &&
+        previousWidth < sidebarAutoCollapseBreakpoint &&
+        newWidth! >= sidebarAutoCollapseBreakpoint;
+    if (!transitioningToWide) {
+      _lastLayoutWidth = newWidth;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final layoutWidth = widget.layoutWidth;
+    if (layoutWidth != null &&
+        layoutWidth >= sidebarAutoCollapseBreakpoint &&
+        _lastLayoutWidth != null &&
+        _lastLayoutWidth! < sidebarAutoCollapseBreakpoint) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        widget.controller.sidebarCollapsed.value = false;
+        setState(() => _lastLayoutWidth = layoutWidth);
+      });
+    }
+
     return Obx(() {
       final controllerCollapsed = widget.controller.sidebarCollapsed.value;
-      final layoutWidth = widget.layoutWidth;
       final forceCollapsed = layoutWidth != null &&
           layoutWidth < sidebarAutoCollapseBreakpoint &&
           layoutWidth >= mobileBreakpoint;
