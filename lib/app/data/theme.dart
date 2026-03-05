@@ -2,20 +2,38 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-const MaterialColor primarySwatch = MaterialColor(0xFFFCB328, <int, Color>{
-  50: Color(0xFFFFF6E5),
-  100: Color(0xFFFEE8BF),
-  200: Color(0xFFFED994),
-  300: Color(0xFFFDCA69),
-  400: Color(0xFFFCBE48),
-  500: Color(0xFFFCB328),
-  600: Color(0xFFFCAC24),
-  700: Color(0xFFFBA31E),
-  800: Color(0xFFFB9A18),
-  900: Color(0xFFFA8B0F),
-});
+const String defaultAccentColorHex = '#F7A8B8';
+final Color defaultAccentColor = colorFromHex(defaultAccentColorHex);
 
-final Color accentColor = primarySwatch.shade400;
+Color colorFromHex(String hex) {
+  final normalized = hex.trim().replaceFirst('#', '');
+  if (normalized.length != 6) return defaultAccentColor;
+  final value = int.tryParse(normalized, radix: 16);
+  if (value == null) return defaultAccentColor;
+  return Color(0xFF000000 | value);
+}
+
+String hexFromColor(Color color) =>
+    '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
+
+MaterialColor materialSwatchFromColor(Color color) {
+  final hsl = HSLColor.fromColor(color);
+  Color tone(double lightness) =>
+      hsl.withLightness(lightness.clamp(0.0, 1.0)).toColor();
+
+  return MaterialColor(color.toARGB32(), {
+    50: tone(0.95),
+    100: tone(0.88),
+    200: tone(0.78),
+    300: tone(0.68),
+    400: tone(0.60),
+    500: tone(0.54),
+    600: tone(0.47),
+    700: tone(0.40),
+    800: tone(0.33),
+    900: tone(0.26),
+  });
+}
 
 enum AppTheme {
   dark,
@@ -28,13 +46,14 @@ enum AppTheme {
         AppTheme.light => 'Light',
       };
 
-  ThemeData get data {
+  ThemeData dataForAccent(Color accent) {
+    final primarySwatch = materialSwatchFromColor(accent);
     switch (this) {
       case AppTheme.light:
         return M2ThemeData.from(
           colorScheme: ColorScheme.fromSwatch(
             primarySwatch: primarySwatch,
-            accentColor: accentColor,
+            accentColor: accent,
             cardColor: Colors.white,
             backgroundColor: Colors.grey[50],
           ),
@@ -47,7 +66,7 @@ enum AppTheme {
         return M2ThemeData.from(
           colorScheme: ColorScheme.fromSwatch(
             primarySwatch: primarySwatch,
-            accentColor: accentColor,
+            accentColor: accent,
             cardColor: Colors.grey[900],
             backgroundColor: const Color.fromARGB(255, 20, 20, 20),
             brightness: Brightness.dark,
@@ -57,7 +76,7 @@ enum AppTheme {
         return M2ThemeData.from(
           colorScheme: ColorScheme.fromSwatch(
             primarySwatch: primarySwatch,
-            accentColor: accentColor,
+            accentColor: accent,
             cardColor: const Color.fromARGB(255, 20, 20, 20),
             backgroundColor: Colors.black,
             brightness: Brightness.dark,
@@ -65,11 +84,13 @@ enum AppTheme {
         );
     }
   }
+
+  ThemeData get data => dataForAccent(defaultAccentColor);
 }
 
 extension AppThemeCupertino on AppTheme {
-  CupertinoThemeData get cupertino {
-    final theme = data;
+  CupertinoThemeData cupertinoForAccent(Color accent) {
+    final theme = dataForAccent(accent);
     final colorScheme = theme.colorScheme;
 
     return CupertinoThemeData(
@@ -86,6 +107,8 @@ extension AppThemeCupertino on AppTheme {
       ),
     );
   }
+
+  CupertinoThemeData get cupertino => cupertinoForAccent(defaultAccentColor);
 }
 
 extension M2ThemeData on ThemeData {

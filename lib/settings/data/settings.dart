@@ -42,6 +42,10 @@ class Settings extends NotifiedSettings {
     initialValue: AppTheme.values.first,
     values: AppTheme.values,
   );
+  late final ValueNotifier<String> accentColorHex = createSetting<String>(
+    key: 'accentColorHex',
+    initialValue: defaultAccentColorHex,
+  );
 
   late final ValueNotifier<int> tileSize = createSetting(
     key: 'tileSize',

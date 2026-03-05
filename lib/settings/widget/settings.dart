@@ -14,6 +14,7 @@ import 'package:klit/user/user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart' show ColorPicker;
 import 'package:flutter_sub/flutter_sub.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
@@ -41,6 +42,17 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  static final List<Color> _accentPresets = [
+    colorFromHex(defaultAccentColorHex),
+    const Color(0xFFF48FB1),
+    const Color(0xFFE57373),
+    const Color(0xFFBA68C8),
+    const Color(0xFF7986CB),
+    const Color(0xFF4FC3F7),
+    const Color(0xFF4DB6AC),
+    const Color(0xFFAED581),
+  ];
+
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _accountsSectionKey = GlobalKey();
   bool _focusedRequestedSection = false;
@@ -608,6 +620,43 @@ class _SettingsPageState extends State<SettingsPage> {
                 );
               },
             ),
+          ),
+          ValueListenableBuilder<String>(
+            valueListenable: settings.accentColorHex,
+            builder: (context, value, _) {
+              final accent = colorFromHex(value);
+              final hex = hexFromColor(accent);
+              return CupertinoListTile(
+                leading: const _SettingsLeadingIcon(
+                  icon: CupertinoIcons.paintbrush,
+                  color: Color(0xFFEC6F91),
+                ),
+                title: const Text('Accent color'),
+                subtitle: Text(hex),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: accent,
+                        border: Border.all(
+                          color: Theme.of(context).dividerColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(CupertinoIcons.chevron_forward, size: 18),
+                  ],
+                ),
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  _showAccentColorSheet(context, settings);
+                },
+              );
+            },
           ),
           ValueListenableBuilder<int>(
             valueListenable: settings.tileSize,
@@ -1273,6 +1322,123 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                 ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showAccentColorSheet(BuildContext context, Settings settings) {
+    var selected = colorFromHex(settings.accentColorHex.value);
+
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (context) => SafeArea(
+        top: false,
+        child: StatefulBuilder(
+          builder: (context, setSheetState) => GlassSurface(
+            margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            padding: const EdgeInsets.all(12),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 560),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(8, 8, 8, 10),
+                      child: Text(
+                        'Accent color',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: _accentPresets.map((color) {
+                        final isSelected = hexFromColor(color) ==
+                            hexFromColor(selected);
+                        return InkWell(
+                          borderRadius: BorderRadius.circular(999),
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            setSheetState(() => selected = color);
+                          },
+                          child: Container(
+                            width: 34,
+                            height: 34,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: color,
+                              border: Border.all(
+                                color: isSelected
+                                    ? Theme.of(context).colorScheme.onSurface
+                                    : Theme.of(context).dividerColor,
+                                width: isSelected ? 2 : 1,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 14),
+                    ColorPicker(
+                      pickerColor: selected,
+                      onColorChanged: (value) {
+                        setSheetState(() => selected = value.withAlpha(255));
+                      },
+                      colorPickerWidth: 300,
+                      pickerAreaHeightPercent: 0.6,
+                      enableAlpha: false,
+                      displayThumbColor: true,
+                      portraitOnly: true,
+                      hexInputBar: false,
+                      labelTypes: const [],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      hexFromColor(selected),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('Cancel'),
+                        ),
+                        const SizedBox(width: 6),
+                        TextButton(
+                          onPressed: () {
+                            HapticFeedback.selectionClick();
+                            settings.accentColorHex.value =
+                                defaultAccentColorHex;
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Reset'),
+                        ),
+                        const SizedBox(width: 6),
+                        FilledButton(
+                          onPressed: () {
+                            HapticFeedback.selectionClick();
+                            settings.accentColorHex.value =
+                                hexFromColor(selected);
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Save'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

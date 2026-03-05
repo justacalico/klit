@@ -19,7 +19,7 @@ class LikeDisplay extends StatelessWidget {
     final theme = Theme.of(context);
     final cupertino = CupertinoTheme.of(context);
     final primary = cupertino.primaryColor;
-    final iconColor = theme.iconTheme.color;
+    final iconColor = theme.iconTheme.color ?? theme.colorScheme.onSurface;
     final voteStatus = post.vote.status;
     final settings = context.read<Settings>();
 
@@ -60,6 +60,8 @@ class LikeDisplay extends StatelessWidget {
         launch(context.read<Client>().withHost(post.link));
 
     Widget buildControlButton({
+      required String keyId,
+      required String semanticLabel,
       required IconData icon,
       required bool active,
       required VoidCallback? onPressed,
@@ -69,19 +71,14 @@ class LikeDisplay extends StatelessWidget {
           : primary.withValues(alpha: 0.2);
       final fgColor = active ? theme.colorScheme.onPrimary : iconColor;
 
-      return AnimatedContainer(
-        duration: const Duration(milliseconds: 160),
-        curve: Curves.easeOut,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          color: bgColor,
-        ),
-        child: CupertinoButton(
-          onPressed: onPressed,
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Icon(icon, size: 20, color: fgColor),
-          minimumSize: const Size(0, 0),
-        ),
+      return _AnimatedPostActionButton(
+        key: ValueKey<String>('post_action_$keyId'),
+        semanticLabel: semanticLabel,
+        icon: icon,
+        active: active,
+        backgroundColor: bgColor,
+        foregroundColor: fgColor,
+        onPressed: onPressed,
       );
     }
 
@@ -92,6 +89,8 @@ class LikeDisplay extends StatelessWidget {
           case PostActionId.upvote:
             buttons.add(
               buildControlButton(
+                keyId: action.key,
+                semanticLabel: action.label,
                 icon: voteStatus == VoteStatus.upvoted
                     ? Icons.thumb_up
                     : Icons.thumb_up_alt_outlined,
@@ -106,6 +105,8 @@ class LikeDisplay extends StatelessWidget {
           case PostActionId.downvote:
             buttons.add(
               buildControlButton(
+                keyId: action.key,
+                semanticLabel: action.label,
                 icon: voteStatus == VoteStatus.downvoted
                     ? Icons.thumb_down
                     : Icons.thumb_down_alt_outlined,
@@ -123,6 +124,8 @@ class LikeDisplay extends StatelessWidget {
           case PostActionId.favorite:
             buttons.add(
               buildControlButton(
+                keyId: action.key,
+                semanticLabel: action.label,
                 icon: post.isFavorited ? Icons.favorite : Icons.favorite_border,
                 active: post.isFavorited,
                 onPressed: () {
@@ -135,6 +138,8 @@ class LikeDisplay extends StatelessWidget {
           case PostActionId.share:
             buttons.add(
               buildControlButton(
+                keyId: action.key,
+                semanticLabel: action.label,
                 icon: Icons.share_outlined,
                 active: false,
                 onPressed: () {
@@ -148,6 +153,8 @@ class LikeDisplay extends StatelessWidget {
             if (post.file != null) {
               buttons.add(
                 buildControlButton(
+                  keyId: action.key,
+                  semanticLabel: action.label,
                   icon: Icons.file_download_outlined,
                   active: false,
                   onPressed: () {
@@ -161,6 +168,8 @@ class LikeDisplay extends StatelessWidget {
           case PostActionId.browse:
             buttons.add(
               buildControlButton(
+                keyId: action.key,
+                semanticLabel: action.label,
                 icon: Icons.open_in_browser_outlined,
                 active: false,
                 onPressed: () {
@@ -279,6 +288,83 @@ class LikeDisplay extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _AnimatedPostActionButton extends StatefulWidget {
+  const _AnimatedPostActionButton({
+    super.key,
+    required this.semanticLabel,
+    required this.icon,
+    required this.active,
+    required this.backgroundColor,
+    required this.foregroundColor,
+    required this.onPressed,
+  });
+
+  final String semanticLabel;
+  final IconData icon;
+  final bool active;
+  final Color backgroundColor;
+  final Color foregroundColor;
+  final VoidCallback? onPressed;
+
+  @override
+  State<_AnimatedPostActionButton> createState() =>
+      _AnimatedPostActionButtonState();
+}
+
+class _AnimatedPostActionButtonState extends State<_AnimatedPostActionButton> {
+  bool _pressed = false;
+  double _activeScale = 1;
+
+  @override
+  void didUpdateWidget(covariant _AnimatedPostActionButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.active != widget.active) {
+      setState(() => _activeScale = 1.06);
+      Future<void>.delayed(const Duration(milliseconds: 170), () {
+        if (!mounted) return;
+        setState(() => _activeScale = 1);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: widget.semanticLabel,
+      child: AnimatedScale(
+        scale: _activeScale,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutBack,
+        child: AnimatedScale(
+          scale: _pressed ? 0.96 : 1,
+          duration: Duration(milliseconds: _pressed ? 90 : 140),
+          curve: _pressed ? Curves.easeOut : Curves.easeOutBack,
+          child: Listener(
+            onPointerDown: (_) => setState(() => _pressed = true),
+            onPointerUp: (_) => setState(() => _pressed = false),
+            onPointerCancel: (_) => setState(() => _pressed = false),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 160),
+              curve: Curves.easeOut,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                color: widget.backgroundColor,
+              ),
+              child: CupertinoButton(
+                onPressed: widget.onPressed,
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                minimumSize: const Size(0, 0),
+                child: Icon(widget.icon, size: 20, color: widget.foregroundColor),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
