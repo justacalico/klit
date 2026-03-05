@@ -257,21 +257,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   : theme.colorScheme.surfaceContainerHighest;
               final fgColor = theme.colorScheme.onSurface;
               messenger
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    behavior: SnackBarBehavior.floating,
-                    margin: const EdgeInsets.fromLTRB(
-                      16,
-                      0,
-                      16,
-                      defaultActionListBottomHeight - 12,
-                    ),
+                ..hideCurrentMaterialBanner()
+                ..showMaterialBanner(
+                  MaterialBanner(
+                    elevation: 0,
                     backgroundColor: bgColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    duration: Duration(seconds: success ? 1 : 2),
                     content: Row(
                       children: [
                         Icon(
@@ -292,8 +282,18 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                       ],
                     ),
+                    actions: [
+                      TextButton(
+                        onPressed: messenger.hideCurrentMaterialBanner,
+                        child: const Text('Dismiss'),
+                      ),
+                    ],
                   ),
                 );
+              Future<void>.delayed(
+                Duration(seconds: success ? 1 : 2),
+                messenger.hideCurrentMaterialBanner,
+              );
             }
 
             final apikey = parseBasicAuth(
