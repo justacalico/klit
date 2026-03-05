@@ -3,6 +3,7 @@ import 'package:klit/client/client.dart';
 import 'package:klit/comment/comment.dart';
 import 'package:klit/flag/flag.dart';
 import 'package:klit/post/post.dart';
+import 'package:klit/settings/settings.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:klit/ticket/ticket.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,29 +12,57 @@ import 'package:flutter/services.dart';
 
 typedef _PostMenuAction = ({IconData icon, String title, VoidCallback onTap});
 
-List<_PostMenuAction> _postMenuPostActionsConfig(
+_PostMenuAction _postActionToMenuAction(
   BuildContext context,
   Post post,
+  PostActionId action,
 ) {
-  return [
-    (
-      icon: Icons.share,
-      title: 'Share',
-      onTap: () async =>
-          Share.text(context, context.read<Client>().withHost(post.link)),
-    ),
-    if (post.file != null)
-      (
+  switch (action) {
+    case PostActionId.share:
+      return (
+        icon: Icons.share,
+        title: 'Share',
+        onTap: () async =>
+            Share.text(context, context.read<Client>().withHost(post.link)),
+      );
+    case PostActionId.download:
+      return (
         icon: Icons.file_download,
         title: 'Download',
         onTap: () => postDownloadingNotification(context, {post}),
-      ),
-    (
-      icon: Icons.open_in_browser,
-      title: 'Browse',
-      onTap: () async => launch(context.read<Client>().withHost(post.link)),
-    ),
-  ];
+      );
+    case PostActionId.browse:
+      return (
+        icon: Icons.open_in_browser,
+        title: 'Browse',
+        onTap: () async => launch(context.read<Client>().withHost(post.link)),
+      );
+    case PostActionId.upvote:
+    case PostActionId.downvote:
+    case PostActionId.favorite:
+      throw StateError('Unsupported menu action: ${action.key}');
+  }
+}
+
+bool _isPostActionAvailable(Post post, PostActionId action) {
+  return switch (action) {
+    PostActionId.download => post.file != null,
+    _ => true,
+  };
+}
+
+List<_PostMenuAction> _postMenuPostActionsConfig(
+  BuildContext context,
+  Post post, {
+  Set<PostActionId> excluded = const <PostActionId>{},
+}) {
+  final actions = <_PostMenuAction>[];
+  for (final action in PostActionPreferences.menuActions) {
+    if (excluded.contains(action)) continue;
+    if (!_isPostActionAvailable(post, action)) continue;
+    actions.add(_postActionToMenuAction(context, post, action));
+  }
+  return actions;
 }
 
 List<_PostMenuAction> _postMenuUserActionsConfig(
@@ -73,10 +102,7 @@ List<_PostMenuAction> _postMenuUserActionsConfig(
         context: context,
         callback: () async {
           final controller = context.read<PostController>();
-          final success = await writeComment(
-            context: context,
-            postId: post.id,
-          );
+          final success = await writeComment(context: context, postId: post.id);
           if (success) {
             controller.replacePost(
               post.copyWith(commentCount: post.commentCount + 1),
@@ -117,13 +143,7 @@ List<PopupMenuItem<VoidCallback>> postMenuPostActions(
 ) {
   final actions = _postMenuPostActionsConfig(context, post);
   return actions
-      .map(
-        (a) => PopupMenuTile(
-          value: a.onTap,
-          title: a.title,
-          icon: a.icon,
-        ),
-      )
+      .map((a) => PopupMenuTile(value: a.onTap, title: a.title, icon: a.icon))
       .toList();
 }
 
@@ -133,21 +153,26 @@ List<PopupMenuItem<VoidCallback>> postMenuUserActions(
 ) {
   final actions = _postMenuUserActionsConfig(context, post);
   return actions
-      .map(
-        (a) => PopupMenuTile(
-          value: a.onTap,
-          title: a.title,
-          icon: a.icon,
-        ),
-      )
+      .map((a) => PopupMenuTile(value: a.onTap, title: a.title, icon: a.icon))
       .toList();
 }
 
 Future<void> showPostMenuSheet(BuildContext context, Post post) async {
   final theme = Theme.of(context);
   final cupertinoTheme = CupertinoTheme.of(context);
+  final settings = context.read<Settings>();
+  final hasLogin = context.read<Client>().hasLogin;
+  final pinnedActions = hasLogin
+      ? PostActionPreferences.decode(
+          settings.postActionBarActions.value,
+        ).toSet()
+      : <PostActionId>{};
 
-  final postActions = _postMenuPostActionsConfig(context, post);
+  final postActions = _postMenuPostActionsConfig(
+    context,
+    post,
+    excluded: pinnedActions,
+  );
   final userActions = _postMenuUserActionsConfig(context, post);
 
   await showCupertinoModalPopup<void>(
@@ -175,17 +200,11 @@ Future<void> showPostMenuSheet(BuildContext context, Post post) async {
                 ),
               ),
               ...postActions.map(
-                (a) => _PostMenuTile(
-                  action: a,
-                  cupertinoTheme: cupertinoTheme,
-                ),
+                (a) => _PostMenuTile(action: a, cupertinoTheme: cupertinoTheme),
               ),
               if (userActions.isNotEmpty) const Divider(height: 1),
               ...userActions.map(
-                (a) => _PostMenuTile(
-                  action: a,
-                  cupertinoTheme: cupertinoTheme,
-                ),
+                (a) => _PostMenuTile(action: a, cupertinoTheme: cupertinoTheme),
               ),
               const SizedBox(height: 8),
             ],
@@ -197,10 +216,7 @@ Future<void> showPostMenuSheet(BuildContext context, Post post) async {
 }
 
 class _PostMenuTile extends StatelessWidget {
-  const _PostMenuTile({
-    required this.action,
-    required this.cupertinoTheme,
-  });
+  const _PostMenuTile({required this.action, required this.cupertinoTheme});
 
   final _PostMenuAction action;
   final CupertinoThemeData cupertinoTheme;
@@ -209,10 +225,7 @@ class _PostMenuTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final iconColor = CupertinoColors.label.resolveFrom(context);
     return CupertinoListTile(
-      leading: Icon(
-        action.icon,
-        color: iconColor,
-      ),
+      leading: Icon(action.icon, color: iconColor),
       title: Text(
         action.title,
         style: const TextStyle(fontWeight: FontWeight.w500),

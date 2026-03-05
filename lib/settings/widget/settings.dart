@@ -569,21 +569,6 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           ValueListenableBuilder<bool>(
-            valueListenable: settings.showShareButton,
-            builder: (context, value, _) => _SettingsSwitchTile(
-              leading: const _SettingsLeadingIcon(
-                icon: CupertinoIcons.share,
-                color: Color(0xFF1ABC9C),
-              ),
-              title: 'Share button',
-              subtitle: value
-                  ? 'Show share action on posts'
-                  : 'Hide share action on posts',
-              value: value,
-              onChanged: (v) => settings.showShareButton.value = v,
-            ),
-          ),
-          ValueListenableBuilder<bool>(
             valueListenable: settings.showPostInfo,
             builder: (context, value, _) => _SettingsSwitchTile(
               leading: const _SettingsLeadingIcon(
@@ -643,6 +628,25 @@ class _SettingsPageState extends State<SettingsPage> {
               value: value,
               onChanged: (v) => settings.upvoteFavs.value = v,
             ),
+          ),
+          ValueListenableBuilder<String>(
+            valueListenable: settings.postActionBarActions,
+            builder: (context, rawActions, _) {
+              final actions = PostActionPreferences.decode(rawActions);
+              return CupertinoListTile(
+                leading: const _SettingsLeadingIcon(
+                  icon: CupertinoIcons.square_stack_3d_down_right,
+                  color: Color(0xFF1ABC9C),
+                ),
+                title: const Text('Post action bar'),
+                subtitle: Text('${actions.length} actions pinned'),
+                trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  _showPostActionBarEditor(context, settings);
+                },
+              );
+            },
           ),
           ValueListenableBuilder<bool>(
             valueListenable: settings.muteVideos,
@@ -952,6 +956,161 @@ class _SettingsPageState extends State<SettingsPage> {
           },
         ),
       ),
+    );
+  }
+
+  void _showPostActionBarEditor(BuildContext context, Settings settings) {
+    final initial = PostActionPreferences.decode(
+      settings.postActionBarActions.value,
+    );
+    final selected = <PostActionId>[...initial];
+
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            final available = PostActionId.values
+                .where((action) => !selected.contains(action))
+                .toList();
+
+            return SafeArea(
+              top: false,
+              child: GlassSurface(
+                margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                padding: const EdgeInsets.all(12),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 560),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.fromLTRB(8, 4, 8, 8),
+                          child: Text(
+                            'Post action bar',
+                            style: TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 10),
+                          child: Text(
+                            'Pinned actions are shown first on post detail. Drag to reorder.',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ),
+                        ReorderableListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          buildDefaultDragHandles: false,
+                          itemCount: selected.length,
+                          onReorder: (oldIndex, newIndex) {
+                            setSheetState(() {
+                              if (newIndex > oldIndex) {
+                                newIndex -= 1;
+                              }
+                              final action = selected.removeAt(oldIndex);
+                              selected.insert(newIndex, action);
+                            });
+                          },
+                          itemBuilder: (context, index) {
+                            final action = selected[index];
+                            return ListTile(
+                              key: ValueKey(action.key),
+                              dense: true,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              leading: Icon(action.icon, size: 20),
+                              title: Text(action.label),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      setSheetState(() {
+                                        selected.removeAt(index);
+                                      });
+                                      HapticFeedback.selectionClick();
+                                    },
+                                    icon: const Icon(
+                                      CupertinoIcons.minus_circle,
+                                    ),
+                                  ),
+                                  ReorderableDragStartListener(
+                                    index: index,
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                      ),
+                                      child: Icon(
+                                        CupertinoIcons.line_horizontal_3,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                        if (available.isNotEmpty) const Divider(height: 20),
+                        if (available.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                            child: Text(
+                              'Available',
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                        ...available.map(
+                          (action) => CupertinoListTile(
+                            leading: Icon(action.icon, size: 20),
+                            title: Text(action.label),
+                            trailing: const Icon(
+                              CupertinoIcons.plus_circle,
+                              size: 20,
+                            ),
+                            onTap: () {
+                              setSheetState(() {
+                                selected.add(action);
+                              });
+                              HapticFeedback.selectionClick();
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: const Text('Cancel'),
+                            ),
+                            const SizedBox(width: 8),
+                            FilledButton(
+                              onPressed: () {
+                                settings.postActionBarActions.value =
+                                    PostActionPreferences.encode(selected);
+                                HapticFeedback.selectionClick();
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('Save'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 

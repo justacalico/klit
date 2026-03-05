@@ -1,4 +1,5 @@
 import 'package:klit/app/app.dart';
+import 'package:klit/settings/data/post_actions.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:notified_preferences/notified_preferences.dart';
@@ -12,6 +13,24 @@ class Settings extends NotifiedSettings {
     if (theme == 'blue' || theme == 'dynamic') {
       await prefs.setString('theme', 'dark');
     }
+    final existingPostActions = prefs.getString(
+      PostActionPreferences.settingKey,
+    );
+    if (existingPostActions == null) {
+      final showShare =
+          prefs.getBool(PostActionPreferences.legacyShareButtonKey) ?? true;
+      final defaults = <PostActionId>[
+        PostActionId.upvote,
+        PostActionId.downvote,
+        PostActionId.favorite,
+        if (showShare) PostActionId.share,
+      ];
+      await prefs.setString(
+        PostActionPreferences.settingKey,
+        PostActionPreferences.encode(defaults),
+      );
+    }
+    await prefs.remove(PostActionPreferences.legacyShareButtonKey);
     return Settings(prefs);
   }
 
@@ -44,9 +63,11 @@ class Settings extends NotifiedSettings {
     key: 'showPostInfo',
     initialValue: false,
   );
-  late final ValueNotifier<bool> showShareButton = createSetting<bool>(
-    key: 'showShareButton',
-    initialValue: true,
+  late final ValueNotifier<String> postActionBarActions = createSetting<String>(
+    key: PostActionPreferences.settingKey,
+    initialValue: PostActionPreferences.encode(
+      PostActionPreferences.defaultActions,
+    ),
   );
   late final ValueNotifier<bool> upvoteFavs = createSetting<bool>(
     key: 'upvoteFavs',

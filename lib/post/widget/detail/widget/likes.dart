@@ -1,3 +1,4 @@
+import 'package:klit/app/app.dart';
 import 'package:klit/client/client.dart';
 import 'package:klit/post/post.dart';
 import 'package:klit/settings/settings.dart';
@@ -21,7 +22,6 @@ class LikeDisplay extends StatelessWidget {
     final iconColor = theme.iconTheme.color;
     final voteStatus = post.vote.status;
     final settings = context.read<Settings>();
-    final showShare = settings.showShareButton.value;
 
     Future<void> vote({required bool upvote, required bool isLiked}) async {
       PostController controller = context.read<PostController>();
@@ -50,9 +50,14 @@ class LikeDisplay extends StatelessWidget {
       );
     }
 
-    Future<void> share() async {
-      await Share.text(context, context.read<Client>().withHost(post.link));
-    }
+    Future<void> share() async =>
+        Share.text(context, context.read<Client>().withHost(post.link));
+
+    Future<void> download() async =>
+        postDownloadingNotification(context, {post});
+
+    Future<void> browse() async =>
+        launch(context.read<Client>().withHost(post.link));
 
     Widget buildControlButton({
       required IconData icon,
@@ -64,23 +69,111 @@ class LikeDisplay extends StatelessWidget {
           : primary.withValues(alpha: 0.2);
       final fgColor = active ? theme.colorScheme.onPrimary : iconColor;
 
-      return Expanded(
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 160),
-          curve: Curves.easeOut,
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            color: bgColor,
-          ),
-          child: CupertinoButton(
-            onPressed: onPressed,
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Icon(icon, size: 20, color: fgColor),
-            minimumSize: Size(0, 0),
-          ),
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        curve: Curves.easeOut,
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          color: bgColor,
+        ),
+        child: CupertinoButton(
+          onPressed: onPressed,
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+          child: Icon(icon, size: 20, color: fgColor),
+          minimumSize: const Size(0, 0),
         ),
       );
+    }
+
+    List<Widget> buildActionButtons(List<PostActionId> actions) {
+      final buttons = <Widget>[];
+      for (final action in actions) {
+        switch (action) {
+          case PostActionId.upvote:
+            buttons.add(
+              buildControlButton(
+                icon: voteStatus == VoteStatus.upvoted
+                    ? Icons.thumb_up
+                    : Icons.thumb_up_alt_outlined,
+                active: voteStatus == VoteStatus.upvoted,
+                onPressed: () {
+                  HapticFeedback.selectionClick();
+                  vote(upvote: true, isLiked: voteStatus == VoteStatus.upvoted);
+                },
+              ),
+            );
+            break;
+          case PostActionId.downvote:
+            buttons.add(
+              buildControlButton(
+                icon: voteStatus == VoteStatus.downvoted
+                    ? Icons.thumb_down
+                    : Icons.thumb_down_alt_outlined,
+                active: voteStatus == VoteStatus.downvoted,
+                onPressed: () {
+                  HapticFeedback.selectionClick();
+                  vote(
+                    upvote: false,
+                    isLiked: voteStatus == VoteStatus.downvoted,
+                  );
+                },
+              ),
+            );
+            break;
+          case PostActionId.favorite:
+            buttons.add(
+              buildControlButton(
+                icon: post.isFavorited ? Icons.favorite : Icons.favorite_border,
+                active: post.isFavorited,
+                onPressed: () {
+                  HapticFeedback.selectionClick();
+                  toggleFavorite();
+                },
+              ),
+            );
+            break;
+          case PostActionId.share:
+            buttons.add(
+              buildControlButton(
+                icon: Icons.share_outlined,
+                active: false,
+                onPressed: () {
+                  HapticFeedback.selectionClick();
+                  share();
+                },
+              ),
+            );
+            break;
+          case PostActionId.download:
+            if (post.file != null) {
+              buttons.add(
+                buildControlButton(
+                  icon: Icons.file_download_outlined,
+                  active: false,
+                  onPressed: () {
+                    HapticFeedback.selectionClick();
+                    download();
+                  },
+                ),
+              );
+            }
+            break;
+          case PostActionId.browse:
+            buttons.add(
+              buildControlButton(
+                icon: Icons.open_in_browser_outlined,
+                active: false,
+                onPressed: () {
+                  HapticFeedback.selectionClick();
+                  browse();
+                },
+              ),
+            );
+            break;
+        }
+      }
+      return buttons;
     }
 
     Widget buildStat({
@@ -113,59 +206,20 @@ class LikeDisplay extends StatelessWidget {
     return Column(
       children: [
         if (hasLogin)
-          GlassCard(
-            margin: const EdgeInsets.only(top: 12),
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-            borderRadius: 18,
-            child: Row(
-              children: [
-                buildControlButton(
-                  icon: voteStatus == VoteStatus.upvoted
-                      ? Icons.thumb_up
-                      : Icons.thumb_up_alt_outlined,
-                  active: voteStatus == VoteStatus.upvoted,
-                  onPressed: () {
-                    HapticFeedback.selectionClick();
-                    vote(
-                      upvote: true,
-                      isLiked: voteStatus == VoteStatus.upvoted,
-                    );
-                  },
+          ValueListenableBuilder<String>(
+            valueListenable: settings.postActionBarActions,
+            builder: (context, rawActions, _) {
+              final actions = PostActionPreferences.decode(rawActions);
+              return GlassCard(
+                margin: const EdgeInsets.only(top: 12),
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                borderRadius: 18,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(children: buildActionButtons(actions)),
                 ),
-                buildControlButton(
-                  icon: voteStatus == VoteStatus.downvoted
-                      ? Icons.thumb_down
-                      : Icons.thumb_down_alt_outlined,
-                  active: voteStatus == VoteStatus.downvoted,
-                  onPressed: () {
-                    HapticFeedback.selectionClick();
-                    vote(
-                      upvote: false,
-                      isLiked: voteStatus == VoteStatus.downvoted,
-                    );
-                  },
-                ),
-                buildControlButton(
-                  icon: post.isFavorited
-                      ? Icons.favorite
-                      : Icons.favorite_border,
-                  active: post.isFavorited,
-                  onPressed: () {
-                    HapticFeedback.selectionClick();
-                    toggleFavorite();
-                  },
-                ),
-                if (showShare)
-                  buildControlButton(
-                    icon: Icons.share_outlined,
-                    active: false,
-                    onPressed: () {
-                      HapticFeedback.selectionClick();
-                      share();
-                    },
-                  ),
-              ],
-            ),
+              );
+            },
           ),
         GlassCard(
           margin: EdgeInsets.only(top: hasLogin ? 10 : 12),
