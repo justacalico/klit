@@ -581,6 +581,25 @@ class _SettingsPageState extends State<SettingsPage> {
               onChanged: (v) => settings.showPostInfo.value = v,
             ),
           ),
+          ValueListenableBuilder<String>(
+            valueListenable: settings.postActionBarActions,
+            builder: (context, rawActions, _) {
+              final actions = PostActionPreferences.decode(rawActions);
+              return CupertinoListTile(
+                leading: const _SettingsLeadingIcon(
+                  icon: CupertinoIcons.square_stack_3d_down_right,
+                  color: Color(0xFF1ABC9C),
+                ),
+                title: const Text('Post action bar'),
+                subtitle: Text('${actions.length} actions pinned'),
+                trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  _showPostActionBarEditor(context, settings);
+                },
+              );
+            },
+          ),
         ],
       ),
     );
@@ -628,25 +647,6 @@ class _SettingsPageState extends State<SettingsPage> {
               value: value,
               onChanged: (v) => settings.upvoteFavs.value = v,
             ),
-          ),
-          ValueListenableBuilder<String>(
-            valueListenable: settings.postActionBarActions,
-            builder: (context, rawActions, _) {
-              final actions = PostActionPreferences.decode(rawActions);
-              return CupertinoListTile(
-                leading: const _SettingsLeadingIcon(
-                  icon: CupertinoIcons.square_stack_3d_down_right,
-                  color: Color(0xFF1ABC9C),
-                ),
-                title: const Text('Post action bar'),
-                subtitle: Text('${actions.length} actions pinned'),
-                trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
-                onTap: () {
-                  HapticFeedback.selectionClick();
-                  _showPostActionBarEditor(context, settings);
-                },
-              );
-            },
           ),
           ValueListenableBuilder<bool>(
             valueListenable: settings.muteVideos,
