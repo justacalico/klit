@@ -27,8 +27,8 @@ class PostActionPreferences {
   static const String legacyShareButtonKey = 'showShareButton';
   static const List<PostActionId> defaultActions = [
     PostActionId.favorite,
-    PostActionId.downvote,
     PostActionId.upvote,
+    PostActionId.downvote,
     PostActionId.download,
   ];
   static const List<PostActionId> menuActions = [
