@@ -979,130 +979,133 @@ class _SettingsPageState extends State<SettingsPage> {
               child: GlassSurface(
                 margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                 padding: const EdgeInsets.all(12),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 560),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.fromLTRB(8, 4, 8, 8),
-                          child: Text(
-                            'Post action bar',
-                            style: TextStyle(
-                              fontSize: 19,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 10),
-                          child: Text(
-                            'Pinned actions are shown first on post detail. Drag to reorder.',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ),
-                        ReorderableListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          buildDefaultDragHandles: false,
-                          itemCount: selected.length,
-                          onReorder: (oldIndex, newIndex) {
-                            setSheetState(() {
-                              if (newIndex > oldIndex) {
-                                newIndex -= 1;
-                              }
-                              final action = selected.removeAt(oldIndex);
-                              selected.insert(newIndex, action);
-                            });
-                          },
-                          itemBuilder: (context, index) {
-                            final action = selected[index];
-                            return ListTile(
-                              key: ValueKey(action.key),
-                              dense: true,
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 4,
-                              ),
-                              leading: Icon(action.icon, size: 20),
-                              title: Text(action.label),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      setSheetState(() {
-                                        selected.removeAt(index);
-                                      });
-                                      HapticFeedback.selectionClick();
-                                    },
-                                    icon: const Icon(
-                                      CupertinoIcons.minus_circle,
-                                    ),
-                                  ),
-                                  ReorderableDragStartListener(
-                                    index: index,
-                                    child: const Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                      ),
-                                      child: Icon(
-                                        CupertinoIcons.line_horizontal_3,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                        if (available.isNotEmpty) const Divider(height: 20),
-                        if (available.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                child: Material(
+                  color: Colors.transparent,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 560),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.fromLTRB(8, 4, 8, 8),
                             child: Text(
-                              'Available',
-                              style: Theme.of(context).textTheme.titleSmall
-                                  ?.copyWith(fontWeight: FontWeight.w700),
+                              'Post action bar',
+                              style: TextStyle(
+                                fontSize: 19,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
-                        ...available.map(
-                          (action) => CupertinoListTile(
-                            leading: Icon(action.icon, size: 20),
-                            title: Text(action.label),
-                            trailing: const Icon(
-                              CupertinoIcons.plus_circle,
-                              size: 20,
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 10),
+                            child: Text(
+                              'Pinned actions are shown first on post detail. Drag to reorder.',
+                              style: Theme.of(context).textTheme.bodySmall,
                             ),
-                            onTap: () {
+                          ),
+                          ReorderableListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            buildDefaultDragHandles: false,
+                            itemCount: selected.length,
+                            onReorder: (oldIndex, newIndex) {
                               setSheetState(() {
-                                selected.add(action);
+                                if (newIndex > oldIndex) {
+                                  newIndex -= 1;
+                                }
+                                final action = selected.removeAt(oldIndex);
+                                selected.insert(newIndex, action);
                               });
-                              HapticFeedback.selectionClick();
+                            },
+                            itemBuilder: (context, index) {
+                              final action = selected[index];
+                              return ListTile(
+                                key: ValueKey(action.key),
+                                dense: true,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                ),
+                                leading: Icon(action.icon, size: 20),
+                                title: Text(action.label),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {
+                                        setSheetState(() {
+                                          selected.removeAt(index);
+                                        });
+                                        HapticFeedback.selectionClick();
+                                      },
+                                      icon: const Icon(
+                                        CupertinoIcons.minus_circle,
+                                      ),
+                                    ),
+                                    ReorderableDragStartListener(
+                                      index: index,
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                        ),
+                                        child: Icon(
+                                          CupertinoIcons.line_horizontal_3,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
                             },
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: const Text('Cancel'),
+                          if (available.isNotEmpty) const Divider(height: 20),
+                          if (available.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                              child: Text(
+                                'Available',
+                                style: Theme.of(context).textTheme.titleSmall
+                                    ?.copyWith(fontWeight: FontWeight.w700),
+                              ),
                             ),
-                            const SizedBox(width: 8),
-                            FilledButton(
-                              onPressed: () {
-                                settings.postActionBarActions.value =
-                                    PostActionPreferences.encode(selected);
+                          ...available.map(
+                            (action) => CupertinoListTile(
+                              leading: Icon(action.icon, size: 20),
+                              title: Text(action.label),
+                              trailing: const Icon(
+                                CupertinoIcons.plus_circle,
+                                size: 20,
+                              ),
+                              onTap: () {
+                                setSheetState(() {
+                                  selected.add(action);
+                                });
                                 HapticFeedback.selectionClick();
-                                Navigator.of(context).pop();
                               },
-                              child: const Text('Save'),
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text('Cancel'),
+                              ),
+                              const SizedBox(width: 8),
+                              FilledButton(
+                                onPressed: () {
+                                  settings.postActionBarActions.value =
+                                      PostActionPreferences.encode(selected);
+                                  HapticFeedback.selectionClick();
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Save'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
