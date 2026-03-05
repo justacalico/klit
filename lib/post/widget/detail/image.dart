@@ -257,6 +257,13 @@ class PostDetailImageDisplay extends StatelessWidget {
   final Post post;
   final VoidCallback? onTap;
 
+  double get _aspectRatio {
+    final width = post.width.toDouble();
+    final height = post.height.toDouble();
+    if (width <= 0 || height <= 0) return 1;
+    return width / height;
+  }
+
   @override
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(16);
@@ -275,8 +282,28 @@ class PostDetailImageDisplay extends StatelessWidget {
       post: post,
       child: PostImageOverlay(
         post: post,
-        builder: (context) => Center(
-          child: Hero(tag: post.link, child: clipped),
+        builder: (context) => LayoutBuilder(
+          builder: (context, constraints) {
+            final aspectRatio = _aspectRatio;
+            final maxWidth = constraints.maxWidth.isFinite
+                ? constraints.maxWidth
+                : post.width.toDouble();
+            final maxHeight = constraints.maxHeight.isFinite
+                ? constraints.maxHeight
+                : maxWidth / aspectRatio;
+            final fittedWidth = (maxHeight * aspectRatio).clamp(1.0, maxWidth);
+
+            return Align(
+              alignment: Alignment.center,
+              child: SizedBox(
+                width: fittedWidth,
+                child: AspectRatio(
+                  aspectRatio: aspectRatio,
+                  child: Hero(tag: post.link, child: clipped),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

@@ -13,6 +13,14 @@ class PostCommentsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isOled = context.watch<Settings>().theme.value == AppTheme.amoled;
+    final surface = isOled
+        ? Colors.black
+        : theme.brightness == Brightness.dark
+        ? Color.lerp(theme.canvasColor, Colors.white, 0.06)!
+        : theme.colorScheme.surface;
+
     return CommentProvider(
       postId: postId,
       child: AdaptiveScaffold(
@@ -23,7 +31,9 @@ class PostCommentsPage extends StatelessWidget {
         endDrawer: const CommentListDrawer(),
         body: Column(
           children: [
-            const Expanded(child: CommentList()),
+            Expanded(
+              child: ColoredBox(color: surface, child: const CommentList()),
+            ),
             InlineCommentComposer(postId: postId),
           ],
         ),
@@ -116,18 +126,21 @@ Future<void> showPostCommentsDrawer(
                     ),
                     const Divider(height: 1),
                     Expanded(
-                      child: PullToRefresh(
-                        onRefresh: () => context
-                            .read<CommentController>()
-                            .refresh(force: true, background: true),
-                        child: CustomScrollView(
-                          controller: scrollController,
-                          slivers: [
-                            SliverPadding(
-                              padding: defaultActionListPadding,
-                              sliver: const SliverCommentList(),
-                            ),
-                          ],
+                      child: ColoredBox(
+                        color: surface,
+                        child: PullToRefresh(
+                          onRefresh: () => context
+                              .read<CommentController>()
+                              .refresh(force: true, background: true),
+                          child: CustomScrollView(
+                            controller: scrollController,
+                            slivers: [
+                              SliverPadding(
+                                padding: defaultActionListPadding,
+                                sliver: const SliverCommentList(),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
