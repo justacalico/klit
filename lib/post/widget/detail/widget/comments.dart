@@ -12,7 +12,6 @@ class CommentDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (post.commentCount <= 0) return const SizedBox();
     final textColor = Theme.of(context).textTheme.bodyMedium?.color;
     return Column(
       children: [

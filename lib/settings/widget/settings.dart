@@ -860,7 +860,7 @@ class _SettingsPageState extends State<SettingsPage> {
             final sourceName = switch (appInfo.source) {
               Source.IS_INSTALLED_FROM_LOCAL_SOURCE => 'Local build',
               Source.IS_INSTALLED_FROM_OTHER_SOURCE => 'Other source',
-              Source.UNKNOWN => 'Unknown source',
+              Source.UNKNOWN => null,
               _ => 'Store install',
             };
 
@@ -922,12 +922,13 @@ class _SettingsPageState extends State<SettingsPage> {
                               color: onTop.withValues(alpha: 0.14),
                               textColor: onTop,
                             ),
-                            _AboutMetaPill(
-                              icon: CupertinoIcons.cube_box,
-                              text: sourceName,
-                              color: onTop.withValues(alpha: 0.14),
-                              textColor: onTop,
-                            ),
+                            if (sourceName != null)
+                              _AboutMetaPill(
+                                icon: CupertinoIcons.cube_box,
+                                text: sourceName,
+                                color: onTop.withValues(alpha: 0.14),
+                                textColor: onTop,
+                              ),
                             _AboutMetaPill(
                               icon: CupertinoIcons.number,
                               text: appInfo.packageName,
