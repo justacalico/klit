@@ -20,9 +20,7 @@ class Settings extends NotifiedSettings {
       final showShare =
           prefs.getBool(PostActionPreferences.legacyShareButtonKey) ?? true;
       final defaults = <PostActionId>[
-        PostActionId.upvote,
-        PostActionId.downvote,
-        PostActionId.favorite,
+        ...PostActionPreferences.defaultActions,
         if (showShare) PostActionId.share,
       ];
       await prefs.setString(
