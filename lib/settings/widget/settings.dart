@@ -407,11 +407,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
                 onTap: () {
                   HapticFeedback.selectionClick();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const DenyListEditor(),
-                    ),
-                  );
+                  showDenyListEditorDialog(context);
                 },
               ),
             ),
