@@ -13,6 +13,7 @@ class LikeDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasLogin = context.watch<Client>().hasLogin;
     final theme = Theme.of(context);
     final cupertino = CupertinoTheme.of(context);
     final primary = cupertino.primaryColor;
@@ -110,60 +111,51 @@ class LikeDisplay extends StatelessWidget {
 
     return Column(
       children: [
-        GlassCard(
-          margin: const EdgeInsets.only(top: 12),
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-          borderRadius: 18,
-          child: Row(
-            children: [
-              buildControlButton(
-                icon: voteStatus == VoteStatus.upvoted
-                    ? Icons.thumb_up
-                    : Icons.thumb_up_alt_outlined,
-                active: voteStatus == VoteStatus.upvoted,
-                onPressed: () => guardWithLogin(
-                  context: context,
-                  callback: () => vote(
+        if (hasLogin)
+          GlassCard(
+            margin: const EdgeInsets.only(top: 12),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            borderRadius: 18,
+            child: Row(
+              children: [
+                buildControlButton(
+                  icon: voteStatus == VoteStatus.upvoted
+                      ? Icons.thumb_up
+                      : Icons.thumb_up_alt_outlined,
+                  active: voteStatus == VoteStatus.upvoted,
+                  onPressed: () => vote(
                     upvote: true,
                     isLiked: voteStatus == VoteStatus.upvoted,
                   ),
-                  error: 'You must be logged in to vote on posts!',
                 ),
-              ),
-              buildControlButton(
-                icon: voteStatus == VoteStatus.downvoted
-                    ? Icons.thumb_down
-                    : Icons.thumb_down_alt_outlined,
-                active: voteStatus == VoteStatus.downvoted,
-                onPressed: () => guardWithLogin(
-                  context: context,
-                  callback: () => vote(
+                buildControlButton(
+                  icon: voteStatus == VoteStatus.downvoted
+                      ? Icons.thumb_down
+                      : Icons.thumb_down_alt_outlined,
+                  active: voteStatus == VoteStatus.downvoted,
+                  onPressed: () => vote(
                     upvote: false,
                     isLiked: voteStatus == VoteStatus.downvoted,
                   ),
-                  error: 'You must be logged in to vote on posts!',
                 ),
-              ),
-              buildControlButton(
-                icon: post.isFavorited ? Icons.favorite : Icons.favorite_border,
-                active: post.isFavorited,
-                onPressed: () => guardWithLogin(
-                  context: context,
-                  callback: toggleFavorite,
-                  error: 'You must be logged in to favorite posts!',
-                ),
-              ),
-              if (showShare)
                 buildControlButton(
-                  icon: Icons.share_outlined,
-                  active: false,
-                  onPressed: share,
+                  icon: post.isFavorited
+                      ? Icons.favorite
+                      : Icons.favorite_border,
+                  active: post.isFavorited,
+                  onPressed: toggleFavorite,
                 ),
-            ],
+                if (showShare)
+                  buildControlButton(
+                    icon: Icons.share_outlined,
+                    active: false,
+                    onPressed: share,
+                  ),
+              ],
+            ),
           ),
-        ),
         GlassCard(
-          margin: const EdgeInsets.only(top: 10),
+          margin: EdgeInsets.only(top: hasLogin ? 10 : 12),
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           borderRadius: 18,
           child: Row(
