@@ -620,15 +620,10 @@ class SettingsPage extends StatelessWidget {
           builder: (context) {
             final theme = Theme.of(context);
             final appInfo = AppInfo.instance;
-            final topA = theme.brightness == Brightness.dark
-                ? Color.lerp(theme.colorScheme.primary, Colors.black, 0.45)!
-                : Color.lerp(theme.colorScheme.primary, Colors.white, 0.8)!;
-            final topB = theme.brightness == Brightness.dark
-                ? Color.lerp(theme.colorScheme.secondary, Colors.black, 0.6)!
-                : Color.lerp(theme.colorScheme.secondary, Colors.white, 0.88)!;
-            final onTop = theme.brightness == Brightness.dark
-                ? Colors.white
-                : theme.colorScheme.onSurface;
+            final surface = theme.brightness == Brightness.dark
+                ? Color.lerp(theme.canvasColor, Colors.white, 0.04)!
+                : theme.colorScheme.surface;
+            final onTop = theme.colorScheme.onSurface;
             final sourceName = switch (appInfo.source) {
               Source.IS_INSTALLED_FROM_LOCAL_SOURCE => 'Local build',
               Source.IS_INSTALLED_FROM_OTHER_SOURCE => 'Other source',
@@ -641,12 +636,8 @@ class SettingsPage extends StatelessWidget {
               children: [
                 DecoratedBox(
                   decoration: BoxDecoration(
+                    color: surface,
                     borderRadius: BorderRadius.circular(14),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [topA, topB],
-                    ),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
