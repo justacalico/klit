@@ -52,13 +52,15 @@ class _MainShellState extends State<MainShell> {
       valueListenable: client.traits,
       builder: (context, traits, child) {
         final showHistory = traits.writeHistory ?? false;
-        return Obx(
-          () => AppShell(
-            body: _buildContent(nav.currentPath.value),
+        return Obx(() {
+          final path = nav.currentPath.value;
+          if (path == AppRoutes.search) nav.searchInitialQuery.value;
+          return AppShell(
+            body: _buildContent(path),
             showFavorites: showFavorites,
             showHistory: showHistory,
-          ),
-        );
+          );
+        });
       },
     );
   }
@@ -75,7 +77,10 @@ class _MainShellState extends State<MainShell> {
         final initialTags = nav.searchInitialQuery.value;
         if (initialTags != null) {
           nav.searchInitialQuery.value = null;
-          return PostsSearchPage(query: {'tags': initialTags});
+          return PostsSearchPage(
+            key: ValueKey(initialTags),
+            query: {'tags': initialTags},
+          );
         }
         return const PostsSearchPage();
       case AppRoutes.feeds:
