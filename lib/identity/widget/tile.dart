@@ -1,5 +1,6 @@
 import 'package:klit/app/routes/app_routes.dart';
 import 'package:klit/identity/identity.dart';
+import 'package:klit/settings/settings.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:klit/user/user.dart';
 import 'package:flutter/material.dart';
@@ -43,9 +44,10 @@ class CurrentIdentityTile extends StatelessWidget {
             child: InkWell(
               borderRadius: const BorderRadius.all(Radius.circular(4)),
               onTap: identity.username != null
-                  ? () => Get.offAllNamed(AppRoutes.home, arguments: {
-                      'path': AppRoutes.profile,
-                    })
+                  ? () => Get.offAllNamed(
+                      AppRoutes.home,
+                      arguments: {'path': AppRoutes.profile},
+                    )
                   : null,
               child: Padding(
                 padding: const EdgeInsets.all(8),
@@ -76,9 +78,7 @@ class CurrentIdentityTile extends StatelessWidget {
           ),
           InkWell(
             borderRadius: const BorderRadius.all(Radius.circular(4)),
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const IdentitiesPage()),
-            ),
+            onTap: openSettingsAccounts,
             child: const Center(
               child: Padding(
                 padding: EdgeInsets.all(16),

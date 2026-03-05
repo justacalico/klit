@@ -1,3 +1,2 @@
-export 'identities.dart';
-export 'identity.dart';
+export 'editor.dart';
 export 'tile.dart';

@@ -1,5 +1,5 @@
 import 'package:klit/client/client.dart';
-import 'package:klit/identity/identity.dart';
+import 'package:klit/settings/settings.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:flutter/material.dart';
 
@@ -24,9 +24,7 @@ Future<void> guardWithLogin({
         content: Text(error ?? 'You must be logged in to perform this action.'),
         action: SnackBarAction(
           label: 'Choose identity',
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const IdentitiesPage()),
-          ),
+          onPressed: openSettingsAccounts,
         ),
       ),
     );

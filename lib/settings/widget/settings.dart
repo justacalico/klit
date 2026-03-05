@@ -9,6 +9,7 @@ import 'package:klit/identity/identity.dart';
 import 'package:klit/logs/logs.dart';
 import 'package:klit/settings/settings.dart';
 import 'package:klit/shared/shared.dart';
+import 'package:klit/user/user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,13 +17,75 @@ import 'package:flutter_sub/flutter_sub.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
 
-class SettingsPage extends StatelessWidget {
+const String settingsSectionArgumentKey = 'settingsSection';
+const String settingsAccountsSectionValue = 'accounts';
+
+void openSettingsAccounts() {
+  Get.offAllNamed(
+    AppRoutes.home,
+    arguments: {
+      'path': AppRoutes.settings,
+      settingsSectionArgumentKey: settingsAccountsSectionValue,
+    },
+  );
+}
+
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
   static const double _desktopBreakpoint = 980;
 
   @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _accountsSectionKey = GlobalKey();
+  bool _focusedRequestedSection = false;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _focusAccountsSectionIfRequested() {
+    if (_focusedRequestedSection) return;
+    final args = Get.arguments;
+    if (args is! Map) return;
+    if (args[settingsSectionArgumentKey] != settingsAccountsSectionValue)
+      return;
+    _focusedRequestedSection = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final context = _accountsSectionKey.currentContext;
+      if (!mounted || context == null) return;
+      await Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+        alignment: 0.05,
+      );
+    });
+  }
+
+  void _openAccountsInSettings() {
+    HapticFeedback.selectionClick();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final context = _accountsSectionKey.currentContext;
+      if (!mounted || context == null) return;
+      await Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeOutCubic,
+        alignment: 0.05,
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    _focusAccountsSectionIfRequested();
     final settings = Get.find<SettingsController>().settings;
     final nav = Get.find<NavigationController>();
 
@@ -44,7 +107,13 @@ class SettingsPage extends StatelessWidget {
 
               final hasLogs = context.read<Logs?>() != null;
               final sections = <_SettingsSectionEntry>[
-                _SettingsSectionEntry(weight: 2, child: _identitySection()),
+                _SettingsSectionEntry(
+                  weight: 2,
+                  child: _identitySection(
+                    onOpenAccounts: _openAccountsInSettings,
+                  ),
+                ),
+                _SettingsSectionEntry(weight: 7, child: _accountsSection()),
                 _SettingsSectionEntry(weight: 4, child: _userSection(nav)),
                 _SettingsSectionEntry(
                   weight: 7,
@@ -68,13 +137,15 @@ class SettingsPage extends StatelessWidget {
 
               return LayoutBuilder(
                 builder: (context, constraints) {
-                  final isDesktop = constraints.maxWidth >= _desktopBreakpoint;
+                  final isDesktop =
+                      constraints.maxWidth >= SettingsPage._desktopBreakpoint;
 
                   return Container(
                     color: CupertinoColors.systemGroupedBackground.resolveFrom(
                       context,
                     ),
                     child: SingleChildScrollView(
+                      controller: _scrollController,
                       padding: contentPadding,
                       child: isDesktop
                           ? _buildDesktopColumns(sections)
@@ -136,7 +207,7 @@ class SettingsPage extends StatelessWidget {
     return (left, right);
   }
 
-  Widget _identitySection() {
+  Widget _identitySection({required VoidCallback onOpenAccounts}) {
     return _SettingsSection(
       title: 'Identity',
       child: _SettingsGroupCard(
@@ -145,13 +216,207 @@ class SettingsPage extends StatelessWidget {
             builder: (context, client, _) => IdentityTile(
               identity: client.identity,
               trailing: const Icon(CupertinoIcons.arrow_2_squarepath),
-              onTap: () {
-                HapticFeedback.selectionClick();
-                Get.to(() => const IdentitiesPage());
-              },
+              onTap: onOpenAccounts,
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _accountsSection() {
+    return _SettingsSection(
+      key: _accountsSectionKey,
+      title: 'Accounts',
+      child: SubStream<List<Identity>>(
+        create: () => context.watch<IdentityClient>().all().stream,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return _SettingsGroupCard(
+              children: const [
+                CupertinoListTile(
+                  leading: Icon(Icons.warning_amber),
+                  title: Text('Failed to load accounts'),
+                  subtitle: Text('Try reopening Settings.'),
+                ),
+              ],
+            );
+          }
+          final identities = snapshot.data;
+          if (identities == null) {
+            return _SettingsGroupCard(
+              children: const [
+                CupertinoListTile(
+                  leading: SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  title: Text('Loading accounts...'),
+                ),
+              ],
+            );
+          }
+
+          final identityClient = context.watch<IdentityClient>();
+          final activeIdentity = identityClient.identity;
+
+          Future<void> addIdentity() async {
+            HapticFeedback.selectionClick();
+            await showIdentityEditorDialog(context: context);
+          }
+
+          Future<void> editIdentity(Identity identity) async {
+            HapticFeedback.selectionClick();
+            await showIdentityEditorDialog(
+              context: context,
+              identity: identity,
+            );
+          }
+
+          Future<void> activateIdentity(Identity identity) async {
+            HapticFeedback.selectionClick();
+            await identityClient.activate(identity.id);
+          }
+
+          Future<void> deleteIdentity(Identity identity) async {
+            HapticFeedback.selectionClick();
+            final confirmed = await showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Delete account?'),
+                content: const Text(
+                  'All local data will be removed, including follows and history.',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text('CANCEL'),
+                  ),
+                  FilledButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: const Text('DELETE'),
+                  ),
+                ],
+              ),
+            );
+            if (confirmed != true) return;
+            await identityClient.remove(identity);
+          }
+
+          return _SettingsGroupCard(
+            children: [
+              CupertinoListTile(
+                leading: IdentityAvatar(activeIdentity.id),
+                title: Text(activeIdentity.usernameOrAnon),
+                subtitle: Text(
+                  'Active account • ${linkToDisplay(activeIdentity.host)}',
+                ),
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    'Active',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: addIdentity,
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add account'),
+                  ),
+                ),
+              ),
+              if (identities.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 320),
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: identities.length,
+                      separatorBuilder: (_, _) => const Divider(height: 1),
+                      itemBuilder: (context, index) {
+                        final identity = identities[index];
+                        final selected = identity.id == activeIdentity.id;
+                        return ListTile(
+                          dense: true,
+                          leading: IdentityAvatar(identity.id),
+                          title: Text(identity.usernameOrAnon),
+                          subtitle: Text(linkToDisplay(identity.host)),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (selected)
+                                Container(
+                                  margin: const EdgeInsets.only(right: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primaryContainer,
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Text(
+                                    'Active',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onPrimaryContainer,
+                                    ),
+                                  ),
+                                ),
+                              PopupMenuButton<VoidCallback>(
+                                onSelected: (value) => value(),
+                                itemBuilder: (context) => [
+                                  if (!selected)
+                                    PopupMenuTile(
+                                      title: 'Activate',
+                                      icon: Icons.check,
+                                      value: () => activateIdentity(identity),
+                                    ),
+                                  PopupMenuTile(
+                                    title: 'Edit',
+                                    icon: Icons.edit,
+                                    value: () => editIdentity(identity),
+                                  ),
+                                  PopupMenuTile(
+                                    title: 'Delete',
+                                    icon: Icons.delete,
+                                    value: () => deleteIdentity(identity),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          onTap: () => activateIdentity(identity),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -790,7 +1055,7 @@ class SettingsPage extends StatelessWidget {
 }
 
 class _SettingsSection extends StatelessWidget {
-  const _SettingsSection({required this.title, required this.child});
+  const _SettingsSection({super.key, required this.title, required this.child});
 
   final String title;
   final Widget child;

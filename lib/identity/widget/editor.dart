@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/isolate.dart';
@@ -6,21 +5,33 @@ import 'package:drift/native.dart';
 import 'package:klit/app/app.dart';
 import 'package:klit/client/client.dart';
 import 'package:klit/identity/identity.dart';
-import 'package:klit/settings/settings.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class IdentityPage extends StatefulWidget {
-  const IdentityPage({super.key, this.identity});
-
-  final Identity? identity;
-
-  @override
-  State<IdentityPage> createState() => _IdentityPageState();
+Future<void> showIdentityEditorDialog({
+  required BuildContext context,
+  Identity? identity,
+  VoidCallback? onDone,
+}) {
+  return showDialog<void>(
+    context: context,
+    builder: (context) =>
+        _IdentityEditorDialog(identity: identity, onDone: onDone),
+  );
 }
 
-class _IdentityPageState extends State<IdentityPage> {
+class _IdentityEditorDialog extends StatefulWidget {
+  const _IdentityEditorDialog({required this.identity, this.onDone});
+
+  final Identity? identity;
+  final VoidCallback? onDone;
+
+  @override
+  State<_IdentityEditorDialog> createState() => _IdentityEditorDialogState();
+}
+
+class _IdentityEditorDialogState extends State<_IdentityEditorDialog> {
   late final TextEditingController hostController = TextEditingController(
     text: widget.identity?.host,
   );
@@ -32,7 +43,6 @@ class _IdentityPageState extends State<IdentityPage> {
         ? OmittedPasswordTextInputFormatter.passwordOmitted
         : null,
   );
-
   late bool withAuth =
       widget.identity == null || widget.identity!.username != null;
   String? error;
@@ -46,238 +56,179 @@ class _IdentityPageState extends State<IdentityPage> {
   @override
   void initState() {
     super.initState();
-    allFields.addListener(resetErrors);
+    allFields.addListener(_clearError);
   }
 
-  void resetErrors() => WidgetsBinding.instance.addPostFrameCallback(
-    (_) => setState(() => error = null),
-  );
+  void _clearError() {
+    if (!mounted) return;
+    if (error != null) setState(() => error = null);
+  }
 
   @override
   void dispose() {
+    allFields.removeListener(_clearError);
     hostController.dispose();
     usernameController.dispose();
     apikeyController.dispose();
-    allFields.removeListener(resetErrors);
     super.dispose();
   }
 
-  Future<void> saveAndTest(BuildContext context) async {
-    FormState form = Form.of(context);
-    if (form.validate()) {
-      final navigator = Navigator.of(context);
-      if (!context.mounted) return;
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => LoginLoadingDialog(
-          identity: widget.identity,
-          host: hostController.text,
-          username: withAuth ? usernameController.text : null,
-          apikey: withAuth ? apikeyController.text : null,
-          onError: (value) {
-            setState(() {
-              value ??= 'Check your network connection and login details';
-              error = 'Failed to login. \n$value';
-            });
-            form.validate();
-          },
-          onDone: navigator.maybePop,
-        ),
-      );
-    }
-  }
+  Future<void> _saveAndTest() async {
+    final form = Form.of(context);
+    if (!form.validate()) return;
 
-  Future<bool> showUnknownHostDialog() {
-    return showDialog<bool>(
+    showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Unknown host'),
-        content: Text(
-          'The host ${linkToDisplay(hostController.text)} is not recognized.\n'
-          '${AppInfo.instance.appName} only supports hosts with the official e621 API.\n'
-          'If you don\'t know what this means, please do not proceed.\n',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('CANCEL'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('CONFIRM'),
-          ),
-        ],
+      builder: (dialogContext) => LoginLoadingDialog(
+        identity: widget.identity,
+        host: hostController.text,
+        username: withAuth ? usernameController.text : null,
+        apikey: withAuth ? apikeyController.text : null,
+        onError: (value) {
+          setState(() {
+            value ??= 'Check your network connection and login details';
+            error = 'Failed to login.\n$value';
+          });
+          form.validate();
+        },
+        onDone: () {
+          Navigator.of(context).maybePop();
+          widget.onDone?.call();
+        },
       ),
-    ).then((value) => value ?? false);
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget form() {
-      String? apiKeysUrl = context.watch<ClientFactory>().apiKeysUrl(
-        hostController.text,
-        usernameController.text,
-      );
-      String? registrationUrl = context.watch<ClientFactory>().registrationUrl(
-        hostController.text,
-      );
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Text(
-                'Identity',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ),
-            HostFormField(
-              controller: hostController,
-              readOnly: widget.identity != null,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: CheckboxFormField(
-                label: 'Authentication',
-                title: withAuth ? const Text('Login') : const Text('Anonymous'),
-                value: withAuth,
-                onChanged: (value) => setState(() => withAuth = value!),
-              ),
-            ),
-            AnimatedSize(
-              duration: defaultAnimationDuration,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (withAuth) ...[
-                    UsernameFormField(controller: usernameController),
-                    ApikeyFormField(
-                      controller: apikeyController,
-                      canOmit: widget.identity != null,
-                    ),
-                    Row(
-                      children: [
-                        CrossFade(
-                          showChild: apiKeysUrl != null,
-                          secondChild: CrossFade(
-                            showChild: registrationUrl != null,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              child: TextButton(
-                                onPressed: () => launch(registrationUrl ?? ''),
-                                child: const Text(
-                                  'Don\'t have an account? Sign up here',
-                                ),
-                              ),
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            child: TextButton(
-                              onPressed: () => launch(apiKeysUrl ?? ''),
-                              child: const Text('Where do I find my API key?'),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            if (error != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.warning_amber,
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        error!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-          ],
-        ),
-      );
-    }
+    final apiKeysUrl = context.watch<ClientFactory>().apiKeysUrl(
+      hostController.text,
+      usernameController.text,
+    );
+    final registrationUrl = context.watch<ClientFactory>().registrationUrl(
+      hostController.text,
+    );
+    final isEditing = widget.identity != null;
 
     return KeyboardDismisser(
       child: Form(
-        child: Scaffold(
-          appBar: const DefaultAppBar(leading: CloseButton(), elevation: 0),
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              bool isWide = constraints.maxWidth > 1100;
-              return Column(
+        child: Dialog(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: isWide
-                          ? CrossAxisAlignment.center
-                          : CrossAxisAlignment.start,
+                  Text(
+                    isEditing ? 'Edit account' : 'Add account',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 12),
+                  HostFormField(
+                    controller: hostController,
+                    readOnly: isEditing,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: CheckboxFormField(
+                      label: 'Authentication',
+                      title: withAuth
+                          ? const Text('Login')
+                          : const Text('Anonymous'),
+                      value: withAuth,
+                      onChanged: (value) => setState(() => withAuth = value!),
+                    ),
+                  ),
+                  AnimatedSize(
+                    duration: defaultAnimationDuration,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (isWide)
-                          Expanded(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const AppIcon(radius: 64),
-                                const SizedBox(height: 32),
-                                Text(
-                                  AppInfo.instance.appName,
-                                  style: Theme.of(context).textTheme.titleLarge,
-                                ),
-                              ],
-                            ),
+                        if (withAuth) ...[
+                          UsernameFormField(controller: usernameController),
+                          ApikeyFormField(
+                            controller: apikeyController,
+                            canOmit: isEditing,
                           ),
-                        SizedBox(
-                          width: isWide ? 700 : constraints.maxWidth,
-                          child: LimitedWidthLayout.builder(
-                            maxWidth: 520,
-                            builder: (context) => Center(
-                              child: ListView(
-                                padding: LimitedWidthLayout.of(
-                                  context,
-                                ).padding.add(defaultActionListPadding),
-                                shrinkWrap: true,
-                                children: [
-                                  if (!isWide)
-                                    const SizedBox(
-                                      height: 300,
-                                      child: Center(child: AppIcon(radius: 64)),
+                          Row(
+                            children: [
+                              CrossFade(
+                                showChild: apiKeysUrl != null,
+                                secondChild: CrossFade(
+                                  showChild: registrationUrl != null,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
                                     ),
-                                  form(),
-                                ],
+                                    child: TextButton(
+                                      onPressed: () =>
+                                          launch(registrationUrl ?? ''),
+                                      child: const Text(
+                                        'Don\'t have an account? Sign up here',
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  child: TextButton(
+                                    onPressed: () => launch(apiKeysUrl ?? ''),
+                                    child: const Text(
+                                      'Where do I find my API key?',
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   ),
+                  if (error != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4, bottom: 10),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.warning_amber,
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              error!,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.error,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).maybePop(),
+                        child: const Text('Cancel'),
+                      ),
+                      const SizedBox(width: 8),
+                      FilledButton.icon(
+                        onPressed: _saveAndTest,
+                        icon: const Icon(Icons.check),
+                        label: Text(isEditing ? 'Save' : 'Add'),
+                      ),
+                    ],
+                  ),
                 ],
-              );
-            },
-          ),
-          floatingActionButton: Builder(
-            builder: (context) => FloatingActionButton(
-              child: const Icon(Icons.check),
-              onPressed: () => saveAndTest(context),
+              ),
             ),
           ),
         ),
@@ -316,13 +267,14 @@ class _LoginLoadingDialogState extends State<LoginLoadingDialog> {
   }
 
   Future<void> login() async {
-    NavigatorState navigator = Navigator.of(context);
-    IdentityClient client = context.read<IdentityClient>();
-    Identity? identity = widget.identity;
-    String host = widget.host;
-    String? username = widget.username;
+    final navigator = Navigator.of(context);
+    final client = context.read<IdentityClient>();
+    final identity = widget.identity;
+    final host = widget.host;
+    final username = widget.username;
     String? apikey = widget.apikey;
-    Map<String, String>? headers = Map.of(identity?.headers ?? {});
+    final headers = Map<String, String>.of(identity?.headers ?? {});
+
     if (username != null && apikey != null) {
       if (apikey == OmittedPasswordTextInputFormatter.passwordOmitted) {
         apikey = parseBasicAuth(headers[HttpHeaders.authorizationHeader])?.$2;
@@ -339,6 +291,7 @@ class _LoginLoadingDialogState extends State<LoginLoadingDialog> {
     } else {
       headers.remove(HttpHeaders.authorizationHeader);
     }
+
     try {
       if (identity != null) {
         await client.replace(
@@ -350,16 +303,17 @@ class _LoginLoadingDialogState extends State<LoginLoadingDialog> {
         );
       }
     } on DriftRemoteException catch (e) {
-      Object error = e.remoteCause;
+      Object remoteError = e.remoteCause;
       String? reason;
-      // Duplicate username/host combination
-      if (error is SqliteException && error.extendedResultCode == 2067) {
+      if (remoteError is SqliteException &&
+          remoteError.extendedResultCode == 2067) {
         reason = 'You already have an identity under this host and username.';
       }
       await navigator.maybePop();
       widget.onError?.call(reason);
       return;
     }
+
     await navigator.maybePop();
     widget.onDone?.call();
   }
@@ -375,8 +329,8 @@ class _LoginLoadingDialogState extends State<LoginLoadingDialog> {
             const Padding(
               padding: EdgeInsets.all(4),
               child: SizedBox(
-                height: 28,
                 width: 28,
+                height: 28,
                 child: CircularProgressIndicator(),
               ),
             ),
@@ -413,8 +367,8 @@ class _HostFormFieldState extends State<HostFormField> {
   );
   bool isHttps = true;
 
-  final String http = 'http://';
-  final String https = 'https://';
+  static const String _http = 'http://';
+  static const String _https = 'https://';
 
   @override
   void initState() {
@@ -426,19 +380,20 @@ class _HostFormFieldState extends State<HostFormField> {
   }
 
   void _updateController() {
-    if (controller.text.startsWith(http)) {
+    if (controller.text.startsWith(_http)) {
       setState(() => isHttps = false);
-      controller.text = controller.text.replaceFirst(http, '');
-    } else if (controller.text.startsWith(https)) {
+      controller.text = controller.text.replaceFirst(_http, '');
+    } else if (controller.text.startsWith(_https)) {
       setState(() => isHttps = true);
-      controller.text = controller.text.replaceFirst(https, '');
+      controller.text = controller.text.replaceFirst(_https, '');
     }
-    widget.controller.text = '${isHttps ? https : http}${controller.text}';
+    widget.controller.text = '${isHttps ? _https : _http}${controller.text}';
   }
 
   @override
   void dispose() {
     controller.removeListener(_updateController);
+    controller.dispose();
     super.dispose();
   }
 
@@ -462,12 +417,7 @@ class _HostFormFieldState extends State<HostFormField> {
             return 'You must provide a host URL.';
           }
           try {
-            if (isHttps) {
-              value = 'https://$value';
-            } else {
-              value = 'http://$value';
-            }
-            Uri.parse(value);
+            Uri.parse('${isHttps ? _https : _http}$value');
           } on FormatException {
             return 'Invalid host URL';
           }
@@ -523,7 +473,7 @@ class ApikeyFormField extends StatefulWidget {
 }
 
 class _ApikeyFormFieldState extends State<ApikeyFormField> {
-  final String apiKeyExample = '1ca1d165e973d7f8d35b7deb7a2ae54c';
+  static const String _apiKeyExample = '1ca1d165e973d7f8d35b7deb7a2ae54c';
   bool obscurePassword = true;
 
   @override
@@ -535,7 +485,7 @@ class _ApikeyFormFieldState extends State<ApikeyFormField> {
         controller: widget.controller,
         decoration: InputDecoration(
           labelText: 'API key',
-          helperText: 'e.g. $apiKeyExample',
+          helperText: 'e.g. $_apiKeyExample',
           border: const OutlineInputBorder(),
           suffixIcon: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -547,8 +497,9 @@ class _ApikeyFormFieldState extends State<ApikeyFormField> {
                   icon: Icon(
                     obscurePassword ? Icons.visibility_off : Icons.visibility,
                   ),
-                  onPressed: () =>
-                      setState(() => obscurePassword = !obscurePassword),
+                  onPressed: () {
+                    setState(() => obscurePassword = !obscurePassword);
+                  },
                 ),
               ],
             ),
@@ -564,19 +515,16 @@ class _ApikeyFormFieldState extends State<ApikeyFormField> {
         validator: (value) {
           if (value!.isEmpty) {
             return 'You must provide an API key.\n'
-                'e.g. $apiKeyExample';
+                'e.g. $_apiKeyExample';
           }
-
           if (widget.canOmit &&
               value == OmittedPasswordTextInputFormatter.passwordOmitted) {
             return null;
           }
-
           if (!RegExp(r'^[A-z\d]{24,32}$').hasMatch(value)) {
             return 'API key is a 24 or 32-character sequence of {A..z} and {0..9}\n'
-                'e.g. $apiKeyExample';
+                'e.g. $_apiKeyExample';
           }
-
           return null;
         },
       ),
