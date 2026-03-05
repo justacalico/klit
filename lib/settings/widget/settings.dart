@@ -1364,8 +1364,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       children: _accentPresets.map((color) {
                         final isSelected = hexFromColor(color) ==
                             hexFromColor(selected);
-                        return InkWell(
-                          borderRadius: BorderRadius.circular(999),
+                        return GestureDetector(
                           onTap: () {
                             HapticFeedback.selectionClick();
                             setSheetState(() => selected = color);
