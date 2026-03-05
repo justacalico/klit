@@ -59,7 +59,7 @@ class Settings extends NotifiedSettings {
   );
   late final ValueNotifier<bool> showPostInfo = createSetting<bool>(
     key: 'showPostInfo',
-    initialValue: false,
+    initialValue: true,
   );
   late final ValueNotifier<String> postActionBarActions = createSetting<String>(
     key: PostActionPreferences.settingKey,

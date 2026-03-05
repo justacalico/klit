@@ -1,3 +1,4 @@
+import 'package:klit/app/app.dart';
 import 'package:klit/client/client.dart';
 import 'package:klit/comment/comment.dart';
 import 'package:klit/markup/markup.dart';
@@ -80,7 +81,10 @@ class _InlineCommentComposerState extends State<InlineCommentComposer>
     final hasLogin = context.watch<Client>().hasLogin;
     final viewInsets = MediaQuery.viewInsetsOf(context);
     final theme = Theme.of(context);
-    final surface = theme.brightness == Brightness.dark
+    final isOled = context.read<Settings>().theme.value == AppTheme.amoled;
+    final surface = isOled
+        ? Colors.black
+        : theme.brightness == Brightness.dark
         ? Color.lerp(theme.canvasColor, Colors.white, 0.06)!
         : theme.colorScheme.surface;
 

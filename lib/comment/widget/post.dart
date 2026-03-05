@@ -1,4 +1,6 @@
+import 'package:klit/app/app.dart';
 import 'package:klit/comment/comment.dart';
+import 'package:klit/settings/settings.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +37,10 @@ Future<void> showPostCommentsDrawer(
   required int postId,
 }) {
   final theme = Theme.of(context);
-  final surface = theme.brightness == Brightness.dark
+  final isOled = context.read<Settings>().theme.value == AppTheme.amoled;
+  final surface = isOled
+      ? Colors.black
+      : theme.brightness == Brightness.dark
       ? Color.lerp(theme.canvasColor, Colors.white, 0.06)!
       : theme.colorScheme.surface;
 
