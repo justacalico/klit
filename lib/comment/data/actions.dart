@@ -42,22 +42,25 @@ Future<bool> writeComment({
         onSubmitted: (text) async {
           ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
           if (text.isNotEmpty) {
-            try {
-              if (comment == null) {
-                await context.read<Client>().comments.create(
-                  postId: postId,
-                  content: text,
-                );
-              } else {
+            String? error;
+            if (comment == null) {
+              error = await submitNewComment(
+                context: context,
+                postId: postId,
+                text: text,
+              );
+            } else {
+              try {
                 await context.read<Client>().comments.update(
                   id: comment.id,
                   postId: postId,
                   content: text,
                 );
+              } on ClientException {
+                error = 'Failed to send comment!';
               }
-            } on ClientException {
-              return 'Failed to send comment!';
             }
+            if (error != null) return error;
             sent = true;
             messenger.showSnackBar(
               const SnackBar(
@@ -73,6 +76,24 @@ Future<bool> writeComment({
     ),
   );
   return sent;
+}
+
+Future<String?> submitNewComment({
+  required BuildContext context,
+  required int postId,
+  required String text,
+}) async {
+  final trimmed = text.trim();
+  if (trimmed.isEmpty) return 'Comment cannot be empty';
+  try {
+    await context.read<Client>().comments.create(
+      postId: postId,
+      content: trimmed,
+    );
+    return null;
+  } on ClientException {
+    return 'Failed to send comment!';
+  }
 }
 
 extension Transitioning on Comment {

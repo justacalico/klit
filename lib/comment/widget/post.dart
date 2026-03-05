@@ -1,4 +1,3 @@
-import 'package:klit/client/client.dart';
 import 'package:klit/comment/comment.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,7 +11,6 @@ class PostCommentsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final client = context.watch<Client>();
     return CommentProvider(
       postId: postId,
       child: AdaptiveScaffold(
@@ -20,11 +18,13 @@ class PostCommentsPage extends StatelessWidget {
           title: Text('#$postId comments'),
           actions: const [ContextDrawerButton()],
         ),
-        floatingActionButton: client.hasLogin
-            ? CommentCreateFab(postId: postId)
-            : null,
         endDrawer: const CommentListDrawer(),
-        body: const CommentList(),
+        body: Column(
+          children: [
+            const Expanded(child: CommentList()),
+            InlineCommentComposer(postId: postId),
+          ],
+        ),
       ),
     );
   }
@@ -126,34 +126,7 @@ Future<void> showPostCommentsDrawer(
                         ),
                       ),
                     ),
-                    Consumer<Client>(
-                      builder: (context, client, _) {
-                        if (!client.hasLogin) return const SizedBox(height: 6);
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 6, 12, 12),
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: FilledButton.icon(
-                              onPressed: () {
-                                HapticFeedback.selectionClick();
-                                writeComment(
-                                  context: context,
-                                  postId: postId,
-                                ).then((sent) {
-                                  if (sent) {
-                                    context.read<CommentController>().refresh(
-                                      force: true,
-                                    );
-                                  }
-                                });
-                              },
-                              icon: const Icon(CupertinoIcons.chat_bubble_text),
-                              label: const Text('Add comment'),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                    InlineCommentComposer(postId: postId),
                   ],
                 ),
               ),

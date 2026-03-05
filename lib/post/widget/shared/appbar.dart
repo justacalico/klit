@@ -100,15 +100,11 @@ List<_PostMenuAction> _postMenuUserActionsConfig(
       title: 'Comment',
       onTap: () => guardWithLogin(
         context: context,
-        callback: () async {
-          final controller = context.read<PostController>();
-          final success = await writeComment(context: context, postId: post.id);
-          if (success) {
-            controller.replacePost(
-              post.copyWith(commentCount: post.commentCount + 1),
-            );
-          }
-        },
+        callback: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => PostCommentsPage(postId: post.id),
+          ),
+        ),
         error: 'You must be logged in to comment!',
       ),
     ),
