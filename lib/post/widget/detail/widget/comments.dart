@@ -1,7 +1,9 @@
 import 'package:klit/comment/comment.dart';
 import 'package:klit/post/post.dart';
 import 'package:klit/shared/shared.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CommentDisplay extends StatelessWidget {
   const CommentDisplay({super.key, required this.post});
@@ -11,34 +13,50 @@ class CommentDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (post.commentCount <= 0) return const SizedBox();
+    final textColor = Theme.of(context).textTheme.bodyMedium?.color;
     return Column(
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton(
-                onPressed: () => Navigator.of(context).push(
+        GlassCard(
+          margin: const EdgeInsets.only(top: 10),
+          padding: EdgeInsets.zero,
+          borderRadius: 12,
+          child: SizedBox(
+            width: double.infinity,
+            child: CupertinoButton(
+              onPressed: () {
+                HapticFeedback.selectionClick();
+                Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => PostCommentsPage(postId: post.id),
                   ),
-                ),
-                style: ButtonStyle(
-                  foregroundColor: WidgetStateProperty.all(
-                    Theme.of(context).textTheme.bodyMedium!.color,
+                );
+              },
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              child: Row(
+                children: [
+                  Icon(Icons.comment_outlined, size: 18, color: textColor),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Comments (${post.commentCount})',
+                      style: TextStyle(
+                        color: textColor,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
                   ),
-                  overlayColor: WidgetStateProperty.all(
-                    Theme.of(context).splashColor,
+                  Icon(
+                    CupertinoIcons.chevron_forward,
+                    size: 16,
+                    color: textColor?.withValues(alpha: 0.8),
                   ),
-                ),
-                child: Text(
-                  'COMMENTS'
-                  ' (${post.commentCount})',
-                ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
-        const Divider(),
+        const SizedBox(height: 6),
       ],
     );
   }
