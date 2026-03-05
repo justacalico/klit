@@ -857,6 +857,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 ? Color.lerp(theme.canvasColor, Colors.white, 0.04)!
                 : theme.colorScheme.surface;
             final onTop = theme.colorScheme.onSurface;
+            final buildNumber = appInfo.buildNumber.trim();
+            final versionLabel = buildNumber.isEmpty
+                ? 'v${appInfo.version}'
+                : 'v${appInfo.version} ($buildNumber)';
             final sourceName = switch (appInfo.source) {
               Source.IS_INSTALLED_FROM_LOCAL_SOURCE => 'Local build',
               Source.IS_INSTALLED_FROM_OTHER_SOURCE => 'Other source',
@@ -895,7 +899,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    'v${appInfo.version} (${appInfo.buildNumber})',
+                                    versionLabel,
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color: onTop.withValues(alpha: 0.82),
                                     ),
