@@ -409,11 +409,6 @@ class _Sidebar extends StatelessWidget {
       final forceCollapsed = layoutWidth != null &&
           layoutWidth! < sidebarAutoCollapseBreakpoint &&
           layoutWidth! >= mobileBreakpoint;
-      if (forceCollapsed && !controllerCollapsed) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          controller.sidebarCollapsed.value = true;
-        });
-      }
       final collapsed = forceCollapsed || controllerCollapsed;
       final theme = Theme.of(context);
       final colorScheme = theme.colorScheme;
