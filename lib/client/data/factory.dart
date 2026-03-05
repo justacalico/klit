@@ -34,7 +34,16 @@ class ClientFactory {
     return switch (normalizeHostUrl(identity.host)) {
       _e621Host || _e926Host => TraitsRequest(
         identity: identity.id,
-        denylist: ['gore', 'scat', 'blood', 'weapon', 'gun', 'knife'],
+        denylist: [
+          'gore',
+          'blood',
+          'feces',
+          'gun',
+          'weapon',
+          'knife',
+          'scat',
+          'poop',
+        ],
         homeTags: 'score:>=20',
         writeHistory: false,
       ),
