@@ -32,6 +32,7 @@ class _IdentityEditorDialog extends StatefulWidget {
 }
 
 class _IdentityEditorDialogState extends State<_IdentityEditorDialog> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final TextEditingController hostController = TextEditingController(
     text: widget.identity?.host,
   );
@@ -74,8 +75,8 @@ class _IdentityEditorDialogState extends State<_IdentityEditorDialog> {
   }
 
   Future<void> _saveAndTest() async {
-    final form = Form.of(context);
-    if (!form.validate()) return;
+    final form = _formKey.currentState;
+    if (form == null || !form.validate()) return;
 
     showDialog<void>(
       context: context,
@@ -113,6 +114,7 @@ class _IdentityEditorDialogState extends State<_IdentityEditorDialog> {
 
     return KeyboardDismisser(
       child: Form(
+        key: _formKey,
         child: Dialog(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 560),
