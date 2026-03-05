@@ -19,6 +19,7 @@ class PostImageTile extends StatelessWidget {
     this.withLowRes,
     this.onTap,
     this.bottomBar,
+    this.infoOverlay,
   });
 
   final Post post;
@@ -28,6 +29,7 @@ class PostImageTile extends StatelessWidget {
   final bool? showProgress;
   final bool? withLowRes;
   final Widget? bottomBar;
+  final Widget? infoOverlay;
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +64,8 @@ class PostImageTile extends StatelessWidget {
               ],
             ),
             Positioned(top: 0, right: 0, child: PostImageTag(post: post)),
+            if (infoOverlay != null)
+              Positioned(left: 8, right: 8, bottom: 8, child: infoOverlay!),
             if (onTap != null)
               Material(
                 type: MaterialType.transparency,
@@ -209,6 +213,74 @@ class PostInfoBar extends StatelessWidget {
   }
 }
 
+class PostInfoOverlay extends StatelessWidget {
+  const PostInfoOverlay({super.key, required this.post});
+
+  final Post post;
+
+  @override
+  Widget build(BuildContext context) {
+    final score = post.vote.score;
+    final scorePositive = score >= 0;
+    final scoreColor = scorePositive ? const Color(0xFF4CD964) : Colors.red;
+    final ratingLabel = post.rating.name.characters.first.toUpperCase();
+    final ratingColor = switch (post.rating) {
+      Rating.s => const Color(0xFF2ECC71),
+      Rating.q => const Color(0xFFF1C40F),
+      Rating.e => const Color(0xFFE74C3C),
+    };
+
+    Widget chip({required Widget child, Color? color}) {
+      return DecoratedBox(
+        decoration: BoxDecoration(
+          color: color ?? Colors.black.withValues(alpha: 0.68),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          child: child,
+        ),
+      );
+    }
+
+    return IgnorePointer(
+      child: IconTheme(
+        data: const IconThemeData(size: 12, color: Colors.white),
+        child: DefaultTextStyle(
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+          child: Row(
+            children: [
+              chip(
+                color: ratingColor.withValues(alpha: 0.9),
+                child: Text(ratingLabel),
+              ),
+              const Spacer(),
+              chip(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      scorePositive
+                          ? Icons.arrow_upward_rounded
+                          : Icons.arrow_downward_rounded,
+                      color: scoreColor,
+                    ),
+                    Text(score.toString(), style: TextStyle(color: scoreColor)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 void defaultPushPostDetail(BuildContext context, Post post) {
   PostController? controller = context.read<PostController?>();
   int? cacheSize = context.read<ImageCacheSize>().size;
@@ -238,13 +310,14 @@ class PostTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final showPostInfo = context.watch<Settings>().showPostInfo;
     return PostImageTile(
       post: post,
       onTap: onTap ?? () => defaultPushPostDetail(context, post),
-      bottomBar: ValueListenableBuilder<bool>(
-        valueListenable: context.watch<Settings>().showPostInfo,
+      infoOverlay: ValueListenableBuilder<bool>(
+        valueListenable: showPostInfo,
         builder: (context, value, child) =>
-            value ? PostInfoBar(post: post) : const SizedBox(),
+            value ? PostInfoOverlay(post: post) : const SizedBox.shrink(),
       ),
     );
   }
