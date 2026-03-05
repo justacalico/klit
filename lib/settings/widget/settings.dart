@@ -340,19 +340,6 @@ class SettingsPage extends StatelessWidget {
             ),
           ),
           ValueListenableBuilder<bool>(
-            valueListenable: settings.showPostAura,
-            builder: (context, value, _) => _SettingsSwitchTile(
-              leading: const _SettingsLeadingIcon(
-                icon: CupertinoIcons.sparkles,
-                color: Color(0xFFE67E22),
-              ),
-              title: 'Post aura',
-              subtitle: value ? 'Glow around post media' : 'No glow',
-              value: value,
-              onChanged: (v) => settings.showPostAura.value = v,
-            ),
-          ),
-          ValueListenableBuilder<bool>(
             valueListenable: settings.showShareButton,
             builder: (context, value, _) => _SettingsSwitchTile(
               leading: const _SettingsLeadingIcon(

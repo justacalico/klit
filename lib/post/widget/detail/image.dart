@@ -1,8 +1,5 @@
-import 'dart:ui';
-
 import 'package:klit/app/app.dart';
 import 'package:klit/post/post.dart';
-import 'package:klit/settings/settings.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:flutter/material.dart';
 
@@ -23,11 +20,7 @@ class PostDetailImage extends StatelessWidget {
 }
 
 class PostDetailVideo extends StatelessWidget {
-  const PostDetailVideo({
-    super.key,
-    required this.post,
-    this.onOpen,
-  });
+  const PostDetailVideo({super.key, required this.post, this.onOpen});
 
   final Post post;
   final VoidCallback? onOpen;
@@ -71,9 +64,7 @@ class PostDetailVideo extends StatelessWidget {
                     children: [
                       const VideoServiceVolumeControl(),
                       const SizedBox(width: 8),
-                      Expanded(
-                        child: InlineVideoTimeline(player: player),
-                      ),
+                      Expanded(child: InlineVideoTimeline(player: player)),
                       const SizedBox(width: 8),
                       if (onOpen != null)
                         IconButton(
@@ -268,50 +259,16 @@ class PostDetailImageDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final settings = context.watch<Settings>();
-    final showAura = settings.showPostAura.value;
     final radius = BorderRadius.circular(16);
 
-    Widget media = ImageCacheSizeProvider(
+    final media = ImageCacheSizeProvider(
       size: context.watch<ImageCacheSize?>()?.size,
       child: post.type == PostType.video
-          ? PostDetailVideo(
-              post: post,
-              onOpen: onTap,
-            )
+          ? PostDetailVideo(post: post, onOpen: onTap)
           : PostDetailImage(post: post),
     );
 
-    final clipped = ClipRRect(
-      borderRadius: radius,
-      child: media,
-    );
-
-    if (showAura) {
-      media = Stack(
-        alignment: Alignment.center,
-        children: [
-          ImageFiltered(
-            imageFilter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-            child: Opacity(
-              opacity: 0.9,
-              child: ClipRRect(
-                borderRadius: radius,
-                child: ImageCacheSizeProvider(
-                  size: context.watch<ImageCacheSize?>()?.size,
-                  child: post.type == PostType.video
-                      ? PostDetailVideo(post: post)
-                      : PostDetailImage(post: post),
-                ),
-              ),
-            ),
-          ),
-          clipped,
-        ],
-      );
-    } else {
-      media = clipped;
-    }
+    final clipped = ClipRRect(borderRadius: radius, child: media);
 
     final content = PostDetailImageActions(
       onOpen: onTap,
@@ -319,10 +276,7 @@ class PostDetailImageDisplay extends StatelessWidget {
       child: PostImageOverlay(
         post: post,
         builder: (context) => Center(
-          child: Hero(
-            tag: post.link,
-            child: media,
-          ),
+          child: Hero(tag: post.link, child: clipped),
         ),
       ),
     );

@@ -44,10 +44,6 @@ class Settings extends NotifiedSettings {
     key: 'showPostInfo',
     initialValue: false,
   );
-  late final ValueNotifier<bool> showPostAura = createSetting<bool>(
-    key: 'showPostAura',
-    initialValue: false,
-  );
   late final ValueNotifier<bool> showShareButton = createSetting<bool>(
     key: 'showShareButton',
     initialValue: true,
