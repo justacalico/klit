@@ -69,20 +69,6 @@ class _SettingsPageState extends State<SettingsPage> {
     });
   }
 
-  void _openAccountsInSettings() {
-    HapticFeedback.selectionClick();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final context = _accountsSectionKey.currentContext;
-      if (!mounted || context == null) return;
-      await Scrollable.ensureVisible(
-        context,
-        duration: const Duration(milliseconds: 260),
-        curve: Curves.easeOutCubic,
-        alignment: 0.05,
-      );
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     _focusAccountsSectionIfRequested();
@@ -107,12 +93,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
               final hasLogs = context.read<Logs?>() != null;
               final sections = <_SettingsSectionEntry>[
-                _SettingsSectionEntry(
-                  weight: 2,
-                  child: _identitySection(
-                    onOpenAccounts: _openAccountsInSettings,
-                  ),
-                ),
                 _SettingsSectionEntry(weight: 7, child: _accountsSection()),
                 _SettingsSectionEntry(weight: 4, child: _userSection(nav)),
                 _SettingsSectionEntry(
@@ -205,23 +185,6 @@ class _SettingsPageState extends State<SettingsPage> {
     }
 
     return (left, right);
-  }
-
-  Widget _identitySection({required VoidCallback onOpenAccounts}) {
-    return _SettingsSection(
-      title: 'Identity',
-      child: _SettingsGroupCard(
-        children: [
-          Consumer<IdentityClient>(
-            builder: (context, client, _) => IdentityTile(
-              identity: client.identity,
-              trailing: const Icon(CupertinoIcons.arrow_2_squarepath),
-              onTap: onOpenAccounts,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _accountsSection() {
