@@ -121,34 +121,33 @@ class _PostsSearchPageState extends State<PostsSearchPage> {
               final nav = Get.find<NavigationController>();
               return PostsPage(
                 controller: controller,
-                appBar: const DefaultAppBar(title: Text('Search')),
-                bodyTop: FloatingSearchBar(
+                appBar: SearchPageAppBar(
                   controller: controller,
                   requestFocus: nav.takeRequestSearchFocus(),
                 ),
                 displayType: readerMode ? PostDisplayType.comic : null,
                 drawerActions: [
-                if (pool != null)
-                  Builder(
-                    builder: (context) => PoolReaderSwitch(
-                      readerMode: readerMode,
-                      onChange: (value) {
-                        setState(() => readerMode = value);
-                        Scaffold.of(context).closeEndDrawer();
-                      },
+                  if (pool != null)
+                    Builder(
+                      builder: (context) => PoolReaderSwitch(
+                        readerMode: readerMode,
+                        onChange: (value) {
+                          setState(() => readerMode = value);
+                          Scaffold.of(context).closeEndDrawer();
+                        },
+                      ),
                     ),
-                  ),
-                if (pool != null)
-                  AnimatedBuilder(
-                    animation: controller,
-                    builder: (context, child) => PoolOrderSwitch(
-                      oldestFirst: controller.orderPools,
-                      onChange: (value) {
-                        controller.orderPools = value;
-                        Scaffold.of(context).closeEndDrawer();
-                      },
+                  if (pool != null)
+                    AnimatedBuilder(
+                      animation: controller,
+                      builder: (context, child) => PoolOrderSwitch(
+                        oldestFirst: controller.orderPools,
+                        onChange: (value) {
+                          controller.orderPools = value;
+                          Scaffold.of(context).closeEndDrawer();
+                        },
+                      ),
                     ),
-                  ),
                 ],
               );
             },
