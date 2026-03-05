@@ -72,14 +72,13 @@ class LikeDisplay extends StatelessWidget {
       return AnimatedContainer(
         duration: const Duration(milliseconds: 160),
         curve: Curves.easeOut,
-        margin: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
           color: bgColor,
         ),
         child: CupertinoButton(
           onPressed: onPressed,
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+          padding: const EdgeInsets.symmetric(vertical: 10),
           child: Icon(icon, size: 20, color: fgColor),
           minimumSize: const Size(0, 0),
         ),
@@ -210,13 +209,44 @@ class LikeDisplay extends StatelessWidget {
             valueListenable: settings.postActionBarActions,
             builder: (context, rawActions, _) {
               final actions = PostActionPreferences.decode(rawActions);
+              final buttons = buildActionButtons(actions);
               return GlassCard(
                 margin: const EdgeInsets.only(top: 12),
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                 borderRadius: 18,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(children: buildActionButtons(actions)),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (buttons.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+
+                    const minButtonWidth = 72.0;
+                    const gap = 8.0;
+                    final count = buttons.length;
+                    final availableWidth =
+                        constraints.maxWidth - (gap * (count - 1));
+                    final fittedWidth = availableWidth / count;
+                    final buttonWidth = fittedWidth < minButtonWidth
+                        ? minButtonWidth
+                        : fittedWidth;
+
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minWidth: constraints.maxWidth,
+                        ),
+                        child: Row(
+                          children: [
+                            for (var i = 0; i < count; i++) ...[
+                              SizedBox(width: buttonWidth, child: buttons[i]),
+                              if (i != count - 1) const SizedBox(width: gap),
+                            ],
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
               );
             },
