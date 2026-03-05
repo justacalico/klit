@@ -246,6 +246,56 @@ class _SettingsPageState extends State<SettingsPage> {
           Future<void> testIdentity(Identity identity) async {
             HapticFeedback.selectionClick();
             final messenger = ScaffoldMessenger.of(context);
+            final theme = Theme.of(context);
+
+            void showTestResult({
+              required bool success,
+              required String message,
+            }) {
+              final bgColor = theme.brightness == Brightness.dark
+                  ? Color.lerp(theme.canvasColor, Colors.white, 0.08)!
+                  : theme.colorScheme.surfaceContainerHighest;
+              final fgColor = theme.colorScheme.onSurface;
+              messenger
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    behavior: SnackBarBehavior.floating,
+                    margin: const EdgeInsets.fromLTRB(
+                      16,
+                      0,
+                      16,
+                      defaultActionListBottomHeight - 12,
+                    ),
+                    backgroundColor: bgColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    duration: Duration(seconds: success ? 1 : 2),
+                    content: Row(
+                      children: [
+                        Icon(
+                          success
+                              ? CupertinoIcons.check_mark_circled_solid
+                              : CupertinoIcons.exclamationmark_triangle_fill,
+                          size: 18,
+                          color: success
+                              ? theme.colorScheme.secondary
+                              : theme.colorScheme.error,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            message,
+                            style: TextStyle(color: fgColor),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+            }
+
             final apikey = parseBasicAuth(
               identity.headers?[HttpHeaders.authorizationHeader],
             )?.$2;
@@ -258,23 +308,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 username: identity.username,
                 apikey: apikey,
                 onError: (value) {
-                  messenger.showSnackBar(
-                    SnackBar(
-                      duration: const Duration(seconds: 2),
-                      content: Text(
-                        value ?? 'Failed to connect to ${identity.host}',
-                      ),
-                    ),
+                  showTestResult(
+                    success: false,
+                    message: value ?? 'Failed to connect to ${identity.host}',
                   );
                 },
                 onDone: () {
-                  messenger.showSnackBar(
-                    SnackBar(
-                      duration: const Duration(seconds: 1),
-                      content: Text(
-                        'Connected to ${linkToDisplay(identity.host)}',
-                      ),
-                    ),
+                  showTestResult(
+                    success: true,
+                    message: 'Connected to ${linkToDisplay(identity.host)}',
                   );
                 },
               ),
