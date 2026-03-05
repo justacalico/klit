@@ -625,25 +625,111 @@ class SettingsPage extends StatelessWidget {
             final surface = theme.brightness == Brightness.dark
                 ? Color.lerp(theme.canvasColor, Colors.white, 0.04)!
                 : theme.colorScheme.surface;
+            final topA = theme.brightness == Brightness.dark
+                ? Color.lerp(theme.colorScheme.primary, Colors.black, 0.45)!
+                : Color.lerp(theme.colorScheme.primary, Colors.white, 0.8)!;
+            final topB = theme.brightness == Brightness.dark
+                ? Color.lerp(theme.colorScheme.secondary, Colors.black, 0.6)!
+                : Color.lerp(theme.colorScheme.secondary, Colors.white, 0.88)!;
+            final onTop = theme.brightness == Brightness.dark
+                ? Colors.white
+                : theme.colorScheme.onSurface;
+            final sourceName = switch (appInfo.source) {
+              Source.IS_INSTALLED_FROM_LOCAL_SOURCE => 'Local build',
+              Source.IS_INSTALLED_FROM_OTHER_SOURCE => 'Other source',
+              Source.UNKNOWN => 'Unknown source',
+              _ => 'Store install',
+            };
 
-            return DecoratedBox(
-              decoration: BoxDecoration(
-                color: surface,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CupertinoListTile(
-                    leading: const AppIcon(radius: 24),
-                    title: Text(appInfo.appName),
-                    subtitle: Text(appInfo.version),
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [topA, topB],
+                    ),
                   ),
-                  const Divider(height: 1),
-                  AboutVersion(newVersions: versions),
-                  const AboutLinks(),
-                ],
-              ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const AppIcon(radius: 20),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    appInfo.appName,
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                          color: onTop,
+                                        ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'v${appInfo.version} (${appInfo.buildNumber})',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: onTop.withValues(alpha: 0.82),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _AboutMetaPill(
+                              icon: CupertinoIcons.person,
+                              text: appInfo.developer,
+                              color: onTop.withValues(alpha: 0.14),
+                              textColor: onTop,
+                            ),
+                            _AboutMetaPill(
+                              icon: CupertinoIcons.cube_box,
+                              text: sourceName,
+                              color: onTop.withValues(alpha: 0.14),
+                              textColor: onTop,
+                            ),
+                            _AboutMetaPill(
+                              icon: CupertinoIcons.number,
+                              text: appInfo.packageName,
+                              color: onTop.withValues(alpha: 0.14),
+                              textColor: onTop,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: surface,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AboutVersion(newVersions: versions),
+                      const AboutLinks(),
+                    ],
+                  ),
+                ),
+              ],
             );
           },
         ),
@@ -837,6 +923,47 @@ class _SettingsLeadingIcon extends StatelessWidget {
         width: 28,
         height: 28,
         child: Icon(icon, size: 16, color: Colors.white),
+      ),
+    );
+  }
+}
+
+class _AboutMetaPill extends StatelessWidget {
+  const _AboutMetaPill({
+    required this.icon,
+    required this.text,
+    required this.color,
+    required this.textColor,
+  });
+
+  final IconData icon;
+  final String text;
+  final Color color;
+  final Color textColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14, color: textColor),
+            const SizedBox(width: 6),
+            Text(
+              text,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: textColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
