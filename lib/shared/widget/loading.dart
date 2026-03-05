@@ -1,3 +1,4 @@
+import 'package:klit/shared/shared.dart';
 import 'package:flutter/material.dart';
 
 class SizedCircularProgressIndicator extends StatelessWidget {
@@ -180,7 +181,7 @@ class AsyncLoadingPage<T> extends StatelessWidget {
       child: (context) => builder(context, snapshot.data as T),
       loadingBuilder: (context, child) => Scaffold(
         appBar: title != null
-            ? AppBar(leading: const CloseButton(), title: title)
+            ? DefaultAppBar(leading: const CloseButton(), title: title)
             : null,
         body: child(context),
       ),

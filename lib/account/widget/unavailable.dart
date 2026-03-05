@@ -12,7 +12,9 @@ class HostUnvailablePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: TransparentAppBar(child: AppBar(leading: const CloseButton())),
+      appBar: TransparentAppBar(
+        child: const DefaultAppBar(leading: CloseButton()),
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
@@ -30,7 +32,8 @@ class HostUnvailablePage extends StatelessWidget {
                 'It appears that ${linkToDisplay(context.watch<Client>().host)} is not available!',
               ),
               const SizedBox(height: 16),
-              if (offerResolve && PlatformCapabilities.supportsWebViewLogin) ...[
+              if (offerResolve &&
+                  PlatformCapabilities.supportsWebViewLogin) ...[
                 const Text(
                   'Please resolve the issue in the following browser window. '
                   '\n\nCloudflare captcha cookies will be saved. ',

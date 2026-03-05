@@ -48,7 +48,8 @@ AppBarLeadingConfiguration getLeadingConfiguration({
       child: const Icon(CupertinoIcons.line_horizontal_3),
     );
 
-    Widget backButton = parentRoute is PageRoute<dynamic> && parentRoute.fullscreenDialog
+    Widget backButton =
+        parentRoute is PageRoute<dynamic> && parentRoute.fullscreenDialog
         ? CupertinoButton(
             padding: EdgeInsets.zero,
             minimumSize: Size.zero,
@@ -100,6 +101,112 @@ IconData getPlatformBackIcon(BuildContext context) {
   }
 }
 
+enum AppHeaderDensity { compact, regular, spacious }
+
+enum AppHeaderSurface { solid, translucent, transparent }
+
+class AppHeaderBar extends StatelessWidget implements PreferredSizeWidget {
+  const AppHeaderBar({
+    super.key,
+    this.leading,
+    this.actions,
+    this.title,
+    this.secondary,
+    this.automaticallyImplyLeading = true,
+    this.ignoreTitlePointer = true,
+    this.density = AppHeaderDensity.regular,
+    this.surface = AppHeaderSurface.translucent,
+  });
+
+  final Widget? title;
+  final Widget? leading;
+  final List<Widget>? actions;
+  final Widget? secondary;
+  final bool automaticallyImplyLeading;
+  final bool ignoreTitlePointer;
+  final AppHeaderDensity density;
+  final AppHeaderSurface surface;
+
+  double get _secondaryHeight {
+    return switch (density) {
+      AppHeaderDensity.compact => 52,
+      AppHeaderDensity.regular => 60,
+      AppHeaderDensity.spacious => 68,
+    };
+  }
+
+  @override
+  Size get preferredSize => Size.fromHeight(
+    defaultAppBarHeight + (secondary != null ? _secondaryHeight : 0),
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cupertinoTheme = CupertinoTheme.of(context);
+    final secondaryFill = theme.brightness == Brightness.dark
+        ? Color.lerp(theme.cardColor, Colors.white, 0.06)!
+        : theme.colorScheme.surfaceContainerHighest;
+
+    Color navColor() {
+      return switch (surface) {
+        AppHeaderSurface.solid => cupertinoTheme.barBackgroundColor,
+        AppHeaderSurface.translucent =>
+          cupertinoTheme.barBackgroundColor.withValues(alpha: 0.9),
+        AppHeaderSurface.transparent => Colors.transparent,
+      };
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final leadingConfig = getLeadingConfiguration(
+          context: context,
+          width: constraints.maxWidth,
+          automaticallyImplyLeading: automaticallyImplyLeading,
+          leading: leading,
+        );
+        final bar = CupertinoNavigationBar(
+          leading: leadingConfig.leading,
+          middle: IgnorePointer(ignoring: ignoreTitlePointer, child: title),
+          trailing: actions != null && actions!.isNotEmpty
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [...actions!, const SizedBox(width: 8)],
+                )
+              : null,
+          backgroundColor: navColor(),
+          border: null,
+        );
+        if (secondary == null) {
+          return PreferredSize(
+            preferredSize: preferredSize,
+            child: ScrollToTop(child: bar),
+          );
+        }
+        return PreferredSize(
+          preferredSize: preferredSize,
+          child: ScrollToTop(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                bar,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
+                  child: Material(
+                    color: secondaryFill,
+                    borderRadius: BorderRadius.circular(14),
+                    child: SizedBox(height: _secondaryHeight, child: secondary),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
   /// A preconfigured appbar.
   ///
@@ -111,9 +218,12 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.leading,
     this.actions,
     this.title,
+    this.secondary,
     this.elevation,
     this.automaticallyImplyLeading = true,
     this.ignoreTitlePointer = true,
+    this.surface = AppHeaderSurface.translucent,
+    this.density = AppHeaderDensity.regular,
   });
 
   /// Copied from [AppBar.title].
@@ -125,6 +235,8 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
   /// Copied from [AppBar.actions].
   final List<Widget>? actions;
 
+  final Widget? secondary;
+
   /// Copied from [AppBar.elevation].
   final double? elevation;
 
@@ -134,41 +246,32 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
   /// Ignores tapping the title.
   final bool ignoreTitlePointer;
 
+  final AppHeaderSurface surface;
+  final AppHeaderDensity density;
+
   @override
-  Size get preferredSize => const Size.fromHeight(defaultAppBarHeight);
+  Size get preferredSize => AppHeaderBar(
+    title: title,
+    leading: leading,
+    actions: actions,
+    secondary: secondary,
+    automaticallyImplyLeading: automaticallyImplyLeading,
+    ignoreTitlePointer: ignoreTitlePointer,
+    surface: surface,
+    density: density,
+  ).preferredSize;
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        AppBarLeadingConfiguration leadingConfig = getLeadingConfiguration(
-          context: context,
-          width: constraints.maxWidth,
-          automaticallyImplyLeading: automaticallyImplyLeading,
-          leading: leading,
-        );
-        final cupertinoTheme = CupertinoTheme.of(context);
-        return PreferredSize(
-          preferredSize: preferredSize,
-          child: ScrollToTop(
-            child: CupertinoNavigationBar(
-              leading: leadingConfig.leading,
-              middle: IgnorePointer(ignoring: ignoreTitlePointer, child: title),
-              trailing: actions != null && actions!.isNotEmpty
-                  ? Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ...actions!,
-                        const SizedBox(width: 8),
-                      ],
-                    )
-                  : null,
-              backgroundColor: cupertinoTheme.barBackgroundColor.withValues(alpha: 0.9),
-              border: null,
-            ),
-          ),
-        );
-      },
+    return AppHeaderBar(
+      title: title,
+      leading: leading,
+      actions: actions,
+      secondary: secondary,
+      automaticallyImplyLeading: automaticallyImplyLeading,
+      ignoreTitlePointer: ignoreTitlePointer,
+      surface: surface,
+      density: density,
     );
   }
 }

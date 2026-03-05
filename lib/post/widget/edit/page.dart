@@ -180,7 +180,7 @@ class _PostEditPageState extends State<PostEditPage> {
         child: Scaffold(
           extendBodyBehindAppBar: true,
           appBar: TransparentAppBar(
-            child: AppBar(leading: const CloseButton()),
+            child: const DefaultAppBar(leading: CloseButton()),
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: _isLoading ? null : _saveChanges,

@@ -56,7 +56,10 @@ class _CookieCapturePageState extends State<CookieCapturePage> {
       final host = context.read<Client>().host;
       final loginUrl = Uri.https(host, 'users/sign_in');
       return Scaffold(
-        appBar: AppBar(leading: const CloseButton(), title: widget.title),
+        appBar: DefaultAppBar(
+          leading: const CloseButton(),
+          title: widget.title,
+        ),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -80,7 +83,7 @@ class _CookieCapturePageState extends State<CookieCapturePage> {
       );
     }
     return Scaffold(
-      appBar: AppBar(leading: const CloseButton(), title: widget.title),
+      appBar: DefaultAppBar(leading: const CloseButton(), title: widget.title),
       body: WebViewWidget(controller: controller),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.check),

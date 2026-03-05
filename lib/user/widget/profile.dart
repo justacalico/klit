@@ -46,7 +46,11 @@ class ProfilePage extends StatelessWidget {
             body: Center(
               child: IconMessage(
                 icon: const Icon(Icons.warning_amber_outlined),
-                title: Text(snapshot.hasError ? 'Failed to load profile' : 'User not found'),
+                title: Text(
+                  snapshot.hasError
+                      ? 'Failed to load profile'
+                      : 'User not found',
+                ),
               ),
             ),
           );
@@ -77,13 +81,16 @@ class _ProfileControllers {
 
 class _ProfileProvider extends SubProvider<Client, _ProfileControllers> {
   _ProfileProvider({required User user, required super.child})
-      : super(
-          create: (context, client) => _ProfileControllers(
-            favoritePosts: UserFavoritesController(client: client, user: user.name),
-            uploadedPosts: UserUploadsController(client: client, user: user.name),
+    : super(
+        create: (context, client) => _ProfileControllers(
+          favoritePosts: UserFavoritesController(
+            client: client,
+            user: user.name,
           ),
-          dispose: (context, value) => value.dispose(),
-        );
+          uploadedPosts: UserUploadsController(client: client, user: user.name),
+        ),
+        dispose: (context, value) => value.dispose(),
+      );
 }
 
 class _ProfileTabs extends StatelessWidget {
@@ -168,9 +175,9 @@ class _ProfileTabs extends StatelessWidget {
         return DefaultTabController(
           length: tabs.length,
           child: Scaffold(
-            appBar: AppBar(
+            appBar: AppHeaderBar(
               title: Text(user.name),
-              bottom: TabBar(tabs: tabs),
+              secondary: TabBar(tabs: tabs),
             ),
             body: TabBarView(children: children),
           ),
