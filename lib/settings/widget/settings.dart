@@ -698,6 +698,12 @@ class SettingsPage extends StatelessWidget {
                               textColor: onTop,
                             ),
                             _AboutMetaPill(
+                              icon: CupertinoIcons.info,
+                              text: 'v${appInfo.version}',
+                              color: onTop.withValues(alpha: 0.14),
+                              textColor: onTop,
+                            ),
+                            _AboutMetaPill(
                               icon: CupertinoIcons.cube_box,
                               text: sourceName,
                               color: onTop.withValues(alpha: 0.14),
@@ -709,6 +715,17 @@ class SettingsPage extends StatelessWidget {
                               color: onTop.withValues(alpha: 0.14),
                               textColor: onTop,
                             ),
+                            if (appInfo.website != null)
+                              _AboutMetaPill(
+                                icon: CupertinoIcons.globe,
+                                text: appInfo.website!,
+                                color: onTop.withValues(alpha: 0.14),
+                                textColor: onTop,
+                                onTap: () {
+                                  HapticFeedback.selectionClick();
+                                  launch('https://${appInfo.website!}');
+                                },
+                              ),
                           ],
                         ),
                       ],
@@ -934,35 +951,40 @@ class _AboutMetaPill extends StatelessWidget {
     required this.text,
     required this.color,
     required this.textColor,
+    this.onTap,
   });
 
   final IconData icon;
   final String text;
   final Color color;
   final Color textColor;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 14, color: textColor),
-            const SizedBox(width: 6),
-            Text(
-              text,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: textColor,
-                fontWeight: FontWeight.w600,
+    return GestureDetector(
+      onTap: onTap,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 14, color: textColor),
+              const SizedBox(width: 6),
+              Text(
+                text,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: textColor,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
