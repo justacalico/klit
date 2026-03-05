@@ -619,12 +619,7 @@ class SettingsPage extends StatelessWidget {
         child: Builder(
           builder: (context) {
             final theme = Theme.of(context);
-            final client = context.read<AppInfoClient?>();
-            final versions = client?.getNewVersions();
             final appInfo = AppInfo.instance;
-            final surface = theme.brightness == Brightness.dark
-                ? Color.lerp(theme.canvasColor, Colors.white, 0.04)!
-                : theme.colorScheme.surface;
             final topA = theme.brightness == Brightness.dark
                 ? Color.lerp(theme.colorScheme.primary, Colors.black, 0.45)!
                 : Color.lerp(theme.colorScheme.primary, Colors.white, 0.8)!;
@@ -730,20 +725,6 @@ class SettingsPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: surface,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AboutVersion(newVersions: versions),
-                      const AboutLinks(),
-                    ],
                   ),
                 ),
               ],
