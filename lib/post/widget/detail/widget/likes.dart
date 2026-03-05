@@ -13,9 +13,6 @@ class LikeDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final client = context.watch<Client>();
-    bool canVote = client.hasLogin;
-
     final theme = Theme.of(context);
     final cupertino = CupertinoTheme.of(context);
     final primary = cupertino.primaryColor;
@@ -24,15 +21,12 @@ class LikeDisplay extends StatelessWidget {
     final settings = context.read<Settings>();
     final showShare = settings.showShareButton.value;
 
-    Future<void> vote({
-      required bool upvote,
-      required bool isLiked,
-    }) async {
+    Future<void> vote({required bool upvote, required bool isLiked}) async {
       PostController controller = context.read<PostController>();
       ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
-      controller
-          .vote(post: post, upvote: upvote, replace: !isLiked)
-          .then((value) {
+      controller.vote(post: post, upvote: upvote, replace: !isLiked).then((
+        value,
+      ) {
         if (!value) {
           messenger.showSnackBar(
             SnackBar(
@@ -47,14 +41,15 @@ class LikeDisplay extends StatelessWidget {
     }
 
     Future<void> toggleFavorite() async {
-      await _toggleFavorite(context: context, post: post, isLiked: post.isFavorited);
+      await _toggleFavorite(
+        context: context,
+        post: post,
+        isLiked: post.isFavorited,
+      );
     }
 
     Future<void> share() async {
-      await Share.text(
-        context,
-        context.read<Client>().withHost(post.link),
-      );
+      await Share.text(context, context.read<Client>().withHost(post.link));
     }
 
     Widget buildControlButton({
@@ -79,11 +74,8 @@ class LikeDisplay extends StatelessWidget {
           child: CupertinoButton(
             onPressed: onPressed,
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Icon(
-              icon,
-              size: 20,
-              color: fgColor,
-            ), minimumSize: Size(0, 0),
+            child: Icon(icon, size: 20, color: fgColor),
+            minimumSize: Size(0, 0),
           ),
         ),
       );
@@ -99,11 +91,7 @@ class LikeDisplay extends StatelessWidget {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 18,
-            color: color ?? iconColor,
-          ),
+          Icon(icon, size: 18, color: color ?? iconColor),
           const SizedBox(height: 6),
           Text(
             value,
@@ -133,31 +121,37 @@ class LikeDisplay extends StatelessWidget {
                     ? Icons.thumb_up
                     : Icons.thumb_up_alt_outlined,
                 active: voteStatus == VoteStatus.upvoted,
-                onPressed: canVote
-                    ? () => vote(
-                          upvote: true,
-                          isLiked: voteStatus == VoteStatus.upvoted,
-                        )
-                    : null,
+                onPressed: () => guardWithLogin(
+                  context: context,
+                  callback: () => vote(
+                    upvote: true,
+                    isLiked: voteStatus == VoteStatus.upvoted,
+                  ),
+                  error: 'You must be logged in to vote on posts!',
+                ),
               ),
               buildControlButton(
                 icon: voteStatus == VoteStatus.downvoted
                     ? Icons.thumb_down
                     : Icons.thumb_down_alt_outlined,
                 active: voteStatus == VoteStatus.downvoted,
-                onPressed: canVote
-                    ? () => vote(
-                          upvote: false,
-                          isLiked: voteStatus == VoteStatus.downvoted,
-                        )
-                    : null,
+                onPressed: () => guardWithLogin(
+                  context: context,
+                  callback: () => vote(
+                    upvote: false,
+                    isLiked: voteStatus == VoteStatus.downvoted,
+                  ),
+                  error: 'You must be logged in to vote on posts!',
+                ),
               ),
               buildControlButton(
-                icon: post.isFavorited
-                    ? Icons.favorite
-                    : Icons.favorite_border,
+                icon: post.isFavorited ? Icons.favorite : Icons.favorite_border,
                 active: post.isFavorited,
-                onPressed: client.hasLogin ? toggleFavorite : null,
+                onPressed: () => guardWithLogin(
+                  context: context,
+                  callback: toggleFavorite,
+                  error: 'You must be logged in to favorite posts!',
+                ),
               ),
               if (showShare)
                 buildControlButton(
@@ -179,9 +173,7 @@ class LikeDisplay extends StatelessWidget {
                 icon: Icons.thumb_up,
                 label: 'Score',
                 value: post.vote.score.toString(),
-                color: voteStatus == VoteStatus.upvoted
-                    ? primary
-                    : iconColor,
+                color: voteStatus == VoteStatus.upvoted ? primary : iconColor,
               ),
               buildStat(
                 icon: Icons.favorite,
@@ -247,9 +239,7 @@ Future<bool> _toggleFavorite({
         messenger.showSnackBar(
           SnackBar(
             duration: const Duration(seconds: 1),
-            content: Text(
-              'Failed to remove Post #${post.id} from favorites',
-            ),
+            content: Text('Failed to remove Post #${post.id} from favorites'),
           ),
         );
       }
@@ -270,9 +260,7 @@ Future<bool> _toggleFavorite({
         messenger.showSnackBar(
           SnackBar(
             duration: const Duration(seconds: 1),
-            content: Text(
-              'Failed to add Post #${post.id} to favorites',
-            ),
+            content: Text('Failed to add Post #${post.id} to favorites'),
           ),
         );
       }
@@ -280,4 +268,3 @@ Future<bool> _toggleFavorite({
     return true;
   }
 }
-
