@@ -30,6 +30,7 @@ AppBarLeadingConfiguration getLeadingConfiguration({
   Widget? leading,
   bool automaticallyImplyLeading = true,
 }) {
+  const minimumTapTarget = Size(44, 44);
   bool alwaysShowDrawer =
       alwaysShowDrawerBreakpoint != null && width >= alwaysShowDrawerBreakpoint;
 
@@ -43,7 +44,7 @@ AppBarLeadingConfiguration getLeadingConfiguration({
 
     Widget drawerButton() => CupertinoButton(
       padding: EdgeInsets.zero,
-      minimumSize: Size.zero,
+      minimumSize: minimumTapTarget,
       onPressed: Scaffold.of(context).openDrawer,
       child: const Icon(CupertinoIcons.line_horizontal_3),
     );
@@ -52,13 +53,13 @@ AppBarLeadingConfiguration getLeadingConfiguration({
         parentRoute is PageRoute<dynamic> && parentRoute.fullscreenDialog
         ? CupertinoButton(
             padding: EdgeInsets.zero,
-            minimumSize: Size.zero,
+            minimumSize: minimumTapTarget,
             onPressed: () => Navigator.maybePop(context),
             child: const Icon(Icons.close),
           )
         : CupertinoButton(
             padding: EdgeInsets.zero,
-            minimumSize: Size.zero,
+            minimumSize: minimumTapTarget,
             onPressed: () => Navigator.maybePop(context),
             child: const Icon(Icons.arrow_back_ios_new),
           );
