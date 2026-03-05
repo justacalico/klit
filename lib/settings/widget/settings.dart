@@ -243,6 +243,44 @@ class _SettingsPageState extends State<SettingsPage> {
             await identityClient.activate(identity.id);
           }
 
+          Future<void> testIdentity(Identity identity) async {
+            HapticFeedback.selectionClick();
+            final messenger = ScaffoldMessenger.of(context);
+            final apikey = parseBasicAuth(
+              identity.headers?[HttpHeaders.authorizationHeader],
+            )?.$2;
+            await showDialog<void>(
+              context: context,
+              barrierDismissible: false,
+              builder: (dialogContext) => LoginLoadingDialog(
+                identity: identity,
+                host: identity.host,
+                username: identity.username,
+                apikey: apikey,
+                onError: (value) {
+                  messenger.showSnackBar(
+                    SnackBar(
+                      duration: const Duration(seconds: 2),
+                      content: Text(
+                        value ?? 'Failed to connect to ${identity.host}',
+                      ),
+                    ),
+                  );
+                },
+                onDone: () {
+                  messenger.showSnackBar(
+                    SnackBar(
+                      duration: const Duration(seconds: 1),
+                      content: Text(
+                        'Connected to ${linkToDisplay(identity.host)}',
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          }
+
           Future<void> deleteIdentity(Identity identity) async {
             HapticFeedback.selectionClick();
             final confirmed = await showDialog<bool>(
@@ -358,6 +396,11 @@ class _SettingsPageState extends State<SettingsPage> {
                                       icon: Icons.check,
                                       value: () => activateIdentity(identity),
                                     ),
+                                  PopupMenuTile(
+                                    title: 'Test',
+                                    icon: Icons.wifi_tethering,
+                                    value: () => testIdentity(identity),
+                                  ),
                                   PopupMenuTile(
                                     title: 'Edit',
                                     icon: Icons.edit,
