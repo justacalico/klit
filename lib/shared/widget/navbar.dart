@@ -96,19 +96,25 @@ class _BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final viewPadding = MediaQuery.viewPaddingOf(context);
+    final bottomOffset = viewPadding.bottom > 0 ? viewPadding.bottom + 8 : 12.0;
     return Obx(() {
-      final visible =
-          _visibleNavEntries(controller.items, showFavorites, showHistory);
-      final primaryCount =
-          controller.mobilePrimaryCount.clamp(0, visible.length);
+      final visible = _visibleNavEntries(
+        controller.items,
+        showFavorites,
+        showHistory,
+      );
+      final primaryCount = controller.mobilePrimaryCount.clamp(
+        0,
+        visible.length,
+      );
       final primaryVisible = visible.take(primaryCount).toList();
       final moreVisible = visible.skip(primaryCount).toList();
       final selectedVisibleIndex = visible
           .indexWhere((e) => e.index == controller.currentIndex)
           .clamp(0, visible.isEmpty ? 0 : visible.length - 1);
       final isOnPrimary = selectedVisibleIndex < primaryCount;
-      final selectedIndex =
-          isOnPrimary ? selectedVisibleIndex : primaryCount;
+      final selectedIndex = isOnPrimary ? selectedVisibleIndex : primaryCount;
 
       final theme = Theme.of(context);
       final colorScheme = theme.colorScheme;
@@ -121,7 +127,7 @@ class _BottomNavBar extends StatelessWidget {
       final destinationCount =
           primaryVisible.length + (moreVisible.isNotEmpty ? 1 : 0);
       return GlassSurface(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+        margin: EdgeInsets.fromLTRB(16, 0, 16, bottomOffset),
         borderRadius: 28,
         padding: EdgeInsets.zero,
         color: barBgTranslucent,
@@ -198,13 +204,13 @@ class _AnimatedBottomNavBarState extends State<_AnimatedBottomNavBar>
       duration: const Duration(milliseconds: 220),
       vsync: this,
     );
-    _animation = Tween<double>(
-      begin: _currentIndex,
-      end: widget.selectedIndex.toDouble(),
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOutCubic,
-    ));
+    _animation =
+        Tween<double>(
+          begin: _currentIndex,
+          end: widget.selectedIndex.toDouble(),
+        ).animate(
+          CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
+        );
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed && mounted) {
         setState(() => _currentIndex = widget.selectedIndex.toDouble());
@@ -218,13 +224,13 @@ class _AnimatedBottomNavBarState extends State<_AnimatedBottomNavBar>
     if (oldWidget.selectedIndex != widget.selectedIndex) {
       _controller.stop();
       _controller.reset();
-      _animation = Tween<double>(
-        begin: _currentIndex,
-        end: widget.selectedIndex.toDouble(),
-      ).animate(CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOutCubic,
-      ));
+      _animation =
+          Tween<double>(
+            begin: _currentIndex,
+            end: widget.selectedIndex.toDouble(),
+          ).animate(
+            CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
+          );
       _controller.forward();
     }
   }
@@ -362,11 +368,10 @@ void _showMoreMenu(
                   title: Text(
                     e.item.label,
                     style: TextStyle(
-                      fontWeight:
-                          selected ? FontWeight.w600 : FontWeight.normal,
-                      color: selected
-                          ? cupertinoTheme.primaryColor
-                          : null,
+                      fontWeight: selected
+                          ? FontWeight.w600
+                          : FontWeight.normal,
+                      color: selected ? cupertinoTheme.primaryColor : null,
                     ),
                   ),
                   onTap: () {
@@ -425,7 +430,9 @@ class _SidebarState extends State<_Sidebar> {
     final previousWidth = _lastLayoutWidth ?? oldWidget.layoutWidth;
     final newWidth = widget.layoutWidth;
 
-    if (previousWidth != null && newWidth != null && previousWidth != newWidth) {
+    if (previousWidth != null &&
+        newWidth != null &&
+        previousWidth != newWidth) {
       final wasNarrow = previousWidth < sidebarAutoCollapseBreakpoint;
       final isNarrow = _isAutoCollapseWidth(newWidth);
 
@@ -442,7 +449,8 @@ class _SidebarState extends State<_Sidebar> {
       }
     }
 
-    final transitioningToWide = newWidth != null &&
+    final transitioningToWide =
+        newWidth != null &&
         previousWidth != null &&
         previousWidth < sidebarAutoCollapseBreakpoint &&
         newWidth! >= sidebarAutoCollapseBreakpoint;
@@ -467,7 +475,8 @@ class _SidebarState extends State<_Sidebar> {
 
     return Obx(() {
       final controllerCollapsed = widget.controller.sidebarCollapsed.value;
-      final forceCollapsed = layoutWidth != null &&
+      final forceCollapsed =
+          layoutWidth != null &&
           layoutWidth < sidebarAutoCollapseBreakpoint &&
           layoutWidth >= mobileBreakpoint;
       final collapsed = forceCollapsed || controllerCollapsed;
@@ -525,9 +534,9 @@ class _SidebarState extends State<_Sidebar> {
                                         'Klit',
                                         style: theme.textTheme.bodyLarge
                                             ?.copyWith(
-                                          fontWeight: FontWeight.w600,
-                                          color: colorScheme.onSurface,
-                                        ),
+                                              fontWeight: FontWeight.w600,
+                                              color: colorScheme.onSurface,
+                                            ),
                                       ),
                                     ),
                                   ],
@@ -539,7 +548,10 @@ class _SidebarState extends State<_Sidebar> {
                 ),
                 Flexible(
                   child: ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     children: [
                       for (final e in visible)
                         _SidebarTile(
@@ -694,7 +706,9 @@ class _SidebarTile extends StatelessWidget {
                     child: Text(
                       item.label,
                       style: theme.textTheme.bodyLarge?.copyWith(
-                        fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                        fontWeight: selected
+                            ? FontWeight.w600
+                            : FontWeight.w500,
                         color: selected
                             ? colorScheme.onSurface
                             : colorScheme.onSurfaceVariant,
@@ -724,8 +738,11 @@ class _CompactNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final visible =
-        _visibleNavEntries(controller.items, showFavorites, showHistory);
+    final visible = _visibleNavEntries(
+      controller.items,
+      showFavorites,
+      showHistory,
+    );
     final theme = Theme.of(context);
     final barBg = theme.brightness == Brightness.dark
         ? theme.canvasColor
@@ -764,8 +781,11 @@ class _FullNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final visible =
-        _visibleNavEntries(controller.items, showFavorites, showHistory);
+    final visible = _visibleNavEntries(
+      controller.items,
+      showFavorites,
+      showHistory,
+    );
     final theme = Theme.of(context);
     final barBg = theme.brightness == Brightness.dark
         ? theme.canvasColor
