@@ -4,6 +4,7 @@ import 'package:klit/settings/settings.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:like_button/like_button.dart';
 
 class LikeDisplay extends StatelessWidget {
@@ -123,33 +124,45 @@ class LikeDisplay extends StatelessWidget {
                       ? Icons.thumb_up
                       : Icons.thumb_up_alt_outlined,
                   active: voteStatus == VoteStatus.upvoted,
-                  onPressed: () => vote(
-                    upvote: true,
-                    isLiked: voteStatus == VoteStatus.upvoted,
-                  ),
+                  onPressed: () {
+                    HapticFeedback.selectionClick();
+                    vote(
+                      upvote: true,
+                      isLiked: voteStatus == VoteStatus.upvoted,
+                    );
+                  },
                 ),
                 buildControlButton(
                   icon: voteStatus == VoteStatus.downvoted
                       ? Icons.thumb_down
                       : Icons.thumb_down_alt_outlined,
                   active: voteStatus == VoteStatus.downvoted,
-                  onPressed: () => vote(
-                    upvote: false,
-                    isLiked: voteStatus == VoteStatus.downvoted,
-                  ),
+                  onPressed: () {
+                    HapticFeedback.selectionClick();
+                    vote(
+                      upvote: false,
+                      isLiked: voteStatus == VoteStatus.downvoted,
+                    );
+                  },
                 ),
                 buildControlButton(
                   icon: post.isFavorited
                       ? Icons.favorite
                       : Icons.favorite_border,
                   active: post.isFavorited,
-                  onPressed: toggleFavorite,
+                  onPressed: () {
+                    HapticFeedback.selectionClick();
+                    toggleFavorite();
+                  },
                 ),
                 if (showShare)
                   buildControlButton(
                     icon: Icons.share_outlined,
                     active: false,
-                    onPressed: share,
+                    onPressed: () {
+                      HapticFeedback.selectionClick();
+                      share();
+                    },
                   ),
               ],
             ),
