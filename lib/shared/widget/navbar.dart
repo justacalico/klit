@@ -389,7 +389,7 @@ const double _sidebarExpandedWidth = 240;
 const double _sidebarCollapsedWidth = 72;
 const Duration _sidebarAnimationDuration = Duration(milliseconds: 200);
 
-class _Sidebar extends StatelessWidget {
+class _Sidebar extends StatefulWidget {
   const _Sidebar({
     required this.controller,
     required this.showFavorites,
@@ -403,21 +403,66 @@ class _Sidebar extends StatelessWidget {
   final double? layoutWidth;
 
   @override
+  State<_Sidebar> createState() => _SidebarState();
+}
+
+class _SidebarState extends State<_Sidebar> {
+  double? _lastLayoutWidth;
+
+  @override
+  void initState() {
+    super.initState();
+    _lastLayoutWidth = widget.layoutWidth;
+  }
+
+  bool _isAutoCollapseWidth(double width) {
+    return width < sidebarAutoCollapseBreakpoint && width >= mobileBreakpoint;
+  }
+
+  @override
+  void didUpdateWidget(covariant _Sidebar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final previousWidth = _lastLayoutWidth ?? oldWidget.layoutWidth;
+    final newWidth = widget.layoutWidth;
+
+    if (previousWidth != null && newWidth != null && previousWidth != newWidth) {
+      final wasAutoCollapsed = _isAutoCollapseWidth(previousWidth);
+      final isAutoCollapsed = _isAutoCollapseWidth(newWidth);
+
+      if (wasAutoCollapsed && !isAutoCollapsed && newWidth >= sidebarAutoCollapseBreakpoint) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          widget.controller.sidebarCollapsed.value = false;
+        });
+      } else if (!wasAutoCollapsed && isAutoCollapsed) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          widget.controller.sidebarCollapsed.value = true;
+        });
+      }
+    }
+
+    _lastLayoutWidth = newWidth;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Obx(() {
-      final controllerCollapsed = controller.sidebarCollapsed.value;
+      final controllerCollapsed = widget.controller.sidebarCollapsed.value;
+      final layoutWidth = widget.layoutWidth;
       final forceCollapsed = layoutWidth != null &&
-          layoutWidth! < sidebarAutoCollapseBreakpoint &&
-          layoutWidth! >= mobileBreakpoint;
+          layoutWidth < sidebarAutoCollapseBreakpoint &&
+          layoutWidth >= mobileBreakpoint;
       final collapsed = forceCollapsed || controllerCollapsed;
       final theme = Theme.of(context);
       final colorScheme = theme.colorScheme;
       final sidebarBg = theme.canvasColor;
       final width = collapsed ? _sidebarCollapsedWidth : _sidebarExpandedWidth;
-      final visible =
-          _visibleNavEntries(controller.items, showFavorites, showHistory)
-              .where((e) => e.item.path != '/settings')
-              .toList();
+      final visible = _visibleNavEntries(
+        widget.controller.items,
+        widget.showFavorites,
+        widget.showHistory,
+      ).where((e) => e.item.path != '/settings').toList();
 
       return Material(
         color: sidebarBg,
@@ -443,7 +488,7 @@ class _Sidebar extends StatelessWidget {
                         onTap: collapsed
                             ? () {
                                 HapticFeedback.selectionClick();
-                                controller.toggleSidebar();
+                                widget.controller.toggleSidebar();
                               }
                             : null,
                         borderRadius: BorderRadius.circular(10),
@@ -482,8 +527,8 @@ class _Sidebar extends StatelessWidget {
                       for (final e in visible)
                         _SidebarTile(
                           item: e.item,
-                          selected: controller.currentIndex == e.index,
-                          onTap: () => controller.goTo(e.index),
+                          selected: widget.controller.currentIndex == e.index,
+                          onTap: () => widget.controller.goTo(e.index),
                           collapsed: collapsed,
                         ),
                     ],
@@ -494,17 +539,17 @@ class _Sidebar extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      for (var i = 0; i < controller.items.length; i++)
-                        if (controller.items[i].path == '/settings')
+                      for (var i = 0; i < widget.controller.items.length; i++)
+                        if (widget.controller.items[i].path == '/settings')
                           _SidebarTile(
-                            item: controller.items[i],
-                            selected: i == controller.currentIndex,
-                            onTap: () => controller.goTo(i),
+                            item: widget.controller.items[i],
+                            selected: i == widget.controller.currentIndex,
+                            onTap: () => widget.controller.goTo(i),
                             collapsed: collapsed,
                           ),
                       const SizedBox(height: 4),
                       _SidebarCollapseButton(
-                        controller: controller,
+                        controller: widget.controller,
                         effectiveCollapsed: collapsed,
                       ),
                     ],
