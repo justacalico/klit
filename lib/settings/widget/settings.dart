@@ -9,6 +9,7 @@ import 'package:klit/identity/identity.dart';
 import 'package:klit/logs/logs.dart';
 import 'package:klit/settings/settings.dart';
 import 'package:klit/shared/shared.dart';
+import 'package:klit/traits/traits.dart';
 import 'package:klit/user/user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -406,7 +407,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
                 onTap: () {
                   HapticFeedback.selectionClick();
-                  nav.currentPath.value = AppRoutes.blacklist;
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const DenyListEditor(),
+                    ),
+                  );
                 },
               ),
             ),
