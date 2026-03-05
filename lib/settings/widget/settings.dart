@@ -245,8 +245,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
           Future<void> testIdentity(Identity identity) async {
             HapticFeedback.selectionClick();
-            final messenger = ScaffoldMessenger.of(context);
             final theme = Theme.of(context);
+            OverlayEntry? testResultOverlay;
 
             void showTestResult({
               required bool success,
@@ -256,44 +256,56 @@ class _SettingsPageState extends State<SettingsPage> {
                   ? Color.lerp(theme.canvasColor, Colors.white, 0.08)!
                   : theme.colorScheme.surfaceContainerHighest;
               final fgColor = theme.colorScheme.onSurface;
-              messenger
-                ..hideCurrentMaterialBanner()
-                ..showMaterialBanner(
-                  MaterialBanner(
-                    elevation: 0,
-                    backgroundColor: bgColor,
-                    content: Row(
-                      children: [
-                        Icon(
-                          success
-                              ? CupertinoIcons.check_mark_circled_solid
-                              : CupertinoIcons.exclamationmark_triangle_fill,
-                          size: 18,
-                          color: success
-                              ? theme.colorScheme.secondary
-                              : theme.colorScheme.error,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            message,
-                            style: TextStyle(color: fgColor),
+              testResultOverlay?.remove();
+              testResultOverlay = OverlayEntry(
+                builder: (context) => SafeArea(
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: bgColor,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  success
+                                      ? CupertinoIcons.check_mark_circled_solid
+                                      : CupertinoIcons
+                                            .exclamationmark_triangle_fill,
+                                  size: 18,
+                                  color: success
+                                      ? theme.colorScheme.secondary
+                                      : theme.colorScheme.error,
+                                ),
+                                const SizedBox(width: 10),
+                                Flexible(
+                                  child: Text(
+                                    message,
+                                    style: TextStyle(color: fgColor),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ],
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: messenger.hideCurrentMaterialBanner,
-                        child: const Text('Dismiss'),
                       ),
-                    ],
+                    ),
                   ),
-                );
-              Future<void>.delayed(
-                Duration(seconds: success ? 1 : 2),
-                messenger.hideCurrentMaterialBanner,
+                ),
               );
+              Overlay.of(context, rootOverlay: true).insert(testResultOverlay!);
+              Future<void>.delayed(Duration(seconds: success ? 1 : 2), () {
+                testResultOverlay?.remove();
+                testResultOverlay = null;
+              });
             }
 
             final apikey = parseBasicAuth(
