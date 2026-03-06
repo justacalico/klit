@@ -52,18 +52,14 @@ class ClientFactory {
   }
 
   String? registrationUrl(String host) {
-    return switch (normalizeHostUrl(host)) {
-      _e621Host || _e926Host => '$host/users/new',
-      _ => null,
-    };
+    final base = normalizeHostUrl(host);
+    return base.isNotEmpty ? '$base/users/new' : null;
   }
 
   String? apiKeysUrl(String host, String username) {
     if (username.isEmpty) return null;
-    return switch (normalizeHostUrl(host)) {
-      _e621Host || _e926Host => '$host/users/$username/api_key',
-      _ => null,
-    };
+    final base = normalizeHostUrl(host);
+    return base.isNotEmpty ? '$base/users/$username/api_key' : null;
   }
 
   String? unsafeHostUrl(String host) {
