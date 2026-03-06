@@ -1,11 +1,11 @@
 # Klit
 
-An **E926**/**Self21**-compatible client,
+An **E926**/**[Self21](https://gitlab.com/HttpAnimations/Self21)**-compatible client,
 
 ## Prerequisites
 
 - [Flutter](https://flutter.dev) SDK (see `pubspec.yaml` for `sdk` constraint)
-- An E926-compatible host (e.g. [e926.net](https://e926.net))
+- An E926-compatible host (e.g. [e926.net](https://e926.net)) OR a [Self21](https://gitlab.com/HttpAnimations/Self21) host.
 
 ## Getting started
 
