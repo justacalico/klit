@@ -522,8 +522,8 @@ class _ApikeyFormFieldState extends State<ApikeyFormField> {
               value == OmittedPasswordTextInputFormatter.passwordOmitted) {
             return null;
           }
-          if (!RegExp(r'^[A-Za-z0-9_]{16,64}$').hasMatch(value)) {
-            return 'API key is 16–64 characters (letters, digits, optional underscore)\n'
+          if (!RegExp(r'^[A-Za-z0-9_]{16,80}$').hasMatch(value)) {
+            return 'API key is 16–80 characters (letters, digits, optional underscore)\n'
                 'e.g. $_apiKeyExample';
           }
           return null;
