@@ -420,30 +420,66 @@ class _HostFormFieldState extends State<HostFormField> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = isHttps ? _https : _http;
+    final hostField = TextFormField(
+      controller: controller,
+      readOnly: widget.readOnly,
+      decoration: InputDecoration(
+        labelText: 'Host',
+        border: const OutlineInputBorder(),
+        prefixText: widget.allowHttp ? null : scheme,
+      ),
+      inputFormatters: [FilteringTextInputFormatter.deny(' ')],
+      autofillHints: const [AutofillHints.url],
+      textInputAction: TextInputAction.next,
+      validator: (value) {
+        if (value!.trim().isEmpty) {
+          return 'You must provide a host URL.';
+        }
+        try {
+          Uri.parse('${isHttps ? _https : _http}$value');
+        } on FormatException {
+          return 'Invalid host URL';
+        }
+        return null;
+      },
+    );
+    if (!widget.allowHttp) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: hostField,
+      );
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
-      child: TextFormField(
-        controller: controller,
-        readOnly: widget.readOnly,
-        decoration: InputDecoration(
-          labelText: 'Host',
-          border: const OutlineInputBorder(),
-          prefixText: isHttps ? 'https://' : 'http://',
-        ),
-        inputFormatters: [FilteringTextInputFormatter.deny(' ')],
-        autofillHints: const [AutofillHints.url],
-        textInputAction: TextInputAction.next,
-        validator: (value) {
-          if (value!.trim().isEmpty) {
-            return 'You must provide a host URL.';
-          }
-          try {
-            Uri.parse('${isHttps ? _https : _http}$value');
-          } on FormatException {
-            return 'Invalid host URL';
-          }
-          return null;
-        },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 96,
+            child: DropdownButtonFormField<bool>(
+              value: isHttps,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              ),
+              items: const [
+                DropdownMenuItem(value: true, child: Text('https')),
+                DropdownMenuItem(value: false, child: Text('http')),
+              ],
+              onChanged: widget.readOnly
+                  ? null
+                  : (value) {
+                      if (value != null) {
+                        setState(() => isHttps = value);
+                        _updateController();
+                      }
+                    },
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(child: hostField),
+        ],
       ),
     );
   }
