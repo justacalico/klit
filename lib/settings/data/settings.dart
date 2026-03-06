@@ -101,6 +101,10 @@ class Settings extends NotifiedSettings {
     key: 'incognitoKeyboard',
     initialValue: false,
   );
+  late final ValueNotifier<bool> allowHttpHosts = createSetting<bool>(
+    key: 'allowHttpHosts',
+    initialValue: false,
+  );
   late final ValueNotifier<String?> appPin = createSetting(
     key: 'appPin',
     initialValue: null,

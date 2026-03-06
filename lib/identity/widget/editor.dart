@@ -13,19 +13,28 @@ Future<void> showIdentityEditorDialog({
   required BuildContext context,
   Identity? identity,
   VoidCallback? onDone,
+  bool allowHttpHosts = false,
 }) {
   return showDialog<void>(
     context: context,
-    builder: (context) =>
-        _IdentityEditorDialog(identity: identity, onDone: onDone),
+    builder: (context) => _IdentityEditorDialog(
+      identity: identity,
+      onDone: onDone,
+      allowHttpHosts: allowHttpHosts,
+    ),
   );
 }
 
 class _IdentityEditorDialog extends StatefulWidget {
-  const _IdentityEditorDialog({required this.identity, this.onDone});
+  const _IdentityEditorDialog({
+    required this.identity,
+    this.onDone,
+    this.allowHttpHosts = false,
+  });
 
   final Identity? identity;
   final VoidCallback? onDone;
+  final bool allowHttpHosts;
 
   @override
   State<_IdentityEditorDialog> createState() => _IdentityEditorDialogState();
@@ -131,6 +140,7 @@ class _IdentityEditorDialogState extends State<_IdentityEditorDialog> {
                   HostFormField(
                     controller: hostController,
                     readOnly: isEditing,
+                    allowHttp: widget.allowHttpHosts,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
@@ -353,10 +363,12 @@ class HostFormField extends StatefulWidget {
     super.key,
     required this.controller,
     this.readOnly = false,
+    this.allowHttp = false,
   });
 
   final TextEditingController controller;
   final bool readOnly;
+  final bool allowHttp;
 
   @override
   State<HostFormField> createState() => _HostFormFieldState();
@@ -366,7 +378,7 @@ class _HostFormFieldState extends State<HostFormField> {
   late final TextEditingController controller = TextEditingController(
     text: widget.controller.text,
   );
-  bool isHttps = true;
+  late bool isHttps;
 
   static const String _http = 'http://';
   static const String _https = 'https://';
@@ -374,6 +386,14 @@ class _HostFormFieldState extends State<HostFormField> {
   @override
   void initState() {
     super.initState();
+    final text = controller.text;
+    if (text.startsWith(_http)) {
+      isHttps = false;
+    } else if (text.startsWith(_https)) {
+      isHttps = true;
+    } else {
+      isHttps = !widget.allowHttp;
+    }
     controller.addListener(_updateController);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateController();

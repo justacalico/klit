@@ -22,7 +22,7 @@ class _CookieCapturePageState extends State<CookieCapturePage> {
     ..setUserAgent(AppInfo.instance.userAgent)
     ..setJavaScriptMode(JavaScriptMode.unrestricted)
     ..setBackgroundColor(Theme.of(context).colorScheme.surface)
-    ..loadRequest(Uri.https(context.read<Client>().host));
+    ..loadRequest(Uri.parse(context.read<Client>().identity.host));
 
   Future<void> setCookies(BuildContext context) async {
     IdentityClient client = context.read<IdentityClient>();
@@ -53,8 +53,8 @@ class _CookieCapturePageState extends State<CookieCapturePage> {
   @override
   Widget build(BuildContext context) {
     if (!PlatformCapabilities.supportsWebViewLogin) {
-      final host = context.read<Client>().host;
-      final loginUrl = Uri.https(host, 'users/sign_in');
+      final identity = context.read<Client>().identity;
+      final loginUrl = Uri.parse(identity.host).replace(path: '/users/sign_in');
       return Scaffold(
         appBar: DefaultAppBar(
           leading: const CloseButton(),

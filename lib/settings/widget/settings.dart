@@ -239,14 +239,20 @@ class _SettingsPageState extends State<SettingsPage> {
 
           Future<void> addIdentity() async {
             HapticFeedback.selectionClick();
-            await showIdentityEditorDialog(context: context);
+            final allowHttp = Get.find<SettingsController>().settings.allowHttpHosts.value;
+            await showIdentityEditorDialog(
+              context: context,
+              allowHttpHosts: allowHttp,
+            );
           }
 
           Future<void> editIdentity(Identity identity) async {
             HapticFeedback.selectionClick();
+            final allowHttp = Get.find<SettingsController>().settings.allowHttpHosts.value;
             await showIdentityEditorDialog(
               context: context,
               identity: identity,
+              allowHttpHosts: allowHttp,
             );
           }
 
@@ -885,6 +891,21 @@ class _SettingsPageState extends State<SettingsPage> {
                 onChanged: (v) => settings.incognitoKeyboard.value = v,
               ),
             ),
+          ValueListenableBuilder<bool>(
+            valueListenable: settings.allowHttpHosts,
+            builder: (context, value, _) => _SettingsSwitchTile(
+              leading: const _SettingsLeadingIcon(
+                icon: CupertinoIcons.globe,
+                color: Color(0xFF95A5A6),
+              ),
+              title: 'Allow HTTP hosts',
+              subtitle: value
+                  ? 'http:// for local or self-hosted (unencrypted)'
+                  : 'https:// only',
+              value: value,
+              onChanged: (v) => settings.allowHttpHosts.value = v,
+            ),
+          ),
           ValueListenableBuilder<String?>(
             valueListenable: settings.appPin,
             builder: (context, value, _) => _SettingsSwitchTile(
