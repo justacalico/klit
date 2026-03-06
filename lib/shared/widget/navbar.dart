@@ -453,7 +453,7 @@ class _SidebarState extends State<_Sidebar> {
         newWidth != null &&
         previousWidth != null &&
         previousWidth < sidebarAutoCollapseBreakpoint &&
-        newWidth! >= sidebarAutoCollapseBreakpoint;
+        newWidth >= sidebarAutoCollapseBreakpoint;
     if (!transitioningToWide) {
       _lastLayoutWidth = newWidth;
     }
