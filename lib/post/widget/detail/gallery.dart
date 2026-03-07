@@ -55,7 +55,6 @@ class _PostDetailGalleryWithShellState extends State<PostDetailGalleryWithShell>
             body: PostDetailGallery(
               controller: widget.controller,
               pageController: _pageController,
-              initialPage: widget.initialPage,
               contentOnly: true,
               onPageChanged: (index) {
                 setState(() => _currentIndex = index);
