@@ -16,11 +16,17 @@ class PostDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
     return TransparentAppBar(
       child: DefaultAppBar(
         actions: [
-          CupertinoButton(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            minimumSize: const Size(44, 44),
-            onPressed: () => showPostMenuSheet(context, post),
-            child: const Icon(Icons.more_vert),
+          Builder(
+            builder: (buttonContext) => CupertinoButton(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              minimumSize: const Size(44, 44),
+              onPressed: () => showPostMenuSheet(
+                context,
+                post,
+                anchorContext: buttonContext,
+              ),
+              child: const Icon(Icons.more_vert),
+            ),
           ),
         ],
       ),

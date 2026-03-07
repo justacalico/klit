@@ -153,7 +153,11 @@ List<PopupMenuItem<VoidCallback>> postMenuUserActions(
       .toList();
 }
 
-Future<void> showPostMenuSheet(BuildContext context, Post post) async {
+Future<void> showPostMenuSheet(
+  BuildContext context,
+  Post post, {
+  BuildContext? anchorContext,
+}) async {
   final theme = Theme.of(context);
   final cupertinoTheme = CupertinoTheme.of(context);
   final settings = context.read<Settings>();
@@ -170,6 +174,46 @@ Future<void> showPostMenuSheet(BuildContext context, Post post) async {
     excluded: pinnedActions,
   );
   final userActions = _postMenuUserActionsConfig(context, post);
+
+  Future<void> showAsPopup() async {
+    final anchor = anchorContext ?? context;
+    final overlay =
+        Overlay.of(context, rootOverlay: true).context.findRenderObject()
+            as RenderBox;
+    final anchorBox = anchor.findRenderObject() as RenderBox;
+    final anchorRect = RelativeRect.fromRect(
+      Rect.fromPoints(
+        anchorBox.localToGlobal(Offset.zero, ancestor: overlay),
+        anchorBox.localToGlobal(anchorBox.size.bottomRight(Offset.zero),
+            ancestor: overlay),
+      ),
+      Offset.zero & overlay.size,
+    );
+    final menuItems = <PopupMenuEntry<VoidCallback>>[
+      ...postActions.map(
+        (a) => PopupMenuTile(value: a.onTap, title: a.title, icon: a.icon),
+      ),
+      if (userActions.isNotEmpty && postActions.isNotEmpty)
+        const PopupMenuDivider(),
+      ...userActions.map(
+        (a) => PopupMenuTile(value: a.onTap, title: a.title, icon: a.icon),
+      ),
+    ];
+    final selected = await showMenu<VoidCallback>(
+      context: context,
+      position: anchorRect,
+      items: menuItems,
+    );
+    if (selected != null) {
+      HapticFeedback.selectionClick();
+      selected();
+    }
+  }
+
+  if (theme.isDesktop) {
+    await showAsPopup();
+    return;
+  }
 
   await showCupertinoModalPopup<void>(
     context: context,

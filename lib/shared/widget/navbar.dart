@@ -1,6 +1,9 @@
 import 'package:klit/shared/controller/navigation_controller.dart';
+import 'package:klit/shared/data/provider.dart';
 import 'package:klit/shared/widget/glass.dart';
 import 'package:klit/settings/widget/icon.dart';
+import 'package:klit/identity/identity.dart';
+import 'package:klit/user/user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -568,6 +571,7 @@ class _SidebarState extends State<_Sidebar> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      if (collapsed) const _SidebarActiveAccountAvatar(),
                       for (var i = 0; i < widget.controller.items.length; i++)
                         if (widget.controller.items[i].path == '/settings')
                           _SidebarTile(
@@ -590,6 +594,34 @@ class _SidebarState extends State<_Sidebar> {
         ),
       );
     });
+  }
+}
+
+class _SidebarActiveAccountAvatar extends StatelessWidget {
+  const _SidebarActiveAccountAvatar();
+
+  @override
+  Widget build(BuildContext context) {
+    final identity = context.watch<IdentityClient>().identity;
+    if (identity.username == null) {
+      return const SizedBox.shrink();
+    }
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Tooltip(
+        message: identity.username!,
+        child: Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: colorScheme.outlineVariant),
+          ),
+          child: IdentityAvatar(identity.id, radius: 14),
+        ),
+      ),
+    );
   }
 }
 

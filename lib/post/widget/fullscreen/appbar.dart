@@ -24,14 +24,20 @@ class PostFullscreenAppBar extends StatelessWidget
         actions: isEditing
             ? null
             : [
-                CupertinoButton(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 8,
+                Builder(
+                  builder: (buttonContext) => CupertinoButton(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 8,
+                    ),
+                    minimumSize: const Size(44, 44),
+                    onPressed: () => showPostMenuSheet(
+                      context,
+                      post,
+                      anchorContext: buttonContext,
+                    ),
+                    child: const Icon(Icons.more_vert),
                   ),
-                  minimumSize: const Size(44, 44),
-                  onPressed: () => showPostMenuSheet(context, post),
-                  child: const Icon(Icons.more_vert),
                 ),
               ],
       ),
