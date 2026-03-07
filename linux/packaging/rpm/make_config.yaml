@@ -1,0 +1,18 @@
+display_name: Klit
+icon: assets/icon/app/icon.png
+summary: E621/E926-compatible browser client
+group: Applications/Internet
+vendor: Openlyst
+packager: Openlyst
+packagerEmail: contact@openlyst.ink
+license: GPL-3.0
+url: https://openlyst.ink/apps/klit
+generic_name: E621 Browser
+keywords:
+  - e621
+  - browser
+  - media
+categories:
+  - Network
+  - Graphics
+startup_notify: true

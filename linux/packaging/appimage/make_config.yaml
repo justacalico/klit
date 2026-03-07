@@ -1,0 +1,12 @@
+display_name: Klit
+icon: assets/icon/app/icon.png
+generic_name: E621 Browser
+keywords:
+  - e621
+  - browser
+  - media
+categories:
+  - Network
+  - Graphics
+startup_notify: true
+include: []

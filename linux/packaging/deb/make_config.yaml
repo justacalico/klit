@@ -1,0 +1,17 @@
+display_name: Klit
+package_name: klit
+maintainer:
+  name: Openlyst
+  email: contact@openlyst.ink
+priority: optional
+section: net
+icon: assets/icon/app/icon.png
+generic_name: E621 Browser
+keywords:
+  - e621
+  - browser
+  - media
+categories:
+  - Network
+  - Graphics
+startup_notify: true
