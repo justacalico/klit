@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:klit/app/routes/app_routes.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:klit/client/client.dart';
@@ -256,6 +257,13 @@ class _FinishTile extends StatelessWidget {
       child: CachedNetworkImage(
         imageUrl: context.read<Client>().withHost(postThumb),
         fit: BoxFit.cover,
+        cacheManager: context.read<BaseCacheManager>(),
+        errorWidget: (context, url, error) => ColoredBox(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+          child: const Center(
+            child: Icon(Icons.image_not_supported, size: 40),
+          ),
+        ),
       ),
     );
   }
