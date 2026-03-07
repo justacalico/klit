@@ -5,10 +5,16 @@ import 'package:klit/shared/shared.dart';
 import 'package:flutter/material.dart';
 
 class PostDetail extends StatefulWidget {
-  const PostDetail({super.key, required this.post, this.onTapImage});
+  const PostDetail({
+    super.key,
+    required this.post,
+    this.onTapImage,
+    this.useShell = true,
+  });
 
   final Post post;
   final VoidCallback? onTapImage;
+  final bool useShell;
 
   @override
   State<PostDetail> createState() => _PostDetailState();
@@ -33,26 +39,33 @@ class _PostDetailState extends State<PostDetail> {
     super.dispose();
   }
 
+  Widget _buildContent() {
+    return _PostDetailBody(
+      post: widget.post,
+      onTapImage: widget.onTapImage,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return PostVideoRoute(
+    final content = PostVideoRoute(
       post: widget.post,
       child: PostHistoryConnector(
         post: widget.post,
         child: Focus(
           focusNode: _focusNode,
           canRequestFocus: true,
-          child: AppShell(
-            appBar: PostDetailAppBar(post: widget.post),
-            floatingActionButton: null,
-            body: _PostDetailBody(
-              post: widget.post,
-              onTapImage: widget.onTapImage,
-            ),
-          ),
+          child: widget.useShell
+              ? AppShell(
+                  appBar: PostDetailAppBar(post: widget.post),
+                  floatingActionButton: null,
+                  body: _buildContent(),
+                )
+              : _buildContent(),
         ),
       ),
     );
+    return content;
   }
 }
 

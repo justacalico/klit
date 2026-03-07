@@ -3,6 +3,77 @@ import 'package:klit/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
 
+class PostDetailGalleryWithShell extends StatefulWidget {
+  const PostDetailGalleryWithShell({
+    super.key,
+    required this.controller,
+    this.initialPage = 0,
+  });
+
+  final PostController controller;
+  final int initialPage;
+
+  @override
+  State<PostDetailGalleryWithShell> createState() =>
+      _PostDetailGalleryWithShellState();
+}
+
+class _PostDetailGalleryWithShellState extends State<PostDetailGalleryWithShell> {
+  late final PageController _pageController =
+      PageController(initialPage: widget.initialPage);
+  int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialPage;
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider.value(
+      value: widget.controller,
+      child: Consumer<PostController>(
+        builder: (context, controller, _) {
+          final items = controller.items;
+          final post = items != null &&
+                  _currentIndex >= 0 &&
+                  _currentIndex < items.length
+              ? items[_currentIndex]
+              : null;
+          return AppShell(
+            appBar: post != null
+                ? PostDetailAppBar(post: post)
+                : const TransparentAppBar(child: DefaultAppBar()),
+            floatingActionButton: null,
+            body: PostDetailGallery(
+              controller: widget.controller,
+              pageController: _pageController,
+              initialPage: widget.initialPage,
+              contentOnly: true,
+              onPageChanged: (index) {
+                setState(() => _currentIndex = index);
+                preloadPostImages(
+                  context: context,
+                  index: index,
+                  posts: controller.items!,
+                  size: PostImageSize.sample,
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
 class PostDetailGallery extends StatelessWidget {
   const PostDetailGallery({
     super.key,
@@ -10,6 +81,7 @@ class PostDetailGallery extends StatelessWidget {
     this.initialPage,
     this.pageController,
     this.onPageChanged,
+    this.contentOnly = false,
   }) : assert(
          initialPage == null || pageController == null,
          'Cannot pass both initialPage and pageController',
@@ -19,6 +91,7 @@ class PostDetailGallery extends StatelessWidget {
   final int? initialPage;
   final PageController? pageController;
   final ValueChanged<int>? onPageChanged;
+  final bool contentOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -32,52 +105,61 @@ class PostDetailGallery extends StatelessWidget {
             controller: pageController,
             child: ListenableBuilder(
               listenable: controller,
-              builder: (context, _) => PagedPageView(
+              builder: (context, _) => _PageChangeNotifier(
                 pageController: pageController,
-                state: controller.state,
-                fetchNextPage: controller.getNextPage,
-                builderDelegate: defaultPagedChildBuilderDelegate<Post>(
-                  onRetry: controller.getNextPage,
-                  pageBuilder: (context, child) => Scaffold(
-                    appBar: const TransparentAppBar(child: DefaultAppBar()),
-                    body: child,
-                  ),
-                  onEmpty: const Text('No posts'),
-                  onError: const Text('Failed to load posts'),
-                  itemBuilder: (context, item, index) => SubScrollController(
-                        builder: (context, scrollController) =>
-                        PrimaryScrollController(
-                          controller: scrollController,
-                          child: PostDetailPageControllerProvider(
-                            controller: pageController,
-                            child: PostDetail(
-                              post: item,
-                              onTapImage: () => Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => PostsRouteConnector(
+                onPageChanged: (index) {
+                  onPageChanged?.call(index);
+                  if (controller.items != null) {
+                    preloadPostImages(
+                      context: context,
+                      index: index,
+                      posts: controller.items!,
+                      size: PostImageSize.sample,
+                    );
+                  }
+                },
+                child: PagedPageView(
+                  pageController: pageController,
+                  state: controller.state,
+                  fetchNextPage: controller.getNextPage,
+                  builderDelegate: defaultPagedChildBuilderDelegate<Post>(
+                    onRetry: controller.getNextPage,
+                    pageBuilder: contentOnly
+                        ? (context, child) => child
+                        : (context, child) => Scaffold(
+                            appBar: const TransparentAppBar(
+                                child: DefaultAppBar()),
+                            body: child,
+                          ),
+                    onEmpty: const Text('No posts'),
+                    onError: const Text('Failed to load posts'),
+                    itemBuilder: (context, item, index) => SubScrollController(
+                      builder: (context, scrollController) =>
+                          PrimaryScrollController(
+                        controller: scrollController,
+                        child: PostDetailPageControllerProvider(
+                          controller: pageController,
+                          child: PostDetail(
+                            post: item,
+                            useShell: !contentOnly,
+                            onTapImage: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => PostsRouteConnector(
+                                  controller: controller,
+                                  child: PostFullscreenGallery(
                                     controller: controller,
-                                    child: PostFullscreenGallery(
-                                      controller: controller,
-                                      initialPage: index,
-                                      onPageChanged: pageController.jumpToPage,
-                                    ),
+                                    initialPage: index,
+                                    onPageChanged: pageController.jumpToPage,
                                   ),
                                 ),
                               ),
                             ),
                           ),
                         ),
+                      ),
+                    ),
                   ),
                 ),
-                onPageChanged: (index) {
-                  onPageChanged?.call(index);
-                  preloadPostImages(
-                    context: context,
-                    index: index,
-                    posts: controller.items!,
-                    size: PostImageSize.sample,
-                  );
-                },
               ),
             ),
           ),
@@ -85,4 +167,55 @@ class PostDetailGallery extends StatelessWidget {
       ),
     );
   }
+}
+
+class _PageChangeNotifier extends StatefulWidget {
+  const _PageChangeNotifier({
+    required this.pageController,
+    required this.onPageChanged,
+    required this.child,
+  });
+
+  final PageController pageController;
+  final ValueChanged<int> onPageChanged;
+  final Widget child;
+
+  @override
+  State<_PageChangeNotifier> createState() => _PageChangeNotifierState();
+}
+
+class _PageChangeNotifierState extends State<_PageChangeNotifier> {
+  int _lastReportedPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.pageController.addListener(_onPageChanged);
+  }
+
+  @override
+  void didUpdateWidget(_PageChangeNotifier oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.pageController != widget.pageController) {
+      oldWidget.pageController.removeListener(_onPageChanged);
+      widget.pageController.addListener(_onPageChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.pageController.removeListener(_onPageChanged);
+    super.dispose();
+  }
+
+  void _onPageChanged() {
+    final page = widget.pageController.page?.round() ?? 0;
+    if (page != _lastReportedPage) {
+      _lastReportedPage = page;
+      widget.onPageChanged(page);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }

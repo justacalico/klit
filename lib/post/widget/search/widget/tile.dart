@@ -291,7 +291,7 @@ void defaultPushPostDetail(BuildContext context, Post post) {
         child: controller != null
             ? PostsRouteConnector(
                 controller: controller,
-                child: PostDetailGallery(
+                child: PostDetailGalleryWithShell(
                   controller: controller,
                   initialPage: controller.items!.indexOf(post),
                 ),
