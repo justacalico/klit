@@ -105,6 +105,14 @@ class Settings extends NotifiedSettings {
     key: 'allowHttpHosts',
     initialValue: false,
   );
+  late final ValueNotifier<bool> iFinishedEnabled = createSetting<bool>(
+    key: 'iFinishedEnabled',
+    initialValue: false,
+  );
+  late final ValueNotifier<bool> iFinishedRequestPhoto = createSetting<bool>(
+    key: 'iFinishedRequestPhoto',
+    initialValue: false,
+  );
   late final ValueNotifier<String?> appPin = createSetting(
     key: 'appPin',
     initialValue: null,

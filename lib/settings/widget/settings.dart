@@ -853,6 +853,44 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
           ),
+          ValueListenableBuilder<bool>(
+            valueListenable: settings.iFinishedEnabled,
+            builder: (context, value, _) => _SettingsSwitchTile(
+              leading: const _SettingsLeadingIcon(
+                icon: CupertinoIcons.checkmark_circle,
+                color: Color(0xFF1ABC9C),
+              ),
+              title: 'I Finished',
+              subtitle: value
+                  ? 'Button on post detail to mark finished'
+                  : 'Off',
+              value: value,
+              onChanged: (v) => settings.iFinishedEnabled.value = v,
+            ),
+          ),
+          ValueListenableBuilder<bool>(
+            valueListenable: settings.iFinishedEnabled,
+            builder: (context, enabled, _) {
+              if (!enabled) return const SizedBox.shrink();
+              final isMobile = Platform.isIOS || Platform.isAndroid;
+              if (!isMobile) return const SizedBox.shrink();
+              return ValueListenableBuilder<bool>(
+                valueListenable: settings.iFinishedRequestPhoto,
+                builder: (context, value, _) => _SettingsSwitchTile(
+                  leading: const _SettingsLeadingIcon(
+                    icon: CupertinoIcons.camera,
+                    color: Color(0xFF9B59B6),
+                  ),
+                  title: 'Request image on completion',
+                  subtitle: value
+                      ? 'Ask for a photo when marking I Finished'
+                      : 'No photo',
+                  value: value,
+                  onChanged: (v) => settings.iFinishedRequestPhoto.value = v,
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
@@ -1241,20 +1279,43 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                             ),
                           ...available.map(
-                            (action) => CupertinoListTile(
-                              leading: Icon(action.icon, size: 20),
-                              title: Text(action.label),
-                              trailing: const Icon(
-                                CupertinoIcons.plus_circle,
-                                size: 20,
-                              ),
-                              onTap: () {
-                                setSheetState(() {
-                                  selected.add(action);
-                                });
-                                HapticFeedback.selectionClick();
-                              },
-                            ),
+                            (action) {
+                              final iFinishedDisabled = action ==
+                                      PostActionId.iFinished &&
+                                  !settings.iFinishedEnabled.value;
+                              return CupertinoListTile(
+                                leading: Icon(
+                                  action.icon,
+                                  size: 20,
+                                  color: iFinishedDisabled
+                                      ? CupertinoColors.systemGrey
+                                      : null,
+                                ),
+                                title: Text(
+                                  action.label,
+                                  style: iFinishedDisabled
+                                      ? TextStyle(
+                                          color: CupertinoColors.systemGrey,
+                                        )
+                                      : null,
+                                ),
+                                trailing: Icon(
+                                  CupertinoIcons.plus_circle,
+                                  size: 20,
+                                  color: iFinishedDisabled
+                                      ? CupertinoColors.systemGrey
+                                      : null,
+                                ),
+                                onTap: iFinishedDisabled
+                                    ? null
+                                    : () {
+                                        setSheetState(() {
+                                          selected.add(action);
+                                        });
+                                        HapticFeedback.selectionClick();
+                                      },
+                              );
+                            },
                           ),
                           const SizedBox(height: 12),
                           Row(

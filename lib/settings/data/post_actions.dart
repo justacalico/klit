@@ -6,7 +6,8 @@ enum PostActionId {
   favorite('favorite', 'Favorite', CupertinoIcons.heart),
   share('share', 'Share', CupertinoIcons.share),
   download('download', 'Download', CupertinoIcons.arrow_down_to_line),
-  browse('browse', 'Browse', CupertinoIcons.globe);
+  browse('browse', 'Browse', CupertinoIcons.globe),
+  iFinished('iFinished', 'I Finished', CupertinoIcons.checkmark_circle);
 
   const PostActionId(this.key, this.label, this.icon);
 
