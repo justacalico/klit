@@ -3,6 +3,7 @@ import 'package:klit/account/account.dart';
 import 'package:klit/app/app.dart';
 import 'package:klit/client/client.dart';
 import 'package:klit/comment/comment.dart';
+import 'package:klit/finish/finish.dart';
 import 'package:klit/flag/flag.dart';
 import 'package:klit/follow/follow.dart';
 import 'package:klit/history/history.dart';
@@ -80,6 +81,11 @@ class Client with Disposable {
 
   late final HistoryClient histories = HistoryClient(server: historyServer);
 
+  late final FinishServer finishes = FinishServer(
+    database: storage.sqlite,
+    identity: identity,
+  );
+
   @override
   void dispose() {
     dio.close();
@@ -99,6 +105,7 @@ class Client with Disposable {
       followServer,
       historyServer,
       histories,
+      finishes,
     ]) {
       Disposable.tryDispose(client);
     }
