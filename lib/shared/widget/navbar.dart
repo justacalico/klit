@@ -1,3 +1,4 @@
+import 'package:klit/app/routes/app_routes.dart';
 import 'package:klit/shared/controller/navigation_controller.dart';
 import 'package:klit/shared/data/provider.dart';
 import 'package:klit/shared/widget/glass.dart';
@@ -23,12 +24,14 @@ class ResponsiveNavbar extends StatelessWidget {
     required this.placement,
     this.showFavorites = true,
     this.showHistory = true,
+    this.showFinishes = true,
     this.layoutWidth,
   });
 
   final NavbarPlacement placement;
   final bool showFavorites;
   final bool showHistory;
+  final bool showFinishes;
   final double? layoutWidth;
 
   @override
@@ -39,6 +42,7 @@ class ResponsiveNavbar extends StatelessWidget {
         controller: nav,
         showFavorites: showFavorites,
         showHistory: showHistory,
+        showFinishes: showFinishes,
       );
     }
     if (placement == NavbarPlacement.sidebar) {
@@ -46,6 +50,7 @@ class ResponsiveNavbar extends StatelessWidget {
         controller: nav,
         showFavorites: showFavorites,
         showHistory: showHistory,
+        showFinishes: showFinishes,
         layoutWidth: layoutWidth,
       );
     }
@@ -57,12 +62,14 @@ class ResponsiveNavbar extends StatelessWidget {
             controller: nav,
             showFavorites: showFavorites,
             showHistory: showHistory,
+            showFinishes: showFinishes,
           );
         }
         return _FullNavBar(
           controller: nav,
           showFavorites: showFavorites,
           showHistory: showHistory,
+          showFinishes: showFinishes,
         );
       },
     );
@@ -73,6 +80,7 @@ List<({int index, NavItem item})> _visibleNavEntries(
   List<NavItem> items,
   bool showFavorites,
   bool showHistory,
+  bool showFinishes,
 ) {
   return items
       .asMap()
@@ -80,6 +88,7 @@ List<({int index, NavItem item})> _visibleNavEntries(
       .where((e) {
         if (e.value.path == _historyPath && !showHistory) return false;
         if (e.value.path == _profilePath && !showFavorites) return false;
+        if (e.value.path == AppRoutes.finishes && !showFinishes) return false;
         return true;
       })
       .map((e) => (index: e.key, item: e.value))
@@ -91,11 +100,13 @@ class _BottomNavBar extends StatelessWidget {
     required this.controller,
     required this.showFavorites,
     required this.showHistory,
+    required this.showFinishes,
   });
 
   final NavigationController controller;
   final bool showFavorites;
   final bool showHistory;
+  final bool showFinishes;
 
   @override
   Widget build(BuildContext context) {
@@ -106,6 +117,7 @@ class _BottomNavBar extends StatelessWidget {
         controller.items,
         showFavorites,
         showHistory,
+        showFinishes,
       );
       final primaryCount = controller.mobilePrimaryCount.clamp(
         0,
@@ -402,12 +414,14 @@ class _Sidebar extends StatefulWidget {
     required this.controller,
     required this.showFavorites,
     required this.showHistory,
+    required this.showFinishes,
     this.layoutWidth,
   });
 
   final NavigationController controller;
   final bool showFavorites;
   final bool showHistory;
+  final bool showFinishes;
   final double? layoutWidth;
 
   @override
@@ -491,6 +505,7 @@ class _SidebarState extends State<_Sidebar> {
         widget.controller.items,
         widget.showFavorites,
         widget.showHistory,
+        widget.showFinishes,
       ).where((e) => e.item.path != '/settings').toList();
 
       return Material(
@@ -762,11 +777,13 @@ class _CompactNavBar extends StatelessWidget {
     required this.controller,
     required this.showFavorites,
     required this.showHistory,
+    required this.showFinishes,
   });
 
   final NavigationController controller;
   final bool showFavorites;
   final bool showHistory;
+  final bool showFinishes;
 
   @override
   Widget build(BuildContext context) {
@@ -774,6 +791,7 @@ class _CompactNavBar extends StatelessWidget {
       controller.items,
       showFavorites,
       showHistory,
+      showFinishes,
     );
     final theme = Theme.of(context);
     final barBg = theme.brightness == Brightness.dark
@@ -805,11 +823,13 @@ class _FullNavBar extends StatelessWidget {
     required this.controller,
     required this.showFavorites,
     required this.showHistory,
+    required this.showFinishes,
   });
 
   final NavigationController controller;
   final bool showFavorites;
   final bool showHistory;
+  final bool showFinishes;
 
   @override
   Widget build(BuildContext context) {
@@ -817,6 +837,7 @@ class _FullNavBar extends StatelessWidget {
       controller.items,
       showFavorites,
       showHistory,
+      showFinishes,
     );
     final theme = Theme.of(context);
     final barBg = theme.brightness == Brightness.dark

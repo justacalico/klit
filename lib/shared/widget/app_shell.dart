@@ -10,6 +10,7 @@ class AppShell extends StatelessWidget {
     this.floatingActionButton,
     this.showFavorites = true,
     this.showHistory = true,
+    this.showFinishes = true,
   });
 
   final Widget body;
@@ -18,6 +19,7 @@ class AppShell extends StatelessWidget {
   final Widget? floatingActionButton;
   final bool showFavorites;
   final bool showHistory;
+  final bool showFinishes;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +39,7 @@ class AppShell extends StatelessWidget {
                       placement: NavbarPlacement.sidebar,
                       showFavorites: showFavorites,
                       showHistory: showHistory,
+                      showFinishes: showFinishes,
                       layoutWidth: layoutWidth,
                     ),
                     Expanded(child: body),
@@ -47,6 +50,7 @@ class AppShell extends StatelessWidget {
                   placement: NavbarPlacement.bottom,
                   showFavorites: showFavorites,
                   showHistory: showHistory,
+                  showFinishes: showFinishes,
                 )
               : null,
           endDrawer: endDrawer,

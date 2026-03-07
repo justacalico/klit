@@ -48,25 +48,38 @@ class _MainShellState extends State<MainShell> {
   Widget build(BuildContext context) {
     final nav = Get.find<NavigationController>();
     final client = context.watch<Client>();
+    final settings = context.read<Settings>();
     final showFavorites = client.hasLogin;
     return ValueListenableBuilder<Traits>(
       valueListenable: client.traits,
       builder: (context, traits, child) {
         final showHistory = traits.writeHistory ?? false;
-        return Obx(() {
-          final path = nav.currentPath.value;
-          if (path == AppRoutes.search) nav.searchInitialQuery.value;
-          return AppShell(
-            body: _buildContent(path),
-            showFavorites: showFavorites,
-            showHistory: showHistory,
-          );
-        });
+        return ValueListenableBuilder<bool>(
+          valueListenable: settings.iFinishedEnabled,
+          builder: (context, showFinishes, child) {
+            return Obx(() {
+              final path = nav.currentPath.value;
+              if (path == AppRoutes.search) nav.searchInitialQuery.value;
+              return AppShell(
+                body: _buildContent(path, settings),
+                showFavorites: showFavorites,
+                showHistory: showHistory,
+                showFinishes: showFinishes,
+              );
+            });
+          },
+        );
       },
     );
   }
 
-  Widget _buildContent(String path) {
+  Widget _buildContent(String path, Settings settings) {
+    if (path == AppRoutes.finishes && !settings.iFinishedEnabled.value) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Get.find<NavigationController>().currentPath.value = AppRoutes.home;
+      });
+      return const HomePage();
+    }
     switch (path) {
       case AppRoutes.home:
         Get.find<NavigationController>().searchInitialQuery.value = null;

@@ -99,6 +99,7 @@ final List<RouterDrawerDestination> rootDestintations = [
     name: 'Finishes',
     icon: const Icon(Icons.check_circle),
     builder: (context) => const FinishesPage(),
+    visible: (context) => context.read<Settings>().iFinishedEnabled.value,
     group: _drawerSettingsGroup,
   ),
   RouterDrawerDestination(
