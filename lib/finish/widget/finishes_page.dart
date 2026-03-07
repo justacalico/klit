@@ -148,13 +148,11 @@ class _FinishTile extends StatelessWidget {
             onPressed: onDelete,
           ),
           onTap: () {
-            if (post != null) {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (context) => PostDetail(post: post),
-                ),
-              );
-            }
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => PostLoadingPage(finish.postId),
+              ),
+            );
           },
         );
       },
