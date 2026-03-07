@@ -64,6 +64,7 @@ dependencies:
   external_path: ^2.0.1
   filesize: ^2.0.1
   file_picker: ^10.2.4
+  image_picker: ^1.1.2
   flutter_local_notifications: ^19.4.0
   freezed_annotation: ^3.0.0
   html_character_entities: ^1.0.0+1
