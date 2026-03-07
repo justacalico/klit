@@ -10,7 +10,7 @@ _TagPreview _$TagPreviewFromJson(Map<String, dynamic> json) => _TagPreview(
   id: (json['id'] as num?)?.toInt(),
   name: json['name'] as String,
   category: (json['category'] as num?)?.toInt(),
-  postCount: (json['post_count'] as num?)?.toInt(),
+  postCount: (json['postCount'] as num?)?.toInt(),
   implies: (json['implies'] as List<dynamic>?)
       ?.map((e) => e as String)
       .toList(),
@@ -23,7 +23,7 @@ Map<String, dynamic> _$TagPreviewToJson(_TagPreview instance) =>
       'id': instance.id,
       'name': instance.name,
       'category': instance.category,
-      'post_count': instance.postCount,
+      'postCount': instance.postCount,
       'implies': instance.implies,
       'alias': instance.alias,
       'resolved': instance.resolved,

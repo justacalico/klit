@@ -8,7 +8,7 @@ part of 'history.dart';
 
 _History _$HistoryFromJson(Map<String, dynamic> json) => _History(
   id: (json['id'] as num).toInt(),
-  visitedAt: DateTime.parse(json['visited_at'] as String),
+  visitedAt: DateTime.parse(json['visitedAt'] as String),
   link: json['link'] as String,
   category: $enumDecode(_$HistoryCategoryEnumMap, json['category']),
   type: $enumDecode(_$HistoryTypeEnumMap, json['type']),
@@ -21,7 +21,7 @@ _History _$HistoryFromJson(Map<String, dynamic> json) => _History(
 
 Map<String, dynamic> _$HistoryToJson(_History instance) => <String, dynamic>{
   'id': instance.id,
-  'visited_at': instance.visitedAt.toIso8601String(),
+  'visitedAt': instance.visitedAt.toIso8601String(),
   'link': instance.link,
   'category': _$HistoryCategoryEnumMap[instance.category]!,
   'type': _$HistoryTypeEnumMap[instance.type]!,
@@ -45,7 +45,7 @@ const _$HistoryTypeEnumMap = {
 
 _HistoryRequest _$HistoryRequestFromJson(Map<String, dynamic> json) =>
     _HistoryRequest(
-      visitedAt: DateTime.parse(json['visited_at'] as String),
+      visitedAt: DateTime.parse(json['visitedAt'] as String),
       link: json['link'] as String,
       category: $enumDecode(_$HistoryCategoryEnumMap, json['category']),
       type: $enumDecode(_$HistoryTypeEnumMap, json['type']),
@@ -60,7 +60,7 @@ _HistoryRequest _$HistoryRequestFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$HistoryRequestToJson(_HistoryRequest instance) =>
     <String, dynamic>{
-      'visited_at': instance.visitedAt.toIso8601String(),
+      'visitedAt': instance.visitedAt.toIso8601String(),
       'link': instance.link,
       'category': _$HistoryCategoryEnumMap[instance.category]!,
       'type': _$HistoryTypeEnumMap[instance.type]!,

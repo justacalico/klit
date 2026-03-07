@@ -9,7 +9,7 @@ part of 'user.dart';
 _User _$UserFromJson(Map<String, dynamic> json) => _User(
   id: (json['id'] as num).toInt(),
   name: json['name'] as String,
-  avatarId: (json['avatar_id'] as num?)?.toInt(),
+  avatarId: (json['avatarId'] as num?)?.toInt(),
   about: json['about'] == null ? null : UserAbout.fromJson(json['about']),
   stats: json['stats'] == null ? null : UserStats.fromJson(json['stats']),
 );
@@ -17,7 +17,7 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
 Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
   'id': instance.id,
   'name': instance.name,
-  'avatar_id': instance.avatarId,
+  'avatarId': instance.avatarId,
   'about': instance.about,
   'stats': instance.stats,
 };
@@ -31,24 +31,24 @@ Map<String, dynamic> _$UserAboutToJson(_UserAbout instance) =>
     <String, dynamic>{'bio': instance.bio, 'comission': instance.comission};
 
 _UserStats _$UserStatsFromJson(Map<String, dynamic> json) => _UserStats(
-  createdAt: json['created_at'] == null
+  createdAt: json['createdAt'] == null
       ? null
-      : DateTime.parse(json['created_at'] as String),
-  levelString: json['level_string'] as String?,
-  favoriteCount: (json['favorite_count'] as num?)?.toInt(),
-  postUpdateCount: (json['post_update_count'] as num?)?.toInt(),
-  postUploadCount: (json['post_upload_count'] as num?)?.toInt(),
-  forumPostCount: (json['forum_post_count'] as num?)?.toInt(),
-  commentCount: (json['comment_count'] as num?)?.toInt(),
+      : DateTime.parse(json['createdAt'] as String),
+  levelString: json['levelString'] as String?,
+  favoriteCount: (json['favoriteCount'] as num?)?.toInt(),
+  postUpdateCount: (json['postUpdateCount'] as num?)?.toInt(),
+  postUploadCount: (json['postUploadCount'] as num?)?.toInt(),
+  forumPostCount: (json['forumPostCount'] as num?)?.toInt(),
+  commentCount: (json['commentCount'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$UserStatsToJson(_UserStats instance) =>
     <String, dynamic>{
-      'created_at': instance.createdAt?.toIso8601String(),
-      'level_string': instance.levelString,
-      'favorite_count': instance.favoriteCount,
-      'post_update_count': instance.postUpdateCount,
-      'post_upload_count': instance.postUploadCount,
-      'forum_post_count': instance.forumPostCount,
-      'comment_count': instance.commentCount,
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'levelString': instance.levelString,
+      'favoriteCount': instance.favoriteCount,
+      'postUpdateCount': instance.postUpdateCount,
+      'postUploadCount': instance.postUploadCount,
+      'forumPostCount': instance.forumPostCount,
+      'commentCount': instance.commentCount,
     };

@@ -8,52 +8,52 @@ part of 'traits.dart';
 
 _Traits _$TraitsFromJson(Map<String, dynamic> json) => _Traits(
   id: (json['id'] as num).toInt(),
-  userId: (json['user_id'] as num?)?.toInt(),
+  userId: (json['userId'] as num?)?.toInt(),
   denylist: (json['denylist'] as List<dynamic>)
       .map((e) => e as String)
       .toList(),
-  homeTags: json['home_tags'] as String,
+  homeTags: json['homeTags'] as String,
   avatar: json['avatar'] as String?,
-  perPage: (json['per_page'] as num?)?.toInt(),
-  writeHistory: json['write_history'] as bool?,
-  trimHistory: json['trim_history'] as bool?,
+  perPage: (json['perPage'] as num?)?.toInt(),
+  writeHistory: json['writeHistory'] as bool?,
+  trimHistory: json['trimHistory'] as bool?,
 );
 
 Map<String, dynamic> _$TraitsToJson(_Traits instance) => <String, dynamic>{
   'id': instance.id,
-  'user_id': instance.userId,
+  'userId': instance.userId,
   'denylist': instance.denylist,
-  'home_tags': instance.homeTags,
+  'homeTags': instance.homeTags,
   'avatar': instance.avatar,
-  'per_page': instance.perPage,
-  'write_history': instance.writeHistory,
-  'trim_history': instance.trimHistory,
+  'perPage': instance.perPage,
+  'writeHistory': instance.writeHistory,
+  'trimHistory': instance.trimHistory,
 };
 
 _TraitsRequest _$TraitsRequestFromJson(Map<String, dynamic> json) =>
     _TraitsRequest(
       identity: (json['identity'] as num).toInt(),
-      userId: (json['user_id'] as num?)?.toInt(),
+      userId: (json['userId'] as num?)?.toInt(),
       denylist:
           (json['denylist'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           const [],
-      homeTags: json['home_tags'] as String? ?? '',
+      homeTags: json['homeTags'] as String? ?? '',
       avatar: json['avatar'] as String?,
-      perPage: (json['per_page'] as num?)?.toInt(),
-      writeHistory: json['write_history'] as bool?,
-      trimHistory: json['trim_history'] as bool?,
+      perPage: (json['perPage'] as num?)?.toInt(),
+      writeHistory: json['writeHistory'] as bool?,
+      trimHistory: json['trimHistory'] as bool?,
     );
 
 Map<String, dynamic> _$TraitsRequestToJson(_TraitsRequest instance) =>
     <String, dynamic>{
       'identity': instance.identity,
-      'user_id': instance.userId,
+      'userId': instance.userId,
       'denylist': instance.denylist,
-      'home_tags': instance.homeTags,
+      'homeTags': instance.homeTags,
       'avatar': instance.avatar,
-      'per_page': instance.perPage,
-      'write_history': instance.writeHistory,
-      'trim_history': instance.trimHistory,
+      'perPage': instance.perPage,
+      'writeHistory': instance.writeHistory,
+      'trimHistory': instance.trimHistory,
     };

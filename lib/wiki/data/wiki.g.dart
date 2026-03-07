@@ -10,22 +10,22 @@ _Wiki _$WikiFromJson(Map<String, dynamic> json) => _Wiki(
   id: (json['id'] as num).toInt(),
   title: json['title'] as String,
   body: json['body'] as String,
-  createdAt: DateTime.parse(json['created_at'] as String),
-  updatedAt: json['updated_at'] == null
+  createdAt: DateTime.parse(json['createdAt'] as String),
+  updatedAt: json['updatedAt'] == null
       ? null
-      : DateTime.parse(json['updated_at'] as String),
-  otherNames: (json['other_names'] as List<dynamic>?)
+      : DateTime.parse(json['updatedAt'] as String),
+  otherNames: (json['otherNames'] as List<dynamic>?)
       ?.map((e) => e as String)
       .toList(),
-  isLocked: json['is_locked'] as bool?,
+  isLocked: json['isLocked'] as bool?,
 );
 
 Map<String, dynamic> _$WikiToJson(_Wiki instance) => <String, dynamic>{
   'id': instance.id,
   'title': instance.title,
   'body': instance.body,
-  'created_at': instance.createdAt.toIso8601String(),
-  'updated_at': instance.updatedAt?.toIso8601String(),
-  'other_names': instance.otherNames,
-  'is_locked': instance.isLocked,
+  'createdAt': instance.createdAt.toIso8601String(),
+  'updatedAt': instance.updatedAt?.toIso8601String(),
+  'otherNames': instance.otherNames,
+  'isLocked': instance.isLocked,
 };

@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Credentials {
 
- String get username;@JsonKey(name: 'apikey') String get password;
+ String get username; String get password;
 /// Create a copy of Credentials
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,7 +49,7 @@ abstract mixin class $CredentialsCopyWith<$Res>  {
   factory $CredentialsCopyWith(Credentials value, $Res Function(Credentials) _then) = _$CredentialsCopyWithImpl;
 @useResult
 $Res call({
- String username,@JsonKey(name: 'apikey') String password
+ String username, String password
 });
 
 
@@ -81,11 +81,11 @@ as String,
 @JsonSerializable()
 
 class _Credentials extends Credentials {
-  const _Credentials({required this.username, @JsonKey(name: 'apikey') required this.password}): super._();
+  const _Credentials({required this.username, required this.password}): super._();
   factory _Credentials.fromJson(Map<String, dynamic> json) => _$CredentialsFromJson(json);
 
 @override final  String username;
-@override@JsonKey(name: 'apikey') final  String password;
+@override final  String password;
 
 /// Create a copy of Credentials
 /// with the given fields replaced by the non-null parameter values.
@@ -120,7 +120,7 @@ abstract mixin class _$CredentialsCopyWith<$Res> implements $CredentialsCopyWith
   factory _$CredentialsCopyWith(_Credentials value, $Res Function(_Credentials) _then) = __$CredentialsCopyWithImpl;
 @override @useResult
 $Res call({
- String username,@JsonKey(name: 'apikey') String password
+ String username, String password
 });
 
 

@@ -10,13 +10,13 @@ _ClientSyncStatus _$ClientSyncStatusFromJson(Map<String, dynamic> json) =>
     _ClientSyncStatus(
       denyList: $enumDecodeNullable(
         _$DenyListSyncStatusEnumMap,
-        json['deny_list'],
+        json['denyList'],
       ),
     );
 
 Map<String, dynamic> _$ClientSyncStatusToJson(_ClientSyncStatus instance) =>
     <String, dynamic>{
-      'deny_list': _$DenyListSyncStatusEnumMap[instance.denyList],
+      'denyList': _$DenyListSyncStatusEnumMap[instance.denyList],
     };
 
 const _$DenyListSyncStatusEnumMap = {

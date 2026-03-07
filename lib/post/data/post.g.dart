@@ -22,17 +22,17 @@ _Post _$PostFromJson(Map<String, dynamic> json) => _Post(
     (k, e) =>
         MapEntry(k, (e as List<dynamic>).map((e) => e as String).toList()),
   ),
-  uploaderId: (json['uploader_id'] as num).toInt(),
-  createdAt: DateTime.parse(json['created_at'] as String),
-  updatedAt: json['updated_at'] == null
+  uploaderId: (json['uploaderId'] as num).toInt(),
+  createdAt: DateTime.parse(json['createdAt'] as String),
+  updatedAt: json['updatedAt'] == null
       ? null
-      : DateTime.parse(json['updated_at'] as String),
+      : DateTime.parse(json['updatedAt'] as String),
   vote: VoteInfo.fromJson(json['vote'] as Map<String, dynamic>),
-  isDeleted: json['is_deleted'] as bool,
+  isDeleted: json['isDeleted'] as bool,
   rating: $enumDecode(_$RatingEnumMap, json['rating']),
-  favCount: (json['fav_count'] as num).toInt(),
-  isFavorited: json['is_favorited'] as bool,
-  commentCount: (json['comment_count'] as num).toInt(),
+  favCount: (json['favCount'] as num).toInt(),
+  isFavorited: json['isFavorited'] as bool,
+  commentCount: (json['commentCount'] as num).toInt(),
   description: json['description'] as String,
   sources: (json['sources'] as List<dynamic>).map((e) => e as String).toList(),
   pools: (json['pools'] as List<dynamic>?)
@@ -52,15 +52,15 @@ Map<String, dynamic> _$PostToJson(_Post instance) => <String, dynamic>{
   'size': instance.size,
   'variants': instance.variants,
   'tags': instance.tags,
-  'uploader_id': instance.uploaderId,
-  'created_at': instance.createdAt.toIso8601String(),
-  'updated_at': instance.updatedAt?.toIso8601String(),
+  'uploaderId': instance.uploaderId,
+  'createdAt': instance.createdAt.toIso8601String(),
+  'updatedAt': instance.updatedAt?.toIso8601String(),
   'vote': instance.vote,
-  'is_deleted': instance.isDeleted,
+  'isDeleted': instance.isDeleted,
   'rating': _$RatingEnumMap[instance.rating]!,
-  'fav_count': instance.favCount,
-  'is_favorited': instance.isFavorited,
-  'comment_count': instance.commentCount,
+  'favCount': instance.favCount,
+  'isFavorited': instance.isFavorited,
+  'commentCount': instance.commentCount,
   'description': instance.description,
   'sources': instance.sources,
   'pools': instance.pools,
@@ -71,9 +71,9 @@ const _$RatingEnumMap = {Rating.s: 's', Rating.q: 'q', Rating.e: 'e'};
 
 _Relationships _$RelationshipsFromJson(Map<String, dynamic> json) =>
     _Relationships(
-      parentId: (json['parent_id'] as num?)?.toInt(),
-      hasChildren: json['has_children'] as bool,
-      hasActiveChildren: json['has_active_children'] as bool?,
+      parentId: (json['parentId'] as num?)?.toInt(),
+      hasChildren: json['hasChildren'] as bool,
+      hasActiveChildren: json['hasActiveChildren'] as bool?,
       children: (json['children'] as List<dynamic>)
           .map((e) => (e as num).toInt())
           .toList(),
@@ -81,8 +81,8 @@ _Relationships _$RelationshipsFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$RelationshipsToJson(_Relationships instance) =>
     <String, dynamic>{
-      'parent_id': instance.parentId,
-      'has_children': instance.hasChildren,
-      'has_active_children': instance.hasActiveChildren,
+      'parentId': instance.parentId,
+      'hasChildren': instance.hasChildren,
+      'hasActiveChildren': instance.hasActiveChildren,
       'children': instance.children,
     };
