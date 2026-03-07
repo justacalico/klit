@@ -40,13 +40,19 @@ _PostMenuAction _postActionToMenuAction(
     case PostActionId.upvote:
     case PostActionId.downvote:
     case PostActionId.favorite:
+    case PostActionId.iFinished:
       throw StateError('Unsupported menu action: ${action.key}');
   }
 }
 
-bool _isPostActionAvailable(Post post, PostActionId action) {
+bool _isPostActionAvailable(
+  BuildContext context,
+  Post post,
+  PostActionId action,
+) {
   return switch (action) {
     PostActionId.download => post.file != null,
+    PostActionId.iFinished => context.read<Settings>().iFinishedEnabled.value,
     _ => true,
   };
 }
@@ -59,7 +65,7 @@ List<_PostMenuAction> _postMenuPostActionsConfig(
   final actions = <_PostMenuAction>[];
   for (final action in PostActionPreferences.menuActions) {
     if (excluded.contains(action)) continue;
-    if (!_isPostActionAvailable(post, action)) continue;
+    if (!_isPostActionAvailable(context, post, action)) continue;
     actions.add(_postActionToMenuAction(context, post, action));
   }
   return actions;

@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:image_picker/image_picker.dart';
 import 'package:klit/app/app.dart';
 import 'package:klit/client/client.dart';
 import 'package:klit/post/post.dart';
@@ -7,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:like_button/like_button.dart';
+import 'package:path_provider/path_provider.dart';
 
 class LikeDisplay extends StatelessWidget {
   const LikeDisplay({super.key, required this.post});
@@ -179,6 +183,20 @@ class LikeDisplay extends StatelessWidget {
               ),
             );
             break;
+          case PostActionId.iFinished:
+            final enabled = settings.iFinishedEnabled.value;
+            buttons.add(
+              _IFinishedButton(
+                post: post,
+                settings: settings,
+                theme: theme,
+                primary: primary,
+                iconColor: iconColor,
+                enabled: enabled,
+                buildControlButton: buildControlButton,
+              ),
+            );
+            break;
         }
       }
       return buttons;
@@ -290,6 +308,120 @@ class LikeDisplay extends StatelessWidget {
       ],
     );
   }
+}
+
+class _IFinishedButton extends StatefulWidget {
+  const _IFinishedButton({
+    required this.post,
+    required this.settings,
+    required this.theme,
+    required this.primary,
+    required this.iconColor,
+    required this.enabled,
+    required this.buildControlButton,
+  });
+
+  final Post post;
+  final Settings settings;
+  final ThemeData theme;
+  final Color primary;
+  final Color iconColor;
+  final bool enabled;
+  final Widget Function({
+    required String keyId,
+    required String semanticLabel,
+    required IconData icon,
+    required bool active,
+    required VoidCallback? onPressed,
+  }) buildControlButton;
+
+  @override
+  State<_IFinishedButton> createState() => _IFinishedButtonState();
+}
+
+class _IFinishedButtonState extends State<_IFinishedButton> {
+  bool _lock = false;
+
+  Future<void> _onTap() async {
+    if (_lock || !widget.enabled) return;
+    setState(() => _lock = true);
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted) setState(() => _lock = false);
+    });
+    HapticFeedback.selectionClick();
+    final client = context.read<Client>();
+    String? photoPath;
+    final requestPhoto = widget.settings.iFinishedRequestPhoto.value &&
+        (Platform.isIOS || Platform.isAndroid);
+    if (requestPhoto) {
+      final source = await _showPhotoSourceSheet(context);
+      if (source == null) {
+        setState(() => _lock = false);
+        return;
+      }
+      if (source != _PhotoSource.skip) {
+        final picker = ImagePicker();
+        final sourceType =
+            source == _PhotoSource.camera
+                ? ImageSource.camera
+                : ImageSource.gallery;
+        final file = await picker.pickImage(source: sourceType);
+        if (file != null) {
+          final dir = await getTemporaryDirectory();
+          final name = 'finish_${widget.post.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+          final dest = File('${dir.path}/$name');
+          await dest.writeAsBytes(await file.readAsBytes());
+          photoPath = dest.path;
+        }
+      }
+    }
+    await client.finishes.add(widget.post.id, photoPath);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const action = PostActionId.iFinished;
+    final effectiveEnabled = widget.enabled && !_lock;
+    return widget.buildControlButton(
+      keyId: action.key,
+      semanticLabel: action.label,
+      icon: CupertinoIcons.checkmark_circle,
+      active: false,
+      onPressed: effectiveEnabled ? _onTap : null,
+    );
+  }
+}
+
+enum _PhotoSource { camera, gallery, skip }
+
+Future<_PhotoSource?> _showPhotoSourceSheet(BuildContext context) async {
+  return showCupertinoModalPopup<_PhotoSource>(
+    context: context,
+    builder: (ctx) => SafeArea(
+      child: CupertinoActionSheet(
+        title: const Text('Take a photo?'),
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: () => Navigator.pop(ctx, _PhotoSource.camera),
+            child: const Text('Camera'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () => Navigator.pop(ctx, _PhotoSource.gallery),
+            child: const Text('Gallery'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () => Navigator.pop(ctx, _PhotoSource.skip),
+            child: const Text('Skip'),
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          isDefaultAction: true,
+          onPressed: () => Navigator.pop(ctx),
+          child: const Text('Cancel'),
+        ),
+      ),
+    ),
+  );
 }
 
 class _AnimatedPostActionButton extends StatefulWidget {
