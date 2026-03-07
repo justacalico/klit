@@ -25,4 +25,7 @@ class FinishServer {
 
   Stream<List<Finish>> watchForIdentity() =>
       repository.watchForIdentity(identity.id);
+
+  Stream<int> watchCountForPost(int postId) =>
+      watchForIdentity().map((list) => list.where((f) => f.postId == postId).length);
 }

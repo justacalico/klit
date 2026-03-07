@@ -69,6 +69,7 @@ class LikeDisplay extends StatelessWidget {
       required IconData icon,
       required bool active,
       required VoidCallback? onPressed,
+      Widget? child,
     }) {
       final bgColor = active
           ? primary.withValues(alpha: 0.9)
@@ -83,6 +84,7 @@ class LikeDisplay extends StatelessWidget {
         backgroundColor: bgColor,
         foregroundColor: fgColor,
         onPressed: onPressed,
+        child: child,
       );
     }
 
@@ -333,6 +335,7 @@ class _IFinishedButton extends StatefulWidget {
     required IconData icon,
     required bool active,
     required VoidCallback? onPressed,
+    Widget? child,
   }) buildControlButton;
 
   @override
@@ -382,14 +385,57 @@ class _IFinishedButtonState extends State<_IFinishedButton> {
   Widget build(BuildContext context) {
     const action = PostActionId.iFinished;
     final effectiveEnabled = widget.enabled && !_lock;
-    return widget.buildControlButton(
-      keyId: action.key,
-      semanticLabel: action.label,
-      icon: CupertinoIcons.checkmark_circle,
-      active: false,
-      onPressed: effectiveEnabled ? _onTap : null,
+    final client = context.read<Client>();
+    return StreamBuilder<int>(
+      stream: client.finishes.watchCountForPost(widget.post.id),
+      initialData: 0,
+      builder: (context, snapshot) {
+        final count = snapshot.data ?? 0;
+        final fgColor = widget.iconColor;
+        final child = ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 64),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(CupertinoIcons.checkmark_circle, size: 20, color: fgColor),
+                const SizedBox(width: 4),
+                Text(
+                  '(${_compactCount(count)})',
+                  style: widget.theme.textTheme.labelMedium?.copyWith(
+                    color: fgColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.clip,
+                  maxLines: 1,
+                ),
+              ],
+            ),
+          ),
+        );
+        return widget.buildControlButton(
+          keyId: action.key,
+          semanticLabel: action.label,
+          icon: CupertinoIcons.checkmark_circle,
+          active: false,
+          onPressed: effectiveEnabled ? _onTap : null,
+          child: child,
+        );
+      },
     );
   }
+}
+
+String _compactCount(int n) {
+  if (n < 1000) return '$n';
+  if (n < 1000000) {
+    final s = '${(n / 1000).toStringAsFixed(1)}K';
+    return s.endsWith('.0K') ? '${(n / 1000).round()}K' : s;
+  }
+  final s = '${(n / 1000000).toStringAsFixed(1)}M';
+  return s.endsWith('.0M') ? '${(n / 1000000).round()}M' : s;
 }
 
 enum _PhotoSource { camera, gallery, skip }
@@ -433,6 +479,7 @@ class _AnimatedPostActionButton extends StatefulWidget {
     required this.backgroundColor,
     required this.foregroundColor,
     required this.onPressed,
+    this.child,
   });
 
   final String semanticLabel;
@@ -441,6 +488,7 @@ class _AnimatedPostActionButton extends StatefulWidget {
   final Color backgroundColor;
   final Color foregroundColor;
   final VoidCallback? onPressed;
+  final Widget? child;
 
   @override
   State<_AnimatedPostActionButton> createState() =>
@@ -491,7 +539,8 @@ class _AnimatedPostActionButtonState extends State<_AnimatedPostActionButton> {
                 onPressed: widget.onPressed,
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 minimumSize: const Size(0, 0),
-                child: Icon(widget.icon, size: 20, color: widget.foregroundColor),
+                child: widget.child ??
+                    Icon(widget.icon, size: 20, color: widget.foregroundColor),
               ),
             ),
           ),
