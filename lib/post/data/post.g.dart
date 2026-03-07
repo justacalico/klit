@@ -72,7 +72,7 @@ const _$RatingEnumMap = {Rating.s: 's', Rating.q: 'q', Rating.e: 'e'};
 _Relationships _$RelationshipsFromJson(Map<String, dynamic> json) =>
     _Relationships(
       parentId: (json['parentId'] as num?)?.toInt(),
-      hasChildren: json['hasChildren'] as bool,
+      hasChildren: _hasChildrenFromJson(json['hasChildren']),
       hasActiveChildren: json['hasActiveChildren'] as bool?,
       children: (json['children'] as List<dynamic>)
           .map((e) => (e as num).toInt())

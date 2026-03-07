@@ -37,11 +37,13 @@ abstract class Post with _$Post {
 
 enum Rating { s, q, e }
 
+bool _hasChildrenFromJson(dynamic v) => v == null ? false : v as bool;
+
 @freezed
 abstract class Relationships with _$Relationships {
   const factory Relationships({
     required int? parentId,
-    required bool hasChildren,
+    @JsonKey(fromJson: _hasChildrenFromJson) required bool hasChildren,
     required bool? hasActiveChildren,
     required List<int> children,
   }) = _Relationships;
