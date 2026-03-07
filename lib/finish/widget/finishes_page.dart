@@ -103,16 +103,30 @@ class _FinishesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: defaultActionListPadding,
-      itemCount: finishes.length,
-      itemBuilder: (context, index) {
-        final finish = finishes[index];
-        return _FinishTile(
-          finish: finish,
-          onDelete: () => onDelete(finish.id),
-        );
-      },
+    return TileLayout(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final layout = TileLayout.of(context);
+          final crossAxisCount = (layout.crossAxisCount * 0.5).round().clamp(1, 8);
+          return GridView.builder(
+            padding: defaultListPadding,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              childAspectRatio: 0.9,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+            ),
+            itemCount: finishes.length,
+            itemBuilder: (context, index) {
+              final finish = finishes[index];
+              return _FinishTile(
+                finish: finish,
+                onDelete: () => onDelete(finish.id),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
@@ -132,73 +146,117 @@ class _FinishTile extends StatelessWidget {
       future: context.read<Client>().posts.get(id: finish.postId),
       builder: (context, postSnapshot) {
         final post = postSnapshot.data;
-        return ListTile(
-          leading: _buildLeading(context),
-          title: Text(
-            post != null
-                ? 'Post #${post.id}'
-                : 'Post #${finish.postId}',
-          ),
-          subtitle: Text(
-            _formatDate(finish.finishedAt),
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-          trailing: IconButton(
-            icon: const Icon(Icons.delete_outline),
-            onPressed: onDelete,
-          ),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (context) => PostLoadingPage(finish.postId),
+        final postThumb = post?.sample ?? post?.preview;
+        final hasFinishPhoto = finish.photoPath != null &&
+            File(finish.photoPath!).existsSync();
+        return Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => PostLoadingPage(finish.postId),
+                ),
+              );
+            },
+            borderRadius: BorderRadius.circular(8),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _buildPostImage(context, postThumb),
+                        ),
+                        if (hasFinishPhoto) ...[
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: Image.file(
+                                File(finish.photoPath!),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 6,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                post != null
+                                    ? 'Post #${post.id}'
+                                    : 'Post #${finish.postId}',
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.labelLarge,
+                              ),
+                              Text(
+                                _formatDate(finish.finishedAt),
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline),
+                          onPressed: onDelete,
+                          iconSize: 20,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            );
-          },
+            ),
+          ),
         );
       },
     );
   }
 
-  Widget _buildLeading(BuildContext context) {
-    return FutureBuilder<Post?>(
-      future: context.read<Client>().posts.get(id: finish.postId),
-      builder: (context, snapshot) {
-        final post = snapshot.data;
-        final postThumb = post?.sample ?? post?.preview;
-        return SizedBox(
-          width: 56,
-          height: 56,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (postThumb != null)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: CachedNetworkImage(
-                    imageUrl: context.read<Client>().withHost(postThumb),
-                    width: 40,
-                    height: 40,
-                    fit: BoxFit.cover,
-                  ),
-                )
-              else
-                const Icon(Icons.image_not_supported, size: 40),
-              if (finish.photoPath != null && File(finish.photoPath!).existsSync()) ...[
-                const SizedBox(width: 4),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: Image.file(
-                    File(finish.photoPath!),
-                    width: 32,
-                    height: 32,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ],
-            ],
-          ),
-        );
-      },
+  Widget _buildPostImage(BuildContext context, String? postThumb) {
+    if (postThumb == null) {
+      return ColoredBox(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        child: const Center(
+          child: Icon(Icons.image_not_supported, size: 40),
+        ),
+      );
+    }
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(4),
+      child: CachedNetworkImage(
+        imageUrl: context.read<Client>().withHost(postThumb),
+        fit: BoxFit.cover,
+      ),
     );
   }
 
