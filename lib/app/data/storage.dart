@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:klit/finish/data/database.dart';
 import 'package:klit/follow/data/database.dart';
 import 'package:klit/history/history.dart';
 import 'package:klit/identity/data/database.dart';
@@ -17,13 +18,14 @@ import 'storage.drift.dart';
     HistoriesIdentitiesTable,
     FollowsTable,
     FollowsIdentitiesTable,
+    FinishesTable,
   ],
 )
 class AppDatabase extends $AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -66,6 +68,9 @@ class AppDatabase extends $AppDatabase {
             newColumns: [traitsTable.writeHistory, traitsTable.trimHistory],
           ),
         );
+      }
+      if (from < 6) {
+        await m.createTable(finishesTable);
       }
     },
     beforeOpen: (details) => customStatement('PRAGMA foreign_keys = ON'),

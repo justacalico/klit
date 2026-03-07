@@ -5,6 +5,7 @@ import 'package:klit/identity/data/database.drift.dart' as i1;
 import 'package:klit/traits/data/database.drift.dart' as i2;
 import 'package:klit/history/data/database.drift.dart' as i3;
 import 'package:klit/follow/data/database.drift.dart' as i4;
+import 'package:klit/finish/data/database.drift.dart' as i5;
 
 abstract class $AppDatabase extends i0.GeneratedDatabase {
   $AppDatabase(i0.QueryExecutor e) : super(e);
@@ -20,6 +21,8 @@ abstract class $AppDatabase extends i0.GeneratedDatabase {
   late final i4.$FollowsTableTable followsTable = i4.$FollowsTableTable(this);
   late final i4.$FollowsIdentitiesTableTable followsIdentitiesTable = i4
       .$FollowsIdentitiesTableTable(this);
+  late final i5.$FinishesTableTable finishesTable =
+      i5.$FinishesTableTable(this);
   @override
   Iterable<i0.TableInfo<i0.Table, Object?>> get allTables =>
       allSchemaEntities.whereType<i0.TableInfo<i0.Table, Object?>>();
@@ -31,6 +34,7 @@ abstract class $AppDatabase extends i0.GeneratedDatabase {
     historiesIdentitiesTable,
     followsTable,
     followsIdentitiesTable,
+    finishesTable,
   ];
   @override
   i0.StreamQueryUpdateRules get streamUpdateRules =>
@@ -96,6 +100,20 @@ abstract class $AppDatabase extends i0.GeneratedDatabase {
               kind: i0.UpdateKind.update,
             ),
           ],
+        ),
+        i0.WritePropagation(
+          on: i0.TableUpdateQuery.onTableName(
+            'identities_table',
+            limitUpdateKind: i0.UpdateKind.delete,
+          ),
+          result: [i0.TableUpdate('finishes_table', kind: i0.UpdateKind.delete)],
+        ),
+        i0.WritePropagation(
+          on: i0.TableUpdateQuery.onTableName(
+            'identities_table',
+            limitUpdateKind: i0.UpdateKind.update,
+          ),
+          result: [i0.TableUpdate('finishes_table', kind: i0.UpdateKind.update)],
         ),
       ]);
 }
