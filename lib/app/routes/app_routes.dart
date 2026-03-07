@@ -10,6 +10,7 @@ abstract class AppRoutes {
   static const String pools = '/pools';
   static const String forum = '/forum';
   static const String history = '/history';
+  static const String finishes = '/finishes';
   static const String profile = '/profile';
   static const String blacklist = '/blacklist';
   static const String settings = '/settings';

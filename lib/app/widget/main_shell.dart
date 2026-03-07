@@ -1,6 +1,7 @@
 import 'package:klit/app/routes/app_routes.dart';
 import 'package:klit/client/client.dart';
 import 'package:klit/feed/feed.dart';
+import 'package:klit/finish/finish.dart';
 import 'package:klit/follow/follow.dart';
 import 'package:klit/history/history.dart';
 import 'package:klit/pool/pool.dart';
@@ -95,6 +96,8 @@ class _MainShellState extends State<MainShell> {
         return const TopicsPage();
       case AppRoutes.history:
         return const HistoriesPage();
+      case AppRoutes.finishes:
+        return const FinishesPage();
       case AppRoutes.profile:
         return const ProfilePage();
       case AppRoutes.blacklist:

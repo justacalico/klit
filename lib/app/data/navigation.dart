@@ -1,4 +1,5 @@
 import 'package:klit/feed/feed.dart';
+import 'package:klit/finish/finish.dart';
 import 'package:klit/follow/follow.dart';
 import 'package:klit/history/history.dart';
 import 'package:klit/user/user.dart';
@@ -91,6 +92,13 @@ final List<RouterDrawerDestination> rootDestintations = [
     name: 'History',
     icon: const Icon(Icons.history),
     builder: (context) => const HistoriesPage(),
+    group: _drawerSettingsGroup,
+  ),
+  NamedRouterDrawerDestination(
+    path: '/finishes',
+    name: 'Finishes',
+    icon: const Icon(Icons.check_circle),
+    builder: (context) => const FinishesPage(),
     group: _drawerSettingsGroup,
   ),
   RouterDrawerDestination(

@@ -47,6 +47,10 @@ class AppPages {
       page: () => _RedirectToShell(AppRoutes.history),
     ),
     GetPage(
+      name: AppRoutes.finishes,
+      page: () => _RedirectToShell(AppRoutes.finishes),
+    ),
+    GetPage(
       name: AppRoutes.profile,
       page: () => _RedirectToShell(AppRoutes.profile),
     ),

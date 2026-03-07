@@ -13,5 +13,6 @@ const List<NavItem> appNavItems = [
   NavItem(AppRoutes.pools, 'Pools', Icons.collections),
   NavItem(AppRoutes.forum, 'Forum', Icons.forum),
   NavItem(AppRoutes.history, 'History', Icons.history),
+  NavItem(AppRoutes.finishes, 'Finishes', Icons.check_circle),
   NavItem(AppRoutes.settings, 'Settings', Icons.settings),
 ];
