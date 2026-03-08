@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import 'package:klit/client/client.dart';
 import 'package:klit/post/post.dart';
+import 'package:klit/settings/settings.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:flutter/material.dart';
 
@@ -40,10 +42,7 @@ class _PostDetailState extends State<PostDetail> {
   }
 
   Widget _buildContent() {
-    return _PostDetailBody(
-      post: widget.post,
-      onTapImage: widget.onTapImage,
-    );
+    return _PostDetailBody(post: widget.post, onTapImage: widget.onTapImage);
   }
 
   @override
@@ -70,10 +69,7 @@ class _PostDetailState extends State<PostDetail> {
 }
 
 class _PostDetailBody extends StatelessWidget {
-  const _PostDetailBody({
-    required this.post,
-    this.onTapImage,
-  });
+  const _PostDetailBody({required this.post, this.onTapImage});
 
   final Post post;
   final VoidCallback? onTapImage;
@@ -99,10 +95,7 @@ class _PostDetailBody extends StatelessWidget {
     );
 
     if (post.type == PostType.video) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: image,
-      );
+      return Padding(padding: const EdgeInsets.only(bottom: 10), child: image);
     }
 
     return Padding(
@@ -120,53 +113,87 @@ class _PostDetailBody extends StatelessWidget {
   }
 
   Widget _upperBody(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ArtistDisplay(post: post),
-            DeletionDisplay(post: post),
-            LikeDisplay(post: post),
-            DescriptionDisplay(post: post),
-          ],
-        ),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ArtistDisplay(post: post),
+        DeletionDisplay(post: post),
+        LikeDisplay(post: post),
+        DescriptionDisplay(post: post),
+      ],
+    ),
+  );
 
   Widget _middleBody(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(children: [CommentDisplay(post: post)]),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    child: Column(children: [CommentDisplay(post: post)]),
+  );
 
   Widget _lowerBody(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          children: [
-            RelationshipDisplay(post: post),
-            PoolDisplay(post: post),
-            DenylistTagDisplay(post: post),
-            TagDisplay(post: post),
-            FileDisplay(post: post),
-            SourceDisplay(post: post),
-          ],
-        ),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    child: Column(
+      children: [
+        RelationshipDisplay(post: post),
+        PoolDisplay(post: post),
+        DenylistTagDisplay(post: post),
+        TagDisplay(post: post),
+        FileDisplay(post: post),
+        SourceDisplay(post: post),
+      ],
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
+    final settings = context.read<Settings>();
+    final hasLogin = context.watch<Client>().hasLogin;
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < 1000) {
-          return ListView(
-            primary: true,
-            padding: const EdgeInsets.only(
-              bottom: kBottomNavigationBarHeight + 24,
-            ),
-            children: [
-              _image(context, constraints),
-              _upperBody(context),
-              _middleBody(context),
-              _lowerBody(context),
-            ],
+          final hasBottomNav = constraints.maxWidth < mobileBreakpoint;
+          final viewPadding = MediaQuery.viewPaddingOf(context);
+          final navBottomOffset = viewPadding.bottom > 0
+              ? viewPadding.bottom + 8
+              : 12.0;
+          const floatingBarHeight = 58.0;
+          final floatingBarBottom =
+              kBottomNavigationBarHeight + navBottomOffset + 12;
+
+          return ValueListenableBuilder<bool>(
+            valueListenable: settings.postActionBarFloatingMobile,
+            builder: (context, floatingMobile, _) {
+              final showFloatingActions =
+                  hasBottomNav && hasLogin && floatingMobile;
+              final contentBottomPadding = showFloatingActions
+                  ? floatingBarBottom + floatingBarHeight + 20
+                  : kBottomNavigationBarHeight + 24;
+
+              return Stack(
+                children: [
+                  ListView(
+                    primary: true,
+                    padding: EdgeInsets.only(bottom: contentBottomPadding),
+                    children: [
+                      _image(context, constraints),
+                      _upperBody(context),
+                      _middleBody(context),
+                      _lowerBody(context),
+                    ],
+                  ),
+                  if (showFloatingActions)
+                    Positioned(
+                      left: 16,
+                      right: 16,
+                      bottom: floatingBarBottom,
+                      child: PostDetailPinnedActions(
+                        post: post,
+                        floating: true,
+                      ),
+                    ),
+                ],
+              );
+            },
           );
         } else {
           double sideBarWidth;

@@ -239,7 +239,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
           Future<void> addIdentity() async {
             HapticFeedback.selectionClick();
-            final allowHttp = Get.find<SettingsController>().settings.allowHttpHosts.value;
+            final allowHttp =
+                Get.find<SettingsController>().settings.allowHttpHosts.value;
             await showIdentityEditorDialog(
               context: context,
               allowHttpHosts: allowHttp,
@@ -248,7 +249,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
           Future<void> editIdentity(Identity identity) async {
             HapticFeedback.selectionClick();
-            final allowHttp = Get.find<SettingsController>().settings.allowHttpHosts.value;
+            final allowHttp =
+                Get.find<SettingsController>().settings.allowHttpHosts.value;
             await showIdentityEditorDialog(
               context: context,
               identity: identity,
@@ -751,6 +753,22 @@ class _SettingsPageState extends State<SettingsPage> {
                 },
               );
             },
+          ),
+          ValueListenableBuilder<bool>(
+            valueListenable: settings.postActionBarFloatingMobile,
+            builder: (context, value, _) => _SettingsSwitchTile(
+              leading: const _SettingsLeadingIcon(
+                icon: CupertinoIcons.rectangle_stack,
+                color: Color(0xFF16A085),
+              ),
+              title: 'Action bar placement',
+              subtitle: value
+                  ? 'Mobile: floating above navbar'
+                  : 'Mobile: inline on post page',
+              value: value,
+              onChanged: (enabled) =>
+                  settings.postActionBarFloatingMobile.value = enabled,
+            ),
           ),
         ],
       ),
@@ -1278,45 +1296,43 @@ class _SettingsPageState extends State<SettingsPage> {
                                     ?.copyWith(fontWeight: FontWeight.w700),
                               ),
                             ),
-                          ...available.map(
-                            (action) {
-                              final iFinishedDisabled = action ==
-                                      PostActionId.iFinished &&
-                                  !settings.iFinishedEnabled.value;
-                              return CupertinoListTile(
-                                leading: Icon(
-                                  action.icon,
-                                  size: 20,
-                                  color: iFinishedDisabled
-                                      ? CupertinoColors.systemGrey
-                                      : null,
-                                ),
-                                title: Text(
-                                  action.label,
-                                  style: iFinishedDisabled
-                                      ? TextStyle(
-                                          color: CupertinoColors.systemGrey,
-                                        )
-                                      : null,
-                                ),
-                                trailing: Icon(
-                                  CupertinoIcons.plus_circle,
-                                  size: 20,
-                                  color: iFinishedDisabled
-                                      ? CupertinoColors.systemGrey
-                                      : null,
-                                ),
-                                onTap: iFinishedDisabled
-                                    ? null
-                                    : () {
-                                        setSheetState(() {
-                                          selected.add(action);
-                                        });
-                                        HapticFeedback.selectionClick();
-                                      },
-                              );
-                            },
-                          ),
+                          ...available.map((action) {
+                            final iFinishedDisabled =
+                                action == PostActionId.iFinished &&
+                                !settings.iFinishedEnabled.value;
+                            return CupertinoListTile(
+                              leading: Icon(
+                                action.icon,
+                                size: 20,
+                                color: iFinishedDisabled
+                                    ? CupertinoColors.systemGrey
+                                    : null,
+                              ),
+                              title: Text(
+                                action.label,
+                                style: iFinishedDisabled
+                                    ? TextStyle(
+                                        color: CupertinoColors.systemGrey,
+                                      )
+                                    : null,
+                              ),
+                              trailing: Icon(
+                                CupertinoIcons.plus_circle,
+                                size: 20,
+                                color: iFinishedDisabled
+                                    ? CupertinoColors.systemGrey
+                                    : null,
+                              ),
+                              onTap: iFinishedDisabled
+                                  ? null
+                                  : () {
+                                      setSheetState(() {
+                                        selected.add(action);
+                                      });
+                                      HapticFeedback.selectionClick();
+                                    },
+                            );
+                          }),
                           const SizedBox(height: 12),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -1444,8 +1460,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       spacing: 10,
                       runSpacing: 10,
                       children: _accentPresets.map((color) {
-                        final isSelected = hexFromColor(color) ==
-                            hexFromColor(selected);
+                        final isSelected =
+                            hexFromColor(color) == hexFromColor(selected);
                         return GestureDetector(
                           onTap: () {
                             HapticFeedback.selectionClick();
@@ -1510,8 +1526,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         FilledButton(
                           onPressed: () {
                             HapticFeedback.selectionClick();
-                            settings.accentColorHex.value =
-                                hexFromColor(selected);
+                            settings.accentColorHex.value = hexFromColor(
+                              selected,
+                            );
                             Navigator.of(context).pop();
                           },
                           child: const Text('Save'),

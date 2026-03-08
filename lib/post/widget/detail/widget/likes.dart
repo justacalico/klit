@@ -26,183 +26,7 @@ class LikeDisplay extends StatelessWidget {
     final iconColor = theme.iconTheme.color ?? theme.colorScheme.onSurface;
     final voteStatus = post.vote.status;
     final settings = context.read<Settings>();
-
-    Future<void> vote({required bool upvote, required bool isLiked}) async {
-      PostController controller = context.read<PostController>();
-      ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
-      controller.vote(post: post, upvote: upvote, replace: !isLiked).then((
-        value,
-      ) {
-        if (!value) {
-          messenger.showSnackBar(
-            SnackBar(
-              duration: const Duration(seconds: 1),
-              content: Text(
-                'Failed to ${upvote ? 'upvote' : 'downvote'} Post #${post.id}',
-              ),
-            ),
-          );
-        }
-      });
-    }
-
-    Future<void> toggleFavorite() async {
-      await _toggleFavorite(
-        context: context,
-        post: post,
-        isLiked: post.isFavorited,
-      );
-    }
-
-    Future<void> share() async =>
-        Share.text(context, context.read<Client>().withHost(post.link));
-
-    Future<void> download() async =>
-        postDownloadingNotification(context, {post});
-
-    Future<void> browse() async =>
-        launch(context.read<Client>().withHost(post.link));
-
-    Widget buildControlButton({
-      required String keyId,
-      required String semanticLabel,
-      required IconData icon,
-      required bool active,
-      required VoidCallback? onPressed,
-      Widget? child,
-    }) {
-      final bgColor = active
-          ? primary.withValues(alpha: 0.9)
-          : primary.withValues(alpha: 0.2);
-      final fgColor = active ? theme.colorScheme.onPrimary : iconColor;
-
-      return _AnimatedPostActionButton(
-        key: ValueKey<String>('post_action_$keyId'),
-        semanticLabel: semanticLabel,
-        icon: icon,
-        active: active,
-        backgroundColor: bgColor,
-        foregroundColor: fgColor,
-        onPressed: onPressed,
-        child: child,
-      );
-    }
-
-    List<Widget> buildActionButtons(List<PostActionId> actions) {
-      final buttons = <Widget>[];
-      for (final action in actions) {
-        switch (action) {
-          case PostActionId.upvote:
-            buttons.add(
-              buildControlButton(
-                keyId: action.key,
-                semanticLabel: action.label,
-                icon: voteStatus == VoteStatus.upvoted
-                    ? Icons.thumb_up
-                    : Icons.thumb_up_alt_outlined,
-                active: voteStatus == VoteStatus.upvoted,
-                onPressed: () {
-                  HapticFeedback.selectionClick();
-                  vote(upvote: true, isLiked: voteStatus == VoteStatus.upvoted);
-                },
-              ),
-            );
-            break;
-          case PostActionId.downvote:
-            buttons.add(
-              buildControlButton(
-                keyId: action.key,
-                semanticLabel: action.label,
-                icon: voteStatus == VoteStatus.downvoted
-                    ? Icons.thumb_down
-                    : Icons.thumb_down_alt_outlined,
-                active: voteStatus == VoteStatus.downvoted,
-                onPressed: () {
-                  HapticFeedback.selectionClick();
-                  vote(
-                    upvote: false,
-                    isLiked: voteStatus == VoteStatus.downvoted,
-                  );
-                },
-              ),
-            );
-            break;
-          case PostActionId.favorite:
-            buttons.add(
-              buildControlButton(
-                keyId: action.key,
-                semanticLabel: action.label,
-                icon: post.isFavorited ? Icons.favorite : Icons.favorite_border,
-                active: post.isFavorited,
-                onPressed: () {
-                  HapticFeedback.selectionClick();
-                  toggleFavorite();
-                },
-              ),
-            );
-            break;
-          case PostActionId.share:
-            buttons.add(
-              buildControlButton(
-                keyId: action.key,
-                semanticLabel: action.label,
-                icon: Icons.share_outlined,
-                active: false,
-                onPressed: () {
-                  HapticFeedback.selectionClick();
-                  share();
-                },
-              ),
-            );
-            break;
-          case PostActionId.download:
-            if (post.file != null) {
-              buttons.add(
-                buildControlButton(
-                  keyId: action.key,
-                  semanticLabel: action.label,
-                  icon: Icons.file_download_outlined,
-                  active: false,
-                  onPressed: () {
-                    HapticFeedback.selectionClick();
-                    download();
-                  },
-                ),
-              );
-            }
-            break;
-          case PostActionId.browse:
-            buttons.add(
-              buildControlButton(
-                keyId: action.key,
-                semanticLabel: action.label,
-                icon: Icons.open_in_browser_outlined,
-                active: false,
-                onPressed: () {
-                  HapticFeedback.selectionClick();
-                  browse();
-                },
-              ),
-            );
-            break;
-          case PostActionId.iFinished:
-            final enabled = settings.iFinishedEnabled.value;
-            buttons.add(
-              _IFinishedButton(
-                post: post,
-                settings: settings,
-                theme: theme,
-                primary: primary,
-                iconColor: iconColor,
-                enabled: enabled,
-                buildControlButton: buildControlButton,
-              ),
-            );
-            break;
-        }
-      }
-      return buttons;
-    }
+    final isMobile = MediaQuery.sizeOf(context).width < mobileBreakpoint;
 
     Widget buildStat({
       required IconData icon,
@@ -231,85 +55,327 @@ class LikeDisplay extends StatelessWidget {
       );
     }
 
-    return Column(
-      children: [
-        if (hasLogin)
-          ValueListenableBuilder<String>(
-            valueListenable: settings.postActionBarActions,
-            builder: (context, rawActions, _) {
-              final actions = PostActionPreferences.decode(rawActions);
-              final buttons = buildActionButtons(actions);
-              return GlassCard(
-                margin: const EdgeInsets.only(top: 12),
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                borderRadius: 18,
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    if (buttons.isEmpty) {
-                      return const SizedBox.shrink();
-                    }
-
-                    const minButtonWidth = 72.0;
-                    const gap = 8.0;
-                    final count = buttons.length;
-                    final availableWidth =
-                        constraints.maxWidth - (gap * (count - 1));
-                    final fittedWidth = availableWidth / count;
-                    final buttonWidth = fittedWidth < minButtonWidth
-                        ? minButtonWidth
-                        : fittedWidth;
-
-                    return SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minWidth: constraints.maxWidth,
-                        ),
-                        child: Row(
-                          children: [
-                            for (var i = 0; i < count; i++) ...[
-                              SizedBox(width: buttonWidth, child: buttons[i]),
-                              if (i != count - 1) const SizedBox(width: gap),
-                            ],
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-          ),
-        GlassCard(
-          margin: EdgeInsets.only(top: hasLogin ? 10 : 12),
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          borderRadius: 18,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              buildStat(
-                icon: Icons.thumb_up,
-                label: 'Score',
-                value: post.vote.score.toString(),
-                color: voteStatus == VoteStatus.upvoted ? primary : iconColor,
+    return ValueListenableBuilder<bool>(
+      valueListenable: settings.postActionBarFloatingMobile,
+      builder: (context, floatingMobile, _) {
+        final showInlineActions = hasLogin && !(floatingMobile && isMobile);
+        return Column(
+          children: [
+            if (showInlineActions) PostDetailPinnedActions(post: post),
+            GlassCard(
+              margin: EdgeInsets.only(top: showInlineActions ? 10 : 12),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              borderRadius: 18,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  buildStat(
+                    icon: Icons.thumb_up,
+                    label: 'Score',
+                    value: post.vote.score.toString(),
+                    color: voteStatus == VoteStatus.upvoted
+                        ? primary
+                        : iconColor,
+                  ),
+                  buildStat(
+                    icon: Icons.favorite,
+                    label: 'Favorites',
+                    value: post.favCount.toString(),
+                    color: post.isFavorited ? Colors.pinkAccent : iconColor,
+                  ),
+                  buildStat(
+                    icon: Icons.comment,
+                    label: 'Comments',
+                    value: post.commentCount.toString(),
+                  ),
+                ],
               ),
-              buildStat(
-                icon: Icons.favorite,
-                label: 'Favorites',
-                value: post.favCount.toString(),
-                color: post.isFavorited ? Colors.pinkAccent : iconColor,
-              ),
-              buildStat(
-                icon: Icons.comment,
-                label: 'Comments',
-                value: post.commentCount.toString(),
-              ),
-            ],
-          ),
-        ),
-      ],
+            ),
+          ],
+        );
+      },
     );
   }
+}
+
+class PostDetailPinnedActions extends StatelessWidget {
+  const PostDetailPinnedActions({
+    super.key,
+    required this.post,
+    this.floating = false,
+  });
+
+  final Post post;
+  final bool floating;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasLogin = context.watch<Client>().hasLogin;
+    if (!hasLogin) {
+      return const SizedBox.shrink();
+    }
+    final settings = context.read<Settings>();
+    return ValueListenableBuilder<String>(
+      valueListenable: settings.postActionBarActions,
+      builder: (context, rawActions, _) {
+        final actions = PostActionPreferences.decode(rawActions);
+        final buttons = _buildActionButtons(
+          context: context,
+          post: post,
+          settings: settings,
+          actions: actions,
+        );
+        if (buttons.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        final strip = _PostDetailActionButtonStrip(buttons: buttons);
+        if (!floating) {
+          return GlassCard(
+            margin: const EdgeInsets.only(top: 12),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            borderRadius: 18,
+            child: strip,
+          );
+        }
+
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        final isDark = theme.brightness == Brightness.dark;
+        final barBg = isDark
+            ? theme.canvasColor
+            : colorScheme.surfaceContainerHigh;
+        return GlassSurface(
+          margin: EdgeInsets.zero,
+          borderRadius: 18,
+          color: barBg.withValues(alpha: 0.55),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+          child: strip,
+        );
+      },
+    );
+  }
+}
+
+class _PostDetailActionButtonStrip extends StatelessWidget {
+  const _PostDetailActionButtonStrip({required this.buttons});
+
+  final List<Widget> buttons;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const minButtonWidth = 72.0;
+        const gap = 8.0;
+        final count = buttons.length;
+        final availableWidth = constraints.maxWidth - (gap * (count - 1));
+        final fittedWidth = availableWidth / count;
+        final buttonWidth = fittedWidth < minButtonWidth
+            ? minButtonWidth
+            : fittedWidth;
+
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: constraints.maxWidth),
+            child: Row(
+              children: [
+                for (var i = 0; i < count; i++) ...[
+                  SizedBox(width: buttonWidth, child: buttons[i]),
+                  if (i != count - 1) const SizedBox(width: gap),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+List<Widget> _buildActionButtons({
+  required BuildContext context,
+  required Post post,
+  required Settings settings,
+  required List<PostActionId> actions,
+}) {
+  final theme = Theme.of(context);
+  final cupertino = CupertinoTheme.of(context);
+  final primary = cupertino.primaryColor;
+  final iconColor = theme.iconTheme.color ?? theme.colorScheme.onSurface;
+  final voteStatus = post.vote.status;
+
+  Future<void> vote({required bool upvote, required bool isLiked}) async {
+    PostController controller = context.read<PostController>();
+    ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+    controller.vote(post: post, upvote: upvote, replace: !isLiked).then((
+      value,
+    ) {
+      if (!value) {
+        messenger.showSnackBar(
+          SnackBar(
+            duration: const Duration(seconds: 1),
+            content: Text(
+              'Failed to ${upvote ? 'upvote' : 'downvote'} Post #${post.id}',
+            ),
+          ),
+        );
+      }
+    });
+  }
+
+  Future<void> toggleFavorite() async {
+    await _toggleFavorite(
+      context: context,
+      post: post,
+      isLiked: post.isFavorited,
+    );
+  }
+
+  Future<void> share() async =>
+      Share.text(context, context.read<Client>().withHost(post.link));
+
+  Future<void> download() async => postDownloadingNotification(context, {post});
+
+  Future<void> browse() async =>
+      launch(context.read<Client>().withHost(post.link));
+
+  Widget buildControlButton({
+    required String keyId,
+    required String semanticLabel,
+    required IconData icon,
+    required bool active,
+    required VoidCallback? onPressed,
+    Widget? child,
+  }) {
+    final bgColor = active
+        ? primary.withValues(alpha: 0.9)
+        : primary.withValues(alpha: 0.2);
+    final fgColor = active ? theme.colorScheme.onPrimary : iconColor;
+
+    return _AnimatedPostActionButton(
+      key: ValueKey<String>('post_action_$keyId'),
+      semanticLabel: semanticLabel,
+      icon: icon,
+      active: active,
+      backgroundColor: bgColor,
+      foregroundColor: fgColor,
+      onPressed: onPressed,
+      child: child,
+    );
+  }
+
+  final buttons = <Widget>[];
+  for (final action in actions) {
+    switch (action) {
+      case PostActionId.upvote:
+        buttons.add(
+          buildControlButton(
+            keyId: action.key,
+            semanticLabel: action.label,
+            icon: voteStatus == VoteStatus.upvoted
+                ? Icons.thumb_up
+                : Icons.thumb_up_alt_outlined,
+            active: voteStatus == VoteStatus.upvoted,
+            onPressed: () {
+              HapticFeedback.selectionClick();
+              vote(upvote: true, isLiked: voteStatus == VoteStatus.upvoted);
+            },
+          ),
+        );
+        break;
+      case PostActionId.downvote:
+        buttons.add(
+          buildControlButton(
+            keyId: action.key,
+            semanticLabel: action.label,
+            icon: voteStatus == VoteStatus.downvoted
+                ? Icons.thumb_down
+                : Icons.thumb_down_alt_outlined,
+            active: voteStatus == VoteStatus.downvoted,
+            onPressed: () {
+              HapticFeedback.selectionClick();
+              vote(upvote: false, isLiked: voteStatus == VoteStatus.downvoted);
+            },
+          ),
+        );
+        break;
+      case PostActionId.favorite:
+        buttons.add(
+          buildControlButton(
+            keyId: action.key,
+            semanticLabel: action.label,
+            icon: post.isFavorited ? Icons.favorite : Icons.favorite_border,
+            active: post.isFavorited,
+            onPressed: () {
+              HapticFeedback.selectionClick();
+              toggleFavorite();
+            },
+          ),
+        );
+        break;
+      case PostActionId.share:
+        buttons.add(
+          buildControlButton(
+            keyId: action.key,
+            semanticLabel: action.label,
+            icon: Icons.share_outlined,
+            active: false,
+            onPressed: () {
+              HapticFeedback.selectionClick();
+              share();
+            },
+          ),
+        );
+        break;
+      case PostActionId.download:
+        if (post.file != null) {
+          buttons.add(
+            buildControlButton(
+              keyId: action.key,
+              semanticLabel: action.label,
+              icon: Icons.file_download_outlined,
+              active: false,
+              onPressed: () {
+                HapticFeedback.selectionClick();
+                download();
+              },
+            ),
+          );
+        }
+        break;
+      case PostActionId.browse:
+        buttons.add(
+          buildControlButton(
+            keyId: action.key,
+            semanticLabel: action.label,
+            icon: Icons.open_in_browser_outlined,
+            active: false,
+            onPressed: () {
+              HapticFeedback.selectionClick();
+              browse();
+            },
+          ),
+        );
+        break;
+      case PostActionId.iFinished:
+        final enabled = settings.iFinishedEnabled.value;
+        buttons.add(
+          _IFinishedButton(
+            post: post,
+            settings: settings,
+            theme: theme,
+            primary: primary,
+            iconColor: iconColor,
+            enabled: enabled,
+            buildControlButton: buildControlButton,
+          ),
+        );
+        break;
+    }
+  }
+  return buttons;
 }
 
 class _IFinishedButton extends StatefulWidget {
@@ -336,7 +402,8 @@ class _IFinishedButton extends StatefulWidget {
     required bool active,
     required VoidCallback? onPressed,
     Widget? child,
-  }) buildControlButton;
+  })
+  buildControlButton;
 
   @override
   State<_IFinishedButton> createState() => _IFinishedButtonState();
@@ -354,7 +421,8 @@ class _IFinishedButtonState extends State<_IFinishedButton> {
     HapticFeedback.selectionClick();
     final client = context.read<Client>();
     String? photoPath;
-    final requestPhoto = widget.settings.iFinishedRequestPhoto.value &&
+    final requestPhoto =
+        widget.settings.iFinishedRequestPhoto.value &&
         (Platform.isIOS || Platform.isAndroid);
     if (requestPhoto) {
       final source = await _showPhotoSourceSheet(context);
@@ -364,14 +432,14 @@ class _IFinishedButtonState extends State<_IFinishedButton> {
       }
       if (source != _PhotoSource.skip) {
         final picker = ImagePicker();
-        final sourceType =
-            source == _PhotoSource.camera
-                ? ImageSource.camera
-                : ImageSource.gallery;
+        final sourceType = source == _PhotoSource.camera
+            ? ImageSource.camera
+            : ImageSource.gallery;
         final file = await picker.pickImage(source: sourceType);
         if (file != null) {
           final dir = await getTemporaryDirectory();
-          final name = 'finish_${widget.post.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+          final name =
+              'finish_${widget.post.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
           final dest = File('${dir.path}/$name');
           await dest.writeAsBytes(await file.readAsBytes());
           photoPath = dest.path;
@@ -539,7 +607,8 @@ class _AnimatedPostActionButtonState extends State<_AnimatedPostActionButton> {
                 onPressed: widget.onPressed,
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 minimumSize: const Size(0, 0),
-                child: widget.child ??
+                child:
+                    widget.child ??
                     Icon(widget.icon, size: 20, color: widget.foregroundColor),
               ),
             ),
