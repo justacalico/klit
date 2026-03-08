@@ -73,7 +73,7 @@ class Settings extends NotifiedSettings {
   );
   late final ValueNotifier<bool> postActionBarFloatingMobile = createSetting(
     key: 'postActionBarFloatingMobile',
-    initialValue: true,
+    initialValue: false,
   );
   late final ValueNotifier<bool> upvoteFavs = createSetting<bool>(
     key: 'upvoteFavs',
