@@ -8,8 +8,6 @@ const List<NavItem> appNavItems = [
   NavItem(AppRoutes.search, 'Search', Icons.search),
   NavItem(AppRoutes.feeds, 'Feeds', Icons.rss_feed),
   NavItem(AppRoutes.profile, 'Profile', Icons.person),
-  NavItem(AppRoutes.timeline, 'Timeline', Icons.feed),
-  NavItem(AppRoutes.subscriptions, 'Subscriptions', Icons.person_add),
   NavItem(AppRoutes.pools, 'Pools', Icons.collections),
   NavItem(AppRoutes.forum, 'Forum', Icons.forum),
   NavItem(AppRoutes.history, 'History', Icons.history),

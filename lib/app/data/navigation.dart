@@ -1,6 +1,5 @@
 import 'package:klit/feed/feed.dart';
 import 'package:klit/finish/finish.dart';
-import 'package:klit/follow/follow.dart';
 import 'package:klit/history/history.dart';
 import 'package:klit/user/user.dart';
 import 'package:klit/pool/pool.dart';
@@ -52,22 +51,6 @@ final List<RouterDrawerDestination> rootDestintations = [
     name: 'Profile',
     icon: const Icon(Icons.person),
     builder: (context) => const ProfilePage(),
-    unique: true,
-    group: _drawerFollowsGroup,
-  ),
-  NamedRouterDrawerDestination(
-    path: '/timeline',
-    name: 'Timeline',
-    icon: const Icon(Icons.feed),
-    builder: (context) => const FollowsTimelinePage(),
-    unique: true,
-    group: _drawerFollowsGroup,
-  ),
-  NamedRouterDrawerDestination(
-    path: '/subscriptions',
-    name: 'Subscriptions',
-    icon: const Icon(Icons.person_add),
-    builder: (context) => const FollowsSubscriptionsPage(),
     unique: true,
     group: _drawerFollowsGroup,
   ),

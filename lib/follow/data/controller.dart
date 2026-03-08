@@ -1,28 +1,6 @@
 import 'package:klit/client/client.dart';
 import 'package:klit/follow/follow.dart';
-import 'package:klit/post/post.dart';
 import 'package:klit/shared/shared.dart';
-
-class FollowTimelineController extends PostController {
-  FollowTimelineController({required super.client}) : super(canSearch: false);
-
-  @override
-  Future<List<Post>> fetch(int page, bool force) async {
-    List<Follow> follows = await client.follows.all(
-      query: FollowsQuery(types: [FollowType.update, FollowType.notify]),
-      force: force,
-    );
-    return client.posts.byTags(
-      tags: follows
-          .where((e) => !e.tags.contains(' '))
-          .map((e) => e.tags)
-          .toList(),
-      page: page,
-      force: force,
-      cancelToken: cancelToken,
-    );
-  }
-}
 
 class FollowController extends PageClientDataController<Follow> {
   FollowController({

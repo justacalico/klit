@@ -23,14 +23,6 @@ class AppPages {
       page: () => _RedirectToShell(AppRoutes.profile),
     ),
     GetPage(
-      name: AppRoutes.timeline,
-      page: () => _RedirectToShell(AppRoutes.timeline),
-    ),
-    GetPage(
-      name: AppRoutes.subscriptions,
-      page: () => _RedirectToShell(AppRoutes.subscriptions),
-    ),
-    GetPage(
       name: AppRoutes.bookmarks,
       page: () => _RedirectToShell(AppRoutes.home),
     ),

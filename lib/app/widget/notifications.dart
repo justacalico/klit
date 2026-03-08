@@ -106,7 +106,7 @@ class _NotificationHandlerState extends State<NotificationHandler> {
 
     switch (notification.type) {
       case 'follow':
-        Get.offAllNamed('/subscriptions');
+        Get.offAllNamed('/');
         if (notification.query != null) {
           Get.to(
             () => PostsSearchPage(

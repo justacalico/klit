@@ -2,7 +2,6 @@ import 'package:klit/app/routes/app_routes.dart';
 import 'package:klit/client/client.dart';
 import 'package:klit/feed/feed.dart';
 import 'package:klit/finish/finish.dart';
-import 'package:klit/follow/follow.dart';
 import 'package:klit/history/history.dart';
 import 'package:klit/pool/pool.dart';
 import 'package:klit/post/post.dart';
@@ -99,10 +98,6 @@ class _MainShellState extends State<MainShell> {
         return const PostsSearchPage();
       case AppRoutes.feeds:
         return const FeedsPage();
-      case AppRoutes.timeline:
-        return const FollowsTimelinePage();
-      case AppRoutes.subscriptions:
-        return const FollowsSubscriptionsPage();
       case AppRoutes.pools:
         return const PoolsPage();
       case AppRoutes.forum:
