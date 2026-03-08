@@ -59,7 +59,21 @@ abstract final class E621Post {
       sources: post('sources').asListOrThrow((pick) => pick.asStringOrThrow()),
       pools: post('pools').asListOrThrow((pick) => pick.asIntOrThrow()),
       relationships: post('relationships').letOrThrow(
-        (pick) => Relationships.fromJson(pick.asMapOrThrow<String, dynamic>()),
+        (relationships) => Relationships(
+          parentId:
+              relationships('parent_id').asIntOrNull() ??
+              relationships('parentId').asIntOrNull(),
+          hasChildren:
+              relationships('has_children').asBoolOrNull() ??
+              relationships('hasChildren').asBoolOrNull() ??
+              false,
+          hasActiveChildren:
+              relationships('has_active_children').asBoolOrNull() ??
+              relationships('hasActiveChildren').asBoolOrNull(),
+          children: relationships(
+            'children',
+          ).asListOrEmpty((pick) => pick.asIntOrThrow()),
+        ),
       ),
     ),
   );

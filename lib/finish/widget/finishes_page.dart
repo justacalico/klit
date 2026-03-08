@@ -252,10 +252,14 @@ class _FinishTile extends StatelessWidget {
         ),
       );
     }
+    final parsed = Uri.tryParse(postThumb);
+    final imageUrl = (parsed?.hasScheme ?? false)
+        ? postThumb
+        : context.read<Client>().withHost(postThumb);
     return ClipRRect(
       borderRadius: BorderRadius.circular(4),
       child: CachedNetworkImage(
-        imageUrl: context.read<Client>().withHost(postThumb),
+        imageUrl: imageUrl,
         fit: BoxFit.cover,
         cacheManager: context.read<BaseCacheManager>(),
         errorWidget: (context, url, error) => ColoredBox(
