@@ -260,7 +260,41 @@ class _SettingsPageState extends State<SettingsPage> {
 
           Future<void> activateIdentity(Identity identity) async {
             HapticFeedback.selectionClick();
-            await identityClient.activate(identity.id);
+            if (identity.id == activeIdentity.id) return;
+            showDialog<void>(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => const PopScope(
+                canPop: false,
+                child: Dialog(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        SizedBox(width: 12),
+                        Text('Switching account...'),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+            try {
+              await Future.wait<void>([
+                identityClient.activate(identity.id),
+                Future<void>.delayed(const Duration(seconds: 1)),
+              ]);
+            } finally {
+              if (context.mounted) {
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+            }
           }
 
           Future<void> testIdentity(Identity identity) async {
