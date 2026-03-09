@@ -97,18 +97,12 @@ class _MainShellState extends ConsumerState<MainShell> {
     }
     switch (path) {
       case AppRoutes.home:
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          ref.read(navigationProvider.notifier).clearSearchInitialQuery();
-        });
         return const HomePage();
       case AppRoutes.hot:
         return const HotPage();
       case AppRoutes.search:
-        final initialTags = ref.read(navigationProvider).searchInitialQuery;
+        final initialTags = ref.read(navigationProvider.notifier).takeSearchInitialQuery();
         if (initialTags != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            ref.read(navigationProvider.notifier).clearSearchInitialQuery();
-          });
           return PostsSearchPage(
             key: ValueKey(initialTags),
             query: {'tags': initialTags},

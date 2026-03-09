@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:klit/app/data/nav_items.dart';
 import 'package:klit/app/routes/app_routes.dart';
@@ -36,6 +37,7 @@ class NavigationState {
     int? profileViewUserId,
     String? profileViewUsername,
     String? searchInitialQuery,
+    bool clearSearchQuery = false,
   }) {
     return NavigationState(
       items: items ?? this.items,
@@ -44,7 +46,8 @@ class NavigationState {
       sidebarCollapsed: sidebarCollapsed ?? this.sidebarCollapsed,
       profileViewUserId: profileViewUserId ?? this.profileViewUserId,
       profileViewUsername: profileViewUsername ?? this.profileViewUsername,
-      searchInitialQuery: searchInitialQuery ?? this.searchInitialQuery,
+      searchInitialQuery:
+          clearSearchQuery ? null : (searchInitialQuery ?? this.searchInitialQuery),
     );
   }
 }
@@ -65,12 +68,18 @@ class NavigationNotifier extends Notifier<NavigationState> {
       currentPath: path,
       profileViewUserId: profileUserId ?? (path == AppRoutes.profile ? null : state.profileViewUserId),
       profileViewUsername: profileUsername ?? (path == AppRoutes.profile ? null : state.profileViewUsername),
-      searchInitialQuery: path == AppRoutes.search ? state.searchInitialQuery : null,
+      clearSearchQuery: path != AppRoutes.search,
     );
   }
 
   void clearSearchInitialQuery() {
-    state = state.copyWith(searchInitialQuery: null);
+    state = state.copyWith(clearSearchQuery: true);
+  }
+
+  String? takeSearchInitialQuery() {
+    final value = state.searchInitialQuery;
+    WidgetsBinding.instance.addPostFrameCallback((_) => clearSearchInitialQuery());
+    return value;
   }
 
   void setSearchInitialQuery(String? query) {
@@ -102,7 +111,7 @@ class NavigationNotifier extends Notifier<NavigationState> {
       currentPath: path,
       profileViewUserId: path == AppRoutes.profile ? null : state.profileViewUserId,
       profileViewUsername: path == AppRoutes.profile ? null : state.profileViewUsername,
-      searchInitialQuery: path == AppRoutes.home ? null : state.searchInitialQuery,
+      clearSearchQuery: path != AppRoutes.search,
     );
     if (path == AppRoutes.search) _requestSearchFocus = true;
     return path;
