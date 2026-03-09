@@ -1,4 +1,3 @@
-import 'package:klit/app/routes/app_routes.dart';
 import 'package:klit/client/client.dart';
 import 'package:klit/feed/data/feed.dart';
 import 'package:klit/feed/feeds_provider.dart';
@@ -6,7 +5,7 @@ import 'package:klit/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 
 import 'feed_edit_page.dart';
 
@@ -39,9 +38,7 @@ class _FeedsPageState extends State<FeedsPage> {
       query = '$query rating:${feed.rating}';
     }
     query = '$query order:${feed.order}';
-    final nav = Get.find<NavigationController>();
-    nav.searchInitialQuery.value = query;
-    nav.currentPath.value = AppRoutes.search;
+    context.go('/search?tags=${Uri.encodeComponent(query)}');
   }
 
   void _openEdit(BuildContext context, Feed? feed) {

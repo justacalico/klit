@@ -11,41 +11,60 @@ import 'package:klit/topic/topic.dart';
 import 'package:klit/user/user.dart';
 import 'package:klit/traits/traits.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-class MainShell extends StatefulWidget {
-  const MainShell({super.key, this.initialPath});
+class MainShell extends ConsumerStatefulWidget {
+  const MainShell({
+    super.key,
+    this.initialPath,
+    this.profileUserId,
+    this.profileUsername,
+    this.searchInitialQuery,
+  });
 
   final String? initialPath;
+  final int? profileUserId;
+  final String? profileUsername;
+  final String? searchInitialQuery;
 
   @override
-  State<MainShell> createState() => _MainShellState();
+  ConsumerState<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class _MainShellState extends ConsumerState<MainShell> {
   @override
   void initState() {
     super.initState();
-    final nav = Get.find<NavigationController>();
-    final args = Get.arguments as Map<String, dynamic>?;
-    if (args?['path'] != null) {
-      nav.currentPath.value = args!['path'] as String;
-      if (nav.currentPath.value == AppRoutes.profile) {
-        if (args['userId'] != null) {
-          nav.profileViewUserId.value = args['userId'] as int;
-        }
-        if (args['username'] != null) {
-          nav.profileViewUsername.value = args['username'] as String;
-        }
-      }
-    } else if (widget.initialPath != null) {
-      nav.currentPath.value = widget.initialPath!;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _syncFromRoute());
+  }
+
+  @override
+  void didUpdateWidget(MainShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialPath != widget.initialPath ||
+        oldWidget.profileUserId != widget.profileUserId ||
+        oldWidget.profileUsername != widget.profileUsername ||
+        oldWidget.searchInitialQuery != widget.searchInitialQuery) {
+      _syncFromRoute();
+    }
+  }
+
+  void _syncFromRoute() {
+    final path = widget.initialPath ?? AppRoutes.home;
+    ref.read(navigationProvider.notifier).setPath(
+          path,
+          profileUserId: widget.profileUserId,
+          profileUsername: widget.profileUsername,
+        );
+    if (widget.searchInitialQuery != null) {
+      ref.read(navigationProvider.notifier).setSearchInitialQuery(widget.searchInitialQuery);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final nav = Get.find<NavigationController>();
+    final nav = ref.watch(navigationProvider);
     final client = context.watch<Client>();
     final settings = context.read<Settings>();
     final showFavorites = client.hasLogin;
@@ -56,16 +75,13 @@ class _MainShellState extends State<MainShell> {
         return ValueListenableBuilder<bool>(
           valueListenable: settings.iFinishedEnabled,
           builder: (context, showFinishes, child) {
-            return Obx(() {
-              final path = nav.currentPath.value;
-              if (path == AppRoutes.search) nav.searchInitialQuery.value;
-              return AppShell(
-                body: _buildContent(path, settings),
-                showFavorites: showFavorites,
-                showHistory: showHistory,
-                showFinishes: showFinishes,
-              );
-            });
+            final path = nav.currentPath;
+            return AppShell(
+              body: _buildContent(path, settings),
+              showFavorites: showFavorites,
+              showHistory: showHistory,
+              showFinishes: showFinishes,
+            );
           },
         );
       },
@@ -75,21 +91,24 @@ class _MainShellState extends State<MainShell> {
   Widget _buildContent(String path, Settings settings) {
     if (path == AppRoutes.finishes && !settings.iFinishedEnabled.value) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Get.find<NavigationController>().currentPath.value = AppRoutes.home;
+        context.go(AppRoutes.home);
       });
       return const HomePage();
     }
     switch (path) {
       case AppRoutes.home:
-        Get.find<NavigationController>().searchInitialQuery.value = null;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ref.read(navigationProvider.notifier).clearSearchInitialQuery();
+        });
         return const HomePage();
       case AppRoutes.hot:
         return const HotPage();
       case AppRoutes.search:
-        final nav = Get.find<NavigationController>();
-        final initialTags = nav.searchInitialQuery.value;
+        final initialTags = ref.read(navigationProvider).searchInitialQuery;
         if (initialTags != null) {
-          nav.searchInitialQuery.value = null;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ref.read(navigationProvider.notifier).clearSearchInitialQuery();
+          });
           return PostsSearchPage(
             key: ValueKey(initialTags),
             query: {'tags': initialTags},

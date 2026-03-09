@@ -4,7 +4,7 @@ import 'package:klit/markup/markup.dart';
 import 'package:klit/reply/reply.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 
 class ReplyTile extends StatelessWidget {
   const ReplyTile({super.key, required this.reply});
@@ -83,10 +83,9 @@ class ReplyHeader extends StatelessWidget {
                 ),
               ),
             ),
-            onTap: () => Get.offAllNamed(AppRoutes.home, arguments: {
-              'path': AppRoutes.profile,
-              'userId': reply.creatorId,
-            }),
+            onTap: () => context.go(
+                '${AppRoutes.profile}?userId=${reply.creatorId}',
+              ),
           ),
         ),
         const SizedBox(width: 4),

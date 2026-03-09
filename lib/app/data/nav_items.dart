@@ -1,6 +1,12 @@
-import 'package:klit/app/routes/app_routes.dart';
-import 'package:klit/shared/controller/navigation_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:klit/app/routes/app_routes.dart';
+
+class NavItem {
+  const NavItem(this.path, this.label, this.icon);
+  final String path;
+  final String label;
+  final IconData icon;
+}
 
 const List<NavItem> appNavItems = [
   NavItem(AppRoutes.home, 'Home', Icons.home),

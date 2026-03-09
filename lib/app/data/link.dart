@@ -7,7 +7,7 @@ import 'package:klit/reply/reply.dart';
 import 'package:klit/topic/topic.dart';
 import 'package:klit/wiki/wiki.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart' as tabs;
 import 'package:path_to_regexp/path_to_regexp.dart';
 import 'package:url_launcher/url_launcher.dart' as urls;
@@ -202,10 +202,10 @@ extension LinkOnTapExtension on LinkParser {
         Object? id = result.id;
         if (id != null) {
           return () {
-            Get.offAllNamed(AppRoutes.home, arguments: {
-              'path': AppRoutes.profile,
-              if (id is int) 'userId': id else 'username': id.toString(),
-            });
+            final q = id is int
+                ? 'userId=${Uri.encodeComponent(id.toString())}'
+                : 'username=${Uri.encodeComponent(id.toString())}';
+            context.go('${AppRoutes.profile}?$q');
           };
         }
         break;

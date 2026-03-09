@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:klit/app/routes/app_routes.dart';
 import 'package:klit/shared/controller/navigation_controller.dart';
 import 'package:klit/shared/data/provider.dart';
@@ -8,7 +9,7 @@ import 'package:klit/user/user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 const double mobileBreakpoint = 600;
 const double compactBreakpoint = 900;
@@ -18,7 +19,29 @@ const String _profilePath = '/profile';
 
 enum NavbarPlacement { top, bottom, sidebar }
 
-class ResponsiveNavbar extends StatelessWidget {
+class _NavAdapter {
+  _NavAdapter(this._ref, this._context);
+
+  final WidgetRef _ref;
+  final BuildContext _context;
+
+  NavigationState get state => _ref.watch(navigationProvider);
+  List<NavItem> get items => state.items;
+  int get mobilePrimaryCount => state.mobilePrimaryCount;
+  int get currentIndex => state.currentIndex;
+  bool get sidebarCollapsed => state.sidebarCollapsed;
+
+  void goTo(int index) {
+    final path = _ref.read(navigationProvider.notifier).goTo(index);
+    _context.go(path);
+  }
+
+  void toggleSidebar() => _ref.read(navigationProvider.notifier).toggleSidebar();
+  void setSidebarCollapsed(bool v) =>
+      _ref.read(navigationProvider.notifier).setSidebarCollapsed(v);
+}
+
+class ResponsiveNavbar extends ConsumerWidget {
   const ResponsiveNavbar({
     super.key,
     required this.placement,
@@ -35,8 +58,8 @@ class ResponsiveNavbar extends StatelessWidget {
   final double? layoutWidth;
 
   @override
-  Widget build(BuildContext context) {
-    final nav = Get.find<NavigationController>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nav = _NavAdapter(ref, context);
     if (placement == NavbarPlacement.bottom) {
       return _BottomNavBar(
         controller: nav,
@@ -103,7 +126,7 @@ class _BottomNavBar extends StatelessWidget {
     required this.showFinishes,
   });
 
-  final NavigationController controller;
+  final _NavAdapter controller;
   final bool showFavorites;
   final bool showHistory;
   final bool showFinishes;
@@ -112,8 +135,7 @@ class _BottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewPadding = MediaQuery.viewPaddingOf(context);
     final bottomOffset = viewPadding.bottom > 0 ? viewPadding.bottom + 8 : 12.0;
-    return Obx(() {
-      final visible = _visibleNavEntries(
+    final visible = _visibleNavEntries(
         controller.items,
         showFavorites,
         showHistory,
@@ -173,9 +195,9 @@ class _BottomNavBar extends StatelessWidget {
                       icon: CupertinoIcons.ellipsis,
                       label: 'More',
                       selected: selectedIndex == primaryCount,
-                      onTap: () {
+                        onTap: () {
                         HapticFeedback.selectionClick();
-                        _showMoreMenu(context, moreVisible);
+                        _showMoreMenu(context, moreVisible, controller);
                       },
                     ),
                   ),
@@ -184,7 +206,6 @@ class _BottomNavBar extends StatelessWidget {
           ),
         ),
       );
-    });
   }
 }
 
@@ -342,8 +363,8 @@ class _BottomNavDestination extends StatelessWidget {
 void _showMoreMenu(
   BuildContext context,
   List<({int index, NavItem item})> entries,
+  _NavAdapter nav,
 ) {
-  final nav = Get.find<NavigationController>();
   final theme = Theme.of(context);
   final cupertinoTheme = CupertinoTheme.of(context);
 
@@ -372,7 +393,7 @@ void _showMoreMenu(
                 ),
               ),
               ...entries.map((e) {
-                final selected = nav.currentIndex == e.index;
+                final selected = nav.state.currentIndex == e.index;
                 return CupertinoListTile(
                   leading: Icon(
                     e.item.icon,
@@ -391,7 +412,7 @@ void _showMoreMenu(
                   ),
                   onTap: () {
                     HapticFeedback.selectionClick();
-                    Navigator.pop(context);
+                    Navigator.of(context).pop();
                     nav.goTo(e.index);
                   },
                 );
@@ -418,7 +439,7 @@ class _Sidebar extends StatefulWidget {
     this.layoutWidth,
   });
 
-  final NavigationController controller;
+  final _NavAdapter controller;
   final bool showFavorites;
   final bool showHistory;
   final bool showFinishes;
@@ -456,12 +477,12 @@ class _SidebarState extends State<_Sidebar> {
       if (newWidth >= sidebarAutoCollapseBreakpoint && wasNarrow) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
-          widget.controller.sidebarCollapsed.value = false;
+          widget.controller.setSidebarCollapsed(false);
         });
       } else if (!wasNarrow && isNarrow) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
-          widget.controller.sidebarCollapsed.value = true;
+          widget.controller.setSidebarCollapsed(true);
         });
       }
     }
@@ -485,13 +506,12 @@ class _SidebarState extends State<_Sidebar> {
         _lastLayoutWidth! < sidebarAutoCollapseBreakpoint) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        widget.controller.sidebarCollapsed.value = false;
+        widget.controller.setSidebarCollapsed(false);
         setState(() => _lastLayoutWidth = layoutWidth);
       });
     }
 
-    return Obx(() {
-      final controllerCollapsed = widget.controller.sidebarCollapsed.value;
+    final controllerCollapsed = widget.controller.sidebarCollapsed;
       final forceCollapsed =
           layoutWidth != null &&
           layoutWidth < sidebarAutoCollapseBreakpoint &&
@@ -501,8 +521,8 @@ class _SidebarState extends State<_Sidebar> {
       final colorScheme = theme.colorScheme;
       final sidebarBg = theme.canvasColor;
       final width = collapsed ? _sidebarCollapsedWidth : _sidebarExpandedWidth;
-      final visible = _visibleNavEntries(
-        widget.controller.items,
+    final visible = _visibleNavEntries(
+      widget.controller.items,
         widget.showFavorites,
         widget.showHistory,
         widget.showFinishes,
@@ -608,7 +628,6 @@ class _SidebarState extends State<_Sidebar> {
           ),
         ),
       );
-    });
   }
 }
 
@@ -646,7 +665,7 @@ class _SidebarCollapseButton extends StatelessWidget {
     required this.effectiveCollapsed,
   });
 
-  final NavigationController controller;
+  final _NavAdapter controller;
   final bool effectiveCollapsed;
 
   @override
@@ -780,7 +799,7 @@ class _CompactNavBar extends StatelessWidget {
     required this.showFinishes,
   });
 
-  final NavigationController controller;
+  final _NavAdapter controller;
   final bool showFavorites;
   final bool showHistory;
   final bool showFinishes;
@@ -826,7 +845,7 @@ class _FullNavBar extends StatelessWidget {
     required this.showFinishes,
   });
 
-  final NavigationController controller;
+  final _NavAdapter controller;
   final bool showFavorites;
   final bool showHistory;
   final bool showFinishes;

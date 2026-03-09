@@ -45,7 +45,7 @@ AppBarLeadingConfiguration getLeadingConfiguration({
     Widget drawerButton() => CupertinoButton(
       padding: EdgeInsets.zero,
       minimumSize: minimumTapTarget,
-      onPressed: Scaffold.of(context).openDrawer,
+      onPressed: () => Scaffold.maybeOf(context)?.openDrawer(),
       child: const Icon(CupertinoIcons.line_horizontal_3),
     );
 

@@ -1,8 +1,7 @@
-import 'package:klit/app/routes/app_routes.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:klit/tag/tag.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 
 class TagCard extends StatelessWidget {
   const TagCard({
@@ -21,9 +20,7 @@ class TagCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void defaultOnTap() {
-      final nav = Get.find<NavigationController>();
-      nav.searchInitialQuery.value = tag;
-      nav.currentPath.value = AppRoutes.search;
+      context.go('/search?tags=${Uri.encodeComponent(tag)}');
     }
 
     return ColoredCard(

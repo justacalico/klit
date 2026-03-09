@@ -4,7 +4,7 @@ import 'package:klit/settings/settings.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:klit/user/user.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 
 class IdentityTile extends StatelessWidget {
   const IdentityTile({
@@ -44,10 +44,7 @@ class CurrentIdentityTile extends StatelessWidget {
             child: InkWell(
               borderRadius: const BorderRadius.all(Radius.circular(4)),
               onTap: identity.username != null
-                  ? () => Get.offAllNamed(
-                      AppRoutes.home,
-                      arguments: {'path': AppRoutes.profile},
-                    )
+                  ? () => context.go(AppRoutes.profile)
                   : null,
               child: Padding(
                 padding: const EdgeInsets.all(8),
@@ -78,7 +75,7 @@ class CurrentIdentityTile extends StatelessWidget {
           ),
           InkWell(
             borderRadius: const BorderRadius.all(Radius.circular(4)),
-            onTap: openSettingsAccounts,
+            onTap: () => openSettingsAccounts(context),
             child: const Center(
               child: Padding(
                 padding: EdgeInsets.all(16),

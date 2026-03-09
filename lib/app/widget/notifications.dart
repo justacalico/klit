@@ -10,17 +10,19 @@ import 'package:klit/shared/shared.dart';
 import 'package:klit/tag/tag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 
 class NotificationHandler extends StatefulWidget {
   const NotificationHandler({
     super.key,
     required this.child,
     required this.navigatorKey,
+    required this.goRouter,
   });
 
   final Widget child;
   final GlobalKey<NavigatorState> navigatorKey;
+  final GoRouter goRouter;
 
   @override
   State<NotificationHandler> createState() => _NotificationHandlerState();
@@ -106,20 +108,13 @@ class _NotificationHandlerState extends State<NotificationHandler> {
 
     switch (notification.type) {
       case 'follow':
-        Get.offAllNamed('/');
+        widget.goRouter.go('/');
         if (notification.query != null) {
-          Get.to(
-            () => PostsSearchPage(
-              query: notification!.query!,
-              orderPoolsByOldest: false,
-              readerMode: poolRegex().hasMatch(
-                notification.query!['tags'] ?? '',
-              ),
-            ),
-          );
+          final tags = notification.query!['tags'] ?? '';
+          widget.goRouter.go('/search?tags=${Uri.encodeComponent(tags)}');
         }
         if (notification.id != null) {
-          Get.to(() => PostLoadingPage(notification!.id!));
+          widget.goRouter.push('/post/${notification.id}');
         }
         break;
       default:

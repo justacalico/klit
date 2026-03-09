@@ -279,7 +279,7 @@ $RelationshipsCopyWith<$Res> get relationships {
 /// @nodoc
 mixin _$Relationships {
 
- int? get parentId;@JsonKey(fromJson: _hasChildrenFromJson) bool get hasChildren; bool? get hasActiveChildren; List<int> get children;
+ int? get parentId; bool get hasChildren; bool? get hasActiveChildren; List<int> get children;
 /// Create a copy of Relationships
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -312,7 +312,7 @@ abstract mixin class $RelationshipsCopyWith<$Res>  {
   factory $RelationshipsCopyWith(Relationships value, $Res Function(Relationships) _then) = _$RelationshipsCopyWithImpl;
 @useResult
 $Res call({
- int? parentId,@JsonKey(fromJson: _hasChildrenFromJson) bool hasChildren, bool? hasActiveChildren, List<int> children
+ int? parentId, bool hasChildren, bool? hasActiveChildren, List<int> children
 });
 
 
@@ -346,11 +346,11 @@ as List<int>,
 @JsonSerializable()
 
 class _Relationships implements Relationships {
-  const _Relationships({required this.parentId, @JsonKey(fromJson: _hasChildrenFromJson) required this.hasChildren, required this.hasActiveChildren, required final  List<int> children}): _children = children;
+  const _Relationships({required this.parentId, this.hasChildren = false, required this.hasActiveChildren, required final  List<int> children}): _children = children;
   factory _Relationships.fromJson(Map<String, dynamic> json) => _$RelationshipsFromJson(json);
 
 @override final  int? parentId;
-@override@JsonKey(fromJson: _hasChildrenFromJson) final  bool hasChildren;
+@override@JsonKey() final  bool hasChildren;
 @override final  bool? hasActiveChildren;
  final  List<int> _children;
 @override List<int> get children {
@@ -393,7 +393,7 @@ abstract mixin class _$RelationshipsCopyWith<$Res> implements $RelationshipsCopy
   factory _$RelationshipsCopyWith(_Relationships value, $Res Function(_Relationships) _then) = __$RelationshipsCopyWithImpl;
 @override @useResult
 $Res call({
- int? parentId,@JsonKey(fromJson: _hasChildrenFromJson) bool hasChildren, bool? hasActiveChildren, List<int> children
+ int? parentId, bool hasChildren, bool? hasActiveChildren, List<int> children
 });
 
 

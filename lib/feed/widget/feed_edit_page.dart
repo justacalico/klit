@@ -4,7 +4,7 @@ import 'package:klit/shared/shared.dart';
 import 'package:klit/tag/tag.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 
 const OutlineInputBorder _roundedInputBorder = OutlineInputBorder(
   borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -85,7 +85,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
     if (widget.onComplete != null) {
       widget.onComplete!();
     } else {
-      Get.back();
+      context.pop();
     }
   }
 

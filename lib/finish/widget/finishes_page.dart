@@ -10,7 +10,7 @@ import 'package:klit/post/post.dart';
 import 'package:klit/settings/settings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 
 class FinishesPage extends StatelessWidget {
   const FinishesPage({super.key});
@@ -27,7 +27,7 @@ class FinishesPage extends StatelessWidget {
       body: !enabled
           ? _EmptyState(
               message: 'Turn on I Finished in Settings',
-              onTap: () => Get.toNamed(AppRoutes.settings),
+              onTap: () => context.go(AppRoutes.settings),
             )
           : StreamBuilder<List<Finish>>(
               stream: client.finishes.watchForIdentity(),

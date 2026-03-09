@@ -1,10 +1,9 @@
-import 'package:klit/app/routes/app_routes.dart';
 import 'package:klit/client/client.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:klit/tag/tag.dart';
 import 'package:klit/traits/traits.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 
 class TagGesture extends StatelessWidget {
   const TagGesture({
@@ -31,9 +30,7 @@ class TagGesture extends StatelessWidget {
         if (wiki || (safe && traits.denylist.contains(tag))) {
           sheet();
         } else {
-          final nav = Get.find<NavigationController>();
-          nav.searchInitialQuery.value = tag;
-          nav.currentPath.value = AppRoutes.search;
+          context.go('/search?tags=${Uri.encodeComponent(tag)}');
         }
       },
       onLongPress: sheet,

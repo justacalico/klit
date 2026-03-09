@@ -6,7 +6,7 @@ import 'package:klit/shared/shared.dart';
 import 'package:klit/ticket/ticket.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 
 class CommentTile extends StatelessWidget {
   const CommentTile({super.key, required this.comment, this.hasActions = true});
@@ -93,10 +93,9 @@ class CommentHeader extends StatelessWidget {
         Dimmed(
           child: InkWell(
             borderRadius: BorderRadius.circular(4),
-            onTap: () => Get.offAllNamed(AppRoutes.home, arguments: {
-              'path': AppRoutes.profile,
-              'userId': comment.creatorId,
-            }),
+            onTap: () => context.go(
+                '${AppRoutes.profile}?userId=${comment.creatorId}',
+              ),
             child: TimedText(
               created: comment.createdAt,
               updated: comment.updatedAt,

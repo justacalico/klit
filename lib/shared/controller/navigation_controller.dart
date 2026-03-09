@@ -1,28 +1,85 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:klit/app/data/nav_items.dart';
 import 'package:klit/app/routes/app_routes.dart';
 
-class NavItem {
-  const NavItem(this.path, this.label, this.icon);
-  final String path;
-  final String label;
-  final IconData icon;
-}
+export 'package:klit/app/data/nav_items.dart' show NavItem;
 
-class NavigationController extends GetxController {
-  NavigationController({required this.items, this.mobilePrimaryCount = 4});
+class NavigationState {
+  const NavigationState({
+    required this.items,
+    this.mobilePrimaryCount = 4,
+    this.currentPath = AppRoutes.home,
+    this.sidebarCollapsed = false,
+    this.profileViewUserId,
+    this.profileViewUsername,
+    this.searchInitialQuery,
+  });
 
   final List<NavItem> items;
   final int mobilePrimaryCount;
+  final String currentPath;
+  final bool sidebarCollapsed;
+  final int? profileViewUserId;
+  final String? profileViewUsername;
+  final String? searchInitialQuery;
 
-  final Rx<String> currentPath = '/'.obs;
-  final RxBool sidebarCollapsed = false.obs;
-  final Rx<int?> profileViewUserId = Rx<int?>(null);
-  final Rx<String?> profileViewUsername = Rx<String?>(null);
-  final Rx<String?> searchInitialQuery = Rx<String?>(null);
+  int get currentIndex {
+    final i = items.indexWhere((e) => e.path == currentPath);
+    return i >= 0 ? i : 0;
+  }
+
+  NavigationState copyWith({
+    List<NavItem>? items,
+    int? mobilePrimaryCount,
+    String? currentPath,
+    bool? sidebarCollapsed,
+    int? profileViewUserId,
+    String? profileViewUsername,
+    String? searchInitialQuery,
+  }) {
+    return NavigationState(
+      items: items ?? this.items,
+      mobilePrimaryCount: mobilePrimaryCount ?? this.mobilePrimaryCount,
+      currentPath: currentPath ?? this.currentPath,
+      sidebarCollapsed: sidebarCollapsed ?? this.sidebarCollapsed,
+      profileViewUserId: profileViewUserId ?? this.profileViewUserId,
+      profileViewUsername: profileViewUsername ?? this.profileViewUsername,
+      searchInitialQuery: searchInitialQuery ?? this.searchInitialQuery,
+    );
+  }
+}
+
+class NavigationNotifier extends Notifier<NavigationState> {
   bool _requestSearchFocus = false;
 
-  void toggleSidebar() => sidebarCollapsed.toggle();
+  @override
+  NavigationState build() {
+    return NavigationState(
+      items: appNavItems,
+      mobilePrimaryCount: 4,
+    );
+  }
+
+  void setPath(String path, {int? profileUserId, String? profileUsername}) {
+    state = state.copyWith(
+      currentPath: path,
+      profileViewUserId: profileUserId ?? (path == AppRoutes.profile ? null : state.profileViewUserId),
+      profileViewUsername: profileUsername ?? (path == AppRoutes.profile ? null : state.profileViewUsername),
+      searchInitialQuery: path == AppRoutes.search ? state.searchInitialQuery : null,
+    );
+  }
+
+  void clearSearchInitialQuery() {
+    state = state.copyWith(searchInitialQuery: null);
+  }
+
+  void setSearchInitialQuery(String? query) {
+    state = state.copyWith(searchInitialQuery: query);
+  }
+
+  void requestSearchFocus() {
+    _requestSearchFocus = true;
+  }
 
   bool takeRequestSearchFocus() {
     final v = _requestSearchFocus;
@@ -30,28 +87,27 @@ class NavigationController extends GetxController {
     return v;
   }
 
-  int get currentIndex {
-    final i = items.indexWhere((e) => e.path == currentPath.value);
-    return i >= 0 ? i : 0;
+  void toggleSidebar() {
+    state = state.copyWith(sidebarCollapsed: !state.sidebarCollapsed);
   }
 
-  void goTo(int index) {
-    if (index < 0 || index >= items.length) return;
-    final path = items[index].path;
-    if (path == '/profile') {
-      profileViewUserId.value = null;
-      profileViewUsername.value = null;
-    }
-    if (path == '/') searchInitialQuery.value = null;
-    if (path == '/search') _requestSearchFocus = true;
-    currentPath.value = path;
+  void setSidebarCollapsed(bool collapsed) {
+    state = state.copyWith(sidebarCollapsed: collapsed);
+  }
 
-    final currentRoute = Get.currentRoute;
-    if (currentRoute != AppRoutes.home) {
-      Get.offAllNamed(
-        AppRoutes.home,
-        arguments: {'path': path},
-      );
-    }
+  String goTo(int index) {
+    if (index < 0 || index >= state.items.length) return state.currentPath;
+    final path = state.items[index].path;
+    state = state.copyWith(
+      currentPath: path,
+      profileViewUserId: path == AppRoutes.profile ? null : state.profileViewUserId,
+      profileViewUsername: path == AppRoutes.profile ? null : state.profileViewUsername,
+      searchInitialQuery: path == AppRoutes.home ? null : state.searchInitialQuery,
+    );
+    if (path == AppRoutes.search) _requestSearchFocus = true;
+    return path;
   }
 }
+
+final navigationProvider =
+    NotifierProvider<NavigationNotifier, NavigationState>(NavigationNotifier.new);

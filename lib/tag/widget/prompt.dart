@@ -1,4 +1,3 @@
-import 'package:klit/app/routes/app_routes.dart';
 import 'package:klit/client/client.dart';
 import 'package:klit/history/history.dart';
 import 'package:klit/markup/markup.dart';
@@ -7,7 +6,7 @@ import 'package:klit/shared/shared.dart';
 import 'package:klit/tag/tag.dart';
 import 'package:klit/wiki/wiki.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 
 Future<void> showTagSearchPrompt({
   required BuildContext context,
@@ -51,9 +50,9 @@ class TagSearchSheet extends StatelessWidget {
                   child: InkWell(
                     onTap: () {
                       Navigator.of(context).maybePop();
-                      final nav = Get.find<NavigationController>();
-                      nav.searchInitialQuery.value = tag;
-                      nav.currentPath.value = AppRoutes.search;
+                      context.go(
+                        '/search?tags=${Uri.encodeComponent(tag)}',
+                      );
                     },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),

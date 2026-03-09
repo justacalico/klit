@@ -16,32 +16,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart' show ColorPicker;
 import 'package:flutter_sub/flutter_sub.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' hide Consumer;
+import 'package:go_router/go_router.dart';
 import 'package:local_auth/local_auth.dart';
 
 const String settingsSectionArgumentKey = 'settingsSection';
 const String settingsAccountsSectionValue = 'accounts';
 
-void openSettingsAccounts() {
-  Get.offAllNamed(
-    AppRoutes.home,
-    arguments: {
-      'path': AppRoutes.settings,
-      settingsSectionArgumentKey: settingsAccountsSectionValue,
-    },
-  );
+void openSettingsAccounts(BuildContext context) {
+  context.go('/settings?$settingsSectionArgumentKey=$settingsAccountsSectionValue');
 }
 
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
 
   static const double _desktopBreakpoint = 980;
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  ConsumerState<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _SettingsPageState extends ConsumerState<SettingsPage> {
   static final List<Color> _accentPresets = [
     colorFromHex(defaultAccentColorHex),
     const Color(0xFFF48FB1),
@@ -63,11 +58,10 @@ class _SettingsPageState extends State<SettingsPage> {
     super.dispose();
   }
 
-  void _focusAccountsSectionIfRequested() {
+  void _focusAccountsSectionIfRequested(BuildContext context) {
     if (_focusedRequestedSection) return;
-    final args = Get.arguments;
-    if (args is! Map) return;
-    if (args[settingsSectionArgumentKey] != settingsAccountsSectionValue)
+    final params = GoRouterState.of(context).uri.queryParameters;
+    if (params[settingsSectionArgumentKey] != settingsAccountsSectionValue)
       return;
     _focusedRequestedSection = true;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -84,9 +78,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    _focusAccountsSectionIfRequested();
-    final settings = Get.find<SettingsController>().settings;
-    final nav = Get.find<NavigationController>();
+    _focusAccountsSectionIfRequested(context);
+    final settings = context.read<Settings>();
 
     return Scaffold(
       appBar: const DefaultAppBar(title: Text('Settings')),
@@ -107,7 +100,7 @@ class _SettingsPageState extends State<SettingsPage> {
               final hasLogs = context.read<Logs?>() != null;
               final sections = <_SettingsSectionEntry>[
                 _SettingsSectionEntry(weight: 7, child: _accountsSection()),
-                _SettingsSectionEntry(weight: 4, child: _userSection(nav)),
+                _SettingsSectionEntry(weight: 4, child: _userSection()),
                 _SettingsSectionEntry(
                   weight: 7,
                   child: _appearanceSection(settings),
@@ -240,7 +233,7 @@ class _SettingsPageState extends State<SettingsPage> {
           Future<void> addIdentity() async {
             HapticFeedback.selectionClick();
             final allowHttp =
-                Get.find<SettingsController>().settings.allowHttpHosts.value;
+                context.read<Settings>().allowHttpHosts.value;
             await showIdentityEditorDialog(
               context: context,
               allowHttpHosts: allowHttp,
@@ -250,7 +243,7 @@ class _SettingsPageState extends State<SettingsPage> {
           Future<void> editIdentity(Identity identity) async {
             HapticFeedback.selectionClick();
             final allowHttp =
-                Get.find<SettingsController>().settings.allowHttpHosts.value;
+                context.read<Settings>().allowHttpHosts.value;
             await showIdentityEditorDialog(
               context: context,
               identity: identity,
@@ -536,7 +529,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _userSection(NavigationController nav) {
+  Widget _userSection() {
     return _SettingsSection(
       title: 'User',
       child: _SettingsGroupCard(
@@ -552,7 +545,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 title: const Text('Blacklist'),
                 subtitle: traits.denylist.isNotEmpty
                     ? Text(
-                        '${traits.denylist.join(' ').split(' ').trim().where((e) => e[0] != '-').length} tags blocked',
+                        '${traits.denylist.join(' ').split(' ').trim().where((e) => e.isNotEmpty && e[0] != '-').length} tags blocked',
                       )
                     : null,
                 trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
@@ -579,7 +572,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
                 onTap: () {
                   HapticFeedback.selectionClick();
-                  Get.to(() => const FollowEditor());
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      builder: (_) => const FollowEditor(),
+                    ),
+                  );
                 },
               ),
             ),
@@ -612,7 +609,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     onTap: () {
                       HapticFeedback.selectionClick();
-                      nav.currentPath.value = AppRoutes.history;
+                      context.go(AppRoutes.history);
                     },
                   );
                 },
@@ -1079,7 +1076,9 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   onTap: () {
                     HapticFeedback.selectionClick();
-                    Get.to(() => const LogsPage());
+                    Navigator.of(context).push(
+                      CupertinoPageRoute(builder: (_) => const LogsPage()),
+                    );
                   },
                 ),
               ),
@@ -1093,7 +1092,11 @@ class _SettingsPageState extends State<SettingsPage> {
               trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
               onTap: () {
                 HapticFeedback.selectionClick();
-                Get.to(() => const DatabaseManagementPage());
+                Navigator.of(context).push(
+                  CupertinoPageRoute(
+                    builder: (_) => const DatabaseManagementPage(),
+                  ),
+                );
               },
             ),
           ],

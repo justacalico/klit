@@ -458,7 +458,7 @@ class _HostFormFieldState extends State<HostFormField> {
           SizedBox(
             width: 96,
             child: DropdownButtonFormField<bool>(
-              value: isHttps,
+              initialValue: isHttps,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),

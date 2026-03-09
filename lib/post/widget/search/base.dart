@@ -7,10 +7,10 @@ import 'package:klit/shared/shared.dart';
 import 'package:klit/tag/tag.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sub/flutter_sub.dart';
-import 'package:get/get.dart';
 
-class PostsSearchPage extends StatefulWidget {
+class PostsSearchPage extends ConsumerStatefulWidget {
   const PostsSearchPage({
     super.key,
     this.query,
@@ -23,10 +23,10 @@ class PostsSearchPage extends StatefulWidget {
   final bool readerMode;
 
   @override
-  State<PostsSearchPage> createState() => _PostsSearchPageState();
+  ConsumerState<PostsSearchPage> createState() => _PostsSearchPageState();
 }
 
-class _PostsSearchPageState extends State<PostsSearchPage> {
+class _PostsSearchPageState extends ConsumerState<PostsSearchPage> {
   late bool readerMode = widget.readerMode;
   bool loadingInfo = true;
   Pool? pool;
@@ -118,12 +118,13 @@ class _PostsSearchPageState extends State<PostsSearchPage> {
               (_) => updateSearch(),
             ),
             builder: (context) {
-              final nav = Get.find<NavigationController>();
+              final requestFocus =
+                  ref.read(navigationProvider.notifier).takeRequestSearchFocus();
               return PostsPage(
                 controller: controller,
                 appBar: SearchPageAppBar(
                   controller: controller,
-                  requestFocus: nav.takeRequestSearchFocus(),
+                  requestFocus: requestFocus,
                 ),
                 displayType: readerMode ? PostDisplayType.comic : null,
                 drawerActions: [

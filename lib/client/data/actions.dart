@@ -24,7 +24,7 @@ Future<void> guardWithLogin({
         content: Text(error ?? 'You must be logged in to perform this action.'),
         action: SnackBarAction(
           label: 'Choose identity',
-          onPressed: openSettingsAccounts,
+          onPressed: () => openSettingsAccounts(context),
         ),
       ),
     );

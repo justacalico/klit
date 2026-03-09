@@ -3,17 +3,18 @@ import 'package:klit/post/post.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:klit/user/user.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' hide Consumer, ChangeNotifierProvider;
+import 'package:provider/provider.dart' show Consumer, ChangeNotifierProvider;
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final client = context.watch<Client>();
-    final nav = Get.find<NavigationController>();
-    final viewUserId = nav.profileViewUserId.value;
-    final viewUsername = nav.profileViewUsername.value;
+    final nav = ref.watch(navigationProvider);
+    final viewUserId = nav.profileViewUserId;
+    final viewUsername = nav.profileViewUsername;
     final Future<User> userFuture;
     if (viewUserId != null) {
       userFuture = client.users.get(id: viewUserId.toString());

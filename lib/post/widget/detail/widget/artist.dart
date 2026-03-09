@@ -4,7 +4,7 @@ import 'package:klit/post/post.dart';
 import 'package:klit/tag/tag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 
 class ArtistDisplay extends StatelessWidget {
   const ArtistDisplay({super.key, required this.post});
@@ -41,10 +41,9 @@ class ArtistDisplay extends StatelessWidget {
                 ),
                 InkWell(
                   borderRadius: BorderRadius.circular(4),
-                  onTap: () => Get.offAllNamed(AppRoutes.home, arguments: {
-                    'path': AppRoutes.profile,
-                    'userId': post.uploaderId,
-                  }),
+                  onTap: () => context.go(
+                    '${AppRoutes.profile}?userId=${post.uploaderId}',
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Row(

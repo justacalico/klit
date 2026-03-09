@@ -45,11 +45,14 @@ class ContextDrawerButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!Scaffold.of(context).hasEndDrawer) return const SizedBox();
+    final scaffold = Scaffold.maybeOf(context);
+    if (scaffold == null || !scaffold.hasEndDrawer) {
+      return const SizedBox();
+    }
     return IconButton(
       tooltip: tooltip,
       icon: Icon(icon ?? Icons.tune),
-      onPressed: () => Scaffold.of(context).openEndDrawer(),
+      onPressed: scaffold.openEndDrawer,
     );
   }
 }

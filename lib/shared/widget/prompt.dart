@@ -94,7 +94,7 @@ class PromptActionController extends ActionController {
   );
 
   FutureOr<void> show(BuildContext context, Widget? child) {
-    if (Theme.of(context).isDesktop) {
+    Future<void> showAsDialog() {
       return showDialog(
         context: context,
         builder: (context) {
@@ -104,10 +104,16 @@ class PromptActionController extends ActionController {
           );
         },
       ).then((_) => close());
+    }
+
+    if (Theme.of(context).isDesktop) {
+      return showAsDialog();
     } else {
-      final sheetController = Scaffold.of(
-        context,
-      ).showBottomSheet((context) => build(context, child));
+      final scaffold = Scaffold.maybeOf(context);
+      if (scaffold == null) return showAsDialog();
+      final sheetController = scaffold.showBottomSheet(
+        (context) => build(context, child),
+      );
       _route = _PromptActionSheet(sheetController);
       return sheetController.closed.then((_) => close());
     }
