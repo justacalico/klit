@@ -48,6 +48,11 @@ class _SearchPageAppBarState extends State<SearchPageAppBar> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final iconColor = colorScheme.onSurfaceVariant;
+    final hintColor = iconColor.withValues(alpha: 0.8);
+
     return DefaultAppBar(
       title: const Text('Search'),
       actions: [Builder(builder: (context) => ContextDrawerButton())],
@@ -55,18 +60,18 @@ class _SearchPageAppBarState extends State<SearchPageAppBar> {
         controller: _textController,
         focusNode: _focusNode,
         autofocus: false,
-        labelText: 'Search tags',
         textInputAction: TextInputAction.search,
         decoration: InputDecoration(
           hintText: 'Search tags',
-          prefixIcon: const Icon(Icons.search),
-          filled: true,
-          fillColor: Colors.transparent,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 12,
-          ),
+          hintStyle: theme.textTheme.bodyLarge?.copyWith(color: hintColor),
+          prefixIcon: Icon(Icons.search, color: iconColor),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+          isDense: true,
+          prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+          contentPadding: const EdgeInsetsDirectional.fromSTEB(0, 14, 14, 14),
         ),
         submit: (value) {
           widget.controller.query = Map.from(widget.controller.query)
