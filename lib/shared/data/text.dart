@@ -68,3 +68,22 @@ String linkToDisplay(String link) {
   }
   return display;
 }
+
+String formatCompactNumber(num value) {
+  final sign = value < 0 ? '-' : '';
+  final abs = value.abs().toDouble();
+  if (abs < 1000) {
+    return '$sign${abs.toInt()}';
+  }
+
+  String formatScaled(double scaled, String suffix) {
+    final rounded = scaled >= 100 ? scaled.toStringAsFixed(0) : scaled
+        .toStringAsFixed(1)
+        .replaceFirst(RegExp(r'\.0$'), '');
+    return '$sign$rounded$suffix';
+  }
+
+  if (abs >= 1000000000) return formatScaled(abs / 1000000000, 'b');
+  if (abs >= 1000000) return formatScaled(abs / 1000000, 'm');
+  return formatScaled(abs / 1000, 'k');
+}

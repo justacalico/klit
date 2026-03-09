@@ -153,7 +153,7 @@ class PostInfoBar extends StatelessWidget {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(post.vote.score.toString()),
+                        Text(formatCompactNumber(post.vote.score)),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: Icon(
@@ -172,7 +172,7 @@ class PostInfoBar extends StatelessWidget {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(post.favCount.toString()),
+                        Text(formatCompactNumber(post.favCount)),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: Icon(
@@ -185,7 +185,7 @@ class PostInfoBar extends StatelessWidget {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('${post.commentCount}'),
+                        Text(formatCompactNumber(post.commentCount)),
                         const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 4),
                           child: Icon(Icons.comment),
@@ -269,7 +269,10 @@ class PostInfoOverlay extends StatelessWidget {
                           : Icons.arrow_downward_rounded,
                       color: scoreColor,
                     ),
-                    Text(score.toString(), style: TextStyle(color: scoreColor)),
+                    Text(
+                      formatCompactNumber(score),
+                      style: TextStyle(color: scoreColor),
+                    ),
                   ],
                 ),
               ),
@@ -370,7 +373,7 @@ class PostFeedTile extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Text(post.commentCount.toString()),
+                Text(formatCompactNumber(post.commentCount)),
               ],
             ),
             VoteDisplay(
@@ -431,7 +434,7 @@ class PostFeedTile extends StatelessWidget {
               children: [
                 FavoriteButton(post: post),
                 const SizedBox(width: 4),
-                Text(post.favCount.toString()),
+                Text(formatCompactNumber(post.favCount)),
               ],
             ),
             IconButton(

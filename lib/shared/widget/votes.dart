@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:klit/shared/data/text.dart';
 import 'package:like_button/like_button.dart';
 
 part 'votes.freezed.dart';
@@ -113,7 +114,7 @@ class VoteDisplay extends StatelessWidget {
         Padding(
           padding: padding ?? const EdgeInsets.symmetric(horizontal: 8),
           child: Text(
-            score.toString(),
+            formatCompactNumber(score),
             style: TextStyle(
               color: switch (status) {
                 VoteStatus.upvoted => Colors.deepOrange,

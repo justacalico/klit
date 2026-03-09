@@ -72,7 +72,7 @@ class LikeDisplay extends StatelessWidget {
                   buildStat(
                     icon: Icons.thumb_up,
                     label: 'Score',
-                    value: post.vote.score.toString(),
+                    value: formatCompactNumber(post.vote.score),
                     color: voteStatus == VoteStatus.upvoted
                         ? primary
                         : iconColor,
@@ -80,13 +80,13 @@ class LikeDisplay extends StatelessWidget {
                   buildStat(
                     icon: Icons.favorite,
                     label: 'Favorites',
-                    value: post.favCount.toString(),
+                    value: formatCompactNumber(post.favCount),
                     color: post.isFavorited ? Colors.pinkAccent : iconColor,
                   ),
                   buildStat(
                     icon: Icons.comment,
                     label: 'Comments',
-                    value: post.commentCount.toString(),
+                    value: formatCompactNumber(post.commentCount),
                   ),
                 ],
               ),
