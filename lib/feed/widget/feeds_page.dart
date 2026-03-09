@@ -85,8 +85,8 @@ class _FeedsPageState extends State<FeedsPage> {
         appBar: DefaultAppBar(
           leading: CupertinoButton(
             padding: EdgeInsets.zero,
-            onPressed: _closeEdit,
-            child: const Icon(Icons.arrow_back_ios_new), minimumSize: Size(0, 0),
+            onPressed: _closeEdit, minimumSize: Size(0, 0),
+            child: const Icon(Icons.arrow_back_ios_new),
           ),
           title: Text(_editingFeed == null ? 'New feed' : 'Edit feed'),
         ),
@@ -105,8 +105,8 @@ class _FeedsPageState extends State<FeedsPage> {
         actions: [
           CupertinoButton(
             padding: EdgeInsets.zero,
-            onPressed: () => _openEdit(context, null),
-            child: const Icon(Icons.add), minimumSize: Size(0, 0),
+            onPressed: () => _openEdit(context, null), minimumSize: Size(0, 0),
+            child: const Icon(Icons.add),
           ),
         ],
       ),
@@ -200,12 +200,12 @@ class _FeedActionsButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoButton(
       padding: EdgeInsets.zero,
-      onPressed: onPressed,
+      onPressed: onPressed, minimumSize: Size(28, 28),
       child: Icon(
         Icons.more_vert,
         size: 20,
         color: CupertinoColors.label.resolveFrom(context),
-      ), minimumSize: Size(28, 28),
+      ),
     );
   }
 }

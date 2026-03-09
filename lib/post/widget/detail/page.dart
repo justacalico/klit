@@ -243,7 +243,7 @@ class _PostDetailBody extends StatelessWidget {
 }
 
 class PostDetailPageControllerProvider extends InheritedWidget {
-  const PostDetailPageControllerProvider({
+  const PostDetailPageControllerProvider({super.key, 
     required this.controller,
     required super.child,
   });

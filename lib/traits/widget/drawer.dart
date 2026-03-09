@@ -38,12 +38,16 @@ class _DrawerMultiDenySwitchState extends State<DrawerMultiDenySwitch> {
 
   void updateDenying(bool value) {
     denying = value;
-    widget.controllers.forEach((e) => e.denying = denying);
+    for (var e in widget.controllers) {
+      e.denying = denying;
+    }
   }
 
   void updateAllowedList(List<String> value) {
     allowedList = value;
-    widget.controllers.forEach((e) => e.allowedTags = allowedList);
+    for (var e in widget.controllers) {
+      e.allowedTags = allowedList;
+    }
   }
 
   @override

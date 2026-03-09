@@ -52,7 +52,9 @@ class VideoService extends ChangeNotifier {
 
   set muteVideos(bool value) {
     _muteVideos = value;
-    _videos.values.forEach((e) => e.setVolume(muteVideos ? 0 : 100));
+    for (var e in _videos.values) {
+      e.setVolume(muteVideos ? 0 : 100);
+    }
     notifyListeners();
     _logger.fine('${_muteVideos ? 'Muted' : 'Unmuted'} all controllers');
   }

@@ -61,8 +61,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   void _focusAccountsSectionIfRequested(BuildContext context) {
     if (_focusedRequestedSection) return;
     final params = GoRouterState.of(context).uri.queryParameters;
-    if (params[settingsSectionArgumentKey] != settingsAccountsSectionValue)
+    if (params[settingsSectionArgumentKey] != settingsAccountsSectionValue) {
       return;
+    }
     _focusedRequestedSection = true;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final context = _accountsSectionKey.currentContext;

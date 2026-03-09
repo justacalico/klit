@@ -293,8 +293,8 @@ class _FeedEditPageState extends State<FeedEditPage> {
         actions: [
           CupertinoButton(
             padding: EdgeInsets.zero,
-            onPressed: _save,
-            child: const Text('Save'), minimumSize: Size(0, 0),
+            onPressed: _save, minimumSize: Size(0, 0),
+            child: const Text('Save'),
           ),
         ],
       ),
