@@ -165,7 +165,7 @@ class SelectionAppBar<T> extends StatelessWidget with AppBarBuilderWidget {
   actionBuilder;
 
   /// Called to display the title for the selection appbar.
-  /// Defaults to '<count> items'.
+  /// Defaults to `'<count> items'`.
   final Widget Function(
     BuildContext context,
     SelectionLayoutData<T> layoutData,
