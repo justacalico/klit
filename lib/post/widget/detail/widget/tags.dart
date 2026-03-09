@@ -20,8 +20,9 @@ class TagDisplay extends StatelessWidget {
               tag: tag,
               category: category,
               onTap: () {
+                final router = GoRouter.of(context);
                 Navigator.maybePop(context).whenComplete(() {
-                  context.go('/search?tags=${Uri.encodeComponent(tag)}');
+                  router.go('/search?tags=${Uri.encodeComponent(tag)}');
                 });
               },
             ),
