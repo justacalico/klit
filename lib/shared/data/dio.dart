@@ -6,8 +6,36 @@ import 'package:klit/shared/shared.dart';
 export 'package:dio/dio.dart' show CancelToken;
 export 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 
-// TODO: Controllers now also throw Database exceptions, so this needs to be a real class.
-typedef ClientException = DioException;
+class ClientException extends DioException {
+  ClientException({
+    required super.requestOptions,
+    super.response,
+    super.type = DioExceptionType.unknown,
+    super.error,
+    super.stackTrace,
+    super.message,
+  });
+
+  factory ClientException.fromDio(DioException e) => ClientException(
+    requestOptions: e.requestOptions,
+    response: e.response,
+    type: e.type,
+    error: e.error,
+    stackTrace: e.stackTrace,
+    message: e.message,
+  );
+
+  factory ClientException.database(
+    Object error,
+    StackTrace stackTrace, {
+    String? message,
+  }) => ClientException(
+    requestOptions: RequestOptions(path: '@db'),
+    error: error,
+    stackTrace: stackTrace,
+    message: message ?? 'Database error',
+  );
+}
 
 Future<bool> validateCall(Future<void> Function() call) async {
   try {

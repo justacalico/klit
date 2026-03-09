@@ -24,6 +24,17 @@ Dio createDefaultDio(Identity identity, {CacheStore? cache}) {
   );
   dio.interceptors.add(NewlineReplaceInterceptor());
   dio.interceptors.add(LoggingDioInterceptor());
+  dio.interceptors.add(
+    InterceptorsWrapper(
+      onError: (err, handler) {
+        if (err is ClientException) {
+          handler.reject(err);
+        } else {
+          handler.reject(ClientException.fromDio(err));
+        }
+      },
+    ),
+  );
   if (cache != null) {
     dio.interceptors.add(
       ClientCacheInterceptor(
