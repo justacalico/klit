@@ -2,65 +2,89 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:klit/app/routes/app_routes.dart';
 import 'package:klit/app/widget/main_shell.dart';
+import 'package:klit/feed/feed.dart';
+import 'package:klit/finish/finish.dart';
+import 'package:klit/history/history.dart';
 import 'package:klit/post/post.dart';
-
-const _simpleShellPaths = [
-  AppRoutes.hot,
-  AppRoutes.feeds,
-  AppRoutes.pools,
-  AppRoutes.forum,
-  AppRoutes.history,
-  AppRoutes.finishes,
-  AppRoutes.blacklist,
-  AppRoutes.settings,
-];
+import 'package:klit/pool/pool.dart';
+import 'package:klit/settings/settings.dart';
+import 'package:klit/topic/topic.dart';
+import 'package:klit/traits/traits.dart';
+import 'package:klit/user/user.dart';
 
 GoRouter createAppRouter(GlobalKey<NavigatorState> navigatorKey) {
   return GoRouter(
     navigatorKey: navigatorKey,
     initialLocation: AppRoutes.home,
     routes: [
-      GoRoute(
-        path: AppRoutes.home,
-        builder: (context, state) => MainShell(
-          initialPath: AppRoutes.home,
+      ShellRoute(
+        builder: (context, state, child) => MainShell(
+          location: state.uri.path,
           profileUserId: _intParam(state, 'userId'),
           profileUsername: state.uri.queryParameters['username'],
+          child: child,
         ),
-      ),
-      GoRoute(
-        path: AppRoutes.search,
-        builder: (context, state) {
-          final tags = state.uri.queryParameters['tags'];
-          return MainShell(
-            initialPath: AppRoutes.search,
-            searchInitialQuery: tags,
-          );
-        },
-      ),
-      GoRoute(
-        path: AppRoutes.favorites,
-        builder: (context, state) =>
-            MainShell(initialPath: AppRoutes.profile),
-      ),
-      GoRoute(
-        path: AppRoutes.bookmarks,
-        builder: (context, state) =>
-            MainShell(initialPath: AppRoutes.home),
-      ),
-      GoRoute(
-        path: AppRoutes.profile,
-        builder: (context, state) => MainShell(
-          initialPath: AppRoutes.profile,
-          profileUserId: _intParam(state, 'userId'),
-          profileUsername: state.uri.queryParameters['username'],
-        ),
-      ),
-      ..._simpleShellPaths.map(
-        (path) => GoRoute(
-          path: path,
-          builder: (context, state) => MainShell(initialPath: path),
-        ),
+        routes: [
+          GoRoute(
+            path: AppRoutes.home,
+            builder: (context, state) => const HomePage(),
+          ),
+          GoRoute(
+            path: AppRoutes.hot,
+            builder: (context, state) => const HotPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.search,
+            builder: (context, state) {
+              final tags = state.uri.queryParameters['tags'];
+              if (tags == null || tags.isEmpty) return const PostsSearchPage();
+              return PostsSearchPage(
+                key: ValueKey(tags),
+                query: {'tags': tags},
+              );
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.feeds,
+            builder: (context, state) => const FeedsPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.favorites,
+            redirect: (context, state) => AppRoutes.profile,
+          ),
+          GoRoute(
+            path: AppRoutes.bookmarks,
+            redirect: (context, state) => AppRoutes.home,
+          ),
+          GoRoute(
+            path: AppRoutes.profile,
+            builder: (context, state) => const ProfilePage(),
+          ),
+          GoRoute(
+            path: AppRoutes.pools,
+            builder: (context, state) => const PoolsPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.forum,
+            builder: (context, state) => const TopicsPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.history,
+            builder: (context, state) => const HistoriesPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.finishes,
+            builder: (context, state) => const FinishesPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.blacklist,
+            builder: (context, state) => const DenyListPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.settings,
+            builder: (context, state) => const SettingsPage(),
+          ),
+        ],
       ),
       GoRoute(
         path: '/post/:id',
