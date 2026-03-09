@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:klit/app/app.dart';
 import 'package:klit/client/client.dart';
+import 'package:klit/identity/identity.dart';
 import 'package:klit/logs/logs.dart';
 import 'package:klit/markup/markup.dart';
 import 'package:klit/shared/shared.dart';
@@ -187,8 +188,8 @@ class DTextBody extends StatelessWidget {
     local ??= false;
     VoidCallback action = () => launch(link);
     Uri? uri = Uri.tryParse(link);
-    // TODO: this should not be hardcoded
-    bool home = uri != null && ['e621.net', 'e926.net'].contains(uri.host);
+    final clientHost = Uri.parse(normalizeHostUrl(context.read<Client>().host)).host;
+    final home = uri != null && uri.host == clientHost;
     if (local || home) {
       VoidCallback? linkAction = const E621LinkParser().parseOnTap(
         context,
