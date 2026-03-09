@@ -343,7 +343,11 @@ class _UserPageControllers {
   final PostController uploadedPosts;
   final PostController? profilePost;
 
-  void dispose() => all.forEach((e) => e.dispose());
+  void dispose() {
+    for (final c in all) {
+      c.dispose();
+    }
+  }
 }
 
 class _UserPageProvider extends SubProvider<Client, _UserPageControllers> {
