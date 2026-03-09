@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:drift/drift.dart';
 import 'package:klit/history/history.dart';
@@ -22,6 +23,10 @@ class HistoryServer with Disposable {
 
   static const int trimAmount = 5000;
   static const Duration trimAge = Duration(days: 30 * 3);
+  static const Duration _duplicateAge = Duration(minutes: 3);
+  static const int _recentMax = 256;
+
+  final LinkedHashMap<String, DateTime> _recent = LinkedHashMap();
 
   Future<History> get({
     required int id,
@@ -59,14 +64,41 @@ class HistoryServer with Disposable {
 
   Future<void> add(HistoryRequest request) async {
     if (!(traits.value.writeHistory ?? true)) return;
+    if (_isRecentDuplicate(request)) return;
 
     await repository.transaction(() async {
-      // TODO: replace this with a Provider above an Area that caches history in memory in the UI
-      if (await repository.isDuplicate(request)) return;
       await repository.add(request, identity.id);
     });
 
     _scheduleTrim();
+  }
+
+  bool _isRecentDuplicate(HistoryRequest request) {
+    final now = DateTime.now();
+    _recent.removeWhere((_, t) => now.difference(t) > _duplicateAge);
+
+    final key = _duplicateKey(request);
+    final last = _recent[key];
+    if (last != null && now.difference(last) <= _duplicateAge) return true;
+
+    _recent.remove(key);
+    _recent[key] = now;
+
+    while (_recent.length > _recentMax) {
+      _recent.remove(_recent.keys.first);
+    }
+    return false;
+  }
+
+  String _duplicateKey(HistoryRequest request) {
+    return [
+      request.link,
+      request.title ?? '',
+      request.subtitle ?? '',
+      request.category.name,
+      request.type.name,
+      request.thumbnails.join('\n'),
+    ].join('\u0001');
   }
 
   void _scheduleTrim() {
