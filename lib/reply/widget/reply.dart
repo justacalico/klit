@@ -1,4 +1,4 @@
-import 'package:klit/app/routes/app_routes.dart';
+import 'package:klit/app/routing/app_routes.dart';
 import 'package:klit/comment/comment.dart';
 import 'package:klit/markup/markup.dart';
 import 'package:klit/reply/reply.dart';

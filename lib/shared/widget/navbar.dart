@@ -1,5 +1,5 @@
 import 'package:go_router/go_router.dart';
-import 'package:klit/app/routes/app_routes.dart';
+import 'package:klit/app/routing/app_routes.dart';
 import 'package:klit/shared/controller/navigation_controller.dart';
 import 'package:klit/shared/data/provider.dart';
 import 'package:klit/shared/widget/glass.dart';

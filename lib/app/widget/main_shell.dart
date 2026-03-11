@@ -1,4 +1,4 @@
-import 'package:klit/app/routes/app_routes.dart';
+import 'package:klit/app/routing/app_routes.dart';
 import 'package:klit/client/client.dart';
 import 'package:klit/post/post.dart';
 import 'package:klit/settings/settings.dart';

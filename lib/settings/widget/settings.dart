@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:klit/app/app.dart';
-import 'package:klit/app/routes/app_routes.dart';
+import 'package:klit/app/routing/app_routes.dart';
 import 'package:klit/client/client.dart';
 import 'package:klit/follow/follow.dart';
 import 'package:klit/identity/identity.dart';

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:klit/app/routes/app_routes.dart';
+import 'package:klit/app/routing/app_routes.dart';
 import 'package:klit/pool/pool.dart';
 import 'package:klit/post/post.dart';
 import 'package:klit/reply/reply.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:klit/app/routes/app_routes.dart';
+import 'package:klit/app/routing/app_routes.dart';
 
 class NavItem {
   const NavItem(this.path, this.label, this.icon);

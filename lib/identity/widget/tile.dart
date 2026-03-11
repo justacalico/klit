@@ -1,4 +1,4 @@
-import 'package:klit/app/routes/app_routes.dart';
+import 'package:klit/app/routing/app_routes.dart';
 import 'package:klit/identity/identity.dart';
 import 'package:klit/settings/settings.dart';
 import 'package:klit/shared/shared.dart';
