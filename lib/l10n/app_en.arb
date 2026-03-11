@@ -28,6 +28,75 @@
   "commonCancelUpper": "CANCEL",
   "commonDownloadUpper": "DOWNLOAD",
   "commonLaterUpper": "LATER",
+  "commonCancel": "Cancel",
+  "commonDelete": "Delete",
+  "commonSave": "Save",
+  "commonImportUpper": "IMPORT",
+  "commonOkUpper": "OK",
+  "commonRestartNowUpper": "RESTART NOW",
   "aboutCheckForUpdate": "Check for update",
-  "aboutCheckingForUpdates": "Checking for updates..."
+  "aboutCheckingForUpdates": "Checking for updates...",
+  "feedsTitle": "Feeds",
+  "feedsNewFeedTitle": "New feed",
+  "feedsEditFeedTitle": "Edit feed",
+  "feedsDeleteDialogTitle": "Delete feed",
+  "feedsDeleteDialogBody": "Delete \"{name}\"?",
+  "@feedsDeleteDialogBody": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "feedsEmptyTitle": "No feeds yet",
+  "feedsEmptyBody": "Create a feed with tags and image or video type to browse posts in one tap",
+  "feedsCreateFeed": "Create feed",
+  "databaseExporting": "Exporting database...",
+  "databaseImporting": "Importing database...",
+  "databaseExportDialogTitle": "Export Database",
+  "databaseExportSuccess": "Database exported successfully",
+  "databaseExportFailed": "Export failed",
+  "databaseExportTitle": "Export",
+  "databaseExportSubtitle": "Save a backup copy of your database",
+  "databaseImportDialogTitle": "Import Database",
+  "databaseImportInvalidFile": "Invalid database file: {error}",
+  "@databaseImportInvalidFile": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "databaseImportFailed": "Import failed: {error}",
+  "@databaseImportFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "databaseImportTitle": "Import",
+  "databaseImportSubtitle": "Replace current database with imported one",
+  "databaseImportWarningBody": "This will replace your current database. \\nAll data will be lost. This cannot be undone!",
+  "databaseRestartRequiredTitle": "Restart Required",
+  "databaseRestartRequiredBody": "The app needs to restart to apply changes.",
+  "postUpdateSuccess": "Updated post #{id}",
+  "@postUpdateSuccess": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postUpdateFailed": "Failed to update post #{id}",
+  "@postUpdateFailed": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "tagPreviewLoadFailed": "Error loading tag preview: {error}",
+  "@tagPreviewLoadFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "tooltipInfo": "Info",
+  "tooltipCopy": "Copy",
+  "tooltipDelete": "Delete",
+  "tooltipAbort": "Abort",
+  "tooltipSelectAll": "Select all",
+  "tooltipPrevious": "Previous",
+  "tooltipNext": "Next"
 }
