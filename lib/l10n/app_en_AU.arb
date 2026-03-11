@@ -1,0 +1,33 @@
+{
+  "@@locale": "en_AU",
+  "settingsTitle": "Settings",
+  "settingsSectionAccounts": "Accounts",
+  "settingsSectionUser": "User",
+  "settingsSectionAppearance": "Appearance",
+  "settingsSectionInteractions": "Interactions",
+  "settingsSectionSecurity": "Security",
+  "settingsSectionDevelopment": "Development",
+  "settingsLanguageTitle": "Language",
+  "settingsLanguageSystem": "System default",
+  "settingsLanguageEnglish": "English",
+  "settingsLanguageEnglishTraditiation": "English Traditiation",
+  "aboutSectionTitle": "About",
+  "aboutDevEnabled": "You are now a developer!",
+  "aboutVersionTitle": "Version",
+  "aboutWebsiteTitle": "Website",
+  "aboutFetchingUpdates": "Fetching updates...",
+  "aboutFailedCheckUpdates": "Failed to check for updates",
+  "aboutNewestVersion": "You have the newest version",
+  "aboutNewerVersionAvailable": "A newer version is available: {version}",
+  "@aboutNewerVersionAvailable": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutNewerVersionAvailablePrefix": "A newer version is available:",
+  "commonCancelUpper": "CANCEL",
+  "commonDownloadUpper": "DOWNLOAD",
+  "commonLaterUpper": "LATER",
+  "aboutCheckForUpdate": "Check for update",
+  "aboutCheckingForUpdates": "Checking for updates..."
+}

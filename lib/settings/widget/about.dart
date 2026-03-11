@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:klit/l10n/gen/app_localizations.dart';
 
 class DevOptionEnabler extends StatefulWidget {
   const DevOptionEnabler({super.key, required this.child});
@@ -27,15 +28,16 @@ class _DevOptionEnablerState extends State<DevOptionEnabler> {
     return GestureDetector(
       onTap: () {
         HapticFeedback.selectionClick();
+        final l10n = AppLocalizations.of(context);
         final messenger = ScaffoldMessenger.of(context);
         reset?.cancel();
         setState(() => taps++);
         if (taps == 7) {
           messenger.clearSnackBars();
           messenger.showSnackBar(
-            const SnackBar(
+            SnackBar(
               duration: Duration(seconds: 2),
-              content: Text('You are now a developer!'),
+              content: Text(l10n.aboutDevEnabled),
             ),
           );
           context.read<Settings>().showDev.value = true;
@@ -67,6 +69,7 @@ class AboutVersion extends StatelessWidget {
     }
 
     Widget changesDialog(List<AppVersion> versions) {
+      final l10n = AppLocalizations.of(context);
       return AlertDialog(
         title: Text(AppInfo.instance.appName),
         content: ConstrainedBox(
@@ -77,7 +80,7 @@ class AboutVersion extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'A newer version is available: ',
+                  l10n.aboutNewerVersionAvailablePrefix,
                   style: TextStyle(color: dimTextColor(context, 0.5)),
                 ),
                 ...versions
@@ -101,11 +104,11 @@ class AboutVersion extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: Navigator.of(context).maybePop,
-            child: const Text('CANCEL'),
+            child: Text(l10n.commonCancelUpper),
           ),
           TextButton(
             onPressed: () => openDownload(),
-            child: const Text('DOWNLOAD'),
+            child: Text(l10n.commonDownloadUpper),
           ),
         ],
       );
@@ -114,25 +117,27 @@ class AboutVersion extends StatelessWidget {
     return FutureBuilder<List<AppVersion>?>(
       future: newVersions,
       builder: (context, snapshot) {
+        final l10n = AppLocalizations.of(context);
         String message;
         Widget icon;
         VoidCallback? onTap;
         if (snapshot.connectionState != ConnectionState.done) {
-          message = 'Fetching updates...';
+          message = l10n.aboutFetchingUpdates;
           icon = const FaIcon(FontAwesomeIcons.clockRotateLeft);
         } else if (snapshot.data == null) {
-          message = 'Failed to check for updates';
+          message = l10n.aboutFailedCheckUpdates;
           onTap = () {
             HapticFeedback.selectionClick();
             openDownload();
           };
           icon = const FaIcon(FontAwesomeIcons.circleExclamation);
         } else if (snapshot.data!.isEmpty) {
-          message = 'You have the newest version';
+          message = l10n.aboutNewestVersion;
           icon = const FaIcon(FontAwesomeIcons.clockRotateLeft);
         } else {
-          message =
-              'A newer version is available: ${snapshot.data!.first.version}';
+          message = l10n.aboutNewerVersionAvailable(
+            snapshot.data!.first.version,
+          );
           onTap = () {
             HapticFeedback.selectionClick();
             showDialog(
@@ -150,7 +155,7 @@ class AboutVersion extends StatelessWidget {
               children: [
                 ListTile(
                   leading: icon,
-                  title: const Text('Version'),
+                  title: Text(l10n.aboutVersionTitle),
                   subtitle: Text(message),
                   onTap: onTap,
                 ),
@@ -183,6 +188,7 @@ class AboutLinks extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppInfo appInfo = AppInfo.instance;
+    final l10n = AppLocalizations.of(context);
 
     Widget linkListTile({
       Widget? leading,
@@ -206,7 +212,7 @@ class AboutLinks extends StatelessWidget {
         if (appInfo.website != null)
           linkListTile(
             leading: const FaIcon(FontAwesomeIcons.house),
-            title: const Text('Website'),
+            title: Text(l10n.aboutWebsiteTitle),
             link: 'https://',
             extra: appInfo.website,
           ),
@@ -220,8 +226,9 @@ class SettingsAboutSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SettingsSection(
-      title: 'About',
+      title: l10n.aboutSectionTitle,
       child: DevOptionEnabler(
         child: Builder(
           builder: (context) {
@@ -402,6 +409,7 @@ class _CheckForUpdateButtonState extends State<_CheckForUpdateButton> {
     if (updater == null) return;
     if (_loading) return;
     setState(() => _loading = true);
+      final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     try {
       final newVersions = await updater.getNewVersions(force: true);
@@ -409,7 +417,7 @@ class _CheckForUpdateButtonState extends State<_CheckForUpdateButton> {
       setState(() => _loading = false);
       if (newVersions.isEmpty) {
         messenger.showSnackBar(
-          const SnackBar(content: Text('You have the newest version')),
+          SnackBar(content: Text(l10n.aboutNewestVersion)),
         );
       } else {
         final latest = newVersions.first;
@@ -418,17 +426,17 @@ class _CheckForUpdateButtonState extends State<_CheckForUpdateButton> {
           builder: (context) => AlertDialog(
             title: Text(AppInfo.instance.appName),
             content: Text(
-              'A newer version is available: ${latest.version}\n\n'
+              '${l10n.aboutNewerVersionAvailable(latest.version)}\n\n'
               '${latest.date != null ? "Released ${latest.date!.toString().split(' ').first}" : ""}',
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('LATER'),
+                child: Text(l10n.commonLaterUpper),
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('DOWNLOAD'),
+                child: Text(l10n.commonDownloadUpper),
               ),
             ],
           ),
@@ -442,7 +450,7 @@ class _CheckForUpdateButtonState extends State<_CheckForUpdateButton> {
       if (context.mounted) {
         setState(() => _loading = false);
         messenger.showSnackBar(
-          const SnackBar(content: Text('Failed to check for updates')),
+          SnackBar(content: Text(l10n.aboutFailedCheckUpdates)),
         );
       }
     }
@@ -454,6 +462,7 @@ class _CheckForUpdateButtonState extends State<_CheckForUpdateButton> {
     if (updater == null) return const SizedBox.shrink();
     final theme = Theme.of(context);
     final onTop = theme.colorScheme.onSurface;
+    final l10n = AppLocalizations.of(context);
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -470,7 +479,7 @@ class _CheckForUpdateButtonState extends State<_CheckForUpdateButton> {
               ),
               const SizedBox(width: 12),
               Text(
-                _loading ? 'Checking for updates...' : 'Check for update',
+                _loading ? l10n.aboutCheckingForUpdates : l10n.aboutCheckForUpdate,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: _loading ? onTop.withValues(alpha: 0.7) : onTop,
                   fontWeight: FontWeight.w500,

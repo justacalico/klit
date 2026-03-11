@@ -16,6 +16,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart' show ColorPicker;
+import 'package:klit/l10n/gen/app_localizations.dart';
 import 'package:flutter_sub/flutter_sub.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' hide Consumer;
 import 'package:go_router/go_router.dart';
@@ -23,6 +24,8 @@ import 'package:local_auth/local_auth.dart';
 
 const String settingsSectionArgumentKey = 'settingsSection';
 const String settingsAccountsSectionValue = 'accounts';
+
+enum _AppLocaleChoice { system, en, enAu }
 
 void openSettingsAccounts(BuildContext context) {
   context.go('/settings?$settingsSectionArgumentKey=$settingsAccountsSectionValue');
@@ -82,9 +85,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   Widget build(BuildContext context) {
     _focusAccountsSectionIfRequested(context);
     final settings = context.read<Settings>();
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: const DefaultAppBar(title: Text('Settings')),
+      appBar: DefaultAppBar(title: Text(l10n.settingsTitle)),
       body: LimitedWidthLayout.builder(
         maxWidth: 1200,
         tolerance: 20,
@@ -193,9 +197,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Widget _accountsSection() {
+    final l10n = AppLocalizations.of(context);
     return SettingsSection(
       key: _accountsSectionKey,
-      title: 'Accounts',
+      title: l10n.settingsSectionAccounts,
       child: SubStream<List<Identity>>(
         create: () => context.watch<IdentityClient>().all().stream,
         builder: (context, snapshot) {
@@ -529,8 +534,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Widget _userSection() {
+    final l10n = AppLocalizations.of(context);
     return SettingsSection(
-      title: 'User',
+      title: l10n.settingsSectionUser,
       child: SettingsGroupCard(
         children: [
           Consumer<Client>(
@@ -621,8 +627,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Widget _appearanceSection(Settings settings) {
+    final l10n = AppLocalizations.of(context);
     return SettingsSection(
-      title: 'Appearance',
+      title: l10n.settingsSectionAppearance,
       child: SettingsGroupCard(
         children: [
           ValueListenableBuilder<AppTheme>(
@@ -658,6 +665,51 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 );
               },
             ),
+          ),
+          ValueListenableBuilder<String?>(
+            valueListenable: settings.localeTag,
+            builder: (context, tag, _) {
+              final l10n = AppLocalizations.of(context);
+              final current = switch (tag) {
+                null || '' => _AppLocaleChoice.system,
+                'en' => _AppLocaleChoice.en,
+                'en-AU' || 'en_AU' => _AppLocaleChoice.enAu,
+                _ => _AppLocaleChoice.system,
+              };
+
+              String subtitleOf(_AppLocaleChoice choice) => switch (choice) {
+                _AppLocaleChoice.system => l10n.settingsLanguageSystem,
+                _AppLocaleChoice.en => l10n.settingsLanguageEnglish,
+                _AppLocaleChoice.enAu => l10n.settingsLanguageEnglishTraditiation,
+              };
+
+              return CupertinoListTile(
+                leading: const SettingsLeadingIcon(
+                  icon: CupertinoIcons.globe,
+                  color: Color(0xFF95A5A6),
+                ),
+                title: Text(l10n.settingsLanguageTitle),
+                subtitle: Text(subtitleOf(current)),
+                trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  _showPickerSheet<_AppLocaleChoice>(
+                    context,
+                    title: l10n.settingsLanguageTitle,
+                    values: _AppLocaleChoice.values,
+                    current: current,
+                    labelOf: subtitleOf,
+                    onSelected: (choice) {
+                      settings.localeTag.value = switch (choice) {
+                        _AppLocaleChoice.system => null,
+                        _AppLocaleChoice.en => 'en',
+                        _AppLocaleChoice.enAu => 'en-AU',
+                      };
+                    },
+                  );
+                },
+              );
+            },
           ),
           ValueListenableBuilder<String>(
             valueListenable: settings.accentColorHex,
@@ -806,8 +858,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Widget _interactionsSection(Settings settings) {
+    final l10n = AppLocalizations.of(context);
     return SettingsSection(
-      title: 'Interactions',
+      title: l10n.settingsSectionInteractions,
       child: SettingsGroupCard(
         children: [
           if (!Platform.isIOS)
@@ -945,8 +998,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Widget _securitySection(Settings settings) {
+    final l10n = AppLocalizations.of(context);
     return SettingsSection(
-      title: 'Security',
+      title: l10n.settingsSectionSecurity,
       child: SettingsGroupCard(
         children: [
           if (PlatformCapabilities.hasSecureDisplay)
@@ -1054,8 +1108,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Widget _developmentSection(Settings settings, {required bool hasLogs}) {
+              final l10n = AppLocalizations.of(context);
     return SettingsSection(
-      title: 'Development',
+      title: l10n.settingsSectionDevelopment,
       child: SettingsGroupCard(
         children: [
           SettingsSwitchTile(
