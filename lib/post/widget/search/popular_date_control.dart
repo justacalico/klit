@@ -23,6 +23,7 @@ class PopularDateButton extends StatelessWidget {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: false,
+      useRootNavigator: true,
       useSafeArea: true,
       builder: (context) => _PopularDateSheet(controller: controller),
     );
@@ -39,57 +40,70 @@ class _PopularDateSheet extends StatelessWidget {
     final theme = Theme.of(context);
     final titleStyle = theme.textTheme.titleMedium;
     final subtle = TextStyle(color: dimTextColor(context));
+    final w = MediaQuery.sizeOf(context).width;
+    final clearBottomNav = w < 900;
 
     return AnimatedBuilder(
       animation: controller,
       builder: (context, _) {
         final label = popularDateLabel(controller);
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text('Popular', style: titleStyle),
-                  ),
-                  Text(label, style: subtle),
-                ],
+        return Align(
+          alignment: Alignment.bottomCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 720),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                16,
+                14,
+                16,
+                clearBottomNav ? 110 : 16,
               ),
-              const SizedBox(height: 12),
-              _ScaleControl(controller: controller),
-              const SizedBox(height: 12),
-              Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  IconButton(
-                    tooltip: 'Previous',
-                    onPressed: controller.prev,
-                    icon: const Icon(Icons.chevron_left),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text('Popular', style: titleStyle),
+                      ),
+                      Text(label, style: subtle),
+                    ],
                   ),
-                  Expanded(
-                    child: Center(
-                      child: Text(label, style: theme.textTheme.bodyLarge),
+                  const SizedBox(height: 12),
+                  _ScaleControl(controller: controller),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      IconButton(
+                        tooltip: 'Previous',
+                        onPressed: controller.prev,
+                        icon: const Icon(Icons.chevron_left),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: Text(label, style: theme.textTheme.bodyLarge),
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Next',
+                        onPressed: controller.canNext ? controller.next : null,
+                        icon: const Icon(Icons.chevron_right),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: () => _pickDate(context),
+                      icon: const Icon(Icons.date_range),
+                      label: const Text('Pick date'),
                     ),
                   ),
-                  IconButton(
-                    tooltip: 'Next',
-                    onPressed: controller.canNext ? controller.next : null,
-                    icon: const Icon(Icons.chevron_right),
-                  ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton.icon(
-                  onPressed: () => _pickDate(context),
-                  icon: const Icon(Icons.date_range),
-                  label: const Text('Pick date'),
-                ),
-              ),
-            ],
+            ),
           ),
         );
       },
