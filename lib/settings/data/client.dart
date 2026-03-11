@@ -34,10 +34,21 @@ class AppInfoClient {
     );
     try {
       final root = pick(response.data);
-      final versionStr = root('data')('version').asStringOrThrow();
-      final dateStr = root('data')('date').asStringOrNull();
-      final platforms = root('data')('platforms')
-          .asListOrEmpty((e) => e.asStringOrThrow());
+      if (root('success').asBoolOrNull() == false) {
+        throw PickException(
+          'API returned success: false',
+        );
+      }
+      final data = root('data');
+      final versionPick = data('version');
+      final versionStr = versionPick.asStringOrNull() ??
+          versionPick.asDoubleOrNull()?.toString() ??
+          versionPick.asIntOrNull()?.toString();
+      if (versionStr == null || versionStr.isEmpty) {
+        throw PickException('Missing or invalid version');
+      }
+      final dateStr = data('date').asStringOrNull();
+      final platforms = data('platforms').asListOrEmpty((e) => e.asStringOrThrow());
       final binaries = platforms
           .map((p) => p == 'Android'
               ? 'apk'
@@ -51,8 +62,7 @@ class AppInfoClient {
           version: Version.parse(versionStr),
           name: versionStr,
           description: '',
-          date:
-              dateStr != null ? DateTime.tryParse(dateStr) : null,
+          date: dateStr != null ? DateTime.tryParse(dateStr) : null,
           binaries: binaries.isEmpty ? null : binaries,
         ),
       ];
@@ -118,11 +128,14 @@ class AppInfoClient {
         ).toOptions(),
       );
       final root = pick(response.data);
+      final downloads = root('data')('downloads');
       if (Platform.isAndroid) {
-        return root('data')('downloads')('Android')('apk').asStringOrNull();
+        final url = downloads('Android')('apk').asStringOrNull();
+        if (url != null && url.isNotEmpty) return url;
       }
       if (Platform.isIOS) {
-        return root('data')('downloads')('iOS').asStringOrNull();
+        final url = downloads('iOS').asStringOrNull();
+        if (url != null && url.isNotEmpty) return url;
       }
     } catch (_) {}
     return null;
