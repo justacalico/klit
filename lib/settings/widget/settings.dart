@@ -1213,6 +1213,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                               ),
                           ],
                         ),
+                        const SizedBox(height: 12),
+                        _CheckForUpdateButton(),
                       ],
                     ),
                   ),
@@ -1748,6 +1750,103 @@ class _AboutMetaPill extends StatelessWidget {
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: textColor,
                   fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CheckForUpdateButton extends StatefulWidget {
+  const _CheckForUpdateButton();
+
+  @override
+  State<_CheckForUpdateButton> createState() => _CheckForUpdateButtonState();
+}
+
+class _CheckForUpdateButtonState extends State<_CheckForUpdateButton> {
+  bool _loading = false;
+
+  Future<void> _checkForUpdate(BuildContext context) async {
+    final updater = context.read<AppInfoClient?>();
+    if (updater == null) return;
+    if (_loading) return;
+    setState(() => _loading = true);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final newVersions = await updater.getNewVersions(force: true);
+      if (!context.mounted) return;
+      setState(() => _loading = false);
+      if (newVersions.isEmpty) {
+        messenger.showSnackBar(
+          const SnackBar(content: Text('You have the newest version')),
+        );
+      } else {
+        final latest = newVersions.first;
+        final showDownload = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(AppInfo.instance.appName),
+            content: Text(
+              'A newer version is available: ${latest.version}\n\n'
+              '${latest.date != null ? "Released ${latest.date!.toString().split(' ').first}" : ""}',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('LATER'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('DOWNLOAD'),
+              ),
+            ],
+          ),
+        );
+        if (showDownload == true && context.mounted) {
+          final url = await updater.getDownloadUrl();
+          if (url != null) launch(url);
+        }
+      }
+    } catch (_) {
+      if (context.mounted) {
+        setState(() => _loading = false);
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Failed to check for updates')),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final updater = context.read<AppInfoClient?>();
+    if (updater == null) return const SizedBox.shrink();
+    final theme = Theme.of(context);
+    final onTop = theme.colorScheme.onSurface;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: _loading ? null : () => _checkForUpdate(context),
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(
+            children: [
+              Icon(
+                _loading ? CupertinoIcons.arrow_2_circlepath : CupertinoIcons.arrow_down_circle,
+                size: 22,
+                color: _loading ? onTop.withValues(alpha: 0.5) : onTop,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                _loading ? 'Checking for updates...' : 'Check for update',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: _loading ? onTop.withValues(alpha: 0.7) : onTop,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
