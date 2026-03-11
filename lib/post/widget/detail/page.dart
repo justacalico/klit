@@ -148,10 +148,28 @@ class _PostDetailBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final settings = context.read<Settings>();
     final hasLogin = context.watch<Client>().hasLogin;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final hasBottomNav = screenWidth < mobileBreakpoint;
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < 1000) {
-          final hasBottomNav = constraints.maxWidth < mobileBreakpoint;
+          if (!hasBottomNav) {
+            return CustomScrollView(
+              primary: true,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
+                    children: [
+                      _image(context, constraints),
+                      _upperBody(context),
+                      _middleBody(context),
+                      _lowerBody(context),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }
           final viewPadding = MediaQuery.viewPaddingOf(context);
           final navBottomOffset = viewPadding.bottom > 0
               ? viewPadding.bottom + 8
@@ -164,7 +182,7 @@ class _PostDetailBody extends StatelessWidget {
             valueListenable: settings.postActionBarFloatingMobile,
             builder: (context, floatingMobile, _) {
               final showFloatingActions =
-                  hasBottomNav && hasLogin && floatingMobile;
+                  hasLogin && floatingMobile;
               final contentBottomPadding = showFloatingActions
                   ? floatingBarBottom + floatingBarHeight + 20
                   : kBottomNavigationBarHeight + 24;
