@@ -12,6 +12,7 @@ class ReplyList extends StatelessWidget {
         onRefresh: () => controller.refresh(force: true, background: true),
         child: CustomScrollView(
           primary: true,
+          cacheExtent: 400,
           slivers: [
             SliverPadding(
               padding: defaultActionListPadding,
@@ -37,7 +38,10 @@ class SliverReplyList extends StatelessWidget {
           fetchNextPage: controller.getNextPage,
           builderDelegate: defaultPagedChildBuilderDelegate(
             onRetry: controller.getNextPage,
-            itemBuilder: (context, item, index) => ReplyTile(reply: item),
+            itemBuilder: (context, item, index) => RepaintBoundary(
+            key: ValueKey(item.id),
+            child: ReplyTile(reply: item),
+          ),
             onEmpty: const IconMessage(
               icon: Icon(Icons.clear),
               title: Text('No replies'),

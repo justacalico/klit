@@ -138,7 +138,7 @@ class RawPostImageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     Duration fades = stacked
         ? Duration.zero
-        : const Duration(milliseconds: 500);
+        : const Duration(milliseconds: 250);
 
     Widget progressIndicator(
       BuildContext context,
@@ -218,7 +218,7 @@ class _ImageProgressWrapperState extends State<ImageProgressWrapper> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(milliseconds: 1000), () {
+    Timer(const Duration(milliseconds: 350), () {
       if (mounted) {
         setState(() => visible = true);
       }

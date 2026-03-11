@@ -4,8 +4,9 @@ import 'package:klit/tag/tag.dart';
 import 'package:klit/traits/traits.dart';
 import 'package:flutter/material.dart';
 
-PreferredSizeWidget _emptyAppBar() =>
-    PreferredSize(preferredSize: Size.zero, child: SizedBox.shrink());
+PreferredSizeWidget _emptyAppBar() => const PreferredSize(
+    preferredSize: Size.zero,
+    child: SizedBox.shrink());
 
 class PostsPage extends StatefulWidget {
   const PostsPage({
@@ -72,6 +73,7 @@ class _PostsPageState extends State<PostsPage> {
                           ),
                           child: CustomScrollView(
                             primary: true,
+                            cacheExtent: 400,
                             slivers: [
                               SliverPadding(
                                 padding: defaultActionListPadding,
@@ -102,6 +104,7 @@ class _PostsPageState extends State<PostsPage> {
                                   ),
                                   child: CustomScrollView(
                                     primary: true,
+                                    cacheExtent: 400,
                                     slivers: [
                                       SliverPadding(
                                         padding: defaultActionListPadding,
@@ -126,6 +129,7 @@ class _PostsPageState extends State<PostsPage> {
                                 widget.controller.refresh(force: true, background: true),
                             child: CustomScrollView(
                               primary: true,
+                              cacheExtent: 400,
                               slivers: [
                                 SliverPadding(
                                   padding: defaultActionListPadding,

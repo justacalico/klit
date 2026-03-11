@@ -90,7 +90,7 @@ class _MainShellState extends ConsumerState<MainShell> {
         final showHistory = traits.writeHistory ?? false;
         return ValueListenableBuilder<bool>(
           valueListenable: settings.iFinishedEnabled,
-          builder: (context, showFinishes, child) {
+          builder: (context, showFinishes, _) {
             if (showFinishes || widget.location != AppRoutes.finishes) {
               _queuedFinishesRedirect = false;
             }

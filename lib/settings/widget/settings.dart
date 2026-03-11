@@ -89,61 +89,58 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         maxWidth: 1200,
         tolerance: 20,
         builder: (context) {
-          return ValueListenableBuilder<bool>(
-            valueListenable: settings.showDev,
-            builder: (context, showDev, _) {
-              final contentPadding = EdgeInsets.fromLTRB(
-                16,
-                12,
-                16,
-                defaultActionListBottomHeight,
-              ).add(LimitedWidthLayout.of(context).padding);
+          final contentPadding = EdgeInsets.fromLTRB(
+            16,
+            12,
+            16,
+            defaultActionListBottomHeight,
+          ).add(LimitedWidthLayout.of(context).padding);
 
-              final hasLogs = context.read<Logs?>() != null;
-              final sections = <SettingsSectionEntry>[
-                SettingsSectionEntry(weight: 7, child: _accountsSection()),
-                SettingsSectionEntry(weight: 4, child: _userSection()),
-                SettingsSectionEntry(
-                  weight: 7,
-                  child: _appearanceSection(settings),
-                ),
-                SettingsSectionEntry(
-                  weight: 5,
-                  child: _interactionsSection(settings),
-                ),
-                SettingsSectionEntry(
-                  weight: 5,
-                  child: _securitySection(settings),
-                ),
-                if (showDev)
-                  SettingsSectionEntry(
-                    weight: hasLogs ? 4 : 2,
-                    child: _developmentSection(settings, hasLogs: hasLogs),
-                  ),
-                SettingsSectionEntry(weight: 3, child: _aboutSection()),
-              ];
+          final hasLogs = context.read<Logs?>() != null;
+          final sections = <SettingsSectionEntry>[
+            SettingsSectionEntry(weight: 7, child: _accountsSection()),
+            SettingsSectionEntry(weight: 4, child: _userSection()),
+            SettingsSectionEntry(
+              weight: 7,
+              child: _appearanceSection(settings),
+            ),
+            SettingsSectionEntry(
+              weight: 5,
+              child: _interactionsSection(settings),
+            ),
+            SettingsSectionEntry(
+              weight: 5,
+              child: _securitySection(settings),
+            ),
+            SettingsSectionEntry(
+              weight: 4,
+              child: _developmentSectionWrapper(
+                settings: settings,
+                hasLogs: hasLogs,
+              ),
+            ),
+            SettingsSectionEntry(weight: 3, child: const SettingsAboutSection()),
+          ];
 
-              return LayoutBuilder(
-                builder: (context, constraints) {
-                  final isDesktop =
-                      constraints.maxWidth >= SettingsPage._desktopBreakpoint;
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final isDesktop =
+                  constraints.maxWidth >= SettingsPage._desktopBreakpoint;
 
-                  return Container(
-                    color: CupertinoColors.systemGroupedBackground.resolveFrom(
-                      context,
-                    ),
-                    child: SingleChildScrollView(
-                      controller: _scrollController,
-                      padding: contentPadding,
-                      child: isDesktop
-                          ? _buildDesktopColumns(sections)
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: sections.map((e) => e.child).toList(),
-                            ),
-                    ),
-                  );
-                },
+              return Container(
+                color: CupertinoColors.systemGroupedBackground.resolveFrom(
+                  context,
+                ),
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  padding: contentPadding,
+                  child: isDesktop
+                      ? _buildDesktopColumns(sections)
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: sections.map((e) => e.child).toList(),
+                        ),
+                ),
               );
             },
           );
@@ -1043,6 +1040,19 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
   }
 
+  Widget _developmentSectionWrapper({
+    required Settings settings,
+    required bool hasLogs,
+  }) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: settings.showDev,
+      builder: (context, showDev, _) {
+        if (!showDev) return const SizedBox.shrink();
+        return _developmentSection(settings, hasLogs: hasLogs);
+      },
+    );
+  }
+
   Widget _developmentSection(Settings settings, {required bool hasLogs}) {
     return SettingsSection(
       title: 'Development',
@@ -1103,127 +1113,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ),
           ],
         ],
-      ),
-    );
-  }
-
-  Widget _aboutSection() {
-    return SettingsSection(
-      title: 'About',
-      child: DevOptionEnabler(
-        child: Builder(
-          builder: (context) {
-            final theme = Theme.of(context);
-            final appInfo = AppInfo.instance;
-            final surface = theme.brightness == Brightness.dark
-                ? Color.lerp(theme.canvasColor, Colors.white, 0.04)!
-                : theme.colorScheme.surface;
-            final onTop = theme.colorScheme.onSurface;
-            final buildNumber = appInfo.buildNumber.trim();
-            final versionLabel = buildNumber.isEmpty
-                ? 'v${appInfo.version}'
-                : 'v${appInfo.version} ($buildNumber)';
-            final sourceName = switch (appInfo.source) {
-              Source.IS_INSTALLED_FROM_LOCAL_SOURCE => 'Local build',
-              Source.IS_INSTALLED_FROM_OTHER_SOURCE => 'Other source',
-              Source.UNKNOWN => null,
-              _ => 'Store install',
-            };
-
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: surface,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const AppIcon(radius: 20),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    appInfo.appName,
-                                    style: theme.textTheme.titleMedium
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w700,
-                                          color: onTop,
-                                        ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    versionLabel,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: onTop.withValues(alpha: 0.82),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            _AboutMetaPill(
-                              icon: CupertinoIcons.person,
-                              text: appInfo.developer,
-                              color: onTop.withValues(alpha: 0.14),
-                              textColor: onTop,
-                            ),
-                            _AboutMetaPill(
-                              icon: CupertinoIcons.info,
-                              text: 'v${appInfo.version}',
-                              color: onTop.withValues(alpha: 0.14),
-                              textColor: onTop,
-                            ),
-                            if (sourceName != null)
-                              _AboutMetaPill(
-                                icon: CupertinoIcons.cube_box,
-                                text: sourceName,
-                                color: onTop.withValues(alpha: 0.14),
-                                textColor: onTop,
-                              ),
-                            _AboutMetaPill(
-                              icon: CupertinoIcons.number,
-                              text: appInfo.packageName,
-                              color: onTop.withValues(alpha: 0.14),
-                              textColor: onTop,
-                            ),
-                            if (appInfo.website != null)
-                              _AboutMetaPill(
-                                icon: CupertinoIcons.globe,
-                                text: appInfo.website!,
-                                color: onTop.withValues(alpha: 0.14),
-                                textColor: onTop,
-                                onTap: () {
-                                  HapticFeedback.selectionClick();
-                                  launch('https://${appInfo.website!}');
-                                },
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        _CheckForUpdateButton(),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
       ),
     );
   }
@@ -1580,149 +1469,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _AboutMetaPill extends StatelessWidget {
-  const _AboutMetaPill({
-    required this.icon,
-    required this.text,
-    required this.color,
-    required this.textColor,
-    this.onTap,
-  });
-
-  final IconData icon;
-  final String text;
-  final Color color;
-  final Color textColor;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(999),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 14, color: textColor),
-              const SizedBox(width: 6),
-              Text(
-                text,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: textColor,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _CheckForUpdateButton extends StatefulWidget {
-  const _CheckForUpdateButton();
-
-  @override
-  State<_CheckForUpdateButton> createState() => _CheckForUpdateButtonState();
-}
-
-class _CheckForUpdateButtonState extends State<_CheckForUpdateButton> {
-  bool _loading = false;
-
-  Future<void> _checkForUpdate(BuildContext context) async {
-    final updater = context.read<AppInfoClient?>();
-    if (updater == null) return;
-    if (_loading) return;
-    setState(() => _loading = true);
-    final messenger = ScaffoldMessenger.of(context);
-    try {
-      final newVersions = await updater.getNewVersions(force: true);
-      if (!context.mounted) return;
-      setState(() => _loading = false);
-      if (newVersions.isEmpty) {
-        messenger.showSnackBar(
-          const SnackBar(content: Text('You have the newest version')),
-        );
-      } else {
-        final latest = newVersions.first;
-        final showDownload = await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(AppInfo.instance.appName),
-            content: Text(
-              'A newer version is available: ${latest.version}\n\n'
-              '${latest.date != null ? "Released ${latest.date!.toString().split(' ').first}" : ""}',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('LATER'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('DOWNLOAD'),
-              ),
-            ],
-          ),
-        );
-        if (showDownload == true && context.mounted) {
-          final url = await updater.getDownloadUrl();
-          if (url != null) launch(url);
-        }
-      }
-    } catch (_) {
-      if (context.mounted) {
-        setState(() => _loading = false);
-        messenger.showSnackBar(
-          const SnackBar(content: Text('Failed to check for updates')),
-        );
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final updater = context.read<AppInfoClient?>();
-    if (updater == null) return const SizedBox.shrink();
-    final theme = Theme.of(context);
-    final onTop = theme.colorScheme.onSurface;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: _loading ? null : () => _checkForUpdate(context),
-        borderRadius: BorderRadius.circular(10),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Row(
-            children: [
-              Icon(
-                _loading ? CupertinoIcons.arrow_2_circlepath : CupertinoIcons.arrow_down_circle,
-                size: 22,
-                color: _loading ? onTop.withValues(alpha: 0.5) : onTop,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                _loading ? 'Checking for updates...' : 'Check for update',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: _loading ? onTop.withValues(alpha: 0.7) : onTop,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
           ),
         ),
       ),

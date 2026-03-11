@@ -54,6 +54,7 @@ class App extends StatelessWidget {
                         child: CupertinoApp.router(
                           title: AppInfo.instance.appName,
                           theme: cupertinoTheme,
+                          scrollBehavior: AndroidStretchScrollBehaviour(),
                           localizationsDelegates: const [
                             GlobalWidgetsLocalizations.delegate,
                             GlobalMaterialLocalizations.delegate,

@@ -7,7 +7,7 @@ import 'package:klit/shared/shared.dart';
 import 'package:klit/tag/tag.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' hide Consumer;
 import 'package:flutter_sub/flutter_sub.dart';
 
 class PostsSearchPage extends ConsumerStatefulWidget {
@@ -38,8 +38,9 @@ class _PostsSearchPageState extends ConsumerState<PostsSearchPage> {
     return PostProvider(
       query: widget.query,
       orderPools: widget.orderPoolsByOldest,
-      child: Consumer2<PostController, Client>(
-        builder: (context, controller, client, child) {
+      child: Consumer<PostController>(
+        builder: (context, controller, child) {
+          final client = context.read<Client>();
           Future<void> updateFollow() async {
             String? tags = controller.query['tags'];
             if (tags?.nullWhenEmpty != null) {

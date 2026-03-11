@@ -14,6 +14,7 @@ class HistoryList extends StatelessWidget {
           onRefresh: () => controller.refresh(force: true, background: true),
           child: CustomScrollView(
             primary: true,
+            cacheExtent: 400,
             slivers: [
               SliverPadding(
                 padding: defaultActionListPadding,
@@ -52,8 +53,10 @@ class SliverHistoryList extends StatelessWidget {
                   onRetry: controller.getNextPage,
                   onEmpty: const Text('Your history is empty'),
                   onError: const Text('Failed to load history'),
-                  itemBuilder: (context, item, index) =>
-                      HistoryTile(entry: item),
+                  itemBuilder: (context, item, index) => RepaintBoundary(
+                    key: ValueKey(item.id),
+                    child: HistoryTile(entry: item),
+                  ),
                 ),
               ),
         ),

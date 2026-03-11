@@ -11,6 +11,8 @@ import 'package:flutter_sub/flutter_sub.dart';
 
 typedef _AppInitData = ({Logs logs, AppStorage storage, VoidCallback dispose});
 
+bool _backgroundTasksScheduled = false;
+
 class AppInit extends StatefulWidget {
   const AppInit({super.key, required this.child});
 
@@ -36,7 +38,6 @@ class AppInitState extends State<AppInit> {
     await initializeAppInfo();
     final logs = await initializeLogger();
     final storage = await initializeAppStorage();
-    unawaited(initializeBackgroundTasks());
     VideoService.ensureInitialized();
     return (
       logs: logs,
@@ -67,6 +68,12 @@ class AppInitState extends State<AppInit> {
         }
 
         final (:logs, :storage, dispose: _) = snapshot.data!;
+        if (!_backgroundTasksScheduled) {
+          _backgroundTasksScheduled = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            initializeBackgroundTasks();
+          });
+        }
         return MultiProvider(
           providers: [
             Provider.value(value: logs),

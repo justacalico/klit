@@ -12,6 +12,7 @@ class CommentList extends StatelessWidget {
         onRefresh: () => controller.refresh(force: true, background: true),
         child: CustomScrollView(
           primary: true,
+          cacheExtent: 400,
           slivers: [
             SliverPadding(
               padding: defaultActionListPadding,
@@ -37,7 +38,10 @@ class SliverCommentList extends StatelessWidget {
           fetchNextPage: controller.getNextPage,
           builderDelegate: defaultPagedChildBuilderDelegate(
             onRetry: controller.getNextPage,
-            itemBuilder: (context, item, index) => CommentTile(comment: item),
+            itemBuilder: (context, item, index) => RepaintBoundary(
+            key: ValueKey(item.id),
+            child: CommentTile(comment: item),
+          ),
             onEmpty: const Text('No comments'),
             onError: const Text('Failed to load comments'),
           ),

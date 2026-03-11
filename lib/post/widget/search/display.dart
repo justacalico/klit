@@ -45,9 +45,12 @@ class PostSliverGrid extends StatelessWidget {
       itemBuilder: itemBuilder,
     );
 
-    Widget itemBuilder(context, item, index) => ImageCacheSizeProvider(
-      size: TileLayout.of(context).tileSize * 2,
-      child: PostTile(post: item),
+    Widget itemBuilder(context, item, index) => RepaintBoundary(
+      key: ValueKey(item.id),
+      child: ImageCacheSizeProvider(
+        size: TileLayout.of(context).tileSize * 2,
+        child: PostTile(post: item),
+      ),
     );
 
     return ListenableBuilder(
@@ -72,9 +75,12 @@ class PostSliverGrid extends StatelessWidget {
           state: controller.state,
           fetchNextPage: controller.getNextPage,
           builderDelegate: buildBuilderDelegate(
-            (context, item, index) => AspectRatio(
-              aspectRatio: 1 / (item.height / item.width),
-              child: itemBuilder(context, item, index),
+            (context, item, index) => RepaintBoundary(
+              key: ValueKey(item.id),
+              child: AspectRatio(
+                aspectRatio: 1 / (item.height / item.width),
+                child: itemBuilder(context, item, index),
+              ),
             ),
           ),
           crossAxisCount: TileLayout.of(context).crossAxisCount,
@@ -100,12 +106,15 @@ class PostSliverComic extends StatelessWidget {
           onRetry: controller.getNextPage,
           onEmpty: const Text('No posts'),
           onError: const Text('Failed to load posts'),
-          itemBuilder: (context, item, index) => Padding(
-            padding:
-                LimitedWidthLayout.maybeOf(context)?.padding ?? EdgeInsets.zero,
-            child: ImageCacheSizeProvider(
-              size: 800,
-              child: PostComicTile(post: item),
+          itemBuilder: (context, item, index) => RepaintBoundary(
+            key: ValueKey(item.id),
+            child: Padding(
+              padding:
+                  LimitedWidthLayout.maybeOf(context)?.padding ?? EdgeInsets.zero,
+              child: ImageCacheSizeProvider(
+                size: 800,
+                child: PostComicTile(post: item),
+              ),
             ),
           ),
         ),
@@ -130,12 +139,15 @@ class PostSliverTimeline extends StatelessWidget {
           onRetry: controller.getNextPage,
           onEmpty: const Text('No posts'),
           onError: const Text('Failed to load posts'),
-          itemBuilder: (context, item, index) => Padding(
-            padding:
-                LimitedWidthLayout.maybeOf(context)?.padding ?? EdgeInsets.zero,
-            child: ImageCacheSizeProvider(
-              size: 800,
-              child: PostFeedTile(post: item),
+          itemBuilder: (context, item, index) => RepaintBoundary(
+            key: ValueKey(item.id),
+            child: Padding(
+              padding:
+                  LimitedWidthLayout.maybeOf(context)?.padding ?? EdgeInsets.zero,
+              child: ImageCacheSizeProvider(
+                size: 800,
+                child: PostFeedTile(post: item),
+              ),
             ),
           ),
         ),

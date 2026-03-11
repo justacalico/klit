@@ -11,7 +11,7 @@ class GlassSurface extends StatelessWidget {
     this.borderRadius = 20,
     this.padding,
     this.margin,
-    this.blurSigma = 24,
+    this.blurSigma = 14,
   });
 
   final Widget? child;
@@ -64,7 +64,7 @@ class GlassCard extends StatelessWidget {
     this.margin,
     this.padding = const EdgeInsets.all(16),
     this.borderRadius = 16,
-    this.blurSigma = 24,
+    this.blurSigma = 14,
     this.color,
     this.elevation = 8,
   });
@@ -114,7 +114,7 @@ class GlassBar extends StatelessWidget implements PreferredSizeWidget {
     this.height = 56,
     this.borderRadius = 24,
     this.margin,
-    this.blurSigma = 24,
+    this.blurSigma = 14,
     this.color,
   });
 

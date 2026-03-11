@@ -13,6 +13,7 @@ class TopicList extends StatelessWidget {
         onRefresh: () => controller.refresh(force: true, background: true),
         child: CustomScrollView(
           primary: true,
+          cacheExtent: 400,
           slivers: [
             SliverPadding(
               padding: defaultActionListPadding,
@@ -49,10 +50,13 @@ class SliverTopicList extends StatelessWidget {
           fetchNextPage: controller.getNextPage,
           builderDelegate: defaultPagedChildBuilderDelegate(
             onRetry: controller.getNextPage,
-            itemBuilder: (context, topic, index) => TopicTile(
-              topic: topic,
-              onPressed: () => pushReplies(topic),
-              onCountPressed: () => pushReplies(topic, orderByOldest: false),
+            itemBuilder: (context, topic, index) => RepaintBoundary(
+              key: ValueKey(topic.id),
+              child: TopicTile(
+                topic: topic,
+                onPressed: () => pushReplies(topic),
+                onCountPressed: () => pushReplies(topic, orderByOldest: false),
+              ),
             ),
             onEmpty: const Text('No topics'),
             onError: const Text('Failed to load topics'),

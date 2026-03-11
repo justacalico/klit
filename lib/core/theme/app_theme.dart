@@ -156,6 +156,16 @@ extension M2ThemeData on ThemeData {
   );
 }
 
+class SnappySnapshotlessZoomPageTransitionsBuilder
+    extends ZoomPageTransitionsBuilder {
+  const SnappySnapshotlessZoomPageTransitionsBuilder()
+      : super(allowSnapshotting: false);
+
+  @override
+  Duration get transitionDuration =>
+      const Duration(milliseconds: 250);
+}
+
 class AndroidStretchScrollBehaviour extends ScrollBehavior {
   @override
   Widget buildOverscrollIndicator(
@@ -185,16 +195,15 @@ class SnapshotlessPageTransitionTheme extends PageTransitionsTheme {
   Map<TargetPlatform, PageTransitionsBuilder> _transformBuilders(
     PageTransitionsTheme? parent,
   ) {
+    const snappyZoom =
+        SnappySnapshotlessZoomPageTransitionsBuilder();
     Map<TargetPlatform, PageTransitionsBuilder> builders = {};
     if (parent != null) {
       builders.addAll(
         Map.fromEntries(
           parent.builders.entries.map((e) {
             if (e.value is ZoomPageTransitionsBuilder) {
-              return MapEntry(
-                e.key,
-                const ZoomPageTransitionsBuilder(allowSnapshotting: false),
-              );
+              return MapEntry(e.key, snappyZoom);
             } else {
               return e;
             }
@@ -204,9 +213,7 @@ class SnapshotlessPageTransitionTheme extends PageTransitionsTheme {
     }
     for (final platform in TargetPlatform.values) {
       if (builders[platform] == null) {
-        builders[platform] = const ZoomPageTransitionsBuilder(
-          allowSnapshotting: false,
-        );
+        builders[platform] = snappyZoom;
       }
     }
     return builders;
