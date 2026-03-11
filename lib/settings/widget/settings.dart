@@ -11,6 +11,7 @@ import 'package:klit/settings/settings.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:klit/traits/traits.dart';
 import 'package:klit/user/user.dart';
+import 'package:klit/settings/widget/settings_shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -99,27 +100,27 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               ).add(LimitedWidthLayout.of(context).padding);
 
               final hasLogs = context.read<Logs?>() != null;
-              final sections = <_SettingsSectionEntry>[
-                _SettingsSectionEntry(weight: 7, child: _accountsSection()),
-                _SettingsSectionEntry(weight: 4, child: _userSection()),
-                _SettingsSectionEntry(
+              final sections = <SettingsSectionEntry>[
+                SettingsSectionEntry(weight: 7, child: _accountsSection()),
+                SettingsSectionEntry(weight: 4, child: _userSection()),
+                SettingsSectionEntry(
                   weight: 7,
                   child: _appearanceSection(settings),
                 ),
-                _SettingsSectionEntry(
+                SettingsSectionEntry(
                   weight: 5,
                   child: _interactionsSection(settings),
                 ),
-                _SettingsSectionEntry(
+                SettingsSectionEntry(
                   weight: 5,
                   child: _securitySection(settings),
                 ),
                 if (showDev)
-                  _SettingsSectionEntry(
+                  SettingsSectionEntry(
                     weight: hasLogs ? 4 : 2,
                     child: _developmentSection(settings, hasLogs: hasLogs),
                   ),
-                _SettingsSectionEntry(weight: 3, child: _aboutSection()),
+                SettingsSectionEntry(weight: 3, child: _aboutSection()),
               ];
 
               return LayoutBuilder(
@@ -151,7 +152,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
   }
 
-  Widget _buildDesktopColumns(List<_SettingsSectionEntry> sections) {
+  Widget _buildDesktopColumns(List<SettingsSectionEntry> sections) {
     final (left, right) = _balanceSections(sections);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,11 +174,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
   }
 
-  (List<_SettingsSectionEntry>, List<_SettingsSectionEntry>) _balanceSections(
-    List<_SettingsSectionEntry> sections,
+  (List<SettingsSectionEntry>, List<SettingsSectionEntry>) _balanceSections(
+    List<SettingsSectionEntry> sections,
   ) {
-    final left = <_SettingsSectionEntry>[];
-    final right = <_SettingsSectionEntry>[];
+    final left = <SettingsSectionEntry>[];
+    final right = <SettingsSectionEntry>[];
     var leftWeight = 0;
     var rightWeight = 0;
 
@@ -195,14 +196,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Widget _accountsSection() {
-    return _SettingsSection(
+    return SettingsSection(
       key: _accountsSectionKey,
       title: 'Accounts',
       child: SubStream<List<Identity>>(
         create: () => context.watch<IdentityClient>().all().stream,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return _SettingsGroupCard(
+            return SettingsGroupCard(
               children: const [
                 CupertinoListTile(
                   leading: Icon(Icons.warning_amber),
@@ -214,7 +215,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           }
           final identities = snapshot.data;
           if (identities == null) {
-            return _SettingsGroupCard(
+            return SettingsGroupCard(
               children: const [
                 CupertinoListTile(
                   leading: SizedBox(
@@ -408,7 +409,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             await identityClient.remove(identity);
           }
 
-          return _SettingsGroupCard(
+          return SettingsGroupCard(
             children: [
               CupertinoListTile(
                 leading: IdentityAvatar(activeIdentity.id),
@@ -531,15 +532,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Widget _userSection() {
-    return _SettingsSection(
+    return SettingsSection(
       title: 'User',
-      child: _SettingsGroupCard(
+      child: SettingsGroupCard(
         children: [
           Consumer<Client>(
             builder: (context, client, _) => ValueListenableBuilder(
               valueListenable: client.traits,
               builder: (context, traits, _) => CupertinoListTile(
-                leading: const _SettingsLeadingIcon(
+                leading: const SettingsLeadingIcon(
                   icon: CupertinoIcons.nosign,
                   color: Color(0xFFE74C3C),
                 ),
@@ -562,7 +563,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               create: () => client.follows.count().streamed,
               keys: [client],
               builder: (context, snapshot) => CupertinoListTile(
-                leading: const _SettingsLeadingIcon(
+                leading: const SettingsLeadingIcon(
                   icon: CupertinoIcons.person_add,
                   color: Color(0xFF2E86DE),
                 ),
@@ -591,7 +592,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 builder: (context, traits, _) {
                   final enabled = traits.writeHistory ?? false;
                   return CupertinoListTile(
-                    leading: const _SettingsLeadingIcon(
+                    leading: const SettingsLeadingIcon(
                       icon: CupertinoIcons.clock,
                       color: Color(0xFF16A085),
                     ),
@@ -623,14 +624,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Widget _appearanceSection(Settings settings) {
-    return _SettingsSection(
+    return SettingsSection(
       title: 'Appearance',
-      child: _SettingsGroupCard(
+      child: SettingsGroupCard(
         children: [
           ValueListenableBuilder<AppTheme>(
             valueListenable: settings.theme,
             builder: (context, value, _) => CupertinoListTile(
-              leading: const _SettingsLeadingIcon(
+              leading: const SettingsLeadingIcon(
                 icon: CupertinoIcons.sun_max,
                 color: Color(0xFFF39C12),
               ),
@@ -667,7 +668,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               final accent = colorFromHex(value);
               final hex = hexFromColor(accent);
               return CupertinoListTile(
-                leading: const _SettingsLeadingIcon(
+                leading: const SettingsLeadingIcon(
                   icon: CupertinoIcons.paintbrush,
                   color: Color(0xFFEC6F91),
                 ),
@@ -701,7 +702,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ValueListenableBuilder<int>(
             valueListenable: settings.tileSize,
             builder: (context, value, _) => CupertinoListTile(
-              leading: const _SettingsLeadingIcon(
+              leading: const SettingsLeadingIcon(
                 icon: CupertinoIcons.square_grid_2x2,
                 color: Color(0xFF8E44AD),
               ),
@@ -733,7 +734,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ValueListenableBuilder<GridQuilt>(
             valueListenable: settings.quilt,
             builder: (context, value, _) => CupertinoListTile(
-              leading: _SettingsLeadingIcon(
+              leading: SettingsLeadingIcon(
                 icon: value.icon,
                 color: const Color(0xFF34495E),
               ),
@@ -756,8 +757,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ),
           ValueListenableBuilder<bool>(
             valueListenable: settings.showPostInfo,
-            builder: (context, value, _) => _SettingsSwitchTile(
-              leading: const _SettingsLeadingIcon(
+            builder: (context, value, _) => SettingsSwitchTile(
+              leading: const SettingsLeadingIcon(
                 icon: CupertinoIcons.doc_text,
                 color: Color(0xFF2980B9),
               ),
@@ -772,7 +773,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             builder: (context, rawActions, _) {
               final actions = PostActionPreferences.decode(rawActions);
               return CupertinoListTile(
-                leading: const _SettingsLeadingIcon(
+                leading: const SettingsLeadingIcon(
                   icon: CupertinoIcons.square_stack_3d_down_right,
                   color: Color(0xFF1ABC9C),
                 ),
@@ -788,8 +789,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ),
           ValueListenableBuilder<bool>(
             valueListenable: settings.postActionBarFloatingMobile,
-            builder: (context, value, _) => _SettingsSwitchTile(
-              leading: const _SettingsLeadingIcon(
+            builder: (context, value, _) => SettingsSwitchTile(
+              leading: const SettingsLeadingIcon(
                 icon: CupertinoIcons.rectangle_stack,
                 color: Color(0xFF16A085),
               ),
@@ -808,15 +809,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Widget _interactionsSection(Settings settings) {
-    return _SettingsSection(
+    return SettingsSection(
       title: 'Interactions',
-      child: _SettingsGroupCard(
+      child: SettingsGroupCard(
         children: [
           if (!Platform.isIOS)
             ValueListenableBuilder<String?>(
               valueListenable: settings.downloadPath,
               builder: (context, value, _) => CupertinoListTile(
-                leading: const _SettingsLeadingIcon(
+                leading: const SettingsLeadingIcon(
                   icon: CupertinoIcons.folder,
                   color: Color(0xFFF1C40F),
                 ),
@@ -839,8 +840,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ),
           ValueListenableBuilder<bool>(
             valueListenable: settings.upvoteFavs,
-            builder: (context, value, _) => _SettingsSwitchTile(
-              leading: const _SettingsLeadingIcon(
+            builder: (context, value, _) => SettingsSwitchTile(
+              leading: const SettingsLeadingIcon(
                 icon: CupertinoIcons.arrow_up,
                 color: Color(0xFF27AE60),
               ),
@@ -852,8 +853,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ),
           ValueListenableBuilder<bool>(
             valueListenable: settings.muteVideos,
-            builder: (context, value, _) => _SettingsSwitchTile(
-              leading: _SettingsLeadingIcon(
+            builder: (context, value, _) => SettingsSwitchTile(
+              leading: SettingsLeadingIcon(
                 icon: value
                     ? CupertinoIcons.speaker_slash
                     : CupertinoIcons.speaker_2,
@@ -867,8 +868,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ),
           ValueListenableBuilder<bool>(
             valueListenable: settings.autoplayVideos,
-            builder: (context, value, _) => _SettingsSwitchTile(
-              leading: const _SettingsLeadingIcon(
+            builder: (context, value, _) => SettingsSwitchTile(
+              leading: const SettingsLeadingIcon(
                 icon: CupertinoIcons.play_circle,
                 color: Color(0xFF9B59B6),
               ),
@@ -881,7 +882,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ValueListenableBuilder<VideoResolution>(
             valueListenable: settings.videoResolution,
             builder: (context, value, _) => CupertinoListTile(
-              leading: const _SettingsLeadingIcon(
+              leading: const SettingsLeadingIcon(
                 icon: CupertinoIcons.videocam,
                 color: Color(0xFF2ECC71),
               ),
@@ -905,8 +906,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ),
           ValueListenableBuilder<bool>(
             valueListenable: settings.iFinishedEnabled,
-            builder: (context, value, _) => _SettingsSwitchTile(
-              leading: const _SettingsLeadingIcon(
+            builder: (context, value, _) => SettingsSwitchTile(
+              leading: const SettingsLeadingIcon(
                 icon: CupertinoIcons.checkmark_circle,
                 color: Color(0xFF1ABC9C),
               ),
@@ -926,8 +927,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               if (!isMobile) return const SizedBox.shrink();
               return ValueListenableBuilder<bool>(
                 valueListenable: settings.iFinishedRequestPhoto,
-                builder: (context, value, _) => _SettingsSwitchTile(
-                  leading: const _SettingsLeadingIcon(
+                builder: (context, value, _) => SettingsSwitchTile(
+                  leading: const SettingsLeadingIcon(
                     icon: CupertinoIcons.camera,
                     color: Color(0xFF9B59B6),
                   ),
@@ -947,15 +948,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Widget _securitySection(Settings settings) {
-    return _SettingsSection(
+    return SettingsSection(
       title: 'Security',
-      child: _SettingsGroupCard(
+      child: SettingsGroupCard(
         children: [
           if (PlatformCapabilities.hasSecureDisplay)
             ValueListenableBuilder<bool>(
               valueListenable: settings.secureDisplay,
-              builder: (context, value, _) => _SettingsSwitchTile(
-                leading: const _SettingsLeadingIcon(
+              builder: (context, value, _) => SettingsSwitchTile(
+                leading: const SettingsLeadingIcon(
                   icon: CupertinoIcons.rectangle_on_rectangle_angled,
                   color: Color(0xFFE67E22),
                 ),
@@ -968,8 +969,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           if (Platform.isAndroid)
             ValueListenableBuilder<bool>(
               valueListenable: settings.incognitoKeyboard,
-              builder: (context, value, _) => _SettingsSwitchTile(
-                leading: const _SettingsLeadingIcon(
+              builder: (context, value, _) => SettingsSwitchTile(
+                leading: const SettingsLeadingIcon(
                   icon: CupertinoIcons.keyboard,
                   color: Color(0xFF7F8C8D),
                 ),
@@ -981,8 +982,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ),
           ValueListenableBuilder<bool>(
             valueListenable: settings.allowHttpHosts,
-            builder: (context, value, _) => _SettingsSwitchTile(
-              leading: const _SettingsLeadingIcon(
+            builder: (context, value, _) => SettingsSwitchTile(
+              leading: const SettingsLeadingIcon(
                 icon: CupertinoIcons.globe,
                 color: Color(0xFF95A5A6),
               ),
@@ -996,8 +997,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ),
           ValueListenableBuilder<String?>(
             valueListenable: settings.appPin,
-            builder: (context, value, _) => _SettingsSwitchTile(
-              leading: const _SettingsLeadingIcon(
+            builder: (context, value, _) => SettingsSwitchTile(
+              leading: const SettingsLeadingIcon(
                 icon: CupertinoIcons.lock,
                 color: Color(0xFF34495E),
               ),
@@ -1021,8 +1022,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               ),
               builder: (context, snapshot) => ValueListenableBuilder<bool>(
                 valueListenable: settings.biometricAuth,
-                builder: (context, value, _) => _SettingsSwitchTile(
-                  leading: const _SettingsLeadingIcon(
+                builder: (context, value, _) => SettingsSwitchTile(
+                  leading: const SettingsLeadingIcon(
                     icon: CupertinoIcons.hand_raised,
                     color: Color(0xFF16A085),
                   ),
@@ -1043,12 +1044,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Widget _developmentSection(Settings settings, {required bool hasLogs}) {
-    return _SettingsSection(
+    return SettingsSection(
       title: 'Development',
-      child: _SettingsGroupCard(
+      child: SettingsGroupCard(
         children: [
-          _SettingsSwitchTile(
-            leading: const _SettingsLeadingIcon(
+          SettingsSwitchTile(
+            leading: const SettingsLeadingIcon(
               icon: CupertinoIcons.ant,
               color: Color(0xFF8E44AD),
             ),
@@ -1063,7 +1064,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 create: () =>
                     logs.stream(filter: (level, type) => level >= Level.SEVERE),
                 builder: (context, snapshot) => CupertinoListTile(
-                  leading: const _SettingsLeadingIcon(
+                  leading: const SettingsLeadingIcon(
                     icon: CupertinoIcons.list_number,
                     color: Color(0xFFD35400),
                   ),
@@ -1085,7 +1086,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               ),
             ),
             CupertinoListTile(
-              leading: const _SettingsLeadingIcon(
+              leading: const SettingsLeadingIcon(
                 icon: CupertinoIcons.square_stack_3d_up,
                 color: Color(0xFF2C3E50),
               ),
@@ -1107,7 +1108,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Widget _aboutSection() {
-    return _SettingsSection(
+    return SettingsSection(
       title: 'About',
       child: DevOptionEnabler(
         child: Builder(
@@ -1581,134 +1582,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _SettingsSection extends StatelessWidget {
-  const _SettingsSection({super.key, required this.title, required this.child});
-
-  final String title;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = Theme.of(
-      context,
-    ).colorScheme.secondary.withValues(alpha: 0.9);
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-            child: Text(
-              title.toUpperCase(),
-              style: TextStyle(
-                color: color,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.4,
-              ),
-            ),
-          ),
-          child,
-        ],
-      ),
-    );
-  }
-}
-
-class _SettingsGroupCard extends StatelessWidget {
-  const _SettingsGroupCard({required this.children});
-
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final surface = theme.brightness == Brightness.dark
-        ? Color.lerp(theme.canvasColor, Colors.white, 0.04)!
-        : theme.colorScheme.surface;
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: surface,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var i = 0; i < children.length; i++) ...[
-            children[i],
-            if (i != children.length - 1) const Divider(height: 1),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _SettingsSwitchTile extends StatelessWidget {
-  const _SettingsSwitchTile({
-    required this.leading,
-    required this.title,
-    required this.subtitle,
-    required this.value,
-    required this.onChanged,
-  });
-
-  final Widget leading;
-  final String title;
-  final String subtitle;
-  final bool value;
-  final ValueChanged<bool>? onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoListTile(
-      leading: leading,
-      title: Text(title),
-      subtitle: Text(subtitle),
-      trailing: CupertinoSwitch(
-        value: value,
-        onChanged: onChanged == null
-            ? null
-            : (v) {
-                HapticFeedback.selectionClick();
-                onChanged!(v);
-              },
-      ),
-    );
-  }
-}
-
-class _SettingsSectionEntry {
-  const _SettingsSectionEntry({required this.weight, required this.child});
-
-  final int weight;
-  final Widget child;
-}
-
-class _SettingsLeadingIcon extends StatelessWidget {
-  const _SettingsLeadingIcon({required this.icon, required this.color});
-
-  final IconData icon;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(7),
-      ),
-      child: SizedBox(
-        width: 28,
-        height: 28,
-        child: Icon(icon, size: 16, color: Colors.white),
       ),
     );
   }
