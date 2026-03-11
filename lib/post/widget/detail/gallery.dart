@@ -8,7 +8,7 @@ class PostDetailGalleryWithShell extends StatefulWidget {
     super.key,
     required this.controller,
     this.initialPage = 0,
-    this.useShell = true,
+    this.useShell = false,
   });
 
   final PostController controller;

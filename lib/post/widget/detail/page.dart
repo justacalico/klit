@@ -11,7 +11,7 @@ class PostDetail extends StatefulWidget {
     super.key,
     required this.post,
     this.onTapImage,
-    this.useShell = true,
+    this.useShell = false,
   });
 
   final Post post;

@@ -297,9 +297,10 @@ void defaultPushPostDetail(BuildContext context, Post post) {
                 child: PostDetailGalleryWithShell(
                   controller: controller,
                   initialPage: controller.items!.indexOf(post),
+                  useShell: false,
                 ),
               )
-            : PostDetail(post: post),
+            : PostDetail(post: post, useShell: false),
       ),
     ),
   );
