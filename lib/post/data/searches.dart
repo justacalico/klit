@@ -2,6 +2,9 @@ import 'package:klit/client/client.dart';
 import 'package:klit/post/post.dart';
 import 'package:klit/shared/shared.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+enum PopularScale { day, week, month }
 
 class FavoritePostController extends PostController {
   FavoritePostController({required super.client});
@@ -43,7 +46,104 @@ class FavoritePostController extends PostController {
 }
 
 class HotPostController extends PostController {
-  HotPostController({required super.client});
+  HotPostController({
+    required super.client,
+    PopularScale scale = PopularScale.day,
+    DateTime? referenceDate,
+  }) : _scale = scale,
+       _referenceDate = DateUtils.dateOnly(referenceDate ?? DateTime.now()),
+       super(
+         query: {
+           'tags': _dateTagFor(
+             scale: scale,
+             referenceDate: DateUtils.dateOnly(referenceDate ?? DateTime.now()),
+           ),
+         },
+       );
+
+  static final DateFormat _apiDate = DateFormat('yyyy-MM-dd');
+
+  PopularScale _scale;
+  PopularScale get scale => _scale;
+
+  DateTime _referenceDate;
+  DateTime get referenceDate => _referenceDate;
+
+  DateTime get _today => DateUtils.dateOnly(DateTime.now());
+
+  bool get canNext {
+    final next = _nextReferenceDate();
+    return !next.isAfter(_today);
+  }
+
+  void setScale(PopularScale value) {
+    if (value == _scale) return;
+    _scale = value;
+    _applyDateQuery();
+  }
+
+  void setReferenceDate(DateTime value) {
+    final d = DateUtils.dateOnly(value);
+    if (d == _referenceDate) return;
+    _referenceDate = d;
+    _applyDateQuery();
+  }
+
+  void prev() {
+    _referenceDate = _prevReferenceDate();
+    _applyDateQuery();
+  }
+
+  void next() {
+    final next = _nextReferenceDate();
+    if (next.isAfter(_today)) return;
+    _referenceDate = next;
+    _applyDateQuery();
+  }
+
+  DateTime _prevReferenceDate() => switch (_scale) {
+    PopularScale.day => _referenceDate.subtract(const Duration(days: 1)),
+    PopularScale.week => _referenceDate.subtract(const Duration(days: 7)),
+    PopularScale.month => DateTime(_referenceDate.year, _referenceDate.month - 1, 1),
+  };
+
+  DateTime _nextReferenceDate() => switch (_scale) {
+    PopularScale.day => _referenceDate.add(const Duration(days: 1)),
+    PopularScale.week => _referenceDate.add(const Duration(days: 7)),
+    PopularScale.month => DateTime(_referenceDate.year, _referenceDate.month + 1, 1),
+  };
+
+  void _applyDateQuery() {
+    query = {'tags': _dateTagFor(scale: _scale, referenceDate: _referenceDate)};
+  }
+
+  static String _dateTagFor({
+    required PopularScale scale,
+    required DateTime referenceDate,
+  }) {
+    final d = DateUtils.dateOnly(referenceDate);
+    final today = DateUtils.dateOnly(DateTime.now());
+    if (scale == PopularScale.day) {
+      if (d == today) return 'date:today';
+      if (d == today.subtract(const Duration(days: 1))) return 'date:yesterday';
+      return 'date:${_apiDate.format(d)}';
+    }
+
+    DateTime start;
+    DateTime end;
+    if (scale == PopularScale.week) {
+      // e621 week is Monday..Sunday
+      start = d.subtract(Duration(days: d.weekday - DateTime.monday));
+      end = start.add(const Duration(days: 6));
+    } else {
+      start = DateTime(d.year, d.month, 1);
+      end = DateTime(d.year, d.month + 1, 0);
+    }
+
+    if (end.isAfter(today)) end = today;
+    if (start.isAfter(end)) start = end;
+    return 'date:${_apiDate.format(start)}..${_apiDate.format(end)}';
+  }
 
   @override
   @protected
