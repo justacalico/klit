@@ -8,10 +8,12 @@ class PostDetailGalleryWithShell extends StatefulWidget {
     super.key,
     required this.controller,
     this.initialPage = 0,
+    this.useShell = true,
   });
 
   final PostController controller;
   final int initialPage;
+  final bool useShell;
 
   @override
   State<PostDetailGalleryWithShell> createState() =>
@@ -47,25 +49,33 @@ class _PostDetailGalleryWithShellState extends State<PostDetailGalleryWithShell>
                   _currentIndex < items.length
               ? items[_currentIndex]
               : null;
-          return AppShell(
-            appBar: post != null
-                ? PostDetailAppBar(post: post)
-                : const TransparentAppBar(child: DefaultAppBar()),
-            floatingActionButton: null,
-            body: PostDetailGallery(
-              controller: widget.controller,
-              pageController: _pageController,
-              contentOnly: true,
-              onPageChanged: (index) {
-                setState(() => _currentIndex = index);
-                preloadPostImages(
-                  context: context,
-                  index: index,
-                  posts: controller.items!,
-                  size: PostImageSize.sample,
-                );
-              },
-            ),
+          final PreferredSizeWidget? appBar = post != null
+              ? PostDetailAppBar(post: post)
+              : const TransparentAppBar(child: DefaultAppBar());
+          final body = PostDetailGallery(
+            controller: widget.controller,
+            pageController: _pageController,
+            contentOnly: true,
+            onPageChanged: (index) {
+              setState(() => _currentIndex = index);
+              preloadPostImages(
+                context: context,
+                index: index,
+                posts: controller.items!,
+                size: PostImageSize.sample,
+              );
+            },
+          );
+          if (widget.useShell) {
+            return AppShell(
+              appBar: appBar,
+              floatingActionButton: null,
+              body: body,
+            );
+          }
+          return Scaffold(
+            appBar: appBar,
+            body: body,
           );
         },
       ),

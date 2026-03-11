@@ -20,7 +20,10 @@ class PostLoadingPage extends StatelessWidget {
               future: controller,
               builder: (context, value) => PostsRouteConnector(
                 controller: value,
-                child: PostDetailGallery(controller: value),
+                child: PostDetailGalleryWithShell(
+                  controller: value,
+                  useShell: false,
+                ),
               ),
               title: Text('Post #$id'),
               onError: const Text('Failed to load post'),

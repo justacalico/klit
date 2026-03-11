@@ -84,14 +84,14 @@ GoRouter createAppRouter(GlobalKey<NavigatorState> navigatorKey) {
             path: AppRoutes.settings,
             builder: (context, state) => const SettingsPage(),
           ),
+          GoRoute(
+            path: '/post/:id',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return PostLoadingPage(int.parse(id));
+            },
+          ),
         ],
-      ),
-      GoRoute(
-        path: '/post/:id',
-        builder: (context, state) {
-          final id = state.pathParameters['id']!;
-          return PostLoadingPage(int.parse(id));
-        },
       ),
     ],
   );
