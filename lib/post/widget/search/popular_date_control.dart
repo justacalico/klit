@@ -4,75 +4,49 @@ import 'package:intl/intl.dart';
 import 'package:klit/post/post.dart';
 import 'package:klit/shared/shared.dart';
 
-class PopularDateButton extends StatelessWidget {
-  const PopularDateButton({super.key, required this.controller});
-
-  final HotPostController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoButton(
-      padding: EdgeInsets.zero,
-      minimumSize: const Size(44, 44),
-      onPressed: () => _open(context),
-      child: const Icon(Icons.calendar_month),
-    );
-  }
-
-  Future<void> _open(BuildContext context) async {
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: false,
-      useRootNavigator: true,
-      useSafeArea: true,
-      builder: (context) => _PopularDateSheet(controller: controller),
-    );
-  }
-}
-
-class _PopularDateSheet extends StatelessWidget {
-  const _PopularDateSheet({required this.controller});
+class PopularDateInlineBar extends StatelessWidget {
+  const PopularDateInlineBar({super.key, required this.controller});
 
   final HotPostController controller;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final titleStyle = theme.textTheme.titleMedium;
     final subtle = TextStyle(color: dimTextColor(context));
-    final w = MediaQuery.sizeOf(context).width;
-    final clearBottomNav = w < 900;
+    final bg = theme.brightness == Brightness.dark
+        ? theme.cardColor.withValues(alpha: 0.55)
+        : theme.colorScheme.surfaceContainerHigh;
 
     return AnimatedBuilder(
       animation: controller,
       builder: (context, _) {
         final label = popularDateLabel(controller);
-        return Align(
-          alignment: Alignment.bottomCenter,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                16,
-                14,
-                16,
-                clearBottomNav ? 110 : 16,
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: bg,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: theme.dividerColor.withValues(alpha: 0.35),
               ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Row(
                     children: [
-                      Expanded(
-                        child: Text('Popular', style: titleStyle),
-                      ),
+                      const Text('Popular'),
+                      const Spacer(),
                       Text(label, style: subtle),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   _ScaleControl(controller: controller),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       IconButton(
@@ -90,16 +64,13 @@ class _PopularDateSheet extends StatelessWidget {
                         onPressed: controller.canNext ? controller.next : null,
                         icon: const Icon(Icons.chevron_right),
                       ),
+                      const SizedBox(width: 6),
+                      TextButton.icon(
+                        onPressed: () => _pickDate(context),
+                        icon: const Icon(Icons.date_range),
+                        label: const Text('Pick date'),
+                      ),
                     ],
-                  ),
-                  const SizedBox(height: 8),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton.icon(
-                      onPressed: () => _pickDate(context),
-                      icon: const Icon(Icons.date_range),
-                      label: const Text('Pick date'),
-                    ),
                   ),
                 ],
               ),

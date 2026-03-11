@@ -17,31 +17,17 @@ class HotPage extends StatelessWidget {
                   controller: controller,
                   child: PostsPage(
                     controller: controller,
-                    appBar: DefaultAppBar(
-                      title: const Text('Popular'),
-                      actions: [
-                        if (hot != null) PopularDateButton(controller: hot),
-                      ],
-                      secondary: hot != null
-                          ? Padding(
-                              padding: const EdgeInsets.only(
-                                left: 12,
-                                right: 12,
+                    appBar: const DefaultAppBar(title: Text('Popular')),
+                    bodyTop: hot != null
+                        ? SafeArea(
+                            bottom: false,
+                            child: LimitedWidthLayout(
+                              child: TileLayout(
+                                child: PopularDateInlineBar(controller: hot),
                               ),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  popularDateLabel(hot),
-                                  style: TextStyle(
-                                    color: dimTextColor(context),
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            )
-                          : null,
-                    ),
+                            ),
+                          )
+                        : null,
                   ),
                 );
               },
