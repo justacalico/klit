@@ -22,9 +22,7 @@ class HotPage extends StatelessWidget {
                         ? SafeArea(
                             bottom: false,
                             child: LimitedWidthLayout(
-                              child: TileLayout(
-                                child: PopularDateInlineBar(controller: hot),
-                              ),
+                              child: PopularDateInlineBar(controller: hot),
                             ),
                           )
                         : null,
