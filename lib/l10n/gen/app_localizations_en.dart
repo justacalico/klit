@@ -81,10 +81,143 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonLaterUpper => 'LATER';
 
   @override
+  String get commonCancel => 'Cancel';
+
+  @override
+  String get commonDelete => 'Delete';
+
+  @override
+  String get commonSave => 'Save';
+
+  @override
+  String get commonImportUpper => 'IMPORT';
+
+  @override
+  String get commonOkUpper => 'OK';
+
+  @override
+  String get commonRestartNowUpper => 'RESTART NOW';
+
+  @override
   String get aboutCheckForUpdate => 'Check for update';
 
   @override
   String get aboutCheckingForUpdates => 'Checking for updates...';
+
+  @override
+  String get feedsTitle => 'Feeds';
+
+  @override
+  String get feedsNewFeedTitle => 'New feed';
+
+  @override
+  String get feedsEditFeedTitle => 'Edit feed';
+
+  @override
+  String get feedsDeleteDialogTitle => 'Delete feed';
+
+  @override
+  String feedsDeleteDialogBody(Object name) {
+    return 'Delete \"$name\"?';
+  }
+
+  @override
+  String get feedsEmptyTitle => 'No feeds yet';
+
+  @override
+  String get feedsEmptyBody =>
+      'Create a feed with tags and image or video type to browse posts in one tap';
+
+  @override
+  String get feedsCreateFeed => 'Create feed';
+
+  @override
+  String get databaseExporting => 'Exporting database...';
+
+  @override
+  String get databaseImporting => 'Importing database...';
+
+  @override
+  String get databaseExportDialogTitle => 'Export Database';
+
+  @override
+  String get databaseExportSuccess => 'Database exported successfully';
+
+  @override
+  String get databaseExportFailed => 'Export failed';
+
+  @override
+  String get databaseExportTitle => 'Export';
+
+  @override
+  String get databaseExportSubtitle => 'Save a backup copy of your database';
+
+  @override
+  String get databaseImportDialogTitle => 'Import Database';
+
+  @override
+  String databaseImportInvalidFile(Object error) {
+    return 'Invalid database file: $error';
+  }
+
+  @override
+  String databaseImportFailed(Object error) {
+    return 'Import failed: $error';
+  }
+
+  @override
+  String get databaseImportTitle => 'Import';
+
+  @override
+  String get databaseImportSubtitle =>
+      'Replace current database with imported one';
+
+  @override
+  String get databaseImportWarningBody =>
+      'This will replace your current database. \\nAll data will be lost. This cannot be undone!';
+
+  @override
+  String get databaseRestartRequiredTitle => 'Restart Required';
+
+  @override
+  String get databaseRestartRequiredBody =>
+      'The app needs to restart to apply changes.';
+
+  @override
+  String postUpdateSuccess(Object id) {
+    return 'Updated post #$id';
+  }
+
+  @override
+  String postUpdateFailed(Object id) {
+    return 'Failed to update post #$id';
+  }
+
+  @override
+  String tagPreviewLoadFailed(Object error) {
+    return 'Error loading tag preview: $error';
+  }
+
+  @override
+  String get tooltipInfo => 'Info';
+
+  @override
+  String get tooltipCopy => 'Copy';
+
+  @override
+  String get tooltipDelete => 'Delete';
+
+  @override
+  String get tooltipAbort => 'Abort';
+
+  @override
+  String get tooltipSelectAll => 'Select all';
+
+  @override
+  String get tooltipPrevious => 'Previous';
+
+  @override
+  String get tooltipNext => 'Next';
 }
 
 /// The translations for English, as used in Australia (`en_AU`).
@@ -164,8 +297,141 @@ class AppLocalizationsEnAu extends AppLocalizationsEn {
   String get commonLaterUpper => 'LATER';
 
   @override
+  String get commonCancel => 'Cancel';
+
+  @override
+  String get commonDelete => 'Delete';
+
+  @override
+  String get commonSave => 'Save';
+
+  @override
+  String get commonImportUpper => 'IMPORT';
+
+  @override
+  String get commonOkUpper => 'OK';
+
+  @override
+  String get commonRestartNowUpper => 'RESTART NOW';
+
+  @override
   String get aboutCheckForUpdate => 'Check for update';
 
   @override
   String get aboutCheckingForUpdates => 'Checking for updates...';
+
+  @override
+  String get feedsTitle => 'Feeds';
+
+  @override
+  String get feedsNewFeedTitle => 'New feed';
+
+  @override
+  String get feedsEditFeedTitle => 'Edit feed';
+
+  @override
+  String get feedsDeleteDialogTitle => 'Delete feed';
+
+  @override
+  String feedsDeleteDialogBody(Object name) {
+    return 'Delete \"$name\"?';
+  }
+
+  @override
+  String get feedsEmptyTitle => 'No feeds yet';
+
+  @override
+  String get feedsEmptyBody =>
+      'Create a feed with tags and image or video type to browse posts in one tap';
+
+  @override
+  String get feedsCreateFeed => 'Create feed';
+
+  @override
+  String get databaseExporting => 'Exporting database...';
+
+  @override
+  String get databaseImporting => 'Importing database...';
+
+  @override
+  String get databaseExportDialogTitle => 'Export Database';
+
+  @override
+  String get databaseExportSuccess => 'Database exported successfully';
+
+  @override
+  String get databaseExportFailed => 'Export failed';
+
+  @override
+  String get databaseExportTitle => 'Export';
+
+  @override
+  String get databaseExportSubtitle => 'Save a backup copy of your database';
+
+  @override
+  String get databaseImportDialogTitle => 'Import Database';
+
+  @override
+  String databaseImportInvalidFile(Object error) {
+    return 'Invalid database file: $error';
+  }
+
+  @override
+  String databaseImportFailed(Object error) {
+    return 'Import failed: $error';
+  }
+
+  @override
+  String get databaseImportTitle => 'Import';
+
+  @override
+  String get databaseImportSubtitle =>
+      'Replace current database with imported one';
+
+  @override
+  String get databaseImportWarningBody =>
+      'This will replace your current database. \\nAll data will be lost. This cannot be undone!';
+
+  @override
+  String get databaseRestartRequiredTitle => 'Restart Required';
+
+  @override
+  String get databaseRestartRequiredBody =>
+      'The app needs to restart to apply changes.';
+
+  @override
+  String postUpdateSuccess(Object id) {
+    return 'Updated post #$id';
+  }
+
+  @override
+  String postUpdateFailed(Object id) {
+    return 'Failed to update post #$id';
+  }
+
+  @override
+  String tagPreviewLoadFailed(Object error) {
+    return 'Error loading tag preview: $error';
+  }
+
+  @override
+  String get tooltipInfo => 'Info';
+
+  @override
+  String get tooltipCopy => 'Copy';
+
+  @override
+  String get tooltipDelete => 'Delete';
+
+  @override
+  String get tooltipAbort => 'Abort';
+
+  @override
+  String get tooltipSelectAll => 'Select all';
+
+  @override
+  String get tooltipPrevious => 'Previous';
+
+  @override
+  String get tooltipNext => 'Next';
 }

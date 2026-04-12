@@ -235,6 +235,42 @@ abstract class AppLocalizations {
   /// **'LATER'**
   String get commonLaterUpper;
 
+  /// No description provided for @commonCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get commonCancel;
+
+  /// No description provided for @commonDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get commonDelete;
+
+  /// No description provided for @commonSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get commonSave;
+
+  /// No description provided for @commonImportUpper.
+  ///
+  /// In en, this message translates to:
+  /// **'IMPORT'**
+  String get commonImportUpper;
+
+  /// No description provided for @commonOkUpper.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get commonOkUpper;
+
+  /// No description provided for @commonRestartNowUpper.
+  ///
+  /// In en, this message translates to:
+  /// **'RESTART NOW'**
+  String get commonRestartNowUpper;
+
   /// No description provided for @aboutCheckForUpdate.
   ///
   /// In en, this message translates to:
@@ -246,6 +282,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Checking for updates...'**
   String get aboutCheckingForUpdates;
+
+  /// No description provided for @feedsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeds'**
+  String get feedsTitle;
+
+  /// No description provided for @feedsNewFeedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New feed'**
+  String get feedsNewFeedTitle;
+
+  /// No description provided for @feedsEditFeedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit feed'**
+  String get feedsEditFeedTitle;
+
+  /// No description provided for @feedsDeleteDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete feed'**
+  String get feedsDeleteDialogTitle;
+
+  /// No description provided for @feedsDeleteDialogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\"?'**
+  String feedsDeleteDialogBody(Object name);
+
+  /// No description provided for @feedsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No feeds yet'**
+  String get feedsEmptyTitle;
+
+  /// No description provided for @feedsEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a feed with tags and image or video type to browse posts in one tap'**
+  String get feedsEmptyBody;
+
+  /// No description provided for @feedsCreateFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Create feed'**
+  String get feedsCreateFeed;
+
+  /// No description provided for @databaseExporting.
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting database...'**
+  String get databaseExporting;
+
+  /// No description provided for @databaseImporting.
+  ///
+  /// In en, this message translates to:
+  /// **'Importing database...'**
+  String get databaseImporting;
+
+  /// No description provided for @databaseExportDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Database'**
+  String get databaseExportDialogTitle;
+
+  /// No description provided for @databaseExportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Database exported successfully'**
+  String get databaseExportSuccess;
+
+  /// No description provided for @databaseExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed'**
+  String get databaseExportFailed;
+
+  /// No description provided for @databaseExportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get databaseExportTitle;
+
+  /// No description provided for @databaseExportSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save a backup copy of your database'**
+  String get databaseExportSubtitle;
+
+  /// No description provided for @databaseImportDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Database'**
+  String get databaseImportDialogTitle;
+
+  /// No description provided for @databaseImportInvalidFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid database file: {error}'**
+  String databaseImportInvalidFile(Object error);
+
+  /// No description provided for @databaseImportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Import failed: {error}'**
+  String databaseImportFailed(Object error);
+
+  /// No description provided for @databaseImportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get databaseImportTitle;
+
+  /// No description provided for @databaseImportSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace current database with imported one'**
+  String get databaseImportSubtitle;
+
+  /// No description provided for @databaseImportWarningBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will replace your current database. \\nAll data will be lost. This cannot be undone!'**
+  String get databaseImportWarningBody;
+
+  /// No description provided for @databaseRestartRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart Required'**
+  String get databaseRestartRequiredTitle;
+
+  /// No description provided for @databaseRestartRequiredBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The app needs to restart to apply changes.'**
+  String get databaseRestartRequiredBody;
+
+  /// No description provided for @postUpdateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated post #{id}'**
+  String postUpdateSuccess(Object id);
+
+  /// No description provided for @postUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update post #{id}'**
+  String postUpdateFailed(Object id);
+
+  /// No description provided for @tagPreviewLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading tag preview: {error}'**
+  String tagPreviewLoadFailed(Object error);
+
+  /// No description provided for @tooltipInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get tooltipInfo;
+
+  /// No description provided for @tooltipCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get tooltipCopy;
+
+  /// No description provided for @tooltipDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get tooltipDelete;
+
+  /// No description provided for @tooltipAbort.
+  ///
+  /// In en, this message translates to:
+  /// **'Abort'**
+  String get tooltipAbort;
+
+  /// No description provided for @tooltipSelectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get tooltipSelectAll;
+
+  /// No description provided for @tooltipPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get tooltipPrevious;
+
+  /// No description provided for @tooltipNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get tooltipNext;
 }
 
 class _AppLocalizationsDelegate
