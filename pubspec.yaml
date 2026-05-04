@@ -1,6 +1,6 @@
 name: klit
 description: An Self21/E926 compatible client
-version: 9.0.1
+version: 9.0.2
 publish_to: none
 
 environment:
