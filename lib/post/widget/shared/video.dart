@@ -540,21 +540,10 @@ class PostVideoRoute extends StatefulWidget {
 class PostVideoRouteState extends State<PostVideoRoute>
     with DefaultRouteAware<PostVideoRoute> {
   late VideoPlayer? player;
-  late final bool _wasPlaying;
   bool _keepPlaying = false;
   bool _startedAutoplay = false;
 
   void keepPlaying() => _keepPlaying = true;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _wasPlaying =
-          widget.post.getVideo(context, listen: false)?.state.playing ?? false;
-    });
-  }
 
   @override
   void didPushNext() {
@@ -581,7 +570,7 @@ class PostVideoRouteState extends State<PostVideoRoute>
 
   @override
   void dispose() {
-    if (widget.stopOnDispose && !_wasPlaying) {
+    if (widget.stopOnDispose) {
       WidgetsBinding.instance.addPostFrameCallback((_) => player?.pause());
     }
     super.dispose();
