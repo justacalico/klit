@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:klit/app/app.dart';
 import 'package:klit/settings/settings.dart';
 import 'package:klit/shared/shared.dart';
@@ -90,7 +92,7 @@ class _WindowFrameState extends State<WindowFrame> with WindowListener {
   @override
   Widget build(BuildContext context) {
     WindowManager? manager = context.read<WindowManager?>();
-    if (manager == null) return widget.child;
+    if (manager == null || Platform.isMacOS) return widget.child;
     return Column(
       children: [
         if (!isFullscreen)
