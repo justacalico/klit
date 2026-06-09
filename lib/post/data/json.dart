@@ -42,6 +42,7 @@ abstract final class E621Post {
       ),
       uploaderId: post('uploader_id').asIntOrThrow(),
       uploaderName: post('uploader_name').asStringOrNull(),
+      approverId: post('approver_id').asIntOrNull(),
       createdAt: post('created_at').asDateTimeOrThrow(),
       updatedAt: post('updated_at').asDateTimeOrNull(),
       changeSeq: post('change_seq').asIntOrNull(),
