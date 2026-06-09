@@ -20,14 +20,18 @@ class PostClient {
   final Identity identity;
   final PoolClient poolsService;
 
+  Map<String, dynamic> _withV2(Map<String, dynamic>? params) {
+    return {'v2': true, ...?params};
+  }
+
   Future<Post> get({required int id, bool? force, CancelToken? cancelToken}) =>
       dio
           .get(
             '/posts/$id.json',
+            queryParameters: _withV2(null),
             options: forceOptions(force),
             cancelToken: cancelToken,
           )
-          .then(unwrapRailsArray)
           .then((response) => E621Post.fromJson(response.data));
 
   Future<List<Post>> page({
@@ -71,11 +75,10 @@ class PostClient {
     return dio
         .get(
           '/posts.json',
-          queryParameters: {'page': page, 'limit': limit, ...?query},
+          queryParameters: _withV2({'page': page, 'limit': limit, ...?query}),
           options: forceOptions(force),
           cancelToken: cancelToken,
         )
-        .then(unwrapRailsArray)
         .then(
           (response) => (response.data as List<dynamic>)
               .map<Post>(E621Post.fromJson)
@@ -262,11 +265,10 @@ class PostClient {
       List<dynamic> body = await dio
           .get(
             '/favorites.json',
-            queryParameters: {'page': page, 'limit': limit, ...?query},
+            queryParameters: _withV2({'page': page, 'limit': limit, ...?query}),
             options: forceOptions(force),
             cancelToken: cancelToken,
           )
-          .then(unwrapRailsArray)
           .then((response) => response.data);
       List<Post> result = List.from(body.map(E621Post.fromJson));
       result.removeWhere((e) => e.isDeleted || e.file == null);

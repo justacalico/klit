@@ -18,8 +18,11 @@ abstract class Post with _$Post {
     required Map<String, String?>? variants,
     required Map<String, List<String>> tags,
     required int uploaderId,
+    String? uploaderName,
     required DateTime createdAt,
     required DateTime? updatedAt,
+    int? changeSeq,
+    int? approverId,
     required VoteInfo vote,
     required bool isDeleted,
     required Rating rating,
@@ -29,6 +32,7 @@ abstract class Post with _$Post {
     required String description,
     required List<String> sources,
     required List<int>? pools,
+    List<String>? lockedTags,
     required Relationships relationships,
   }) = _Post;
 
