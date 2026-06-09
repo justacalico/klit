@@ -44,6 +44,7 @@ abstract final class E621Post {
       uploaderName: post('uploader_name').asStringOrNull(),
       createdAt: post('created_at').asDateTimeOrThrow(),
       updatedAt: post('updated_at').asDateTimeOrNull(),
+      changeSeq: post('change_seq').asIntOrNull(),
       vote: VoteInfo(
         score: post('stats', 'score').letOrNull((score) => score('total').asIntOrNull()) ?? 0,
       ),
