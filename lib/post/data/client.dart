@@ -75,11 +75,10 @@ class PostClient {
     return dio
         .get(
           '/posts.json',
-          queryParameters: {'page': page, 'limit': limit, ...?query},
+          queryParameters: _withV2({'page': page, 'limit': limit, ...?query}),
           options: forceOptions(force),
           cancelToken: cancelToken,
         )
-        .then(unwrapRailsArray)
         .then(
           (response) => (response.data as List<dynamic>)
               .map<Post>(E621Post.fromJson)
