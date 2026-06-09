@@ -28,10 +28,10 @@ class PostClient {
       dio
           .get(
             '/posts/$id.json',
+            queryParameters: _withV2(null),
             options: forceOptions(force),
             cancelToken: cancelToken,
           )
-          .then(unwrapRailsArray)
           .then((response) => E621Post.fromJson(response.data));
 
   Future<List<Post>> page({
