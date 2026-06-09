@@ -1,6 +1,6 @@
 name: klit
 description: A proper e926 client.
-version: 10.0.0
+version: 10.1.0
 publish_to: none
 
 environment:

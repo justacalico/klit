@@ -4,7 +4,7 @@ import 'package:klit/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-enum PopularScale { day, week, month }
+enum PopularScale { day, week, month, hot }
 
 class FavoritePostController extends PostController {
   FavoritePostController({required super.client});
@@ -105,12 +105,14 @@ class HotPostController extends PostController {
     PopularScale.day => _referenceDate.subtract(const Duration(days: 1)),
     PopularScale.week => _referenceDate.subtract(const Duration(days: 7)),
     PopularScale.month => DateTime(_referenceDate.year, _referenceDate.month - 1, 1),
+    PopularScale.hot => _referenceDate,
   };
 
   DateTime _nextReferenceDate() => switch (_scale) {
     PopularScale.day => _referenceDate.add(const Duration(days: 1)),
     PopularScale.week => _referenceDate.add(const Duration(days: 7)),
     PopularScale.month => DateTime(_referenceDate.year, _referenceDate.month + 1, 1),
+    PopularScale.hot => _referenceDate,
   };
 
   void _applyDateQuery() {
@@ -121,6 +123,10 @@ class HotPostController extends PostController {
     required PopularScale scale,
     required DateTime referenceDate,
   }) {
+    if (scale == PopularScale.hot) {
+      return 'order:hot';
+    }
+
     final d = DateUtils.dateOnly(referenceDate);
     final today = DateUtils.dateOnly(DateTime.now());
     if (scale == PopularScale.day) {
