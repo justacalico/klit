@@ -20,6 +20,10 @@ class PostClient {
   final Identity identity;
   final PoolClient poolsService;
 
+  Map<String, dynamic> _withV2(Map<String, dynamic>? params) {
+    return {'v2': true, ...?params};
+  }
+
   Future<Post> get({required int id, bool? force, CancelToken? cancelToken}) =>
       dio
           .get(
