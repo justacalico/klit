@@ -46,32 +46,34 @@ class PopularDateInlineBar extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   _ScaleControl(controller: controller),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      IconButton(
-                        tooltip: 'Previous',
-                        onPressed: controller.prev,
-                        icon: const Icon(Icons.chevron_left),
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: Text(label, style: theme.textTheme.bodyLarge),
+                  if (controller.scale != PopularScale.hot) ...[
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        IconButton(
+                          tooltip: 'Previous',
+                          onPressed: controller.prev,
+                          icon: const Icon(Icons.chevron_left),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Next',
-                        onPressed: controller.canNext ? controller.next : null,
-                        icon: const Icon(Icons.chevron_right),
-                      ),
-                      const SizedBox(width: 6),
-                      TextButton.icon(
-                        onPressed: () => _pickDate(context),
-                        icon: const Icon(Icons.date_range),
-                        label: const Text('Pick date'),
-                      ),
-                    ],
-                  ),
+                        Expanded(
+                          child: Center(
+                            child: Text(label, style: theme.textTheme.bodyLarge),
+                          ),
+                        ),
+                        IconButton(
+                          tooltip: 'Next',
+                          onPressed: controller.canNext ? controller.next : null,
+                          icon: const Icon(Icons.chevron_right),
+                        ),
+                        const SizedBox(width: 6),
+                        TextButton.icon(
+                          onPressed: () => _pickDate(context),
+                          icon: const Icon(Icons.date_range),
+                          label: const Text('Pick date'),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -124,12 +126,20 @@ class _ScaleControl extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           child: Text('Month'),
         ),
+        PopularScale.hot: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Text('Hot'),
+        ),
       },
     );
   }
 }
 
 String popularDateLabel(HotPostController controller) {
+  if (controller.scale == PopularScale.hot) {
+    return 'Hot';
+  }
+
   final d = DateUtils.dateOnly(controller.referenceDate);
   final today = DateUtils.dateOnly(DateTime.now());
 
