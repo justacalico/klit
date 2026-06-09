@@ -56,6 +56,7 @@ abstract final class E621Post {
       commentCount: post('stats').letOrNull((stats) => stats('comment_count').asIntOrNull()) ?? 0,
       description: post('description').asStringOrThrow(),
       sources: post('sources').asListOrThrow((pick) => pick.asStringOrThrow()),
+      lockedTags: post('locked_tags').asListOrNull((pick) => pick.asStringOrThrow()),
       pools: post('pools').asListOrThrow((pick) => pick.asIntOrThrow()),
       relationships: post('relationships').letOrThrow(
         (relationships) => Relationships(
