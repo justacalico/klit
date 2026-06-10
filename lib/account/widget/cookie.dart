@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:klit/app/app.dart';
-import 'package:klit/client/client.dart';
-import 'package:klit/identity/identity.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/identity/identity.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_cookie_manager_plus/webview_cookie_manager_plus.dart';
 import 'package:webview_flutter/webview_flutter.dart';

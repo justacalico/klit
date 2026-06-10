@@ -1,5 +1,5 @@
-import 'package:klit/post/post.dart';
-import 'package:klit/tag/tag.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/tag/tag.dart';
 
 Map<String, int> countTags(List<String> tags, [Map<String, int>? counts]) {
   counts ??= {};

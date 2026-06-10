@@ -1,11 +1,11 @@
-import 'package:klit/history/history.dart';
-import 'package:klit/pool/pool.dart';
-import 'package:klit/post/post.dart';
-import 'package:klit/reply/reply.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/topic/topic.dart';
-import 'package:klit/user/user.dart';
-import 'package:klit/wiki/wiki.dart';
+import 'package:kilt/history/history.dart';
+import 'package:kilt/pool/pool.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/reply/reply.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/topic/topic.dart';
+import 'package:kilt/user/user.dart';
+import 'package:kilt/wiki/wiki.dart';
 
 List<String> getPostHistoryThumbnails(List<Post>? posts) =>
     posts?.map((e) => e.sample ?? e.preview).nonNulls.take(4).toList() ?? [];

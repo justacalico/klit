@@ -2,12 +2,12 @@
 // ignore_for_file: type=lint
 import 'package:drift/drift.dart' as i0;
 import 'package:drift/src/runtime/api/runtime_api.dart' as i1;
-import 'package:klit/identity/data/database.drift.dart' as i2;
+import 'package:kilt/identity/data/database.drift.dart' as i2;
 import 'package:drift/internal/modular.dart' as i3;
-import 'package:klit/traits/data/database.drift.dart' as i4;
-import 'package:klit/traits/data/traits.dart' as i5;
-import 'package:klit/traits/data/database.dart' as i6;
-import 'package:klit/shared/data/sql.dart' as i7;
+import 'package:kilt/traits/data/database.drift.dart' as i4;
+import 'package:kilt/traits/data/traits.dart' as i5;
+import 'package:kilt/traits/data/database.dart' as i6;
+import 'package:kilt/shared/data/sql.dart' as i7;
 
 typedef $$TraitsTableTableCreateCompanionBuilder =
     i4.TraitsCompanion Function({

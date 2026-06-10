@@ -1,4 +1,4 @@
-import 'package:klit/logs/logs.dart';
+import 'package:kilt/logs/logs.dart';
 import 'package:flutter/widgets.dart';
 
 class RouteLoggerObserver extends NavigatorObserver {

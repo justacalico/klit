@@ -1,1 +1,1 @@
-export 'package:klit/finish/widget/finishes_page.dart' show FinishesPage;
+export 'package:kilt/finish/widget/finishes_page.dart' show FinishesPage;

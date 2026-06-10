@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:collection/collection.dart';
-import 'package:klit/tag/tag.dart';
+import 'package:kilt/tag/tag.dart';
 import 'package:petitparser/petitparser.dart';
 
 class TagMap extends MapBase<String, String> {

@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:klit/client/client.dart';
-import 'package:klit/identity/identity.dart';
-import 'package:klit/logs/logs.dart';
-import 'package:klit/settings/settings.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/identity/identity.dart';
+import 'package:kilt/logs/logs.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/shared/shared.dart';
 
 /// Create a default [Dio] instance for the given [Identity].
 /// Includes user agent, logging and caching.

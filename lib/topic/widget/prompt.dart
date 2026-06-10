@@ -1,7 +1,7 @@
-import 'package:klit/client/client.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/tag/tag.dart';
-import 'package:klit/topic/topic.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/tag/tag.dart';
+import 'package:kilt/topic/topic.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sliding_sheet/sliding_sheet.dart';

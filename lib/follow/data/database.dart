@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:drift/drift.dart';
-import 'package:klit/follow/follow.dart';
-import 'package:klit/identity/data/database.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/follow/follow.dart';
+import 'package:kilt/identity/data/database.dart';
+import 'package:kilt/shared/shared.dart';
 
 @UseRowClass(Follow, generateInsertable: true)
 class FollowsTable extends Table {

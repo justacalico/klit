@@ -1,4 +1,4 @@
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'comment.freezed.dart';

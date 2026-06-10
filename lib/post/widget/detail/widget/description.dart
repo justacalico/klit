@@ -1,6 +1,6 @@
-import 'package:klit/markup/markup.dart';
-import 'package:klit/post/post.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/markup/markup.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 
 class DescriptionDisplay extends StatelessWidget {

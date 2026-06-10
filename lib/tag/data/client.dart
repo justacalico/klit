@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/tag/tag.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/tag/tag.dart';
 
 class TagClient {
   TagClient({required this.dio});

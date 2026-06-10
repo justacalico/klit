@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:async/async.dart';
 import 'package:drift/drift.dart';
-import 'package:klit/identity/identity.dart';
+import 'package:kilt/identity/identity.dart';
 import 'package:flutter/foundation.dart';
 
 class IdentityClient extends IdentityRepository with ChangeNotifier {

@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
-import 'package:klit/follow/follow.dart';
-import 'package:klit/identity/identity.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/follow/follow.dart';
+import 'package:kilt/identity/identity.dart';
+import 'package:kilt/shared/shared.dart';
 
 class FollowClient {
   FollowClient({required GeneratedDatabase database, required this.identity})

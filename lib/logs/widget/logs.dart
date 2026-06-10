@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:klit/app/app.dart';
-import 'package:klit/logs/logs.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/logs/logs.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
 

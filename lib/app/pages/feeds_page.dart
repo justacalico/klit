@@ -1,1 +1,1 @@
-export 'package:klit/feed/widget/feeds_page.dart' show FeedsPage;
+export 'package:kilt/feed/widget/feeds_page.dart' show FeedsPage;

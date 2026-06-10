@@ -1,5 +1,5 @@
 import 'package:deep_pick/deep_pick.dart';
-import 'package:klit/user/user.dart';
+import 'package:kilt/user/user.dart';
 
 abstract final class E621User {
   static User fromJson(dynamic json) => pick(json).letOrThrow(

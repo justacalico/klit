@@ -1,6 +1,6 @@
 import 'package:deep_pick/deep_pick.dart';
-import 'package:klit/comment/comment.dart';
-import 'package:klit/reply/reply.dart';
+import 'package:kilt/comment/comment.dart';
+import 'package:kilt/reply/reply.dart';
 
 abstract final class E621Reply {
   static Reply fromJson(dynamic json) => pick(json).letOrThrow(

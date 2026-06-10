@@ -1,4 +1,4 @@
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 

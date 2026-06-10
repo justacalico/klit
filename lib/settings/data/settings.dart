@@ -1,6 +1,6 @@
-import 'package:klit/app/app.dart';
-import 'package:klit/settings/data/post_actions.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/settings/data/post_actions.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:notified_preferences/notified_preferences.dart';
 

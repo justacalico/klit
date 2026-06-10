@@ -1,6 +1,6 @@
-import 'package:klit/client/client.dart';
-import 'package:klit/settings/settings.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 
 class NoUserLoginException implements Exception {

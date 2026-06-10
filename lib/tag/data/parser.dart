@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:klit/tag/tag.dart';
+import 'package:kilt/tag/tag.dart';
 import 'package:petitparser/petitparser.dart';
 
 class TagMapParserDefinition extends GrammarDefinition<List<TagNode>> {

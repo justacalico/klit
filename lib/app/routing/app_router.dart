@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:klit/app/pages/blacklist_page.dart';
-import 'package:klit/app/pages/feeds_page.dart';
-import 'package:klit/app/pages/finishes_page.dart';
-import 'package:klit/app/pages/history_page.dart';
-import 'package:klit/app/pages/home_page.dart';
-import 'package:klit/app/pages/hot_page.dart';
-import 'package:klit/app/pages/pools_page.dart';
-import 'package:klit/app/pages/profile_page.dart';
-import 'package:klit/app/pages/search_page.dart';
-import 'package:klit/app/pages/settings_page.dart';
-import 'package:klit/app/pages/post/post_loading_page.dart';
-import 'package:klit/app/pages/topics_page.dart';
-import 'package:klit/app/routing/app_routes.dart';
-import 'package:klit/app/widget/main_shell.dart';
+import 'package:kilt/app/pages/blacklist_page.dart';
+import 'package:kilt/app/pages/feeds_page.dart';
+import 'package:kilt/app/pages/finishes_page.dart';
+import 'package:kilt/app/pages/history_page.dart';
+import 'package:kilt/app/pages/home_page.dart';
+import 'package:kilt/app/pages/hot_page.dart';
+import 'package:kilt/app/pages/pools_page.dart';
+import 'package:kilt/app/pages/profile_page.dart';
+import 'package:kilt/app/pages/search_page.dart';
+import 'package:kilt/app/pages/settings_page.dart';
+import 'package:kilt/app/pages/post/post_loading_page.dart';
+import 'package:kilt/app/pages/topics_page.dart';
+import 'package:kilt/app/routing/app_routes.dart';
+import 'package:kilt/app/widget/main_shell.dart';
 
 GoRouter createAppRouter(GlobalKey<NavigatorState> navigatorKey) {
   return GoRouter(

@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:klit/app/app.dart';
-import 'package:klit/client/client.dart';
-import 'package:klit/follow/follow.dart';
-import 'package:klit/logs/logs.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/follow/follow.dart';
+import 'package:kilt/logs/logs.dart';
 import 'package:workmanager/workmanager.dart';
 
 export 'package:flutter_local_notifications/flutter_local_notifications.dart';

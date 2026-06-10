@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:klit/identity/identity.dart';
+import 'package:kilt/identity/identity.dart';
 
 String encodeBasicAuth(String username, String password) =>
     'Basic ${base64Encode(utf8.encode('$username:$password'))}';

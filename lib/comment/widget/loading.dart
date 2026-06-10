@@ -1,6 +1,6 @@
-import 'package:klit/client/client.dart';
-import 'package:klit/comment/comment.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/comment/comment.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/widgets.dart';
 
 class CommentLoadingPage extends StatefulWidget {

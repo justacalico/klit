@@ -1,6 +1,6 @@
 import 'package:deep_pick/deep_pick.dart';
-import 'package:klit/post/post.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/shared/shared.dart';
 
 abstract final class E621Post {
   static Post fromJson(dynamic json) => pick(json).letOrThrow(

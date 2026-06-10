@@ -1,6 +1,6 @@
-import 'package:klit/app/app.dart';
-import 'package:klit/post/post.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 
 class PostDetailImage extends StatelessWidget {

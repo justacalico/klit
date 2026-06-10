@@ -1,7 +1,7 @@
-import 'package:klit/client/client.dart';
-import 'package:klit/comment/comment.dart';
-import 'package:klit/markup/markup.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/comment/comment.dart';
+import 'package:kilt/markup/markup.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 
 Future<bool> replyComment({

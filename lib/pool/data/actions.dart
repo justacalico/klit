@@ -1,4 +1,4 @@
-import 'package:klit/pool/pool.dart';
+import 'package:kilt/pool/pool.dart';
 
 extension Linking on Pool {
   String get link => getPoolLink(id);

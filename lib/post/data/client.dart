@@ -2,12 +2,12 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
-import 'package:klit/client/client.dart';
-import 'package:klit/identity/identity.dart';
-import 'package:klit/pool/pool.dart';
-import 'package:klit/post/post.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/tag/tag.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/identity/identity.dart';
+import 'package:kilt/pool/pool.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/tag/tag.dart';
 
 class PostClient {
   PostClient({

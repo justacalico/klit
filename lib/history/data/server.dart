@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:drift/drift.dart';
-import 'package:klit/history/history.dart';
-import 'package:klit/identity/identity.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/traits/traits.dart';
+import 'package:kilt/history/history.dart';
+import 'package:kilt/identity/identity.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/traits/traits.dart';
 import 'package:flutter/foundation.dart';
 
 class HistoryServer with Disposable {

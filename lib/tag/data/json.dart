@@ -1,5 +1,5 @@
 import 'package:deep_pick/deep_pick.dart';
-import 'package:klit/tag/tag.dart';
+import 'package:kilt/tag/tag.dart';
 
 abstract final class E621Tag {
   static Tag fromJson(dynamic json) => pick(json).letOrThrow(

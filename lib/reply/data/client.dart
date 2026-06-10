@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:klit/reply/reply.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/reply/reply.dart';
+import 'package:kilt/shared/shared.dart';
 
 class ReplyClient {
   ReplyClient({required this.dio});

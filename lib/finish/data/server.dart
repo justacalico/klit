@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
-import 'package:klit/finish/finish.dart';
-import 'package:klit/identity/identity.dart';
+import 'package:kilt/finish/finish.dart';
+import 'package:kilt/identity/identity.dart';
 
 class FinishServer {
   FinishServer({

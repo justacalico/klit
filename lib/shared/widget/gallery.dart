@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 
 class GalleryButtons extends StatelessWidget {

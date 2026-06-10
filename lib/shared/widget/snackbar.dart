@@ -1,4 +1,4 @@
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 
 enum LoadingNotificationStatus { loading, cancelled, failed, done }

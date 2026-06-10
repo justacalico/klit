@@ -1,7 +1,7 @@
-import 'package:klit/app/app.dart';
-import 'package:klit/client/client.dart';
-import 'package:klit/identity/identity.dart';
-import 'package:klit/traits/traits.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/identity/identity.dart';
+import 'package:kilt/traits/traits.dart';
 import 'package:flutter/foundation.dart';
 
 class ClientConfig {

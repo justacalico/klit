@@ -1,7 +1,7 @@
-import 'package:klit/history/history.dart';
-import 'package:klit/pool/pool.dart';
-import 'package:klit/post/post.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/history/history.dart';
+import 'package:kilt/pool/pool.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 
 class PoolPage extends StatefulWidget {

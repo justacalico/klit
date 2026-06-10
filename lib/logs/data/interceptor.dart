@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:klit/logs/logs.dart';
+import 'package:kilt/logs/logs.dart';
 
 class LoggingDioInterceptor extends Interceptor {
   LoggingDioInterceptor({

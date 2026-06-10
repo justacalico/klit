@@ -2,11 +2,11 @@
 // ignore_for_file: type=lint
 import 'package:drift/drift.dart' as i0;
 import 'package:drift/src/runtime/api/runtime_api.dart' as i1;
-import 'package:klit/identity/data/database.drift.dart' as i2;
+import 'package:kilt/identity/data/database.drift.dart' as i2;
 import 'package:drift/internal/modular.dart' as i3;
-import 'package:klit/identity/data/identity.dart' as i4;
-import 'package:klit/identity/data/database.dart' as i5;
-import 'package:klit/shared/data/sql.dart' as i6;
+import 'package:kilt/identity/data/identity.dart' as i4;
+import 'package:kilt/identity/data/database.dart' as i5;
+import 'package:kilt/shared/data/sql.dart' as i6;
 
 typedef $$IdentitiesTableTableCreateCompanionBuilder =
     i2.IdentityCompanion Function({

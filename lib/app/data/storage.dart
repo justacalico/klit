@@ -1,10 +1,10 @@
 import 'package:drift/drift.dart';
-import 'package:klit/finish/data/database.dart';
-import 'package:klit/follow/data/database.dart';
-import 'package:klit/history/history.dart';
-import 'package:klit/identity/data/database.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/traits/traits.dart';
+import 'package:kilt/finish/data/database.dart';
+import 'package:kilt/follow/data/database.dart';
+import 'package:kilt/history/history.dart';
+import 'package:kilt/identity/data/database.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/traits/traits.dart';
 import 'package:notified_preferences/notified_preferences.dart';
 
 // ignore: always_use_package_imports

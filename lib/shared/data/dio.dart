@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/shared/shared.dart';
 
 export 'package:dio/dio.dart' show CancelToken;
 export 'package:dio_cache_interceptor/dio_cache_interceptor.dart';

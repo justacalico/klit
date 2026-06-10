@@ -1,16 +1,16 @@
 import 'package:go_router/go_router.dart';
-import 'package:klit/account/account.dart';
-import 'package:klit/app/app.dart';
-import 'package:klit/app/widget/initialize.dart';
-import 'package:klit/feed/feed.dart';
-import 'package:klit/follow/follow.dart';
-import 'package:klit/settings/settings.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/account/account.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/app/widget/initialize.dart';
+import 'package:kilt/feed/feed.dart';
+import 'package:kilt/follow/follow.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:klit/l10n/gen/app_localizations.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:relative_time/relative_time.dart';
 
 class App extends StatelessWidget {

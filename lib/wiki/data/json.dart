@@ -1,5 +1,5 @@
 import 'package:deep_pick/deep_pick.dart';
-import 'package:klit/wiki/wiki.dart';
+import 'package:kilt/wiki/wiki.dart';
 
 abstract final class E621Wiki {
   static Wiki fromJson(dynamic json) => pick(json).letOrThrow(

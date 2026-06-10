@@ -1,4 +1,4 @@
-import 'package:klit/shared/widget/appbar.dart' as shared_appbar;
+import 'package:kilt/shared/widget/appbar.dart' as shared_appbar;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

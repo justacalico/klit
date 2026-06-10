@@ -1,1 +1,1 @@
-export 'package:klit/history/widget/history.dart' show HistoriesPage;
+export 'package:kilt/history/widget/history.dart' show HistoriesPage;

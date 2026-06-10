@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:app_links/app_links.dart';
-import 'package:klit/app/app.dart';
+import 'package:kilt/app/app.dart';
 import 'package:flutter/material.dart';
 
 typedef LinkCallback = FutureOr<void> Function(Uri? url);

@@ -2,12 +2,12 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:klit/app/routing/app_routes.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/client/client.dart';
-import 'package:klit/finish/finish.dart';
-import 'package:klit/post/post.dart';
-import 'package:klit/settings/settings.dart';
+import 'package:kilt/app/routing/app_routes.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/finish/finish.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/settings/settings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';

@@ -1,4 +1,4 @@
-import 'package:klit/post/post.dart';
+import 'package:kilt/post/post.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'editing.freezed.dart';

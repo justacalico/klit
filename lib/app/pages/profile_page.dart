@@ -1,1 +1,1 @@
-export 'package:klit/user/widget/profile.dart' show ProfilePage;
+export 'package:kilt/user/widget/profile.dart' show ProfilePage;

@@ -1,4 +1,4 @@
-import 'package:klit/markup/markup.dart';
+import 'package:kilt/markup/markup.dart';
 import 'package:petitparser/petitparser.dart';
 
 class DTextGrammar extends GrammarDefinition<DTextElement> {

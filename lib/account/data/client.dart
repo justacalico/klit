@@ -1,10 +1,10 @@
 import 'package:deep_pick/deep_pick.dart';
 import 'package:dio/dio.dart';
-import 'package:klit/account/account.dart';
-import 'package:klit/identity/identity.dart';
-import 'package:klit/post/post.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/traits/traits.dart';
+import 'package:kilt/account/account.dart';
+import 'package:kilt/identity/identity.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/traits/traits.dart';
 import 'package:flutter/foundation.dart';
 
 class AccountClient {

@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:drift/drift.dart';
-import 'package:klit/follow/follow.dart';
-import 'package:klit/identity/identity.dart';
-import 'package:klit/pool/pool.dart';
-import 'package:klit/post/post.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/tag/tag.dart';
-import 'package:klit/traits/traits.dart';
+import 'package:kilt/follow/follow.dart';
+import 'package:kilt/identity/identity.dart';
+import 'package:kilt/pool/pool.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/tag/tag.dart';
+import 'package:kilt/traits/traits.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 

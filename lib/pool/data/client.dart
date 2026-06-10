@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:klit/pool/pool.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/pool/pool.dart';
+import 'package:kilt/shared/shared.dart';
 
 class PoolClient {
   PoolClient({required this.dio});

@@ -1,8 +1,8 @@
 // dart format width=80
 // ignore_for_file: type=lint
 import 'package:drift/drift.dart' as i0;
-import 'package:klit/finish/data/finish.dart' as i5;
-import 'package:klit/finish/data/database.dart' as i6;
+import 'package:kilt/finish/data/finish.dart' as i5;
+import 'package:kilt/finish/data/database.dart' as i6;
 
 class $FinishesTableTable extends i6.FinishesTable
     with i0.TableInfo<$FinishesTableTable, i5.Finish> {

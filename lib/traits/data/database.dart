@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
-import 'package:klit/identity/identity.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/traits/traits.dart';
+import 'package:kilt/identity/identity.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/traits/traits.dart';
 
 @UseRowClass(Traits, generateInsertable: true)
 class TraitsTable extends Table {

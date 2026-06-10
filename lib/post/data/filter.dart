@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
-import 'package:klit/client/client.dart';
-import 'package:klit/post/post.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/foundation.dart';
 
 mixin PostFilterableController<KeyType> on DataController<KeyType, Post> {

@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:klit/app/app.dart';
-import 'package:klit/settings/settings.dart';
-import 'package:klit/settings/widget/settings_shared.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/settings/widget/settings_shared.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:klit/l10n/gen/app_localizations.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 
 class DevOptionEnabler extends StatefulWidget {
   const DevOptionEnabler({super.key, required this.child});

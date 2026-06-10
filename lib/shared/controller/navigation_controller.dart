@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:klit/app/data/nav_items.dart';
-import 'package:klit/app/routing/app_routes.dart';
+import 'package:kilt/app/data/nav_items.dart';
+import 'package:kilt/app/routing/app_routes.dart';
 
-export 'package:klit/app/data/nav_items.dart' show NavItem;
+export 'package:kilt/app/data/nav_items.dart' show NavItem;
 
 class NavigationState {
   const NavigationState({

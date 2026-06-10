@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:deep_pick/deep_pick.dart';
 import 'package:dio/dio.dart';
-import 'package:klit/logs/logs.dart';
-import 'package:klit/settings/settings.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/logs/logs.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:pub_semver/pub_semver.dart';
 
 const String _openlystBase = 'https://openlyst.ink/api/v1';

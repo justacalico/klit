@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:async/async.dart';
 import 'package:drift/drift.dart';
-import 'package:klit/traits/traits.dart';
+import 'package:kilt/traits/traits.dart';
 import 'package:flutter/foundation.dart';
 
 class TraitsClient extends TraitsRepository with ChangeNotifier {

@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
-import 'package:klit/markup/markup.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/markup/markup.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
