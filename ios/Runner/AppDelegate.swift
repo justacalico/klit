@@ -17,7 +17,7 @@ import workmanager_apple
         GeneratedPluginRegistrant.register(with: registry)
     }
 
-    WorkmanagerPlugin.registerPeriodicTask(withIdentifier: "gitlab.openlyst.klit.follows", frequency: nil)
+    WorkmanagerPlugin.registerPeriodicTask(withIdentifier: "gitlab.openlyst.kilt.follows", frequency: nil)
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }

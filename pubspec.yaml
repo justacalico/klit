@@ -1,6 +1,6 @@
-name: klit
+name: kilt
 description: A proper e926 client.
-version: 10.1.0
+version: 10.1.2
 publish_to: none
 
 environment:
@@ -155,5 +155,5 @@ flutter_native_splash:
 
 cider:
   link_template:
-    tag: https://openlyst.ink/apps/klit
+    tag: https://openlyst.ink/apps/kilt
     diff: https://openlyst.ink

@@ -1,4 +1,4 @@
-package net.klit
+package net.kilt
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 
