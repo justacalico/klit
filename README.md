@@ -1,4 +1,4 @@
-# Klit
+# Kilt
 
 An **E926**/**[Self21](https://gitlab.com/HttpAnimations/Self21)**-compatible client,
 
