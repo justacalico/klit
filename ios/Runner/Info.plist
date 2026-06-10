@@ -59,7 +59,7 @@
 		</array>
 		<key>BGTaskSchedulerPermittedIdentifiers</key>
 		<array>
-			<string>gitlab.openlyst.klit.follows</string>
+			<string>gitlab.openlyst.kilt.follows</string>
 		</array>
 	</dict>
 </plist>

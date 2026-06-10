@@ -36,7 +36,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "gitlab.openlyst.klit"
+        applicationId = "gitlab.openlyst.kilt"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
