@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:klit/comment/comment.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/comment/comment.dart';
+import 'package:kilt/shared/shared.dart';
 
 class CommentClient {
   CommentClient({required this.dio});

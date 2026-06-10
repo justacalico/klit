@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:drift/drift.dart';
-import 'package:klit/history/history.dart';
-import 'package:klit/identity/data/database.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/history/history.dart';
+import 'package:kilt/identity/data/database.dart';
+import 'package:kilt/shared/shared.dart';
 
 @UseRowClass(History, generateInsertable: true)
 class HistoriesTable extends Table {

@@ -1,5 +1,5 @@
-import 'package:klit/client/client.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
 

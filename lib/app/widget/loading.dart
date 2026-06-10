@@ -1,4 +1,4 @@
-import 'package:klit/settings/settings.dart';
+import 'package:kilt/settings/settings.dart';
 import 'package:flutter/material.dart';
 
 @immutable

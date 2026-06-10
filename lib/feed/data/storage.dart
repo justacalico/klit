@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:klit/feed/data/feed.dart';
+import 'package:kilt/feed/data/feed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _feedsKey = 'feeds';

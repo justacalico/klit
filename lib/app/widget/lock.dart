@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:animations/animations.dart';
-import 'package:klit/app/data/capabilities.dart';
-import 'package:klit/settings/settings.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/app/data/capabilities.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screen_lock/flutter_screen_lock.dart';

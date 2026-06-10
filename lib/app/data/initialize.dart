@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:drift_flutter/drift_flutter.dart';
-import 'package:klit/app/app.dart';
-import 'package:klit/logs/logs.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/logs/logs.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:http_cache_drift_store/http_cache_drift_store.dart';
@@ -10,8 +10,8 @@ import 'package:notified_preferences/notified_preferences.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
-export 'package:klit/logs/logs.dart' show Logs;
-export 'package:klit/settings/settings.dart' show AppInfo;
+export 'package:kilt/logs/logs.dart' show Logs;
+export 'package:kilt/settings/settings.dart' show AppInfo;
 export 'package:window_manager/window_manager.dart' show WindowManager;
 
 /// Initializes an AppInfo with default production values.

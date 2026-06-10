@@ -1,5 +1,5 @@
 import 'package:deep_pick/deep_pick.dart';
-import 'package:klit/flag/flag.dart';
+import 'package:kilt/flag/flag.dart';
 
 abstract final class E621PostFlag {
   static PostFlag fromJson(dynamic json) => pick(json).letOrThrow(

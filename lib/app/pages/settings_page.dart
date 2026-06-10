@@ -1,1 +1,1 @@
-export 'package:klit/settings/widget/settings.dart' show SettingsPage;
+export 'package:kilt/settings/widget/settings.dart' show SettingsPage;

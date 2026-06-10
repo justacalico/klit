@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:klit/settings/settings.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 
 typedef TextEditorSubmit = FutureOr<String?> Function(String value);

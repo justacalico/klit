@@ -1,6 +1,6 @@
-import 'package:klit/reply/reply.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/topic/topic.dart';
+import 'package:kilt/reply/reply.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/topic/topic.dart';
 import 'package:flutter/material.dart';
 
 class TopicList extends StatelessWidget {

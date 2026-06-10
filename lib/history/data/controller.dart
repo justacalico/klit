@@ -1,6 +1,6 @@
-import 'package:klit/client/client.dart';
-import 'package:klit/history/history.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/history/history.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/foundation.dart';
 
 class HistoryController extends PageClientDataController<History> {

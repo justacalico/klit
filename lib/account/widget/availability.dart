@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:klit/account/account.dart';
-import 'package:klit/client/client.dart';
-import 'package:klit/logs/logs.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/account/account.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/logs/logs.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 
 class AvailabilityCheck extends StatefulWidget {

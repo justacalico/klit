@@ -1,5 +1,5 @@
 import 'package:deep_pick/deep_pick.dart';
-import 'package:klit/pool/pool.dart';
+import 'package:kilt/pool/pool.dart';
 
 abstract final class E621Pool {
   static Pool fromJson(dynamic json) => pick(json).letOrThrow(

@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
-import 'package:klit/finish/data/database.drift.dart';
-import 'package:klit/finish/data/finish.dart';
-import 'package:klit/identity/data/database.dart';
+import 'package:kilt/finish/data/database.drift.dart';
+import 'package:kilt/finish/data/finish.dart';
+import 'package:kilt/identity/data/database.dart';
 
 @UseRowClass(Finish, generateInsertable: true)
 class FinishesTable extends Table {

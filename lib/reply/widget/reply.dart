@@ -1,8 +1,8 @@
-import 'package:klit/app/routing/app_routes.dart';
-import 'package:klit/comment/comment.dart';
-import 'package:klit/markup/markup.dart';
-import 'package:klit/reply/reply.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/app/routing/app_routes.dart';
+import 'package:kilt/comment/comment.dart';
+import 'package:kilt/markup/markup.dart';
+import 'package:kilt/reply/reply.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

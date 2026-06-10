@@ -1,6 +1,6 @@
-import 'package:klit/client/client.dart';
-import 'package:klit/follow/follow.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/follow/follow.dart';
+import 'package:kilt/shared/shared.dart';
 
 class FollowController extends PageClientDataController<Follow> {
   FollowController({

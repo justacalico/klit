@@ -1,1 +1,1 @@
-export 'package:klit/post/widget/detail/loading.dart' show PostLoadingPage;
+export 'package:kilt/post/widget/detail/loading.dart' show PostLoadingPage;

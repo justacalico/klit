@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:klit/ticket/ticket.dart';
+import 'package:kilt/ticket/ticket.dart';
 
 class TicketClient {
   TicketClient({required this.dio});

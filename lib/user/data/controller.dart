@@ -1,4 +1,4 @@
-import 'package:klit/post/post.dart';
+import 'package:kilt/post/post.dart';
 
 class UserFavoritesController extends PostController {
   UserFavoritesController({required this.user, required super.client});

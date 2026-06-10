@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:drift_flutter/drift_flutter.dart';
-import 'package:klit/app/app.dart';
-import 'package:klit/app/widget/initialize.dart';
-import 'package:klit/logs/logs.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/app/widget/initialize.dart';
+import 'package:kilt/logs/logs.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';

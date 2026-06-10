@@ -1,10 +1,10 @@
 import 'package:collection/collection.dart';
-import 'package:klit/app/app.dart';
-import 'package:klit/client/client.dart';
-import 'package:klit/identity/identity.dart';
-import 'package:klit/logs/logs.dart';
-import 'package:klit/markup/markup.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/identity/identity.dart';
+import 'package:kilt/logs/logs.dart';
+import 'package:kilt/markup/markup.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

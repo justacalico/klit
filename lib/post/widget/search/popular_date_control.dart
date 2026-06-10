@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:klit/post/post.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/shared/shared.dart';
 
 class PopularDateInlineBar extends StatelessWidget {
   const PopularDateInlineBar({super.key, required this.controller});

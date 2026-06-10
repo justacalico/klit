@@ -1,5 +1,5 @@
 import 'package:deep_pick/deep_pick.dart';
-import 'package:klit/topic/topic.dart';
+import 'package:kilt/topic/topic.dart';
 
 abstract final class E621Topic {
   static Topic fromJson(dynamic json) => pick(json).letOrThrow(

@@ -1,4 +1,4 @@
-import 'package:klit/post/post.dart';
+import 'package:kilt/post/post.dart';
 import 'package:flutter/material.dart';
 
 class PostDetailFloatingActionButton extends StatelessWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:klit/shared/data/text.dart';
+import 'package:kilt/shared/data/text.dart';
 import 'package:like_button/like_button.dart';
 
 part 'votes.freezed.dart';

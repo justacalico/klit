@@ -1,7 +1,7 @@
-import 'package:klit/follow/follow.dart';
-import 'package:klit/pool/pool.dart';
-import 'package:klit/post/post.dart';
-import 'package:klit/tag/tag.dart';
+import 'package:kilt/follow/follow.dart';
+import 'package:kilt/pool/pool.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/tag/tag.dart';
 
 extension Updating on Follow {
   String get name => title ?? tagToName(tags);

@@ -1,4 +1,4 @@
-import 'package:klit/topic/topic.dart';
+import 'package:kilt/topic/topic.dart';
 import 'package:flutter/material.dart';
 
 class TopicTagEditingTile extends StatelessWidget {

@@ -1,4 +1,4 @@
-import 'package:klit/logs/logs.dart';
+import 'package:kilt/logs/logs.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';

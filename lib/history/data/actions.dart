@@ -1,8 +1,8 @@
-import 'package:klit/app/app.dart';
-import 'package:klit/client/client.dart';
-import 'package:klit/history/history.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/tag/tag.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/history/history.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/tag/tag.dart';
 import 'package:flutter/widgets.dart';
 
 extension Identification on History {

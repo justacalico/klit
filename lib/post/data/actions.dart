@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:klit/app/app.dart';
-import 'package:klit/client/client.dart';
-import 'package:klit/post/post.dart';
-import 'package:klit/settings/settings.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/tag/tag.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/tag/tag.dart';
 import 'package:flutter/material.dart';
 
 extension PostTagging on Post {

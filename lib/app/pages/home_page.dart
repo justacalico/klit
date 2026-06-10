@@ -1,1 +1,1 @@
-export 'package:klit/post/widget/search/home.dart' show HomePage;
+export 'package:kilt/post/widget/search/home.dart' show HomePage;

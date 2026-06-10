@@ -1,7 +1,7 @@
-import 'package:klit/client/client.dart';
-import 'package:klit/feed/data/feed.dart';
-import 'package:klit/feed/feeds_provider.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/feed/data/feed.dart';
+import 'package:kilt/feed/feeds_provider.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

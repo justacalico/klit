@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
-import 'package:klit/feed/data/feed.dart';
-import 'package:klit/feed/data/storage.dart';
+import 'package:kilt/feed/data/feed.dart';
+import 'package:kilt/feed/data/storage.dart';
 
 class FeedsProvider extends ChangeNotifier {
   List<Feed> _feeds = [];

@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:deep_pick/deep_pick.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/isolate.dart';
-import 'package:klit/client/client.dart';
-import 'package:klit/logs/logs.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/logs/logs.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 

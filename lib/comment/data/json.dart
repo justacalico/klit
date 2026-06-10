@@ -1,6 +1,6 @@
 import 'package:deep_pick/deep_pick.dart';
-import 'package:klit/comment/comment.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/comment/comment.dart';
+import 'package:kilt/shared/shared.dart';
 
 abstract final class E621Comment {
   static Comment fromJson(dynamic json) => pick(json).letOrThrow(

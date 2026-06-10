@@ -1,7 +1,7 @@
-import 'package:klit/feed/data/feed.dart';
-import 'package:klit/feed/feeds_provider.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/tag/tag.dart';
+import 'package:kilt/feed/data/feed.dart';
+import 'package:kilt/feed/feeds_provider.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/tag/tag.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';

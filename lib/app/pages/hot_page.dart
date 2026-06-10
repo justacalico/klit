@@ -1,1 +1,1 @@
-export 'package:klit/post/widget/search/hot.dart' show HotPage;
+export 'package:kilt/post/widget/search/hot.dart' show HotPage;

@@ -1,11 +1,11 @@
 // dart format width=80
 // ignore_for_file: type=lint
 import 'package:drift/drift.dart' as i0;
-import 'package:klit/identity/data/database.drift.dart' as i1;
-import 'package:klit/traits/data/database.drift.dart' as i2;
-import 'package:klit/history/data/database.drift.dart' as i3;
-import 'package:klit/follow/data/database.drift.dart' as i4;
-import 'package:klit/finish/data/database.drift.dart' as i5;
+import 'package:kilt/identity/data/database.drift.dart' as i1;
+import 'package:kilt/traits/data/database.drift.dart' as i2;
+import 'package:kilt/history/data/database.drift.dart' as i3;
+import 'package:kilt/follow/data/database.drift.dart' as i4;
+import 'package:kilt/finish/data/database.drift.dart' as i5;
 
 abstract class $AppDatabase extends i0.GeneratedDatabase {
   $AppDatabase(i0.QueryExecutor e) : super(e);

@@ -1,7 +1,7 @@
-import 'package:klit/logs/logs.dart';
-import 'package:klit/post/post.dart';
-import 'package:klit/settings/settings.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/logs/logs.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 

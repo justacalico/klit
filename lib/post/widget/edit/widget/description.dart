@@ -1,6 +1,6 @@
-import 'package:klit/markup/markup.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/ticket/ticket.dart';
+import 'package:kilt/markup/markup.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/ticket/ticket.dart';
 import 'package:flutter/material.dart';
 
 class DescriptionEditDisplay extends StatefulWidget {

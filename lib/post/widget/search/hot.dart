@@ -1,6 +1,6 @@
-import 'package:klit/post/post.dart';
-import 'package:klit/post/widget/search/popular_date_control.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/post/widget/search/popular_date_control.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 
 class HotPage extends StatelessWidget {

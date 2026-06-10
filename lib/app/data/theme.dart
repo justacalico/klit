@@ -1,1 +1,1 @@
-export 'package:klit/core/theme/app_theme.dart';
+export 'package:kilt/core/theme/app_theme.dart';

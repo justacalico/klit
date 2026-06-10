@@ -1,4 +1,4 @@
-import 'package:klit/ticket/ticket.dart';
+import 'package:kilt/ticket/ticket.dart';
 import 'package:flutter/material.dart';
 
 class EditReasonDisplay extends StatelessWidget {

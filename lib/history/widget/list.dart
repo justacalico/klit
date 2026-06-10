@@ -1,5 +1,5 @@
-import 'package:klit/history/history.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/history/history.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
 

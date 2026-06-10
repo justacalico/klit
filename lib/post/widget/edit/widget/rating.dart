@@ -1,5 +1,5 @@
-import 'package:klit/post/post.dart';
-import 'package:klit/ticket/ticket.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/ticket/ticket.dart';
 import 'package:flutter/material.dart';
 
 extension ExtraRatingData on Rating {

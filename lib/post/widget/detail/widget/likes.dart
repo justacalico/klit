@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:image_picker/image_picker.dart';
-import 'package:klit/app/app.dart';
-import 'package:klit/client/client.dart';
-import 'package:klit/post/post.dart';
-import 'package:klit/settings/settings.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

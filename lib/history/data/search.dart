@@ -1,4 +1,4 @@
-import 'package:klit/history/history.dart';
+import 'package:kilt/history/history.dart';
 import 'package:flutter/material.dart';
 
 extension HistorySearchFilterDisplaying on HistoryCategory {

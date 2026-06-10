@@ -1,5 +1,5 @@
-import 'package:klit/shared/shared.dart';
-import 'package:klit/traits/traits.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/traits/traits.dart';
 
 abstract class BridgeClient {
   Future<void> available();

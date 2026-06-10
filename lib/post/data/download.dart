@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:klit/post/post.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/tag/tag.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/tag/tag.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:path_provider/path_provider.dart';
 

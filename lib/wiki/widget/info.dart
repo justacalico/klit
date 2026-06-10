@@ -1,5 +1,5 @@
-import 'package:klit/shared/shared.dart';
-import 'package:klit/wiki/wiki.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/wiki/wiki.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

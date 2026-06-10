@@ -1,4 +1,4 @@
-import 'package:klit/traits/traits.dart';
+import 'package:kilt/traits/traits.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'status.freezed.dart';

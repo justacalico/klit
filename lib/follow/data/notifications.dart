@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:klit/app/app.dart';
-import 'package:klit/client/client.dart';
-import 'package:klit/follow/follow.dart';
-import 'package:klit/identity/identity.dart';
-import 'package:klit/logs/logs.dart';
-import 'package:klit/traits/traits.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/follow/follow.dart';
+import 'package:kilt/identity/identity.dart';
+import 'package:kilt/logs/logs.dart';
+import 'package:kilt/traits/traits.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 const String followsBackgroundTaskKey = 'gitlab.openlyst.klit.follows';

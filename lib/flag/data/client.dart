@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:klit/flag/flag.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/flag/flag.dart';
+import 'package:kilt/shared/shared.dart';
 
 class FlagClient {
   FlagClient({required this.dio});

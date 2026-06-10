@@ -1,5 +1,5 @@
-import 'package:klit/pool/pool.dart';
-import 'package:klit/post/post.dart';
+import 'package:kilt/pool/pool.dart';
+import 'package:kilt/post/post.dart';
 import 'package:flutter/material.dart';
 
 class PoolDisplay extends StatelessWidget {

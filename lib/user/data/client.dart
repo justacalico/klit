@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/user/user.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/user/user.dart';
 
 class UserClient {
   UserClient({required this.dio});

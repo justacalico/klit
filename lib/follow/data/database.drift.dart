@@ -2,11 +2,11 @@
 // ignore_for_file: type=lint
 import 'package:drift/drift.dart' as i0;
 import 'package:drift/src/runtime/api/runtime_api.dart' as i1;
-import 'package:klit/follow/data/database.drift.dart' as i2;
+import 'package:kilt/follow/data/database.drift.dart' as i2;
 import 'package:drift/internal/modular.dart' as i3;
-import 'package:klit/identity/data/database.drift.dart' as i4;
-import 'package:klit/follow/data/follow.dart' as i5;
-import 'package:klit/follow/data/database.dart' as i6;
+import 'package:kilt/identity/data/database.drift.dart' as i4;
+import 'package:kilt/follow/data/follow.dart' as i5;
+import 'package:kilt/follow/data/database.dart' as i6;
 
 typedef $$FollowsTableTableCreateCompanionBuilder =
     i2.FollowCompanion Function({

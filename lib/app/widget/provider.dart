@@ -7,12 +7,12 @@ library;
 
 import 'dart:io';
 
-import 'package:klit/app/app.dart';
-import 'package:klit/client/client.dart';
-import 'package:klit/identity/identity.dart';
-import 'package:klit/settings/settings.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/traits/traits.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/identity/identity.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/traits/traits.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_sub/flutter_sub.dart';

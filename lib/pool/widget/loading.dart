@@ -1,6 +1,6 @@
-import 'package:klit/client/client.dart';
-import 'package:klit/pool/pool.dart';
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/pool/pool.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 
 class PoolLoadingPage extends StatefulWidget {

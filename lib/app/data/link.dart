@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:klit/app/routing/app_routes.dart';
-import 'package:klit/pool/pool.dart';
-import 'package:klit/post/post.dart';
-import 'package:klit/reply/reply.dart';
-import 'package:klit/topic/topic.dart';
-import 'package:klit/wiki/wiki.dart';
+import 'package:kilt/app/routing/app_routes.dart';
+import 'package:kilt/pool/pool.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/reply/reply.dart';
+import 'package:kilt/topic/topic.dart';
+import 'package:kilt/wiki/wiki.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart' as tabs;

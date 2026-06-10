@@ -1,4 +1,4 @@
-import 'package:klit/tag/tag.dart';
+import 'package:kilt/tag/tag.dart';
 import 'package:flutter/material.dart';
 
 final List<String> wikiMetaTags = List.unmodifiable([

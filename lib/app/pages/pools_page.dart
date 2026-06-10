@@ -1,1 +1,1 @@
-export 'package:klit/pool/widget/pools.dart' show PoolsPage;
+export 'package:kilt/pool/widget/pools.dart' show PoolsPage;

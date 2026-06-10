@@ -1,1 +1,1 @@
-export 'package:klit/app/routing/app_router.dart';
+export 'package:kilt/app/routing/app_router.dart';

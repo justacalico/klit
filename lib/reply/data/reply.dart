@@ -1,4 +1,4 @@
-import 'package:klit/comment/comment.dart';
+import 'package:kilt/comment/comment.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'reply.freezed.dart';

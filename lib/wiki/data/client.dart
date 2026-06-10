@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:klit/shared/shared.dart';
-import 'package:klit/wiki/wiki.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/wiki/wiki.dart';
 
 class WikiClient {
   WikiClient({required this.dio});

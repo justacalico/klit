@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:klit/shared/shared.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_sub/flutter_sub.dart';

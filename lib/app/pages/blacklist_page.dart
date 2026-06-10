@@ -1,1 +1,1 @@
-export 'package:klit/traits/widget/settings.dart' show DenyListPage;
+export 'package:kilt/traits/widget/settings.dart' show DenyListPage;

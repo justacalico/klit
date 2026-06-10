@@ -1,4 +1,4 @@
-import 'package:klit/follow/follow.dart';
+import 'package:kilt/follow/follow.dart';
 import 'package:flutter/material.dart';
 
 extension FollowIcon on FollowType {

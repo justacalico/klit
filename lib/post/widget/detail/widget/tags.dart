@@ -1,5 +1,5 @@
-import 'package:klit/post/post.dart';
-import 'package:klit/tag/tag.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/tag/tag.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
