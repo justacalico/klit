@@ -12,7 +12,7 @@
 
 </div>
 
-Kilt is a Flutter client for E926 and Self21-compatible image boards. It works on desktop and mobile.
+Kilt is a client for E926 and Self21-compatible image boards. It works on desktop and mobile.
 
 ## Prerequisites
 
@@ -53,16 +53,6 @@ flutter build macos
 flutter build apk
 flutter build ios
 ```
-
-## Supported Platforms
-
-| Platform | Status |
-|----------|--------|
-| Linux | ✅ Supported |
-| Windows | ✅ Supported |
-| macOS | ✅ Supported |
-| Android | ✅ Supported |
-| iOS | ✅ Supported |
 
 ## Configuration
 
