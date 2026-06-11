@@ -12,7 +12,7 @@
 
 </div>
 
-Kilt is a cross-platform Flutter client for E926 and Self21-compatible image boards. It provides a modern, feature-rich interface for browsing, searching, and managing posts across desktop and mobile platforms.
+Kilt is a Flutter client for E926 and Self21-compatible image boards. It works on desktop and mobile.
 
 ## Prerequisites
 
@@ -66,12 +66,7 @@ flutter build ios
 
 ## Configuration
 
-Kilt connects to E926-compatible instances out of the box. To use a custom Self21 instance:
-
-1. Open the app settings
-2. Navigate to the server configuration section
-3. Enter your Self21 instance URL
-4. Save and restart the app
+Kilt connects to E926 by default. For a Self21 instance, go to Settings > Server and enter your URL.
 
 ## License
 
