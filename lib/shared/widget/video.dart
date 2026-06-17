@@ -11,7 +11,7 @@ import 'package:rxdart/rxdart.dart';
 export 'package:media_kit_video/media_kit_video.dart';
 
 VideoControllerConfiguration _videoControllerConfig() {
-  if (Platform.isLinux || Platform.isWindows) {
+  if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
     return const VideoControllerConfiguration(
       enableHardwareAcceleration: false,
     );
