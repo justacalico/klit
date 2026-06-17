@@ -47,12 +47,11 @@ abstract final class E621Post {
         return result.isEmpty ? null : result;
       }),
       tags: post('tags').letOrThrow(
-        (pick) => pick.asListOrEmpty((tag) => tag.asStringOrThrow()).fold<Map<String, List<String>>>(
-          {},
-          (acc, tag) {
-            acc['general'] = [...(acc['general'] ?? []), tag];
-            return acc;
-          },
+        (tags) => tags.asMapOrThrow().map(
+          (key, value) => MapEntry(
+            key.toString(),
+            pick(value).asListOrEmpty((tag) => tag.asStringOrThrow()),
+          ),
         ),
       ),
       uploaderId: post('uploader_id').asIntOrThrow(),

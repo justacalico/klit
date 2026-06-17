@@ -21,7 +21,7 @@ class PostClient {
   final PoolClient poolsService;
 
   Map<String, dynamic> _withV2(Map<String, dynamic>? params) {
-    return {'v2': true, ...?params};
+    return {'v2': true, 'mode': 'extended', ...?params};
   }
 
   Future<Post> get({required int id, bool? force, CancelToken? cancelToken}) =>
