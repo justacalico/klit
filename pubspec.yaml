@@ -143,6 +143,8 @@ flutter_icons:
   adaptive_icon_background: "assets/icon/app/background.png"
   adaptive_icon_foreground: "assets/icon/app/foreground.png"
   image_path: "assets/icon/app/icon.png"
+  macos:
+    generate: true
   windows:
     generate: false
     image_path: "assets/icon/app/round.png"
