@@ -1,6 +1,7 @@
 # Changelog
 
 # 11.0.0 (Unreleased)
+- Added Simplified Chinese (zh) as a language option
 - Removed the "English Traditiation" (en_AU) locale option that was identical to English ([!23](https://gitlab.com/Openlyst/klit/-/merge_requests/23))
 - Fixed Create feed button text contrast on light accent colors by picking black or white text based on the primary color luminance ([!22](https://gitlab.com/Openlyst/klit/-/merge_requests/22))
 - Sped up Popular and Hot pages by using the dedicated `/popular.json` API endpoint for day/week/month scales instead of the general `/posts.json` with date tag queries ([!20](https://gitlab.com/Openlyst/klit/-/merge_requests/20))

@@ -39,6 +39,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLanguageEnglish => 'English';
 
   @override
+  String get settingsLanguageSimplifiedChinese => 'Simplified Chinese';
+
+  @override
   String get aboutSectionTitle => 'About';
 
   @override
