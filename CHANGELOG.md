@@ -1,6 +1,7 @@
 # Changelog
 
 # 11.0.0 (Unreleased)
+- Fixed check-for-update failing after the app slug changed from `klit` to `kilt` on the Openlyst API
 - Moved sidebar Klit branding box down to stop it clashing with the nav buttons ([!17](https://gitlab.com/Openlyst/klit/-/merge_requests/17))
 
 # 10.2.0
