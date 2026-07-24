@@ -15,16 +15,16 @@ abstract class AppRoutes {
   static const String blacklist = '/blacklist';
   static const String settings = '/settings';
 
-  static const List<(String path, String label, IconData icon)> navItems = [
-    (home, 'Home', Icons.home),
-    (hot, 'Popular', Icons.whatshot),
-    (search, 'Search', Icons.search),
-    (feeds, 'Feeds', Icons.rss_feed),
-    (profile, 'Profile', Icons.person),
-    (pools, 'Pools', Icons.collections),
-    (forum, 'Forum', Icons.forum),
-    (history, 'History', Icons.history),
-    (finishes, 'Finishes', Icons.check_circle),
-    (settings, 'Settings', Icons.settings),
+  static const List<(String path, String labelKey, IconData icon)> navItems = [
+    (home, 'navHome', Icons.home),
+    (hot, 'navPopular', Icons.whatshot),
+    (search, 'navSearch', Icons.search),
+    (feeds, 'navFeeds', Icons.rss_feed),
+    (profile, 'navProfile', Icons.person),
+    (pools, 'navPools', Icons.collections),
+    (forum, 'navForum', Icons.forum),
+    (history, 'navHistory', Icons.history),
+    (finishes, 'navFinishes', Icons.check_circle),
+    (settings, 'navSettings', Icons.settings),
   ];
 }

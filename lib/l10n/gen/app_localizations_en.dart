@@ -227,6 +227,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonShrinkSidebar => 'Shrink sidebar';
 
   @override
+  String get navHome => 'Home';
+
+  @override
+  String get navPopular => 'Popular';
+
+  @override
+  String get navSearch => 'Search';
+
+  @override
+  String get navFeeds => 'Feeds';
+
+  @override
+  String get navProfile => 'Profile';
+
+  @override
+  String get navPools => 'Pools';
+
+  @override
+  String get navForum => 'Forum';
+
+  @override
+  String get navHistory => 'History';
+
+  @override
+  String get navFinishes => 'Finishes';
+
+  @override
+  String get navSettings => 'Settings';
+
+  @override
   String get commonActive => 'Active';
 
   @override

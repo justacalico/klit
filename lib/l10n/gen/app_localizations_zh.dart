@@ -226,6 +226,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get commonShrinkSidebar => '收起侧栏';
 
   @override
+  String get navHome => '首页';
+
+  @override
+  String get navPopular => '热门';
+
+  @override
+  String get navSearch => '搜索';
+
+  @override
+  String get navFeeds => '订阅';
+
+  @override
+  String get navProfile => '个人主页';
+
+  @override
+  String get navPools => '图集';
+
+  @override
+  String get navForum => '论坛';
+
+  @override
+  String get navHistory => '历史';
+
+  @override
+  String get navFinishes => '已完成';
+
+  @override
+  String get navSettings => '设置';
+
+  @override
   String get commonActive => '活跃';
 
   @override

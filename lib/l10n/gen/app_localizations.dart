@@ -512,6 +512,66 @@ abstract class AppLocalizations {
   /// **'Shrink sidebar'**
   String get commonShrinkSidebar;
 
+  /// No description provided for @navHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// No description provided for @navPopular.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular'**
+  String get navPopular;
+
+  /// No description provided for @navSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get navSearch;
+
+  /// No description provided for @navFeeds.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeds'**
+  String get navFeeds;
+
+  /// No description provided for @navProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get navProfile;
+
+  /// No description provided for @navPools.
+  ///
+  /// In en, this message translates to:
+  /// **'Pools'**
+  String get navPools;
+
+  /// No description provided for @navForum.
+  ///
+  /// In en, this message translates to:
+  /// **'Forum'**
+  String get navForum;
+
+  /// No description provided for @navHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get navHistory;
+
+  /// No description provided for @navFinishes.
+  ///
+  /// In en, this message translates to:
+  /// **'Finishes'**
+  String get navFinishes;
+
+  /// No description provided for @navSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get navSettings;
+
   /// No description provided for @commonActive.
   ///
   /// In en, this message translates to:

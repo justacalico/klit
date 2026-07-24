@@ -183,7 +183,7 @@ class _BottomNavBar extends StatelessWidget {
                   Expanded(
                     child: _BottomNavDestination(
                       icon: primaryVisible[i].item.icon,
-                      label: primaryVisible[i].item.label,
+                      label: primaryVisible[i].item.label(l10n),
                       selected: selectedIndex == i,
                       onTap: () {
                         HapticFeedback.selectionClick();
@@ -367,6 +367,7 @@ void _showMoreMenu(
   List<({int index, NavItem item})> entries,
   _NavAdapter nav,
 ) {
+  final l10n = AppLocalizations.of(context);
   final theme = Theme.of(context);
   final cupertinoTheme = CupertinoTheme.of(context);
 
@@ -404,7 +405,7 @@ void _showMoreMenu(
                         : CupertinoColors.label.resolveFrom(context),
                   ),
                   title: Text(
-                    e.item.label,
+                    e.item.label(l10n),
                     style: TextStyle(
                       fontWeight: selected
                           ? FontWeight.w600
@@ -736,6 +737,7 @@ class _SidebarTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -773,7 +775,7 @@ class _SidebarTile extends StatelessWidget {
                   const SizedBox(width: 14),
                   Expanded(
                     child: Text(
-                      item.label,
+                      item.label(l10n),
                       style: theme.textTheme.bodyLarge?.copyWith(
                         fontWeight: selected
                             ? FontWeight.w600
@@ -899,13 +901,14 @@ class _NavBarTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final child = showLabel
         ? Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(item.icon, size: 20),
               const SizedBox(width: 8),
-              Text(item.label),
+              Text(item.label(l10n)),
             ],
           )
         : Icon(item.icon);
