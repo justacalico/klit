@@ -1,6 +1,7 @@
 # Changelog
 
 # 11.0.0 (Unreleased)
+- Moved sidebar Klit branding box down to stop it clashing with the nav buttons ([!17](https://gitlab.com/Openlyst/klit/-/merge_requests/17))
 
 # 10.2.0
 - Fixed crash when playing video in release builds on macOS by disabling hardware acceleration
