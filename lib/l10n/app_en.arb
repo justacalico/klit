@@ -25,6 +25,9 @@
     }
   },
   "aboutNewerVersionAvailablePrefix": "A newer version is available:",
+  "aboutSourceLocal": "Local build",
+  "aboutSourceOther": "Other source",
+  "aboutSourceStore": "Store install",
   "commonCancelUpper": "CANCEL",
   "commonDownloadUpper": "DOWNLOAD",
   "commonLaterUpper": "LATER",
@@ -34,6 +37,141 @@
   "commonImportUpper": "IMPORT",
   "commonOkUpper": "OK",
   "commonRestartNowUpper": "RESTART NOW",
+  "commonAdd": "Add",
+  "commonEdit": "Edit",
+  "commonReset": "Reset",
+  "commonRetry": "Retry",
+  "commonSend": "Send",
+  "commonShare": "Share",
+  "commonBrowse": "Browse",
+  "commonReport": "Report",
+  "commonClear": "Clear",
+  "commonCopy": "Copy",
+  "commonLoading": "Loading...",
+  "commonDone": "Done",
+  "commonCancelTask": "Cancelled task",
+  "commonCopiedToClipboard": "Copied to clipboard",
+  "commonTryAgain": "Try again",
+  "commonNothingHere": "Nothing to see here",
+  "commonFailedLoad": "Failed to load",
+  "commonFailedLoadSuggestions": "Failed to load suggestions",
+  "commonSaveFile": "Save file",
+  "commonFileSavedAs": "File saved as {name}",
+  "@commonFileSavedAs": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "commonItemProgress": "Item {current}/{total}",
+  "@commonItemProgress": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "commonFailedItemAt": "Failed at Item {index}",
+  "@commonFailedItemAt": {
+    "placeholders": {
+      "index": {}
+    }
+  },
+  "commonItemsCount": "{count} items",
+  "@commonItemsCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "commonSelectAll": "Select all",
+  "commonAbort": "Abort",
+  "commonPrevious": "Previous",
+  "commonNext": "Next",
+  "commonInfo": "Info",
+  "commonToday": "Today",
+  "commonYesterday": "Yesterday",
+  "commonWrite": "Write",
+  "commonPreview": "Preview",
+  "commonTypeHere": "type here...",
+  "commonYourTextHere": "your text here",
+  "commonMore": "More",
+  "commonExpandSidebar": "Expand sidebar",
+  "commonShrinkSidebar": "Shrink sidebar",
+  "navHome": "Home",
+  "navPopular": "Popular",
+  "navSearch": "Search",
+  "navFeeds": "Feeds",
+  "navProfile": "Profile",
+  "navPools": "Pools",
+  "navForum": "Forum",
+  "navHistory": "History",
+  "navFinishes": "Finishes",
+  "navSettings": "Settings",
+  "commonActive": "Active",
+  "commonInactive": "inactive",
+  "commonYes": "yes",
+  "commonNo": "no",
+  "commonCreated": "created",
+  "commonUpdated": "updated",
+  "commonId": "id",
+  "commonPosts": "posts",
+  "commonDescription": "Description",
+  "commonName": "Name",
+  "commonType": "Type",
+  "commonTags": "Tags",
+  "commonScore": "Score",
+  "commonRating": "Rating",
+  "commonRatingAll": "All",
+  "commonRatingSafe": "Safe",
+  "commonRatingQuestionable": "Questionable",
+  "commonRatingExplicit": "Explicit",
+  "commonRatingQ": "Q",
+  "commonRatingE": "E",
+  "commonSort": "Sort",
+  "commonSortBy": "Sort by",
+  "commonSortDefault": "Default",
+  "commonSortScore": "Score",
+  "commonSortFavorites": "Favorites",
+  "commonSortRank": "Rank",
+  "commonSortRandom": "Random",
+  "commonSortName": "Name",
+  "commonSortCreated": "Created",
+  "commonSortUpdated": "Updated",
+  "commonSortPostCount": "Post count",
+  "commonSortNewestFirst": "Newest first",
+  "commonSortOldestFirst": "Oldest first",
+  "commonSortFavCount": "Fav count",
+  "commonEnabled": "Enabled",
+  "commonDisabled": "Disabled",
+  "commonShow": "Show",
+  "commonHide": "Hide",
+  "commonCamera": "Camera",
+  "commonGallery": "Gallery",
+  "commonSkip": "Skip",
+  "commonBlock": "Block",
+  "commonUnblock": "Unblock",
+  "commonFollow": "Follow",
+  "commonUnfollow": "Unfollow",
+  "commonMute": "Mute",
+  "commonNotify": "Notify",
+  "commonBookmark": "Bookmark",
+  "commonUnbookmark": "Unbookmark",
+  "commonSubtract": "Subtract",
+  "commonRemove": "Remove",
+  "commonResolve": "Resolve",
+  "commonAbout": "About",
+  "commonUploads": "Uploads",
+  "commonFavorites": "Favorites",
+  "commonMain": "Main",
+  "commonNoDescription": "no description",
+  "commonNoTags": "No tags",
+  "commonNoSources": "no sources",
+  "commonNoArtist": "no artist",
+  "commonAnonymous": "Anonymous",
+  "commonLogin": "Login",
+  "commonAuthentication": "Authentication",
+  "commonHost": "Host",
+  "commonUsername": "Username",
+  "commonApiKey": "API key",
+  "commonCancelUpper": "CANCEL",
   "aboutCheckForUpdate": "Check for update",
   "aboutCheckingForUpdates": "Checking for updates...",
   "feedsTitle": "Feeds",
@@ -49,6 +187,34 @@
   "feedsEmptyTitle": "No feeds yet",
   "feedsEmptyBody": "Create a feed with tags and image or video type to browse posts in one tap",
   "feedsCreateFeed": "Create feed",
+  "feedsUnnamed": "Unnamed feed",
+  "feedsNameHint": "e.g. My art feed",
+  "feedsIncludeTags": "Include tags",
+  "feedsIncludeTagsHint": "space separated, all required",
+  "feedsOrTags": "Or tags",
+  "feedsOrTagsHint": "any of these",
+  "feedsExcludeTags": "Exclude tags",
+  "feedsExcludeTagsHint": "posts with these are hidden",
+  "feedsSubfeeds": "Subfeeds",
+  "feedsSubfeedsHelper": "Optional filters; only one can be active at a time when viewing the feed.",
+  "feedsAddSubfeed": "Add subfeed",
+  "feedsSubfeedName": "Subfeed name",
+  "feedsExtraIncludeTags": "Extra include tags",
+  "feedsExtraIncludeTagsLabel": "Additional tags (all required)",
+  "feedsExtraExcludeTags": "Extra exclude tags",
+  "feedsExtraExcludeTagsLabel": "Tags to exclude in this subfeed",
+  "feedsExcludeFavorited": "Exclude favorited",
+  "feedsExcludeFavoritedHelper": "Don't show posts you've favorited in this feed",
+  "feedImage": "Image",
+  "feedVideo": "Video",
+  "feedImageAndVideo": "Image & video",
+  "feedNoTags": "no tags",
+  "feedSubDefault": "Sub {index}",
+  "@feedSubDefault": {
+    "placeholders": {
+      "index": {}
+    }
+  },
   "databaseExporting": "Exporting database...",
   "databaseImporting": "Importing database...",
   "databaseExportDialogTitle": "Export Database",
@@ -74,6 +240,8 @@
   "databaseImportWarningBody": "This will replace your current database. \\nAll data will be lost. This cannot be undone!",
   "databaseRestartRequiredTitle": "Restart Required",
   "databaseRestartRequiredBody": "The app needs to restart to apply changes.",
+  "databaseErrorLoading": "Error loading database",
+  "databaseBackupFileName": "klit_database_backup.db",
   "postUpdateSuccess": "Updated post #{id}",
   "@postUpdateSuccess": {
     "placeholders": {
@@ -86,17 +254,727 @@
       "id": {}
     }
   },
-  "tagPreviewLoadFailed": "Error loading tag preview: {error}",
-  "@tagPreviewLoadFailed": {
+  "postBlacklisted": "Blacklisted",
+  "postComments": "Comments",
+  "postCommentsWithCount": "Comments ({count})",
+  "@postCommentsWithCount": {
     "placeholders": {
-      "error": {}
+      "count": {}
     }
   },
+  "postDeletion": "Deletion",
+  "postFile": "File",
+  "postPools": "Pools",
+  "postParent": "Parent",
+  "postChildren": "Children",
+  "postSources": "Sources",
+  "postScore": "Score",
+  "postFavorites": "Favorites",
+  "postCopiedId": "Copied post id #{id}",
+  "@postCopiedId": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postFailedUpvote": "Failed to upvote Post #{id}",
+  "@postFailedUpvote": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postFailedDownvote": "Failed to downvote Post #{id}",
+  "@postFailedDownvote": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postFailedVote": "Failed to {action} Post #{id}",
+  "@postFailedVote": {
+    "placeholders": {
+      "action": {},
+      "id": {}
+    }
+  },
+  "postTakePhoto": "Take a photo?",
+  "postStatusDeleted": "deleted",
+  "postStatusUnsupported": "unsupported",
+  "postStatusUnavailable": "unavailable",
+  "postStatusBlacklisted": "blacklisted",
+  "postDownload": "Download",
+  "postDownloadedOne": "Downloaded post #{id}",
+  "@postDownloadedOne": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postDownloadedMany": "Downloaded {count} posts",
+  "@postDownloadedMany": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "postDownloadingOne": "Downloading post #{id}",
+  "@postDownloadingOne": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postDownloadingProgress": "Downloading post #{id} ({current}/{total})",
+  "@postDownloadingProgress": {
+    "placeholders": {
+      "id": {},
+      "current": {},
+      "total": {}
+    }
+  },
+  "postDownloadFailed": "Failed to download post #{id}",
+  "@postDownloadFailed": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postDownloadCancelled": "Cancelled download",
+  "postFavoritedOne": "Favorited post #{id}",
+  "@postFavoritedOne": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postFavoritedMany": "Favorited {count} posts",
+  "@postFavoritedMany": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "postUnfavoritedOne": "Unfavorited post #{id}",
+  "@postUnfavoritedOne": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postUnfavoritedMany": "Unfavorited {count} posts",
+  "@postUnfavoritedMany": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "postFavoritingOne": "Favoriting post #{id}",
+  "@postFavoritingOne": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postFavoritingProgress": "Favoriting post #{id} ({current}/{total})",
+  "@postFavoritingProgress": {
+    "placeholders": {
+      "id": {},
+      "current": {},
+      "total": {}
+    }
+  },
+  "postUnfavoritingOne": "Unfavoriting post #{id}",
+  "@postUnfavoritingOne": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postUnfavoritingProgress": "Unfavoriting post #{id} ({current}/{total})",
+  "@postUnfavoritingProgress": {
+    "placeholders": {
+      "id": {},
+      "current": {},
+      "total": {}
+    }
+  },
+  "postFavoriteFailed": "Failed to favorite post #{id}",
+  "@postFavoriteFailed": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postUnfavoriteFailed": "Failed to unfavorite post #{id}",
+  "@postUnfavoriteFailed": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postFavoritingCancelled": "Cancelled favoriting",
+  "postUnfavoritingCancelled": "Cancelled unfavoriting",
+  "postSelectionOne": "post #{id}",
+  "@postSelectionOne": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postSelectionMany": "{count} posts",
+  "@postSelectionMany": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "postFilterFavoriteCount": "Favorite count",
+  "postFilterPool": "Pool",
+  "postFilterHasPool": "Has pool",
+  "postFilterChild": "Child",
+  "postFilterIsChild": "Is child post",
+  "postFilterIsParent": "Is parent post",
+  "postFilterUploadDate": "Upload date",
+  "postFilterDateAll": "All",
+  "postFilterDateLastDay": "Last day",
+  "postFilterDateLastWeek": "Last week",
+  "postFilterDateLastMonth": "Last Month",
+  "postFilterDateLastYear": "Last Year",
+  "postFilterStatus": "Status",
+  "postFilterStatusActive": "Active",
+  "postFilterStatusPending": "Pending",
+  "postFilterStatusDeleted": "Deleted",
+  "postFilterStatusFlagged": "Flagged",
+  "postFilterStatusAny": "Any",
+  "postSearch": "Search",
+  "postSearchTags": "Search tags",
+  "postHome": "Home",
+  "postPopular": "Popular",
+  "postPosts": "Posts",
+  "postFavsUnavailable": "Favorites are unavailable for anonymous users",
+  "postFavOrder": "Favorite order",
+  "postFavOrderAdded": "added order",
+  "postFavOrderId": "id order",
+  "postDay": "Day",
+  "postWeek": "Week",
+  "postMonth": "Month",
+  "postHot": "Hot",
+  "postPickDate": "Pick date",
+  "postEditReasonOptional": "Edit reason (optional)",
+  "postEditReasonHint": "Why are you editing this post?",
+  "postEditDescriptionTitle": "#{id} description",
+  "@postEditDescriptionTitle": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postEditDescriptionHint": "Enter post description...",
+  "postEditNoDescription": "No description",
+  "postEditParentIdOptional": "Parent ID (optional)",
+  "postEditParentIdHint": "Parent post ID",
+  "postEditInvalidNumber": "Invalid number format",
+  "postEditInvalidParent": "Invalid parent post",
+  "postEditSourcesTitle": "#{id} sources",
+  "@postEditSourcesTitle": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postEditNoSources": "No sources",
+  "postEditSpaceSeparated": "space separated tags",
+  "postEditTagNew": "new",
+  "postEditTagInvalid": "invalid",
+  "postEditTagEmpty": "empty",
+  "postEditTagUnderused": "underused",
+  "postFlaggedSuccess": "Flagged post #{id}",
+  "@postFlaggedSuccess": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postFlagFailed": "Failed to flag post #{id}",
+  "@postFlagFailed": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postFlagTitle": "Post #{id}",
+  "@postFlagTitle": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postFlag": "Flag",
+  "postFlagParentId": "Parent ID",
+  "postFlagParentIdEmpty": "Parent ID cannot be empty",
+  "postFlagParentIdNumber": "Parent ID must be a number",
+  "settingsFailedLoadAccounts": "Failed to load accounts",
+  "settingsTryReopen": "Try reopening Settings.",
+  "settingsLoadingAccounts": "Loading accounts...",
+  "settingsSwitchingAccount": "Switching account...",
+  "settingsFailedConnect": "Failed to connect to {host}",
+  "@settingsFailedConnect": {
+    "placeholders": {
+      "host": {}
+    }
+  },
+  "settingsConnectedTo": "Connected to {host}",
+  "@settingsConnectedTo": {
+    "placeholders": {
+      "host": {}
+    }
+  },
+  "settingsDeleteAccountTitle": "Delete account?",
+  "settingsDeleteAccountBody": "All local data will be removed, including follows and history.",
+  "settingsDeleteUpper": "DELETE",
+  "settingsActiveAccount": "Active account • {host}",
+  "@settingsActiveAccount": {
+    "placeholders": {
+      "host": {}
+    }
+  },
+  "settingsActive": "Active",
+  "settingsAddAccount": "Add account",
+  "settingsActivate": "Activate",
+  "settingsTest": "Test",
+  "settingsBlacklist": "Blacklist",
+  "settingsTagsBlocked": "{count} tags blocked",
+  "@settingsTagsBlocked": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "settingsFollows": "Follows",
+  "settingsSearchesFollowed": "{count} searches followed",
+  "@settingsSearchesFollowed": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "settingsHistory": "History",
+  "settingsPagesVisited": "{count} pages visited",
+  "@settingsPagesVisited": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "settingsTheme": "Theme",
+  "settingsAccentColor": "Accent color",
+  "settingsTileSize": "Tile size",
+  "settingsTileSizeValue": "{value} px",
+  "@settingsTileSizeValue": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "settingsQuilt": "Quilt",
+  "settingsGrid": "Grid",
+  "settingsQuiltQuadratic": "tiles are quadratic",
+  "settingsQuiltExpand": "tiles expand vertically",
+  "settingsPostInfo": "Post info",
+  "settingsPostInfoOnTiles": "Info on post tiles",
+  "settingsPostInfoImageOnly": "Image tiles only",
+  "settingsPostActionBar": "Post action bar",
+  "settingsActionsPinned": "{count} actions pinned",
+  "@settingsActionsPinned": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "settingsActionBarPlacement": "Action bar placement",
+  "settingsPlacementFloating": "Mobile: floating above navbar",
+  "settingsPlacementInline": "Mobile: inline on post page",
+  "settingsDownloadLocation": "Download location",
+  "settingsChooseDirectory": "Choose directory",
+  "settingsUpvoteFavorites": "Upvote favorites",
+  "settingsUpvoteAndFav": "Upvote and favorite",
+  "settingsFavOnly": "Favorite only",
+  "settingsVideoVolume": "Video volume",
+  "settingsMuted": "Muted",
+  "settingsWithSound": "With sound",
+  "settingsAutoplayVideos": "Autoplay videos",
+  "settingsPlayAutomatically": "Play automatically",
+  "settingsPlayOnTap": "Play on tap",
+  "settingsVideoResolution": "Video resolution",
+  "settingsIFinished": "I Finished",
+  "settingsIFinishedDesc": "Button on post detail to mark finished",
+  "settingsIFinishedOff": "Off",
+  "settingsRequestPhoto": "Request image on completion",
+  "settingsRequestPhotoDesc": "Ask for a photo when marking I Finished",
+  "settingsRequestPhotoOff": "No photo",
+  "settingsSecureDisplay": "Secure display",
+  "settingsScreenProtected": "Screen protected",
+  "settingsScreenVisible": "Screen visible",
+  "settingsIncognitoKeyboard": "Incognito keyboard",
+  "settingsAllowHttpHosts": "Allow HTTP hosts",
+  "settingsAllowHttpDesc": "http:// for local or self-hosted (unencrypted)",
+  "settingsHttpsOnly": "https:// only",
+  "settingsPinLock": "PIN lock",
+  "settingsPinEnabled": "PIN enabled",
+  "settingsPinDisabled": "PIN disabled",
+  "settingsBiometricLock": "Biometric lock",
+  "settingsBiometricsEnabled": "Biometrics enabled",
+  "settingsBiometricsDisabled": "Biometrics disabled",
+  "settingsDeveloperMode": "Developer mode",
+  "settingsOptionsShown": "Options shown",
+  "settingsLogs": "Logs",
+  "settingsErrorsLogged": "{count} errors logged",
+  "@settingsErrorsLogged": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "settingsDatabase": "Database",
+  "settingsPinnedActions": "Pinned actions are shown first on post detail. Drag to reorder.",
+  "settingsAvailable": "Available",
+  "settingsNotOnList": "Not on the list? contact us!",
+  "identityEditAccount": "Edit account",
+  "identityAddAccount": "Add account",
+  "identityNoAccountSignUp": "Don't have an account? Sign up here",
+  "identityWhereApiKey": "Where do I find my API key?",
+  "identityConnectingTo": "Connecting to {host} as {user}...",
+  "@identityConnectingTo": {
+    "placeholders": {
+      "host": {},
+      "user": {}
+    }
+  },
+  "identityHostRequired": "You must provide a host URL.",
+  "identityHostInvalid": "Invalid host URL",
+  "identityUsernameRequired": "You must provide a username.",
+  "identityApiKeyRequired": "You must provide an API key.\ne.g. {example}",
+  "@identityApiKeyRequired": {
+    "placeholders": {
+      "example": {}
+    }
+  },
+  "identityApiKeyInvalid": "API key is 16\u201380 characters (letters, digits, optional underscore)\ne.g. {example}",
+  "@identityApiKeyInvalid": {
+    "placeholders": {
+      "example": {}
+    }
+  },
+  "identityCheckNetwork": "Check your network connection and login details",
+  "identityFailedLogin": "Failed to login.\n{value}",
+  "@identityFailedLogin": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "identityDuplicate": "You already have an identity under this host and username.",
+  "identityHostUnavailable": "Host unavailable",
+  "identityHostUnavailableBody": "It appears that {host} is not available!",
+  "@identityHostUnavailableBody": {
+    "placeholders": {
+      "host": {}
+    }
+  },
+  "identityResolveBody": "Please resolve the issue in the following browser window. \n\nCloudflare captcha cookies will be saved. ",
+  "identityWaitForHost": "\nPlease wait for {host} to resolve the situation on their end.",
+  "@identityWaitForHost": {
+    "placeholders": {
+      "host": {}
+    }
+  },
+  "identityDesktopLogin": "On desktop, log in using your browser and add an API key in Settings.",
+  "identityOpenLoginBrowser": "Open login in browser",
+  "identityMustBeLoggedIn": "You must be logged in to perform this action.",
+  "identityChooseIdentity": "Choose identity",
+  "identityApiKeyExample": "e.g. {example}",
+  "@identityApiKeyExample": {
+    "placeholders": {
+      "example": {}
+    }
+  },
+  "appEnterPin": "Enter PIN",
+  "appEnterNewPin": "Enter new PIN",
+  "appConfirmNewPin": "Confirm new PIN",
+  "appFailedAuthenticate": "Failed to authenticate",
+  "appPleaseAuthenticate": "Please authenticate",
+  "appAuthenticateToUnlock": "Authenticate to unlock.",
+  "appBiometricFailure": "Severe failure in biometric authentication",
+  "appFailedInitialize": "Failed to initialize",
+  "commentSent": "Comment sent!",
+  "commentLogInToAdd": "Log in to add a comment",
+  "commentAddComment": "Add comment",
+  "commentNoComments": "No comments",
+  "commentFailedLoad": "Failed to load comments",
+  "commentPostComments": "#{id} comments",
+  "@commentPostComments": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "commentFailedUpvote": "Failed to upvote comment #{id}",
+  "@commentFailedUpvote": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "commentFailedDownvote": "Failed to downvote comment #{id}",
+  "@commentFailedDownvote": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "commentHidden": "This comment is hidden",
+  "commentMustLoginEdit": "You must be logged in to edit comments!",
+  "commentMustLoginReply": "You must be logged in to reply to comments!",
+  "commentMustLoginReport": "You must be logged in to report comments!",
+  "commentCopiedId": "Copied comment id #{id}",
+  "@commentCopiedId": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "commentReply": "Reply",
+  "commentCopyId": "Copy ID",
+  "commentCommentOrder": "Comment order",
+  "commentOldestFirst": "oldest first",
+  "commentNewestFirst": "newest first",
+  "commentCommentTitle": "Comment #{id}",
+  "@commentCommentTitle": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "commentFailedLoadOne": "Failed to load comment",
+  "commentNotFound": "Comment not found",
+  "commentDialogTitle": "#{id} comment",
+  "@commentDialogTitle": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "commentRefresh": "Refresh",
+  "topicHideTagsEdits": "hide tags edits",
+  "topicHideTagsAliasShow": "show tag alias and implications",
+  "topicHideTagsAliasHide": "hide tag alias and implications",
+  "topicNoTopics": "No topics",
+  "topicFailedLoad": "Failed to load topics",
+  "topicReplies": "replies",
+  "topicLocked": "locked",
+  "topicCreated": "created",
+  "topicUpdated": "updated",
+  "topicCopiedId": "Copied topic id #{id}",
+  "@topicCopiedId": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "topicTitle": "Topic #{id}",
+  "@topicTitle": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "topicFailedLoadOne": "Failed to load topic",
+  "topicNotFound": "Topic not found",
+  "topicTopics": "Topics",
+  "replyReplies": "Replies",
+  "replyOrder": "Reply order",
+  "replyNoReplies": "No replies",
+  "replyFailedLoad": "Failed to load replies",
+  "replyHidden": "This reply is hidden",
+  "replyTitle": "Reply #{id}",
+  "@replyTitle": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "replyFailedLoadOne": "Failed to load reply",
+  "replyNotFound": "Reply not found",
+  "followFollowsCount": "{count} follows",
+  "@followFollowsCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "followDisableNotifications": "Disable notifications",
+  "followEnableNotifications": "Enable notifications",
+  "followSubscribe": "Subscribe",
+  "followBookmark": "Bookmark",
+  "followMarkSeen": "mark {count} posts as seen",
+  "@followMarkSeen": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "followNoUnseen": "no unseen posts",
+  "followBookmarks": "Bookmarks",
+  "followAddToBookmarks": "Add to bookmarks",
+  "followNoBookmarks": "No bookmarks",
+  "followFailedLoadBookmarks": "Failed to load bookmarks",
+  "followUnseenPosts": "unseen posts",
+  "followShowUnseenFirst": "show unseen first",
+  "followFilteringUnseen": "filtering for unseen",
+  "followAllPostsShown": "all posts shown",
+  "followEditFollows": "Edit follows",
+  "followForceSync": "Force sync",
+  "followSyncAll": "sync all follows",
+  "followSyncing": "syncing follows...",
+  "followEditFollow": "Edit follow",
+  "followMarkAsRead": "Mark as read",
+  "followRename": "Rename",
+  "followFollowTitle": "Follow title",
+  "followNewPost": "new post",
+  "followNewPosts": "new posts",
+  "followAlias": "alias {name}",
+  "@followAlias": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "followNewPostsNotif": "New posts!",
+  "poolPosts": "posts",
+  "poolCopiedId": "Copied pool id #{id}",
+  "@poolCopiedId": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "poolActivity": "activity",
+  "poolPoolOrder": "Pool order",
+  "poolReaderMode": "Pool reader mode",
+  "poolLargeImages": "large images",
+  "poolNormalGrid": "normal grid",
+  "poolNoPools": "No pools",
+  "poolFailedLoad": "Failed to load pools",
+  "poolPoolTitle": "Pool #{id}",
+  "@poolPoolTitle": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "poolFailedLoadOne": "Failed to load pool",
+  "poolNotFound": "Pool not found",
+  "poolPools": "Pools",
+  "poolCreator": "Creator",
+  "poolIsActive": "Is active",
+  "poolCategory": "Category",
+  "poolCategorySeries": "Series",
+  "poolCategoryCollection": "Collection",
+  "poolPoolTitleField": "Pool title",
+  "wikiCopiedId": "Copied wiki id #{id}",
+  "@wikiCopiedId": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "wikiAlias": "alias",
+  "wikiWikiTitle": "Wiki #{id}",
+  "@wikiWikiTitle": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "wikiFailedLoadOne": "Failed to load wiki",
+  "wikiNotFound": "Wiki not found",
+  "wikiUnableRetrieve": "unable to retrieve wiki entry",
+  "wikiNoWikiEntry": "no wiki entry",
+  "wikiFailedLoadTags": "failed to load tags",
+  "userProfileUnavailable": "Profile is not available for anonymous users",
+  "userFailedLoadProfile": "Failed to load profile",
+  "userNotFound": "User not found",
+  "userMustLoginReport": "You must be logged in to report users!",
+  "userCopiedId": "Copied user id #{id}",
+  "@userCopiedId": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "userCommission": "Commission",
+  "userJoined": "joined",
+  "userRank": "rank",
+  "userEdits": "edits",
+  "userComments": "comments",
+  "userForum": "forum",
+  "historyHistory": "History",
+  "historyEntriesCount": "{count} entries",
+  "@historyEntriesCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "historyEnabled": "Enabled",
+  "historyPagesVisited": "{count} pages visited",
+  "@historyPagesVisited": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "historyClearHistory": "Clear history",
+  "historyDeleteAllEntries": "Delete all entries",
+  "historyClearHistoryTitle": "Clear history?",
+  "historyClearHistoryBody": "All history entries will be permanently deleted. This action cannot be undone.",
+  "historyHistoryLimit": "History limit",
+  "historyHistoryLimitBody": "Enabling history limit means all history entries beyond {count} and all entries older than {months} months are automatically deleted.",
+  "@historyHistoryLimitBody": {
+    "placeholders": {
+      "count": {},
+      "months": {}
+    }
+  },
+  "historyLimitHistory": "Limit history",
+  "historyLimitedTo": "Limited to newer than {months} months or less than {count} entries.",
+  "@historyLimitedTo": {
+    "placeholders": {
+      "months": {},
+      "count": {}
+    }
+  },
+  "historyInfinite": "history is infinite",
+  "historyEntries": "Entries",
+  "historyYourHistoryEmpty": "Your history is empty",
+  "historyFailedLoad": "Failed to load history",
+  "logsLogsCount": "{count} logs",
+  "@logsLogsCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "logsLogFilesCount": "{count} log files",
+  "@logsLogFilesCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "logsLogsDate": "Logs - {date}",
+  "@logsLogsDate": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "logsDeleteFilesTitle": "Delete {count} log files?",
+  "@logsDeleteFilesTitle": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "logsCannotUndone": "This action cannot be undone.",
+  "logsLogs": "Logs",
+  "logsLevels": "Levels",
+  "logsCriticalError": "A critical error has occurred!",
+  "logsLogFiles": "Log Files",
+  "logsFailedLoadFiles": "Failed to load log files!",
+  "logsNoLogFiles": "No log files available!",
+  "logsLive": "Live",
+  "logsNoLogItems": "No log items!",
+  "markupSection": "Section",
+  "markupQuote": "Quote",
+  "markupCode": "Code",
+  "markupSpoiler": "Spoiler",
+  "markupBold": "Bold",
+  "markupItalic": "Italic",
+  "markupUnderlined": "Underlined",
+  "markupStrikethrough": "Strikethrough",
+  "traitsBlacklist": "Blacklist",
+  "traitsBlockedPosts": "blocked {count} posts",
+  "@traitsBlockedPosts": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "traitsFailedUpdate": "Failed to update blacklist!",
+  "traitsOneTagPerLine": "One tag per line",
+  "traitsAddTag": "Add tag",
+  "traitsBlacklistEmpty": "Your blacklist is empty",
+  "traitsEditTag": "Edit tag",
   "tooltipInfo": "Info",
   "tooltipCopy": "Copy",
   "tooltipDelete": "Delete",
   "tooltipAbort": "Abort",
   "tooltipSelectAll": "Select all",
   "tooltipPrevious": "Previous",
-  "tooltipNext": "Next"
+  "tooltipNext": "Next",
+  "tagPreviewLoadFailed": "Error loading tag preview: {error}",
+  "@tagPreviewLoadFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  }
 }

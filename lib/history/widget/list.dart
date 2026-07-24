@@ -1,4 +1,5 @@
 import 'package:kilt/history/history.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
@@ -33,6 +34,7 @@ class SliverHistoryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Consumer<HistoryController>(
       builder: (context, controller, child) => SliverPadding(
         padding:
@@ -46,13 +48,13 @@ class SliverHistoryList extends StatelessWidget {
                 order: GroupedListOrder.DESC,
                 groupBy: (element) => DateUtils.dateOnly(element.visitedAt),
                 groupHeaderBuilder: (element) => ListTileHeader(
-                  title: DateFormatting.named(element.visitedAt),
+                  title: DateFormatting.named(element.visitedAt, context),
                 ),
                 itemComparator: (a, b) => a.visitedAt.compareTo(b.visitedAt),
                 builderDelegate: defaultPagedChildBuilderDelegate<History>(
                   onRetry: controller.getNextPage,
-                  onEmpty: const Text('Your history is empty'),
-                  onError: const Text('Failed to load history'),
+                  onEmpty: Text(l10n.historyYourHistoryEmpty),
+                  onError: Text(l10n.historyFailedLoad),
                   itemBuilder: (context, item, index) => RepaintBoundary(
                     key: ValueKey(item.id),
                     child: HistoryTile(entry: item),

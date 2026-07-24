@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:flutter/material.dart';
 
@@ -7,7 +8,9 @@ class RelationshipDisplay extends StatelessWidget {
   final Post post;
 
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       HiddenWidget(
@@ -15,9 +18,9 @@ class RelationshipDisplay extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              child: Text('Parent', style: TextStyle(fontSize: 16)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              child: Text(l10n.postParent, style: const TextStyle(fontSize: 16)),
             ),
             ListTile(
               leading: const Icon(Icons.supervisor_account),
@@ -41,9 +44,9 @@ class RelationshipDisplay extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              child: Text('Children', style: TextStyle(fontSize: 16)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              child: Text(l10n.postChildren, style: const TextStyle(fontSize: 16)),
             ),
             ...post.relationships.children.map(
               (child) => ListTile(
@@ -63,4 +66,5 @@ class RelationshipDisplay extends StatelessWidget {
       ),
     ],
   );
+  }
 }

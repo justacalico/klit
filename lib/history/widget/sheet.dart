@@ -1,5 +1,6 @@
 import 'package:kilt/app/app.dart';
 import 'package:kilt/history/history.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class HistorySheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     VoidCallback? onTap = const E621LinkParser().parseOnTap(
       context,
       entry.link,
@@ -48,7 +50,7 @@ class HistorySheet extends StatelessWidget {
             ? DText(entry.subtitle!)
             : Center(
                 child: Text(
-                  'no description',
+                  l10n.commonNoDescription,
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     color: dimTextColor(context),
                     fontStyle: FontStyle.italic,

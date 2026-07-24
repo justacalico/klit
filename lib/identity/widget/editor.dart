@@ -5,6 +5,7 @@ import 'package:drift/native.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/identity/identity.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -85,6 +86,7 @@ class _IdentityEditorDialogState extends State<_IdentityEditorDialog> {
   Future<void> _saveAndTest() async {
     final form = _formKey.currentState;
     if (form == null || !form.validate()) return;
+    final l10n = AppLocalizations.of(context);
 
     showDialog<void>(
       context: context,
@@ -96,8 +98,8 @@ class _IdentityEditorDialogState extends State<_IdentityEditorDialog> {
         apikey: withAuth ? apikeyController.text : null,
         onError: (value) {
           setState(() {
-            value ??= 'Check your network connection and login details';
-            error = 'Failed to login.\n$value';
+            value ??= l10n.identityCheckNetwork;
+            error = l10n.identityFailedLogin(value!);
           });
           form.validate();
         },
@@ -111,6 +113,7 @@ class _IdentityEditorDialogState extends State<_IdentityEditorDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final apiKeysUrl = context.watch<ClientFactory>().apiKeysUrl(
       hostController.text,
       usernameController.text,
@@ -133,7 +136,7 @@ class _IdentityEditorDialogState extends State<_IdentityEditorDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isEditing ? 'Edit account' : 'Add account',
+                    isEditing ? l10n.identityEditAccount : l10n.identityAddAccount,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 12),
@@ -145,10 +148,10 @@ class _IdentityEditorDialogState extends State<_IdentityEditorDialog> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: CheckboxFormField(
-                      label: 'Authentication',
+                      label: l10n.commonAuthentication,
                       title: withAuth
-                          ? const Text('Login')
-                          : const Text('Anonymous'),
+                          ? Text(l10n.commonLogin)
+                          : Text(l10n.commonAnonymous),
                       value: withAuth,
                       onChanged: (value) => setState(() => withAuth = value!),
                     ),
@@ -177,8 +180,8 @@ class _IdentityEditorDialogState extends State<_IdentityEditorDialog> {
                                     child: TextButton(
                                       onPressed: () =>
                                           launch(registrationUrl ?? ''),
-                                      child: const Text(
-                                        'Don\'t have an account? Sign up here',
+                                      child: Text(
+                                        l10n.identityNoAccountSignUp,
                                       ),
                                     ),
                                   ),
@@ -189,8 +192,8 @@ class _IdentityEditorDialogState extends State<_IdentityEditorDialog> {
                                   ),
                                   child: TextButton(
                                     onPressed: () => launch(apiKeysUrl ?? ''),
-                                    child: const Text(
-                                      'Where do I find my API key?',
+                                    child: Text(
+                                      l10n.identityWhereApiKey,
                                     ),
                                   ),
                                 ),
@@ -228,13 +231,13 @@ class _IdentityEditorDialogState extends State<_IdentityEditorDialog> {
                     children: [
                       TextButton(
                         onPressed: () => Navigator.of(context).maybePop(),
-                        child: const Text('Cancel'),
+                        child: Text(l10n.commonCancel),
                       ),
                       const SizedBox(width: 8),
                       FilledButton.icon(
                         onPressed: _saveAndTest,
                         icon: const Icon(Icons.check),
-                        label: Text(isEditing ? 'Save' : 'Add'),
+                        label: Text(isEditing ? l10n.commonSave : l10n.commonAdd),
                       ),
                     ],
                   ),
@@ -280,6 +283,7 @@ class _LoginLoadingDialogState extends State<LoginLoadingDialog> {
   Future<void> login() async {
     final navigator = Navigator.of(context);
     final client = context.read<IdentityClient>();
+    final l10n = AppLocalizations.of(context);
     final identity = widget.identity;
     final host = widget.host;
     final username = widget.username;
@@ -318,7 +322,7 @@ class _LoginLoadingDialogState extends State<LoginLoadingDialog> {
       String? reason;
       if (remoteError is SqliteException &&
           remoteError.extendedResultCode == 2067) {
-        reason = 'You already have an identity under this host and username.';
+        reason = l10n.identityDuplicate;
       }
       await navigator.maybePop();
       widget.onError?.call(reason);
@@ -331,6 +335,7 @@ class _LoginLoadingDialogState extends State<LoginLoadingDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Dialog(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -348,7 +353,10 @@ class _LoginLoadingDialogState extends State<LoginLoadingDialog> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                'Connecting to ${linkToDisplay(widget.host)} as ${widget.username ?? 'anonymous'}...',
+                l10n.identityConnectingTo(
+                  linkToDisplay(widget.host),
+                  widget.username ?? l10n.commonAnonymous,
+                ),
               ),
             ),
           ],
@@ -420,12 +428,13 @@ class _HostFormFieldState extends State<HostFormField> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final scheme = isHttps ? _https : _http;
     final hostField = TextFormField(
       controller: controller,
       readOnly: widget.readOnly,
       decoration: InputDecoration(
-        labelText: 'Host',
+        labelText: l10n.commonHost,
         border: const OutlineInputBorder(),
         prefixText: widget.allowHttp ? null : scheme,
       ),
@@ -434,12 +443,12 @@ class _HostFormFieldState extends State<HostFormField> {
       textInputAction: TextInputAction.next,
       validator: (value) {
         if (value!.trim().isEmpty) {
-          return 'You must provide a host URL.';
+          return l10n.identityHostRequired;
         }
         try {
           Uri.parse('${isHttps ? _https : _http}$value');
         } on FormatException {
-          return 'Invalid host URL';
+          return l10n.identityHostInvalid;
         }
         return null;
       },
@@ -492,21 +501,22 @@ class UsernameFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: TextFormField(
         controller: controller,
         autocorrect: false,
-        decoration: const InputDecoration(
-          labelText: 'Username',
-          border: OutlineInputBorder(),
+        decoration: InputDecoration(
+          labelText: l10n.commonUsername,
+          border: const OutlineInputBorder(),
         ),
         inputFormatters: [FilteringTextInputFormatter.deny(' ')],
         autofillHints: const [AutofillHints.username],
         textInputAction: TextInputAction.next,
         validator: (value) {
           if (value!.trim().isEmpty) {
-            return 'You must provide a username.';
+            return l10n.identityUsernameRequired;
           }
           return null;
         },
@@ -535,14 +545,15 @@ class _ApikeyFormFieldState extends State<ApikeyFormField> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: TextFormField(
         autocorrect: false,
         controller: widget.controller,
         decoration: InputDecoration(
-          labelText: 'API key',
-          helperText: 'e.g. $_apiKeyExample',
+          labelText: l10n.commonApiKey,
+          helperText: l10n.identityApiKeyExample(_apiKeyExample),
           border: const OutlineInputBorder(),
           suffixIcon: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -550,7 +561,7 @@ class _ApikeyFormFieldState extends State<ApikeyFormField> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  tooltip: obscurePassword ? 'Show' : 'Hide',
+                  tooltip: obscurePassword ? l10n.commonShow : l10n.commonHide,
                   icon: Icon(
                     obscurePassword ? Icons.visibility_off : Icons.visibility,
                   ),
@@ -571,16 +582,14 @@ class _ApikeyFormFieldState extends State<ApikeyFormField> {
         textInputAction: TextInputAction.done,
         validator: (value) {
           if (value!.isEmpty) {
-            return 'You must provide an API key.\n'
-                'e.g. $_apiKeyExample';
+            return l10n.identityApiKeyRequired(_apiKeyExample);
           }
           if (widget.canOmit &&
               value == OmittedPasswordTextInputFormatter.passwordOmitted) {
             return null;
           }
           if (!RegExp(r'^[A-Za-z0-9_]{16,80}$').hasMatch(value)) {
-            return 'API key is 16–80 characters (letters, digits, optional underscore)\n'
-                'e.g. $_apiKeyExample';
+            return l10n.identityApiKeyInvalid(_apiKeyExample);
           }
           return null;
         },

@@ -1,5 +1,6 @@
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 
 enum LoadingNotificationStatus { loading, cancelled, failed, done }
 
@@ -14,16 +15,17 @@ Future<void> loadingNotification<T>({
   Duration? timeout,
   Widget? icon,
 }) async {
+  final l10n = AppLocalizations.of(context);
   String getStatus(LoadingNotificationStatus status, int progress) {
     return switch (status) {
       LoadingNotificationStatus.loading =>
         onProgress?.call(items, progress) ??
-            'Item ${progress + 1}/${items.length}',
+            l10n.commonItemProgress(progress + 1, items.length),
       LoadingNotificationStatus.cancelled =>
-        onCancel?.call(items, progress) ?? 'Cancelled task',
+        onCancel?.call(items, progress) ?? l10n.commonCancelTask,
       LoadingNotificationStatus.failed =>
-        onFailure?.call(items, progress) ?? 'Failed at Item $progress',
-      LoadingNotificationStatus.done => onDone?.call(items) ?? 'Done',
+        onFailure?.call(items, progress) ?? l10n.commonFailedItemAt(progress),
+      LoadingNotificationStatus.done => onDone?.call(items) ?? l10n.commonDone,
     };
   }
 
@@ -61,7 +63,7 @@ Future<void> loadingNotification<T>({
         ),
       ),
       action: SnackBarAction(
-        label: 'CANCEL',
+        label: l10n.commonCancelUpper,
         onPressed: () => status = LoadingNotificationStatus.cancelled,
       ),
       duration: const Duration(days: 1),

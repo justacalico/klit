@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
@@ -19,8 +20,8 @@ class PostSelectionAppBar extends StatelessWidget with AppBarBuilderWidget {
     return SelectionAppBar<Post>(
       child: child,
       titleBuilder: (context, data) => data.selections.length == 1
-          ? Text('post #${data.selections.first.id}')
-          : Text('${data.selections.length} posts'),
+          ? Text(AppLocalizations.of(context).postSelectionOne(data.selections.first.id))
+          : Text(AppLocalizations.of(context).postSelectionMany(data.selections.length)),
       actionBuilder: (context, data) => [
         IconButton(
           icon: const Icon(Icons.file_download),

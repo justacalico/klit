@@ -4,6 +4,7 @@ import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 
 // TODO: This was built with narrow assumptions that we now pay for.
 // The autocomplete should be more configurable, with better defaults.
@@ -89,12 +90,12 @@ class AutocompleteTextField<T> extends StatelessWidget {
           children: [SizedCircularProgressIndicator(size: 24)],
         ),
       ),
-      errorBuilder: (context, error) => const Column(
+      errorBuilder: (context, error) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           IconMessage(
-            icon: Icon(Icons.error),
-            title: Text('Failed to load suggestions'),
+            icon: const Icon(Icons.error),
+            title: Text(AppLocalizations.of(context).commonFailedLoadSuggestions),
           ),
         ],
       ),

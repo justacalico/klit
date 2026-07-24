@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ class DenylistTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Column(
@@ -39,12 +41,12 @@ class DenylistTile extends StatelessWidget {
                     itemBuilder: (context) => [
                       PopupMenuTile(
                         value: onEdit,
-                        title: 'Edit',
+                        title: l10n.commonEdit,
                         icon: Icons.edit,
                       ),
                       PopupMenuTile(
                         value: onDelete,
-                        title: 'Delete',
+                        title: l10n.commonDelete,
                         icon: Icons.delete,
                       ),
                     ],

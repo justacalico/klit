@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
@@ -14,14 +15,15 @@ class DenylistTagDisplay extends StatelessWidget {
       post: post,
       builder: (context, post) {
         PostController controller = context.watch<PostController>();
+        final l10n = AppLocalizations.of(context);
         return CrossFade.builder(
           showChild: controller.isDenied(post),
           builder: (context) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                child: Text('Blacklisted', style: TextStyle(fontSize: 16)),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                child: Text(l10n.postBlacklisted, style: const TextStyle(fontSize: 16)),
               ),
               ...controller
                   .getDeniers(post)!

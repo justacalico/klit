@@ -4,6 +4,7 @@ import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 
 extension DonationSummaryExtension on Donor {
   double totalForCurrency(String currency) {
@@ -57,6 +58,7 @@ class Donors extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     String? username = context.watch<IdentityClient>().identity.username;
     return Column(
       children: [
@@ -84,7 +86,7 @@ class Donors extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(4),
           child: Text(
-            'Not on the list? contact us!',
+            l10n.settingsNotOnList,
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ),

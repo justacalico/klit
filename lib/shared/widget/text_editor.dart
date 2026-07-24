@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 
 typedef TextEditorSubmit = FutureOr<String?> Function(String value);
 typedef TextEditorBuilder =
@@ -123,6 +124,7 @@ class _MultiTextEditorState extends State<MultiTextEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ListenableBuilder(
       listenable: actionController,
       builder: (context, child) {
@@ -153,9 +155,9 @@ class _MultiTextEditorState extends State<MultiTextEditor> {
                       TextField(
                         controller: textControllers[content],
                         keyboardType: TextInputType.multiline,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           border: InputBorder.none,
-                          hintText: 'type here...',
+                          hintText: l10n.commonTypeHere,
                         ),
                         maxLines: null,
                         enabled: !actionController.isLoading,
@@ -191,9 +193,9 @@ class _MultiTextEditorState extends State<MultiTextEditor> {
         }
 
         Map<Widget, Widget>? tabs = {
-          const Tab(text: 'Write'): editor(),
+          Tab(text: l10n.commonWrite): editor(),
           if (widget.preview case final preview?)
-            const Tab(text: 'Preview'): scrollView(
+            Tab(text: l10n.commonPreview): scrollView(
               preview(context, textControllerMap),
             ),
         };

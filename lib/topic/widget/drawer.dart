@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/topic/topic.dart';
 import 'package:flutter/material.dart';
 
@@ -8,15 +9,16 @@ class TopicTagEditingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return AnimatedBuilder(
       animation: controller,
       builder: (context, child) => SwitchListTile(
         secondary: const Icon(Icons.inventory_outlined),
-        title: const Text('hide tags edits'),
+        title: Text(l10n.topicHideTagsEdits),
         subtitle: Text(
           controller.hideTagEditing
-              ? 'hide tag alias and implications'
-              : 'show tag alias and implications',
+              ? l10n.topicHideTagsAliasHide
+              : l10n.topicHideTagsAliasShow,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),

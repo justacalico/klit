@@ -1,5 +1,6 @@
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 
 class SizedCircularProgressIndicator extends StatelessWidget {
   const SizedCircularProgressIndicator({
@@ -106,6 +107,7 @@ class LoadingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     LoadingPageState state = isBuilt ?? true
         ? LoadingPageState.done
         : LoadingPageState.loading;
@@ -125,15 +127,15 @@ class LoadingPage extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         case LoadingPageState.error:
           return onError ??
-              const IconMessage(
-                icon: Icon(Icons.warning_amber_outlined),
-                title: Text('Failed to load'),
+              IconMessage(
+                icon: const Icon(Icons.warning_amber_outlined),
+                title: Text(l10n.commonFailedLoad),
               );
         case LoadingPageState.empty:
           return onEmpty ??
-              const IconMessage(
-                icon: Icon(Icons.clear),
-                title: Text('Nothing to see here'),
+              IconMessage(
+                icon: const Icon(Icons.clear),
+                title: Text(l10n.commonNothingHere),
               );
         case LoadingPageState.done:
           return child(context);

@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
@@ -33,9 +34,10 @@ class PostsPage extends StatefulWidget {
 class _PostsPageState extends State<PostsPage> {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     Widget? endDrawer() {
       return ContextDrawer(
-        title: const Text('Posts'),
+        title: Text(l10n.postPosts),
         children: [
           CrossFade.builder(
             showChild: widget.drawerActions?.isNotEmpty ?? false,

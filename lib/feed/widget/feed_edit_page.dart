@@ -1,5 +1,6 @@
 import 'package:kilt/feed/data/feed.dart';
 import 'package:kilt/feed/feeds_provider.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
 import 'package:flutter/cupertino.dart';
@@ -62,10 +63,11 @@ class _FeedEditPageState extends State<FeedEditPage> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context);
     final name = _nameController.text.trim();
     final feed = Feed(
       id: widget.feed?.id ?? '',
-      name: name.isEmpty ? 'Unnamed feed' : name,
+      name: name.isEmpty ? l10n.feedsUnnamed : name,
       mediaType: _mediaType,
       includeTags: _tagsFrom(_includeController),
       orTags: _tagsFrom(_orController),
@@ -90,6 +92,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
   }
 
   Widget _buildForm(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final padding = _embedded
         ? defaultActionListPadding.add(LimitedWidthLayout.of(context).padding)
         : defaultListPadding;
@@ -103,14 +106,14 @@ class _FeedEditPageState extends State<FeedEditPage> {
             children: [
               TextField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Name',
-                  hintText: 'e.g. My art feed',
+                decoration: InputDecoration(
+                  labelText: l10n.commonName,
+                  hintText: l10n.feedsNameHint,
                   border: _roundedInputBorder,
                 ),
               ),
               const SizedBox(height: 16),
-              const ListTileHeader(title: 'Type'),
+              ListTileHeader(title: l10n.commonType),
               _TypeSelector(
                 value: _mediaType,
                 onChanged: (v) => setState(() => _mediaType = v),
@@ -123,14 +126,14 @@ class _FeedEditPageState extends State<FeedEditPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const ListTileHeader(title: 'Tags'),
+              ListTileHeader(title: l10n.commonTags),
               TagInput(
                 controller: _includeController,
                 autofocus: false,
                 cutoutForFab: false,
-                labelText: 'Include tags',
-                decoration: const InputDecoration(
-                  hintText: 'space separated, all required',
+                labelText: l10n.feedsIncludeTags,
+                decoration: InputDecoration(
+                  hintText: l10n.feedsIncludeTagsHint,
                   border: _roundedInputBorder,
                 ),
               ),
@@ -139,9 +142,9 @@ class _FeedEditPageState extends State<FeedEditPage> {
                 controller: _orController,
                 autofocus: false,
                 cutoutForFab: false,
-                labelText: 'Or tags',
-                decoration: const InputDecoration(
-                  hintText: 'any of these',
+                labelText: l10n.feedsOrTags,
+                decoration: InputDecoration(
+                  hintText: l10n.feedsOrTagsHint,
                   border: _roundedInputBorder,
                 ),
               ),
@@ -150,9 +153,9 @@ class _FeedEditPageState extends State<FeedEditPage> {
                 controller: _excludeController,
                 autofocus: false,
                 cutoutForFab: false,
-                labelText: 'Exclude tags',
-                decoration: const InputDecoration(
-                  hintText: 'posts with these are hidden',
+                labelText: l10n.feedsExcludeTags,
+                decoration: InputDecoration(
+                  hintText: l10n.feedsExcludeTagsHint,
                   border: _roundedInputBorder,
                 ),
               ),
@@ -164,9 +167,9 @@ class _FeedEditPageState extends State<FeedEditPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const ListTileHeader(title: 'Subfeeds'),
+              ListTileHeader(title: l10n.feedsSubfeeds),
               Text(
-                'Optional filters; only one can be active at a time when viewing the feed.',
+                l10n.feedsSubfeedsHelper,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -204,10 +207,10 @@ class _FeedEditPageState extends State<FeedEditPage> {
                   }),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.add, size: 18),
-                      SizedBox(width: 6),
-                      Text('Add subfeed'),
+                    children: [
+                      const Icon(Icons.add, size: 18),
+                      const SizedBox(width: 6),
+                      Text(l10n.feedsAddSubfeed),
                     ],
                   ),
                 ),
@@ -220,13 +223,13 @@ class _FeedEditPageState extends State<FeedEditPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const ListTileHeader(title: 'Rating'),
+              ListTileHeader(title: l10n.commonRating),
               SegmentedButton<String?>(
-                segments: const [
-                  ButtonSegment(value: null, label: Text('All')),
-                  ButtonSegment(value: 's', label: Text('Safe')),
-                  ButtonSegment(value: 'q', label: Text('Q')),
-                  ButtonSegment(value: 'e', label: Text('E')),
+                segments: [
+                  ButtonSegment(value: null, label: Text(l10n.commonRatingAll)),
+                  ButtonSegment(value: 's', label: Text(l10n.commonRatingSafe)),
+                  ButtonSegment(value: 'q', label: Text(l10n.commonRatingQ)),
+                  ButtonSegment(value: 'e', label: Text(l10n.commonRatingE)),
                 ],
                 selected: {_rating},
                 onSelectionChanged: (s) => setState(() => _rating = s.first),
@@ -234,15 +237,15 @@ class _FeedEditPageState extends State<FeedEditPage> {
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 initialValue: _order,
-                decoration: const InputDecoration(
-                  labelText: 'Sort',
+                decoration: InputDecoration(
+                  labelText: l10n.commonSort,
                   border: _roundedInputBorder,
                 ),
-                items: const [
-                  DropdownMenuItem(value: 'id_desc', child: Text('Newest first')),
-                  DropdownMenuItem(value: 'id_asc', child: Text('Oldest first')),
-                  DropdownMenuItem(value: 'score', child: Text('Score')),
-                  DropdownMenuItem(value: 'favcount', child: Text('Fav count')),
+                items: [
+                  DropdownMenuItem(value: 'id_desc', child: Text(l10n.commonSortNewestFirst)),
+                  DropdownMenuItem(value: 'id_asc', child: Text(l10n.commonSortOldestFirst)),
+                  DropdownMenuItem(value: 'score', child: Text(l10n.commonScore)),
+                  DropdownMenuItem(value: 'favcount', child: Text(l10n.commonSortFavCount)),
                 ],
                 onChanged: (v) => setState(() => _order = v ?? _order),
               ),
@@ -252,12 +255,12 @@ class _FeedEditPageState extends State<FeedEditPage> {
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text('Exclude favorited'),
-                        SizedBox(height: 2),
+                      children: [
+                        Text(l10n.feedsExcludeFavorited),
+                        const SizedBox(height: 2),
                         Text(
-                          "Don't show posts you've favorited in this feed",
-                          style: TextStyle(fontSize: 12),
+                          l10n.feedsExcludeFavoritedHelper,
+                          style: const TextStyle(fontSize: 12),
                         ),
                       ],
                     ),
@@ -275,7 +278,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
           const SizedBox(height: 24),
           CupertinoButton.filled(
             onPressed: _save,
-            child: const Text('Save'),
+            child: Text(l10n.commonSave),
           ),
         ],
       ],
@@ -284,17 +287,18 @@ class _FeedEditPageState extends State<FeedEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (_embedded) {
       return _buildForm(context);
     }
     return Scaffold(
       appBar: DefaultAppBar(
-        title: Text(_isNew ? 'New feed' : 'Edit feed'),
+        title: Text(_isNew ? l10n.feedsNewFeedTitle : l10n.feedsEditFeedTitle),
         actions: [
           CupertinoButton(
             padding: EdgeInsets.zero,
             onPressed: _save, minimumSize: Size(0, 0),
-            child: const Text('Save'),
+            child: Text(l10n.commonSave),
           ),
         ],
       ),
@@ -436,6 +440,7 @@ class _SubfeedEditCardState extends State<_SubfeedEditCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final isOled = theme.scaffoldBackgroundColor == Colors.black;
 
     Widget content = Column(
@@ -446,8 +451,8 @@ class _SubfeedEditCardState extends State<_SubfeedEditCard> {
               Expanded(
                 child: TextField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Subfeed name',
+                  decoration: InputDecoration(
+                    labelText: l10n.feedsSubfeedName,
                     border: _roundedInputBorder,
                   ),
                 ),
@@ -461,26 +466,26 @@ class _SubfeedEditCardState extends State<_SubfeedEditCard> {
             ],
           ),
           const SizedBox(height: 12),
-          const ListTileHeader(title: 'Extra include tags'),
+          ListTileHeader(title: l10n.feedsExtraIncludeTags),
           TagInput(
             controller: _includeController,
             autofocus: false,
             cutoutForFab: false,
-            labelText: 'Additional tags (all required)',
+            labelText: l10n.feedsExtraIncludeTagsLabel,
             decoration: const InputDecoration(border: _roundedInputBorder),
           ),
           const SizedBox(height: 8),
-          const ListTileHeader(title: 'Extra exclude tags'),
+          ListTileHeader(title: l10n.feedsExtraExcludeTags),
           TagInput(
             controller: _excludeController,
             autofocus: false,
             cutoutForFab: false,
-            labelText: 'Tags to exclude in this subfeed',
+            labelText: l10n.feedsExtraExcludeTagsLabel,
             decoration: const InputDecoration(border: _roundedInputBorder),
           ),
           if (widget.subfeed.subfeeds.isNotEmpty) ...[
             const SizedBox(height: 12),
-            const ListTileHeader(title: 'Subfeeds'),
+            ListTileHeader(title: l10n.feedsSubfeeds),
             ...List.generate(widget.subfeed.subfeeds.length, (i) {
               return _SubfeedEditCard(
                 key: ValueKey(widget.subfeed.subfeeds[i].id),
@@ -495,10 +500,10 @@ class _SubfeedEditCardState extends State<_SubfeedEditCard> {
               onPressed: _addChild,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(Icons.add, size: 18),
-                  SizedBox(width: 6),
-                  Text('Add subfeed'),
+                children: [
+                  const Icon(Icons.add, size: 18),
+                  const SizedBox(width: 6),
+                  Text(l10n.feedsAddSubfeed),
                 ],
               ),
             ),
@@ -509,10 +514,10 @@ class _SubfeedEditCardState extends State<_SubfeedEditCard> {
               onPressed: _addChild,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(Icons.add, size: 18),
-                  SizedBox(width: 6),
-                  Text('Add subfeed'),
+                children: [
+                  const Icon(Icons.add, size: 18),
+                  const SizedBox(width: 6),
+                  Text(l10n.feedsAddSubfeed),
                 ],
               ),
             ),
@@ -552,6 +557,7 @@ class _TypeSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final colorScheme = theme.colorScheme;
 
     final baseBg = theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6);
@@ -614,20 +620,20 @@ class _TypeSelector extends StatelessWidget {
           buildSegment(
             type: Feed.mediaTypeImage,
             icon: Icons.image,
-            label: 'Image',
+            label: l10n.feedImage,
             radius: const BorderRadius.horizontal(left: Radius.circular(12)),
           ),
           divider(),
           buildSegment(
             type: Feed.mediaTypeVideo,
             icon: Icons.videocam,
-            label: 'Video',
+            label: l10n.feedVideo,
           ),
           divider(),
           buildSegment(
             type: Feed.mediaTypeAll,
             icon: Icons.collections,
-            label: 'Both',
+            label: l10n.feedImageAndVideo,
             radius: const BorderRadius.horizontal(right: Radius.circular(12)),
           ),
         ],

@@ -1,4 +1,5 @@
 import 'package:kilt/client/client.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/pool/pool.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
@@ -18,13 +19,14 @@ class _PoolLoadingPageState extends State<PoolLoadingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return FutureLoadingPage<Pool>(
       future: pool,
       builder: (context, value) =>
           PoolPage(pool: value, orderByOldest: widget.orderByOldest),
-      title: Text('Pool #${widget.id}'),
-      onError: const Text('Failed to load pool'),
-      onEmpty: const Text('Pool not found'),
+      title: Text(l10n.poolPoolTitle(widget.id)),
+      onError: Text(l10n.poolFailedLoadOne),
+      onEmpty: Text(l10n.poolNotFound),
     );
   }
 }

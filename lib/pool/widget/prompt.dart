@@ -1,4 +1,5 @@
 import 'package:kilt/client/client.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/pool/pool.dart';
 import 'package:kilt/post/post.dart';
@@ -34,6 +35,7 @@ class PoolSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Material(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
@@ -61,8 +63,8 @@ class PoolSheet extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: pool.description.isNotEmpty
                   ? DText(pool.description)
-                  : const Text(
-                      'no description',
+                  : Text(
+                      l10n.commonNoDescription,
                       style: TextStyle(fontStyle: FontStyle.italic),
                     ),
             ),
@@ -95,6 +97,7 @@ class PoolDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return AlertDialog(
       content: SizedBox(
         width: 800,
@@ -125,8 +128,8 @@ class PoolDialog extends StatelessWidget {
                       padding: const EdgeInsets.all(16),
                       child: pool.description.isNotEmpty
                           ? DText(pool.description)
-                          : const Text(
-                              'no description',
+                          : Text(
+                              l10n.commonNoDescription,
                               style: TextStyle(fontStyle: FontStyle.italic),
                             ),
                     ),
@@ -156,6 +159,7 @@ class PoolActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SingleChildScrollView(
       primary: false,
       scrollDirection: Axis.horizontal,
@@ -164,7 +168,7 @@ class PoolActions extends StatelessWidget {
         children: [
           ActionButton(
             icon: const Icon(Icons.share),
-            label: const Text('share'),
+            label: Text(l10n.commonShare),
             onTap: () async =>
                 Share.text(context, context.read<Client>().withHost(pool.link)),
           ),

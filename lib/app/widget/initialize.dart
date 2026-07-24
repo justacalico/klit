@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:kilt/app/app.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
@@ -93,6 +94,7 @@ class _LoadingScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return CupertinoPageScaffold(
       child: Center(
         child: DefaultTextStyle.merge(
@@ -105,7 +107,7 @@ class _LoadingScaffold extends StatelessWidget {
               const AppIcon(radius: 64),
               if (snapshot.error != null) ...[
                 const SizedBox(height: 16),
-                const Text('Failed to initialize'),
+                Text(l10n.appFailedInitialize),
                 if (kDebugMode) ...[
                   const SizedBox(height: 8),
                   Text(snapshot.error.toString()),

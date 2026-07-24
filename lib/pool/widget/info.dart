@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/pool/pool.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ class PoolInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     Widget textInfoRow(String label, String value) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -23,11 +25,11 @@ class PoolInfo extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          textInfoRow('posts', pool.postIds.length.toString()),
+          textInfoRow(l10n.commonPosts, pool.postIds.length.toString()),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('id'),
+              Text(l10n.commonId),
               InkWell(
                 child: Text('#${pool.id}'),
                 onLongPress: () async {
@@ -39,20 +41,20 @@ class PoolInfo extends StatelessWidget {
                   messenger.showSnackBar(
                     SnackBar(
                       duration: const Duration(seconds: 1),
-                      content: Text('Copied pool id #${pool.id}'),
+                      content: Text(l10n.poolCopiedId(pool.id)),
                     ),
                   );
                 },
               ),
             ],
           ),
-          textInfoRow('activity', pool.active ? 'active' : 'inactive'),
+          textInfoRow(l10n.poolActivity, pool.active ? l10n.commonActive : l10n.commonInactive),
           textInfoRow(
-            'created',
+            l10n.commonCreated,
             DateFormatting.dateTime(pool.createdAt.toLocal()),
           ),
           textInfoRow(
-            'updated',
+            l10n.commonUpdated,
             DateFormatting.dateTime(pool.updatedAt.toLocal()),
           ),
         ],

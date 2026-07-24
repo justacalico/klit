@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
@@ -148,6 +149,7 @@ class DrawerDenySwitchBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     Map<String, List<Post>> entries = {};
 
     denied.forEach((key, value) {
@@ -167,13 +169,13 @@ class DrawerDenySwitchBody extends StatelessWidget {
     return Column(
       children: [
         SwitchListTile(
-          title: const Text('Blacklist'),
+          title: Text(l10n.traitsBlacklist),
           subtitle: denying && count > 0
               ? TweenAnimationBuilder<int>(
                   tween: IntTween(begin: 0, end: count),
                   duration: defaultAnimationDuration,
                   builder: (context, value, child) =>
-                      Text('blocked $value posts'),
+                      Text(l10n.traitsBlockedPosts(value)),
                 )
               : null,
           secondary: const Icon(Icons.block),

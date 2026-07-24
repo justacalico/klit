@@ -1,5 +1,6 @@
 import 'package:kilt/client/client.dart';
 import 'package:kilt/comment/comment.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/widgets.dart';
 
@@ -19,12 +20,13 @@ class _CommentLoadingPageState extends State<CommentLoadingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return FutureLoadingPage<Comment>(
       future: comment,
       builder: (context, value) => PostCommentsPage(postId: value.postId),
-      title: Text('Comment #${widget.id}'),
-      onError: const Text('Failed to load comment'),
-      onEmpty: const Text('Comment not found'),
+      title: Text(l10n.commentCommentTitle(widget.id)),
+      onError: Text(l10n.commentFailedLoadOne),
+      onEmpty: Text(l10n.commentNotFound),
     );
   }
 }

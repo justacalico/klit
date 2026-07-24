@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/identity/identity.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_cookie_manager_plus/webview_cookie_manager_plus.dart';
@@ -52,6 +53,7 @@ class _CookieCapturePageState extends State<CookieCapturePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (!PlatformCapabilities.supportsWebViewLogin) {
       final identity = context.read<Client>().identity;
       final loginUrl = Uri.parse(identity.host).replace(path: '/users/sign_in');
@@ -66,15 +68,15 @@ class _CookieCapturePageState extends State<CookieCapturePage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'On desktop, log in using your browser and add an API key in Settings.',
+                Text(
+                  l10n.identityDesktopLogin,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
                 FilledButton.icon(
                   onPressed: () => launch(loginUrl.toString()),
                   icon: const Icon(Icons.open_in_browser),
-                  label: const Text('Open login in browser'),
+                  label: Text(l10n.identityOpenLoginBrowser),
                 ),
               ],
             ),

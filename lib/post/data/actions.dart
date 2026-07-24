@@ -20,7 +20,7 @@ extension PostTagging on Post {
           return id == int.tryParse(value);
         case 'rating':
           return rating == Rating.values.asNameMap()[value] ||
-              value == rating.title.toLowerCase();
+              value == rating.titleName.toLowerCase();
         case 'type':
           return ext.toLowerCase() == value.toLowerCase();
         case 'width':

@@ -1,6 +1,7 @@
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/comment/comment.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
@@ -41,6 +42,7 @@ class _InlineCommentComposerState extends State<InlineCommentComposer>
     });
 
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context);
     final error = await submitNewComment(
       context: context,
       postId: widget.postId,
@@ -63,9 +65,9 @@ class _InlineCommentComposerState extends State<InlineCommentComposer>
     _textController.clear();
     await context.read<CommentController>().refresh(force: true);
     messenger.showSnackBar(
-      const SnackBar(
-        duration: Duration(seconds: 1),
-        content: Text('Comment sent!'),
+      SnackBar(
+        duration: const Duration(seconds: 1),
+        content: Text(l10n.commentSent),
       ),
     );
 
@@ -78,6 +80,7 @@ class _InlineCommentComposerState extends State<InlineCommentComposer>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final hasLogin = context.watch<Client>().hasLogin;
     final viewInsets = MediaQuery.viewInsetsOf(context);
     final theme = Theme.of(context);
@@ -94,11 +97,11 @@ class _InlineCommentComposerState extends State<InlineCommentComposer>
           color: surface,
           border: Border(top: BorderSide(color: theme.dividerColor)),
         ),
-        child: const SafeArea(
+        child: SafeArea(
           top: false,
           child: Padding(
-            padding: EdgeInsets.fromLTRB(16, 10, 16, 12),
-            child: Text('Log in to add a comment'),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+            child: Text(l10n.commentLogInToAdd),
           ),
         ),
       );
@@ -123,7 +126,7 @@ class _InlineCommentComposerState extends State<InlineCommentComposer>
                 child: Row(
                   children: [
                     Text(
-                      'Add comment',
+                      l10n.commentAddComment,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -133,9 +136,9 @@ class _InlineCommentComposerState extends State<InlineCommentComposer>
               ),
               TabBar(
                 controller: _tabController,
-                tabs: const [
-                  Tab(text: 'Write'),
-                  Tab(text: 'Preview'),
+                tabs: [
+                  Tab(text: l10n.commonWrite),
+                  Tab(text: l10n.commonPreview),
                 ],
               ),
               SizedBox(
@@ -149,9 +152,9 @@ class _InlineCommentComposerState extends State<InlineCommentComposer>
                         controller: _textController,
                         keyboardType: TextInputType.multiline,
                         maxLines: null,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           border: InputBorder.none,
-                          hintText: 'type here...',
+                          hintText: l10n.commonTypeHere,
                         ),
                         enabled: !_isSubmitting,
                         enableIMEPersonalizedLearning: !PrivateTextFields.of(
@@ -169,7 +172,7 @@ class _InlineCommentComposerState extends State<InlineCommentComposer>
                               return DText(_textController.text);
                             }
                             return Text(
-                              'your text here',
+                              l10n.commonYourTextHere,
                               style: TextStyle(
                                 color: dimTextColor(context),
                                 fontStyle: FontStyle.italic,
@@ -196,7 +199,7 @@ class _InlineCommentComposerState extends State<InlineCommentComposer>
                       child: FilledButton.icon(
                         onPressed: canSend ? _submit : null,
                         icon: const Icon(Icons.send),
-                        label: const Text('Send'),
+                        label: Text(l10n.commonSend),
                       ),
                     );
                   },

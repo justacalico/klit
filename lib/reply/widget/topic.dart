@@ -1,4 +1,5 @@
 import 'package:kilt/history/history.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/reply/reply.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/topic/topic.dart';
@@ -12,6 +13,7 @@ class TopicRepliesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ReplyProvider(
       topicId: topic.id,
       orderByOldest: orderByOldest,
@@ -27,7 +29,7 @@ class TopicRepliesPage extends StatelessWidget {
               actions: [
                 IconButton(
                   icon: const Icon(Icons.info_outline),
-                  tooltip: 'Info',
+                  tooltip: l10n.commonInfo,
                   onPressed: () =>
                       showTopicPrompt(context: context, topic: topic),
                 ),

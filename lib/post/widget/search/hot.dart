@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/post/widget/search/popular_date_control.dart';
 import 'package:kilt/shared/shared.dart';
@@ -17,7 +18,7 @@ class HotPage extends StatelessWidget {
                   controller: controller,
                   child: PostsPage(
                     controller: controller,
-                    appBar: const DefaultAppBar(title: Text('Popular')),
+                    appBar: DefaultAppBar(title: Text(AppLocalizations.of(context).postPopular)),
                     bodyTop: hot != null
                         ? SafeArea(
                             bottom: false,

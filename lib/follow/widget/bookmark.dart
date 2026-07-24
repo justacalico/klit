@@ -1,5 +1,6 @@
 import 'package:kilt/client/client.dart';
 import 'package:kilt/follow/follow.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ class FollowsBookmarkPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SubChangeNotifierProvider<Client, FollowController>(
         create: (context, client) =>
             FollowController(client: client, types: [FollowType.bookmark]),
@@ -27,11 +29,11 @@ class FollowsBookmarkPage extends StatelessWidget {
               items: controller.items,
               child: PromptActions(
                 child: AdaptiveScaffold(
-                  appBar: const FollowSelectionAppBar(
-                    child: DefaultAppBar(title: Text('Bookmarks')),
+                  appBar: FollowSelectionAppBar(
+                    child: DefaultAppBar(title: Text(l10n.followBookmarks)),
                   ),
                   floatingActionButton: AddTagFloatingActionButton(
-                    title: 'Add to bookmarks',
+                    title: l10n.followAddToBookmarks,
                     onSubmit: (value) async {
                       value = value.trim();
                       if (value.isEmpty) return;
@@ -57,8 +59,8 @@ class FollowsBookmarkPage extends StatelessWidget {
                             onRetry: controller.getNextPage,
                             itemBuilder: (context, item, index) =>
                                 FollowTile(follow: item),
-                            onEmpty: const Text('No bookmarks'),
-                            onError: const Text('Failed to load bookmarks'),
+                            onEmpty: Text(l10n.followNoBookmarks),
+                            onError: Text(l10n.followFailedLoadBookmarks),
                           ),
                           crossAxisCount: TileLayout.of(context).crossAxisCount,
                         ),

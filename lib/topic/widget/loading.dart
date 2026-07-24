@@ -1,4 +1,5 @@
 import 'package:kilt/client/client.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/reply/reply.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/topic/topic.dart';
@@ -19,13 +20,14 @@ class _TopicLoadingPageState extends State<TopicLoadingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return FutureLoadingPage<Topic>(
       future: topic,
       builder: (context, value) =>
           TopicRepliesPage(topic: value, orderByOldest: widget.orderByOldest),
-      title: Text('Topic #${widget.id}'),
-      onError: const Text('Failed to load topic'),
-      onEmpty: const Text('Topic not found'),
+      title: Text(l10n.topicTitle(widget.id)),
+      onError: Text(l10n.topicFailedLoadOne),
+      onEmpty: Text(l10n.topicNotFound),
     );
   }
 }

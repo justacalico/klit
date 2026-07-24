@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 
 enum NumberComparison {
   lessThan,
@@ -366,6 +367,7 @@ class _RangeDialogState extends State<RangeDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return AlertDialog(
       title: widget.title,
       content: AnimatedBuilder(
@@ -470,11 +472,11 @@ class _RangeDialogState extends State<RangeDialog> {
       actions: [
         TextButton(
           onPressed: Navigator.of(context).maybePop,
-          child: const Text('CANCEL'),
+          child: Text(l10n.commonCancelUpper),
         ),
         TextButton(
           onPressed: () => submit(controller.text),
-          child: const Text('OK'),
+          child: Text(l10n.commonOkUpper),
         ),
       ],
     );

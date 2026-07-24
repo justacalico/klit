@@ -1,5 +1,6 @@
 import 'package:kilt/client/client.dart';
 import 'package:kilt/flag/flag.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
@@ -32,9 +33,9 @@ class DeletionDisplay extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              child: Text('Deletion', style: TextStyle(fontSize: 16)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              child: Text(AppLocalizations.of(context).postDeletion, style: const TextStyle(fontSize: 16)),
             ),
             Row(
               children: [

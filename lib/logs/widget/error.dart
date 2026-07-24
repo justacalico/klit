@@ -1,4 +1,5 @@
 import 'package:kilt/logs/logs.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
@@ -17,6 +18,7 @@ class LoggerErrorNotifier extends StatelessWidget {
 
   void onMessage(BuildContext context, List<LogRecord> event) {
     if (kReleaseMode) return;
+    final l10n = AppLocalizations.of(context);
     ScaffoldMessengerState? messenger = ScaffoldMessenger.maybeOf(context);
     if (messenger == null) return;
     if (event.isEmpty) return;
@@ -52,7 +54,7 @@ class LoggerErrorNotifier extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'A critical error has occured!',
+                      l10n.logsCriticalError,
                       style: style.copyWith(color: textColor),
                     ),
                     Text(
@@ -68,7 +70,7 @@ class LoggerErrorNotifier extends StatelessWidget {
             backgroundColor: background,
             behavior: SnackBarBehavior.floating,
             action: onOpenLogs != null
-                ? SnackBarAction(label: 'LOGS', onPressed: onOpenLogs!)
+                ? SnackBarAction(label: l10n.logsLogs, onPressed: onOpenLogs!)
                 : null,
           ),
         );

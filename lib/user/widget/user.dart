@@ -1,6 +1,7 @@
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/history/history.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
@@ -25,6 +26,7 @@ class UserPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return _UserPageProvider(
       user: user,
       child: Consumer<_UserPageControllers>(
@@ -33,14 +35,14 @@ class UserPage extends StatelessWidget {
             Widget body;
             PreferredSizeWidget? appbar;
             Map<Widget, WidgetBuilder> tabs = {
-              const Tab(text: 'Favorites'): (context) =>
+              Tab(text: l10n.commonFavorites): (context) =>
                   ChangeNotifierProvider<PostController>.value(
                     value: controllers.favoritePosts,
                     builder: (context, child) => PostSliverDisplay(
                       controller: controllers.favoritePosts,
                     ),
                   ),
-              const Tab(text: 'Uploads'): (context) =>
+              Tab(text: l10n.commonUploads): (context) =>
                   ChangeNotifierProvider<PostController>.value(
                     value: controllers.uploadedPosts,
                     builder: (context, child) => PostSliverDisplay(
@@ -88,7 +90,7 @@ class UserPage extends StatelessWidget {
                   ),
                 ),
               );
-              tabs[const Tab(text: 'About')] = (context) => SliverPadding(
+              tabs[Tab(text: l10n.commonAbout)] = (context) => SliverPadding(
                 padding: defaultListPadding.add(
                   LimitedWidthLayout.of(context).padding,
                 ),
@@ -187,7 +189,7 @@ class UserPage extends StatelessWidget {
                 child: Scaffold(
                   appBar: appbar,
                   endDrawer: ContextDrawer(
-                    title: const Text('Posts'),
+                    title: Text(l10n.postPosts),
                     children: [
                       DrawerMultiDenySwitch(controllers: controllers.all),
                       DrawerMultiTagCounter(controllers: controllers.all),
@@ -279,6 +281,7 @@ class _UserProfileActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     ValueNotifier<Traits> traits = context.watch<Client>().traits;
     String userTag = 'user:${user.id}';
     bool blocked = traits.value.denylist.contains(userTag);
@@ -287,12 +290,12 @@ class _UserProfileActions extends StatelessWidget {
       onSelected: (value) => value(),
       itemBuilder: (context) => [
         PopupMenuTile(
-          title: 'Browse',
+          title: l10n.commonBrowse,
           icon: Icons.open_in_browser,
           value: () async => launch(context.read<Client>().withHost(user.link)),
         ),
         PopupMenuTile(
-          title: 'Report',
+          title: l10n.commonReport,
           icon: Icons.report,
           value: () => guardWithLogin(
             context: context,
@@ -303,11 +306,11 @@ class _UserProfileActions extends StatelessWidget {
                 ),
               );
             },
-            error: 'You must be logged in to report users!',
+            error: l10n.userMustLoginReport,
           ),
         ),
         PopupMenuTile(
-          title: blocked ? 'Unblock' : 'Block',
+          title: blocked ? l10n.commonUnblock : l10n.commonBlock,
           icon: blocked ? Icons.check : Icons.block,
           value: () {
             if (blocked) {
@@ -382,6 +385,7 @@ class UserInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     Widget info(
       IconData icon,
       String title,
@@ -414,7 +418,7 @@ class UserInfo extends StatelessWidget {
                   controller: Expandables.of(context, 'about'),
                   header: ListTile(
                     leading: aboutLeading ?? const Icon(Icons.person),
-                    title: const Text('About'),
+                    title: Text(l10n.commonAbout),
                   ),
                   collapsed: const SizedBox.shrink(),
                   expanded: hasAbout
@@ -433,9 +437,9 @@ class UserInfo extends StatelessWidget {
               Card(
                 child: ExpandablePanel(
                   controller: Expandables.of(context, 'comission'),
-                  header: const ListTile(
-                    leading: Icon(Icons.attach_money),
-                    title: Text('Comission'),
+                  header: ListTile(
+                    leading: const Icon(Icons.attach_money),
+                    title: Text(l10n.userCommission),
                   ),
                   collapsed: const SizedBox.shrink(),
                   expanded: Padding(
@@ -450,9 +454,9 @@ class UserInfo extends StatelessWidget {
             Card(
               child: ExpandablePanel(
                 controller: Expandables.of(context, 'info'),
-                header: const ListTile(
-                  leading: Icon(Icons.info_outline),
-                  title: Text('Info'),
+                header: ListTile(
+                  leading: const Icon(Icons.info_outline),
+                  title: Text(l10n.commonInfo),
                 ),
                 collapsed: const SizedBox.shrink(),
                 expanded: Padding(
@@ -461,7 +465,7 @@ class UserInfo extends StatelessWidget {
                     children: [
                       info(
                         Icons.tag,
-                        'id',
+                        l10n.commonId,
                         user.id.toString(),
                         onLongPress: () {
                           Clipboard.setData(
@@ -470,7 +474,7 @@ class UserInfo extends StatelessWidget {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               duration: const Duration(seconds: 1),
-                              content: Text('Copied user id #${user.id}'),
+                              content: Text(l10n.userCopiedId(user.id)),
                             ),
                           );
                         },
@@ -478,21 +482,21 @@ class UserInfo extends StatelessWidget {
                       if (user.stats case final stats?) ...[
                         info(
                           Icons.calendar_today,
-                          'joined',
+                          l10n.userJoined,
                           stats.createdAt != null
-                              ? DateFormatting.named(stats.createdAt!)
+                              ? DateFormatting.named(stats.createdAt!, context)
                               : null,
                         ),
                         info(
                           Icons.shield,
-                          'rank',
+                          l10n.userRank,
                           stats.levelString?.toLowerCase(),
                         ),
-                        info(Icons.upload, 'posts', stats.postUploadCount),
-                        info(Icons.edit, 'edits', stats.postUpdateCount),
-                        info(Icons.favorite, 'favorites', stats.favoriteCount),
-                        info(Icons.comment, 'comments', stats.commentCount),
-                        info(Icons.forum, 'forum', stats.forumPostCount),
+                        info(Icons.upload, l10n.commonPosts, stats.postUploadCount),
+                        info(Icons.edit, l10n.userEdits, stats.postUpdateCount),
+                        info(Icons.favorite, l10n.commonFavorites, stats.favoriteCount),
+                        info(Icons.comment, l10n.userComments, stats.commentCount),
+                        info(Icons.forum, l10n.userForum, stats.forumPostCount),
                       ],
                     ],
                   ),

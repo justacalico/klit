@@ -1,4 +1,5 @@
 import 'package:kilt/history/history.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/pool/pool.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/settings/settings.dart';
@@ -19,6 +20,7 @@ class PoolsPage extends StatefulWidget {
 class _PoolsPageState extends State<PoolsPage> {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return PoolsProvider(
       search: widget.search,
       child: Consumer<PoolController>(
@@ -33,13 +35,13 @@ class _PoolsPageState extends State<PoolsPage> {
                 ),
               ),
           child: AdaptiveScaffold(
-            appBar: const DefaultAppBar(
-              title: Text('Pools'),
+            appBar: DefaultAppBar(
+              title: Text(l10n.poolPools),
               actions: [ContextDrawerButton()],
             ),
             floatingActionButton: null,
             endDrawer: ContextDrawer(
-              title: const Text('Pools'),
+              title: Text(l10n.poolPools),
               children: [
                 DrawerDenySwitch(controller: controller.thumbnails),
                 DrawerTagCounter(controller: controller.thumbnails),
@@ -81,8 +83,8 @@ class _PoolsPageState extends State<PoolsPage> {
                                   ),
                                 ),
                               ),
-                          onEmpty: const Text('No pools'),
-                          onError: const Text('Failed to load pools'),
+                          onEmpty: Text(l10n.poolNoPools),
+                          onError: Text(l10n.poolFailedLoad),
                         ),
                       ),
                 ),

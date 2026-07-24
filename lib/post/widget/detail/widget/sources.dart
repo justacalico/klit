@@ -1,4 +1,5 @@
 import 'package:kilt/app/app.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
@@ -11,14 +12,15 @@ class SourceDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return HiddenWidget(
       show: post.sources.isNotEmpty,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-            child: Text('Sources', style: TextStyle(fontSize: 16)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            child: Text(l10n.postSources, style: const TextStyle(fontSize: 16)),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
@@ -32,7 +34,7 @@ class SourceDisplay extends StatelessWidget {
                 : Padding(
                     padding: const EdgeInsets.all(4),
                     child: Text(
-                      'no sources',
+                      l10n.commonNoSources,
                       style: TextStyle(
                         color: dimTextColor(context),
                         fontStyle: FontStyle.italic,

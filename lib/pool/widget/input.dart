@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/history/history.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/pool/data/controller.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
@@ -16,6 +17,7 @@ class PoolsPageFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SearchPromptFloatingActionButton(
       tags: controller.query,
       onSubmit: (value) => controller.query = value,
@@ -26,49 +28,49 @@ class PoolsPageFloatingActionButton extends StatelessWidget {
           filters: [
             PrimaryFilterConfig(
               filter: PoolNameFilterTag(tag: 'name_matches'),
-              filters: const [
+              filters: [
                 TextFilterTag(
                   tag: 'description_matches',
-                  name: 'Description',
+                  name: l10n.commonDescription,
                   icon: Icon(Icons.description),
                 ),
                 TextFilterTag(
                   tag: 'creator_name',
-                  name: 'Creator',
+                  name: l10n.poolCreator,
                   icon: Icon(Icons.person),
                 ),
                 ToggleFilterTag(
                   tag: 'is_active',
-                  name: 'Active',
+                  name: l10n.commonActive,
                   enabled: 'true',
                   disabled: 'false',
-                  description: 'Is active',
+                  description: l10n.poolIsActive,
                 ),
                 ChoiceFilterTag(
                   tag: 'category',
-                  name: 'Category',
+                  name: l10n.poolCategory,
                   icon: Icon(Icons.category),
                   options: [
-                    ChoiceFilterTagValue(value: null, name: 'Default'),
-                    ChoiceFilterTagValue(value: 'series', name: 'Series'),
+                    ChoiceFilterTagValue(value: null, name: l10n.commonSortDefault),
+                    ChoiceFilterTagValue(value: 'series', name: l10n.poolCategorySeries),
                     ChoiceFilterTagValue(
                       value: 'collection',
-                      name: 'Collection',
+                      name: l10n.poolCategoryCollection,
                     ),
                   ],
                 ),
                 ChoiceFilterTag(
                   tag: 'order',
-                  name: 'Sort by',
+                  name: l10n.commonSortBy,
                   icon: Icon(Icons.sort),
                   options: [
-                    ChoiceFilterTagValue(value: null, name: 'Default'),
-                    ChoiceFilterTagValue(value: 'name', name: 'Name'),
-                    ChoiceFilterTagValue(value: 'created_at', name: 'Created'),
-                    ChoiceFilterTagValue(value: 'updated_at', name: 'Updated'),
+                    ChoiceFilterTagValue(value: null, name: l10n.commonSortDefault),
+                    ChoiceFilterTagValue(value: 'name', name: l10n.commonName),
+                    ChoiceFilterTagValue(value: 'created_at', name: l10n.commonSortCreated),
+                    ChoiceFilterTagValue(value: 'updated_at', name: l10n.commonSortUpdated),
                     ChoiceFilterTagValue(
                       value: 'post_count',
-                      name: 'Post count',
+                      name: l10n.commonSortPostCount,
                     ),
                   ],
                 ),
@@ -107,6 +109,7 @@ class PoolNameFilter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     FilterTagThemeData theme = FilterTagTheme.of(context);
     return SubTextValue(
       value: state.value,
@@ -116,7 +119,7 @@ class PoolNameFilter extends StatelessWidget {
             direction: VerticalDirection.up,
             submit: (value) => state.onSubmit?.call(value),
             controller: controller,
-            labelText: 'Pool title',
+            labelText: l10n.poolPoolTitleField,
             decoration: theme.decoration,
             focusNode: theme.focusNode,
             onSelected: (value) {

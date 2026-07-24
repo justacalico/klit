@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
@@ -49,12 +50,13 @@ class _SearchPageAppBarState extends State<SearchPageAppBar> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final colorScheme = theme.colorScheme;
     final iconColor = colorScheme.onSurfaceVariant;
     final hintColor = iconColor.withValues(alpha: 0.8);
 
     return DefaultAppBar(
-      title: const Text('Search'),
+      title: Text(l10n.postSearch),
       actions: [Builder(builder: (context) => ContextDrawerButton())],
       secondary: TagInput(
         controller: _textController,
@@ -62,7 +64,7 @@ class _SearchPageAppBarState extends State<SearchPageAppBar> {
         autofocus: false,
         textInputAction: TextInputAction.search,
         decoration: InputDecoration(
-          hintText: 'Search tags',
+          hintText: l10n.postSearchTags,
           hintStyle: theme.textTheme.bodyLarge?.copyWith(color: hintColor),
           prefixIcon: Icon(Icons.search, color: iconColor),
           border: InputBorder.none,

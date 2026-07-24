@@ -1,4 +1,5 @@
 import 'package:kilt/client/client.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/wiki/wiki.dart';
 import 'package:flutter/material.dart';
@@ -17,12 +18,13 @@ class _WikiLoadingPageState extends State<WikiLoadingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return FutureLoadingPage<Wiki>(
       future: wiki,
       builder: (context, value) => WikiPage(wiki: value),
-      title: Text('Wiki #${widget.id}'),
-      onError: const Text('Failed to load wiki'),
-      onEmpty: const Text('Wiki not found'),
+      title: Text(l10n.wikiWikiTitle(widget.id)),
+      onError: Text(l10n.wikiFailedLoadOne),
+      onEmpty: Text(l10n.wikiNotFound),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/logs/logs.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
@@ -118,6 +119,7 @@ class _LogFileListState extends State<LogFileList> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return TileLayout(
       tileSize: 160,
       child: FutureBuilder(
@@ -131,7 +133,7 @@ class _LogFileListState extends State<LogFileList> {
             items: files,
             child: Scaffold(
               appBar: LogFileSelectionAppBar(
-                child: const DefaultAppBar(title: Text('Log Files')),
+                child: DefaultAppBar(title: Text(l10n.logsLogFiles)),
                 onDelete: (files) {
                   for (final file in files) {
                     File(file.path).delete();
@@ -142,18 +144,18 @@ class _LogFileListState extends State<LogFileList> {
               body: Builder(
                 builder: (context) {
                   if (snapshot.hasError) {
-                    return const IconMessage(
-                      icon: Icon(Icons.warning_amber),
-                      title: Text('Failed to load log files!'),
+                    return IconMessage(
+                      icon: const Icon(Icons.warning_amber),
+                      title: Text(l10n.logsFailedLoadFiles),
                     );
                   }
                   if (files == null) {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (files.isEmpty) {
-                    return const IconMessage(
-                      icon: Icon(Icons.close),
-                      title: Text('No log files available!'),
+                    return IconMessage(
+                      icon: const Icon(Icons.close),
+                      title: Text(l10n.logsNoLogFiles),
                     );
                   }
                   return GridView.custom(
@@ -182,7 +184,7 @@ class _LogFileListState extends State<LogFileList> {
                                 Padding(
                                   padding: const EdgeInsets.all(16),
                                   child: Text(
-                                    'Live\n',
+                                    '${l10n.logsLive}\n',
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: Theme.of(
@@ -281,6 +283,7 @@ class _LogPageState extends State<LogPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SubStream<List<LogString>>(
       create: () => widget.loader.load().map(
         (records) =>
@@ -296,7 +299,11 @@ class _LogPageState extends State<LogPage> {
               appBar: LogSelectionAppBar(
                 child: DefaultAppBar(
                   title: Text(
-                    'Logs${widget.loader.date != null ? ' - ${DateFormatting.date(widget.loader.date!)}' : ''}',
+                    widget.loader.date != null
+                        ? l10n.logsLogsDate(
+                            DateFormatting.date(widget.loader.date!),
+                          )
+                        : l10n.logsLogs,
                   ),
                   actions: [
                     if (widget.onShowAll != null)
@@ -314,10 +321,10 @@ class _LogPageState extends State<LogPage> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (logs.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: IconMessage(
-                        title: Text('No log items!'),
-                        icon: Icon(Icons.close),
+                        title: Text(l10n.logsNoLogItems),
+                        icon: const Icon(Icons.close),
                       ),
                     );
                   }

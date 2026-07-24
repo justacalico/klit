@@ -1,5 +1,6 @@
 import 'package:kilt/client/client.dart';
 import 'package:kilt/follow/follow.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ class FollowMarkReadTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Consumer<FollowController>(
       builder: (context, controller, child) {
         int unseenCount =
@@ -20,16 +22,16 @@ class FollowMarkReadTile extends StatelessWidget {
         return ListTile(
           enabled: unseenCount > 0,
           leading: Icon(unseenCount > 0 ? Icons.mark_email_read : Icons.drafts),
-          title: const Text('unseen posts'),
+          title: Text(l10n.followUnseenPosts),
           subtitle: unseenCount > 0
               ? TweenAnimationBuilder<int>(
                   tween: IntTween(begin: 0, end: unseenCount),
                   duration: defaultAnimationDuration,
                   builder: (context, value, child) {
-                    return Text('mark $value posts as seen');
+                    return Text(l10n.followMarkSeen(value));
                   },
                 )
-              : const Text('no unseen posts'),
+              : Text(l10n.followNoUnseen),
           onTap: () {
             Scaffold.of(context).closeEndDrawer();
             context.read<Client>().follows.markAllSeen(null);
@@ -46,6 +48,7 @@ class FollowFilterReadTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ValueListenableBuilder(
       valueListenable: context.watch<Settings>().filterUnseenFollows,
       builder: (context, filterUnseenFollows, child) => SwitchListTile(
@@ -57,10 +60,10 @@ class FollowFilterReadTile extends StatelessWidget {
         secondary: Icon(
           filterUnseenFollows ? Icons.mark_email_unread : Icons.email,
         ),
-        title: const Text('show unseen first'),
+        title: Text(l10n.followShowUnseenFirst),
         subtitle: filterUnseenFollows
-            ? const Text('filtering for unseen')
-            : const Text('all posts shown'),
+            ? Text(l10n.followFilteringUnseen)
+            : Text(l10n.followAllPostsShown),
       ),
     );
   }
@@ -71,8 +74,9 @@ class FollowEditingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ListTile(
-      title: const Text('Edit'),
+      title: Text(l10n.commonEdit),
       leading: const Icon(Icons.edit),
       onTap: () {
         Scaffold.of(context).closeEndDrawer();
@@ -90,6 +94,7 @@ class FollowForceSyncTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final client = context.watch<Client>();
+    final l10n = AppLocalizations.of(context);
     return SubStream<FollowSync?>(
       create: () => client.followServer.syncStream,
       keys: [client],
@@ -104,12 +109,12 @@ class FollowForceSyncTile extends StatelessWidget {
           builder: (context, progressSnapshot) => Column(
             children: [
               ListTile(
-                title: const Text('Force sync'),
+                title: Text(l10n.followForceSync),
                 leading: const Icon(Icons.sync),
                 subtitle: (sync?.completed ?? true)
-                    ? const Text('sync all follows')
+                    ? Text(l10n.followSyncAll)
                     : Text(
-                        'syncing follows... '
+                        '${l10n.followSyncing} '
                         '${NumberFormat('0.#%').format(progressSnapshot.data ?? 0)}',
                       ),
                 enabled: enabled,

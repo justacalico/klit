@@ -10,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 
 const double mobileBreakpoint = 600;
 const double compactBreakpoint = 900;
@@ -133,6 +134,7 @@ class _BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final viewPadding = MediaQuery.viewPaddingOf(context);
     final bottomOffset = viewPadding.bottom > 0 ? viewPadding.bottom + 8 : 12.0;
     final visible = _visibleNavEntries(
@@ -181,7 +183,7 @@ class _BottomNavBar extends StatelessWidget {
                   Expanded(
                     child: _BottomNavDestination(
                       icon: primaryVisible[i].item.icon,
-                      label: primaryVisible[i].item.label,
+                      label: primaryVisible[i].item.label(l10n),
                       selected: selectedIndex == i,
                       onTap: () {
                         HapticFeedback.selectionClick();
@@ -193,7 +195,7 @@ class _BottomNavBar extends StatelessWidget {
                   Expanded(
                     child: _BottomNavDestination(
                       icon: CupertinoIcons.ellipsis,
-                      label: 'More',
+                      label: l10n.commonMore,
                       selected: selectedIndex == primaryCount,
                         onTap: () {
                         HapticFeedback.selectionClick();
@@ -365,6 +367,7 @@ void _showMoreMenu(
   List<({int index, NavItem item})> entries,
   _NavAdapter nav,
 ) {
+  final l10n = AppLocalizations.of(context);
   final theme = Theme.of(context);
   final cupertinoTheme = CupertinoTheme.of(context);
 
@@ -402,7 +405,7 @@ void _showMoreMenu(
                         : CupertinoColors.label.resolveFrom(context),
                   ),
                   title: Text(
-                    e.item.label,
+                    e.item.label(l10n),
                     style: TextStyle(
                       fontWeight: selected
                           ? FontWeight.w600
@@ -670,10 +673,11 @@ class _SidebarCollapseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     return Tooltip(
-      message: effectiveCollapsed ? 'Expand sidebar' : 'Shrink sidebar',
+      message: effectiveCollapsed ? l10n.commonExpandSidebar : l10n.commonShrinkSidebar,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 2),
         child: Material(
@@ -700,7 +704,7 @@ class _SidebarCollapseButton extends StatelessWidget {
                     const SizedBox(width: 14),
                     Expanded(
                       child: Text(
-                        'Shrink sidebar',
+                        l10n.commonShrinkSidebar,
                         style: theme.textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w500,
                           color: colorScheme.onSurfaceVariant,
@@ -733,6 +737,7 @@ class _SidebarTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -770,7 +775,7 @@ class _SidebarTile extends StatelessWidget {
                   const SizedBox(width: 14),
                   Expanded(
                     child: Text(
-                      item.label,
+                      item.label(l10n),
                       style: theme.textTheme.bodyLarge?.copyWith(
                         fontWeight: selected
                             ? FontWeight.w600
@@ -896,13 +901,14 @@ class _NavBarTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final child = showLabel
         ? Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(item.icon, size: 20),
               const SizedBox(width: 8),
-              Text(item.label),
+              Text(item.label(l10n)),
             ],
           )
         : Icon(item.icon);

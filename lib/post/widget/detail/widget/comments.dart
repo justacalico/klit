@@ -1,4 +1,5 @@
 import 'package:kilt/comment/comment.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,6 +14,7 @@ class CommentDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textColor = Theme.of(context).textTheme.bodyMedium?.color;
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         GlassCard(
@@ -42,7 +44,7 @@ class CommentDisplay extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Comments (${post.commentCount})',
+                      l10n.postCommentsWithCount(post.commentCount),
                       style: TextStyle(
                         color: textColor,
                         fontWeight: FontWeight.w600,
@@ -73,6 +75,7 @@ class SliverPostCommentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return CommentProvider(
       postId: post.id,
       child: Consumer<CommentController>(
@@ -90,10 +93,10 @@ class SliverPostCommentSection extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          const Expanded(
+                          Expanded(
                             child: Text(
-                              'Comments',
-                              style: TextStyle(fontSize: 16),
+                              l10n.postComments,
+                              style: const TextStyle(fontSize: 16),
                             ),
                           ),
                           CommentListDropdown(postId: post.id),

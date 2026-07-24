@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
@@ -10,21 +11,22 @@ class PostsPageFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SearchPromptFloatingActionButton(
       tags: controller.query,
       onSubmit: (value) => controller.query = value,
       filters: [
         PrimaryFilterConfig(
-          filter: TagSearchFilterTag(tag: 'tags', name: 'Tags'),
+          filter: TagSearchFilterTag(tag: 'tags', name: l10n.commonTags),
           filters: [
             NestedFilterTag(
               tag: 'tags',
               decode: TagMap.new,
               encode: (value) => TagMap.from(value).toString(),
-              filters: const [
+              filters: [
                 NumberRangeFilterTag(
                   tag: 'score',
-                  name: 'Score',
+                  name: l10n.commonScore,
                   min: 0,
                   max: 100,
                   division: 10,
@@ -32,11 +34,11 @@ class PostsPageFloatingActionButton extends StatelessWidget {
                     20,
                     comparison: NumberComparison.greaterThanOrEqual,
                   ),
-                  icon: Icon(Icons.arrow_upward),
+                  icon: const Icon(Icons.arrow_upward),
                 ),
                 NumberRangeFilterTag(
                   tag: 'favcount',
-                  name: 'Favorite count',
+                  name: l10n.postFilterFavoriteCount,
                   min: 0,
                   max: 100,
                   division: 10,
@@ -44,75 +46,75 @@ class PostsPageFloatingActionButton extends StatelessWidget {
                     20,
                     comparison: NumberComparison.greaterThanOrEqual,
                   ),
-                  icon: Icon(Icons.favorite),
+                  icon: const Icon(Icons.favorite),
                 ),
                 ChoiceFilterTag(
                   tag: 'order',
-                  name: 'Sort by',
-                  icon: Icon(Icons.sort),
+                  name: l10n.commonSortBy,
+                  icon: const Icon(Icons.sort),
                   options: [
-                    ChoiceFilterTagValue(value: null, name: 'Default'),
-                    ChoiceFilterTagValue(value: 'score', name: 'Score'),
-                    ChoiceFilterTagValue(value: 'favcount', name: 'Favorites'),
-                    ChoiceFilterTagValue(value: 'rank', name: 'Rank'),
-                    ChoiceFilterTagValue(value: 'random', name: 'Random'),
+                    ChoiceFilterTagValue(value: null, name: l10n.commonSortDefault),
+                    ChoiceFilterTagValue(value: 'score', name: l10n.commonScore),
+                    ChoiceFilterTagValue(value: 'favcount', name: l10n.commonSortFavorites),
+                    ChoiceFilterTagValue(value: 'rank', name: l10n.commonSortRank),
+                    ChoiceFilterTagValue(value: 'random', name: l10n.commonSortRandom),
                   ],
                 ),
                 ChoiceFilterTag(
                   tag: 'rating',
-                  name: 'Rating',
-                  icon: Icon(Icons.question_mark),
+                  name: l10n.commonRating,
+                  icon: const Icon(Icons.question_mark),
                   options: [
-                    ChoiceFilterTagValue(value: null, name: 'All'),
-                    ChoiceFilterTagValue(value: 's', name: 'Safe'),
-                    ChoiceFilterTagValue(value: 'q', name: 'Questionable'),
-                    ChoiceFilterTagValue(value: 'e', name: 'Explicit'),
+                    ChoiceFilterTagValue(value: null, name: l10n.commonRatingAll),
+                    ChoiceFilterTagValue(value: 's', name: l10n.commonRatingSafe),
+                    ChoiceFilterTagValue(value: 'q', name: l10n.commonRatingQuestionable),
+                    ChoiceFilterTagValue(value: 'e', name: l10n.commonRatingExplicit),
                   ],
                 ),
                 ToggleFilterTag(
                   tag: 'inpool',
-                  name: 'Pool',
+                  name: l10n.postFilterPool,
                   enabled: 'true',
                   disabled: 'false',
-                  description: 'Has pool',
+                  description: l10n.postFilterHasPool,
                 ),
                 ToggleFilterTag(
                   tag: 'ischild',
-                  name: 'Child',
+                  name: l10n.postFilterChild,
                   enabled: 'true',
                   disabled: 'false',
-                  description: 'Is child post',
+                  description: l10n.postFilterIsChild,
                 ),
                 ToggleFilterTag(
                   tag: 'isparent',
-                  name: 'Parent',
+                  name: l10n.postParent,
                   enabled: 'true',
                   disabled: 'false',
-                  description: 'Is parent post',
+                  description: l10n.postFilterIsParent,
                 ),
                 ChoiceFilterTag(
                   tag: 'date',
-                  name: 'Upload date',
-                  icon: Icon(Icons.date_range),
+                  name: l10n.postFilterUploadDate,
+                  icon: const Icon(Icons.date_range),
                   options: [
-                    ChoiceFilterTagValue(value: null, name: 'All'),
-                    ChoiceFilterTagValue(value: 'day', name: 'Last day'),
-                    ChoiceFilterTagValue(value: 'week', name: 'Last week'),
-                    ChoiceFilterTagValue(value: 'month', name: 'Last Month'),
-                    ChoiceFilterTagValue(value: 'year', name: 'Last Year'),
+                    ChoiceFilterTagValue(value: null, name: l10n.postFilterDateAll),
+                    ChoiceFilterTagValue(value: 'day', name: l10n.postFilterDateLastDay),
+                    ChoiceFilterTagValue(value: 'week', name: l10n.postFilterDateLastWeek),
+                    ChoiceFilterTagValue(value: 'month', name: l10n.postFilterDateLastMonth),
+                    ChoiceFilterTagValue(value: 'year', name: l10n.postFilterDateLastYear),
                   ],
                 ),
                 ChoiceFilterTag(
                   tag: 'status',
-                  name: 'Status',
-                  icon: Icon(Icons.help),
+                  name: l10n.postFilterStatus,
+                  icon: const Icon(Icons.help),
                   options: [
-                    ChoiceFilterTagValue(value: null, name: 'Default'),
-                    ChoiceFilterTagValue(value: 'active', name: 'Active'),
-                    ChoiceFilterTagValue(value: 'pending', name: 'Pending'),
-                    ChoiceFilterTagValue(value: 'deleted', name: 'Deleted'),
-                    ChoiceFilterTagValue(value: 'flagged', name: 'Flagged'),
-                    ChoiceFilterTagValue(value: 'any', name: 'Any'),
+                    ChoiceFilterTagValue(value: null, name: l10n.commonSortDefault),
+                    ChoiceFilterTagValue(value: 'active', name: l10n.postFilterStatusActive),
+                    ChoiceFilterTagValue(value: 'pending', name: l10n.postFilterStatusPending),
+                    ChoiceFilterTagValue(value: 'deleted', name: l10n.postFilterStatusDeleted),
+                    ChoiceFilterTagValue(value: 'flagged', name: l10n.postFilterStatusFlagged),
+                    ChoiceFilterTagValue(value: 'any', name: l10n.postFilterStatusAny),
                   ],
                 ),
               ],

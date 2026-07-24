@@ -1,6 +1,7 @@
 import 'package:kilt/account/account.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,7 @@ class HostUnvailablePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: TransparentAppBar(
         child: const DefaultAppBar(leading: CloseButton()),
@@ -24,19 +26,20 @@ class HostUnvailablePage extends StatelessWidget {
               const Icon(Icons.cloud_off, size: 60),
               const SizedBox(height: 8),
               Text(
-                'Host unavailable',
+                l10n.identityHostUnavailable,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 20),
               Text(
-                'It appears that ${linkToDisplay(context.watch<Client>().host)} is not available!',
+                l10n.identityHostUnavailableBody(
+                  linkToDisplay(context.watch<Client>().host),
+                ),
               ),
               const SizedBox(height: 16),
               if (offerResolve &&
                   PlatformCapabilities.supportsWebViewLogin) ...[
-                const Text(
-                  'Please resolve the issue in the following browser window. '
-                  '\n\nCloudflare captcha cookies will be saved. ',
+                Text(
+                  l10n.identityResolveBody,
                 ),
                 const SizedBox(height: 16),
                 TextButton(
@@ -45,12 +48,14 @@ class HostUnvailablePage extends StatelessWidget {
                       builder: (context) => const CookieCapturePage(),
                     ),
                   ),
-                  child: const Text('Resolve'),
+                  child: Text(l10n.commonResolve),
                 ),
               ] else
                 Dimmed(
                   child: Text(
-                    '\nPlease wait for ${linkToDisplay(context.watch<Client>().host)} to resolve the situation on their end.',
+                    l10n.identityWaitForHost(
+                      linkToDisplay(context.watch<Client>().host),
+                    ),
                   ),
                 ),
             ],

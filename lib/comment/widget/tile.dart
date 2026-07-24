@@ -1,6 +1,7 @@
 import 'package:kilt/app/routing/app_routes.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/comment/comment.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/ticket/ticket.dart';
@@ -123,6 +124,7 @@ class CommentVotes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final client = context.watch<Client>();
     VoteInfo? vote = comment.vote;
     if (vote == null) return const SizedBox();
@@ -145,7 +147,7 @@ class CommentVotes extends StatelessWidget {
                           SnackBar(
                             duration: const Duration(seconds: 1),
                             content: Text(
-                              'Failed to upvote comment #${comment.id}',
+                              l10n.commentFailedUpvote(comment.id),
                             ),
                           ),
                         );
@@ -164,7 +166,7 @@ class CommentVotes extends StatelessWidget {
                           SnackBar(
                             duration: const Duration(seconds: 1),
                             content: Text(
-                              'Failed to downvote comment #${comment.id}',
+                              l10n.commentFailedDownvote(comment.id),
                             ),
                           ),
                         );
@@ -186,8 +188,9 @@ class CommentVisibilityIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!comment.hidden) return const SizedBox();
+    final l10n = AppLocalizations.of(context);
     return Tooltip(
-      message: 'This comment is hidden',
+      message: l10n.commentHidden,
       child: Icon(
         Icons.visibility_off,
         size: smallIconSize(context),
@@ -204,6 +207,7 @@ class CommentMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final client = context.watch<Client>();
     return PopupMenuButton<VoidCallback>(
       icon: const Dimmed(child: Icon(Icons.more_vert)),
@@ -211,7 +215,7 @@ class CommentMenu extends StatelessWidget {
       itemBuilder: (context) => [
         if (client.identity.username == comment.creatorName)
           PopupMenuTile(
-            title: 'Edit',
+            title: l10n.commonEdit,
             icon: Icons.edit,
             value: () => guardWithLogin(
               context: context,
@@ -224,11 +228,11 @@ class CommentMenu extends StatelessWidget {
                   }
                 });
               },
-              error: 'You must be logged in to edit comments!',
+              error: l10n.commentMustLoginEdit,
             ),
           ),
         PopupMenuTile(
-          title: 'Reply',
+          title: l10n.commentReply,
           icon: Icons.reply,
           value: () => guardWithLogin(
             context: context,
@@ -240,24 +244,24 @@ class CommentMenu extends StatelessWidget {
                 }
               });
             },
-            error: 'You must be logged in to reply to comments!',
+            error: l10n.commentMustLoginReply,
           ),
         ),
         PopupMenuTile(
-          title: 'Copy ID',
+          title: l10n.commentCopyId,
           icon: Icons.tag,
           value: () async {
             Clipboard.setData(ClipboardData(text: comment.id.toString()));
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 duration: const Duration(seconds: 1),
-                content: Text('Copied comment id #${comment.id}'),
+                content: Text(l10n.commentCopiedId(comment.id)),
               ),
             );
           },
         ),
         PopupMenuTile(
-          title: 'Report',
+          title: l10n.commonReport,
           icon: Icons.report,
           value: () => guardWithLogin(
             context: context,
@@ -266,7 +270,7 @@ class CommentMenu extends StatelessWidget {
                 builder: (context) => CommentReportScreen(comment: comment),
               ),
             ),
-            error: 'You must be logged in to report comments!',
+            error: l10n.commentMustLoginReport,
           ),
         ),
       ],

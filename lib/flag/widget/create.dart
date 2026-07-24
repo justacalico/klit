@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:kilt/client/client.dart';
 import 'package:kilt/flag/flag.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
@@ -34,6 +35,7 @@ class _PostFlagScreenState extends State<PostFlagScreen> {
   }
 
   Future<void> _sendFlag(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
     if (Form.of(context).validate()) {
       setState(() {
         isLoading = true;
@@ -56,7 +58,7 @@ class _PostFlagScreenState extends State<PostFlagScreen> {
         messenger.showSnackBar(
           SnackBar(
             duration: const Duration(seconds: 1),
-            content: Text('Flagged post #${widget.post.id}'),
+            content: Text(l10n.postFlaggedSuccess(widget.post.id)),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -64,7 +66,7 @@ class _PostFlagScreenState extends State<PostFlagScreen> {
         messenger.showSnackBar(
           SnackBar(
             duration: const Duration(seconds: 1),
-            content: Text('Failed to flag post #${widget.post.id}'),
+            content: Text(l10n.postFlagFailed(widget.post.id)),
           ),
         );
       }
@@ -76,12 +78,13 @@ class _PostFlagScreenState extends State<PostFlagScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return KeyboardDismisser(
       child: Form(
         child: Scaffold(
           appBar: DefaultAppBar(
             elevation: 0,
-            title: Text('Post #${widget.post.id}'),
+            title: Text(l10n.postFlagTitle(widget.post.id)),
             leading: const CloseButton(),
           ),
           floatingActionButton: Builder(
@@ -104,7 +107,7 @@ class _PostFlagScreenState extends State<PostFlagScreen> {
                     isLoading: isLoading,
                   ),
                   ReportFormHeader(
-                    title: const Text('Flag'),
+                    title: Text(l10n.postFlag),
                     icon: IconButton(
                       onPressed: () => showTagSearchPrompt(
                         context: context,
@@ -129,9 +132,9 @@ class _PostFlagScreenState extends State<PostFlagScreen> {
                       child: TextFormField(
                         enabled: !isLoading,
                         controller: parentController,
-                        decoration: const InputDecoration(
-                          labelText: 'Parent ID',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: l10n.postFlagParentId,
+                          border: const OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.number,
                         inputFormatters: [
@@ -139,10 +142,10 @@ class _PostFlagScreenState extends State<PostFlagScreen> {
                         ],
                         validator: (value) {
                           if (value!.trim().isEmpty) {
-                            return 'Parent ID cannot be empty';
+                            return l10n.postFlagParentIdEmpty;
                           }
                           if (int.tryParse(value) == null) {
-                            return 'Parent ID must be a number';
+                            return l10n.postFlagParentIdNumber;
                           }
                           return null;
                         },
