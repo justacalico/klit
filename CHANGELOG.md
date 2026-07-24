@@ -1,5 +1,7 @@
 # Changelog
 
+# 11.0.0 (Unreleased)
+
 # 10.2.0
 - Fixed crash when playing video in release builds on macOS by disabling hardware acceleration
 - Fixed artist names not showing on posts by adding `mode=extended` to e621 v2 API requests
