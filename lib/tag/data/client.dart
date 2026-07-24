@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
@@ -95,7 +96,7 @@ class TagClient {
       )
       .then(unwrapRailsArray)
       .then((response) {
-        return response.data
+        return (response.data as List)
             .cast<Map<String, dynamic>>()
             .where((e) => e['status'] != 'deleted')
             .map((e) => e['consequent_name'] as String?)
