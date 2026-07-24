@@ -540,7 +540,7 @@ class _SidebarState extends State<_Sidebar> {
               mainAxisSize: MainAxisSize.max,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 20, 8, 8),
+                  padding: const EdgeInsets.fromLTRB(8, 28, 8, 8),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 2),
                     child: Material(
