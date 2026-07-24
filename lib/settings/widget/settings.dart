@@ -25,7 +25,7 @@ import 'package:local_auth/local_auth.dart';
 const String settingsSectionArgumentKey = 'settingsSection';
 const String settingsAccountsSectionValue = 'accounts';
 
-enum _AppLocaleChoice { system, en }
+enum _AppLocaleChoice { system, en, zh }
 
 void openSettingsAccounts(BuildContext context) {
   context.go('/settings?$settingsSectionArgumentKey=$settingsAccountsSectionValue');
@@ -673,12 +673,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               final current = switch (tag) {
                 null || '' => _AppLocaleChoice.system,
                 'en' => _AppLocaleChoice.en,
+                'zh' => _AppLocaleChoice.zh,
                 _ => _AppLocaleChoice.system,
               };
 
               String subtitleOf(_AppLocaleChoice choice) => switch (choice) {
                 _AppLocaleChoice.system => l10n.settingsLanguageSystem,
                 _AppLocaleChoice.en => l10n.settingsLanguageEnglish,
+                _AppLocaleChoice.zh => l10n.settingsLanguageSimplifiedChinese,
               };
 
               return CupertinoListTile(
@@ -701,6 +703,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       settings.localeTag.value = switch (choice) {
                         _AppLocaleChoice.system => null,
                         _AppLocaleChoice.en => 'en',
+                        _AppLocaleChoice.zh => 'zh',
                       };
                     },
                   );
