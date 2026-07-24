@@ -148,6 +148,7 @@ class _LoadingLayerState<T> extends State<LoadingLayer<T>> {
   late LoadingShellController state;
   late Future<T>? future = widget.future;
   AsyncSnapshot<T>? lastSnapshot;
+  Widget? _lastBuiltChild;
 
   @override
   void didChangeDependencies() {
@@ -177,7 +178,7 @@ class _LoadingLayerState<T> extends State<LoadingLayer<T>> {
           } else {
             state.value = LoadingShellState(message: state.value.message);
           }
-        } else {
+        } else if (_lastBuiltChild == null) {
           state.value = const LoadingShellState();
         }
       }
@@ -208,11 +209,15 @@ class _LoadingLayerState<T> extends State<LoadingLayer<T>> {
       builder: (context, snapshot) {
         onSnapshotChanged(snapshot);
         if (snapshot.connectionState != ConnectionState.done) {
+          if (_lastBuiltChild != null) return _lastBuiltChild!;
           return Container(color: Theme.of(context).colorScheme.surface);
         } else if (snapshot.hasError) {
+          if (_lastBuiltChild != null) return _lastBuiltChild!;
           return Container(color: Theme.of(context).colorScheme.surface);
         } else {
-          return widget.builder(context, snapshot.data as T);
+          final child = widget.builder(context, snapshot.data as T);
+          _lastBuiltChild = child;
+          return child;
         }
       },
     );
