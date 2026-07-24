@@ -172,7 +172,7 @@
 
 ## Added
 
-### 🔄 Pull-to-Refresh on Mobile Home Page
+### Pull-to-Refresh on Mobile Home Page
 - Added native pull-down-to-refresh support on the mobile Home page
 - Swipe down from the top of the post grid to refresh latest posts
 - Smooth refresh indicator animation with haptic feedback
@@ -189,19 +189,19 @@ Added keyboard navigation support to the mobile post detail viewer, matching the
 - `W` / `↑` — Upvote (toggle)
 - `S` / `↓` — Downvote (toggle)
 
-### 📱 Material Style Navigation Bar
+### Material Style Navigation Bar
 - Added a proper Material-style bottom navigation bar when Material UI mode is enabled
 - Full-width design with simple icon/label layout (no floating pill style)
 - Clean top border separator instead of shadow/blur effects
 - Consistent with Android Material Design guidelines
 
-### ⚙️ Material Style Settings Page
+### Material Style Settings Page
 - Settings page now responds to UI style mode
 - Material mode uses solid containers without blur effects
 - Clean borders and simple dividers in Material mode
 - Removes glass effects and shadows for better performance on lower-end devices
 
-### 🌈 Rating Aura on Post Cards
+### Rating Aura on Post Cards
 - Posts now display a colored glow/aura around the card based on content rating
 - **Green** — Safe content
 - **Orange** — Questionable content
@@ -211,7 +211,7 @@ Added keyboard navigation support to the mobile post detail viewer, matching the
 - **Liquid Glass mode**: Enhanced glass-like aura with layered glows, soft outer bloom, and subtle highlight reflection
 - **Material mode**: Simple, performance-focused aura effect
 
-### 📐 Centralized Post Grid Settings
+### Centralized Post Grid Settings
 - New **POST GRID** section in Settings with comprehensive controls:
   - **Auto Mode** — Automatically adjusts grid columns based on screen width (2 cols for phones, 3 for tablets, up to 8 for large monitors)
   - **Grid Size** — Manual control for number of columns (disabled when Auto Mode is on)
@@ -223,7 +223,7 @@ Added keyboard navigation support to the mobile post detail viewer, matching the
 - Removed grid size selectors from desktop toolbar (Home, Hot, Popular, Favorites, Search)
 - All pages now use centralized settings for consistent appearance
 
-### 🚫 Blacklist Management
+### Blacklist Management
 - New **BLACKLIST** section in Settings (mobile and desktop):
   - **Enable Blacklist** — Toggle to enable/disable blacklist filtering globally
   - **Manage Blacklist** — Opens dedicated page to edit blacklist rules
@@ -236,16 +236,16 @@ Added keyboard navigation support to the mobile post detail viewer, matching the
 
 ## Fixed
 
-### 🎊 Left-Handed Mode Confetti Position
+### Left-Handed Mode Confetti Position
 - Fixed confetti animation playing from the wrong side when left-handed mode is enabled
 - Confetti now correctly originates near the favorite button position in both left and right-handed modes
 
-### 📐 Auto Mode Grid Scaling
+### Auto Mode Grid Scaling
 - Fixed auto mode only using up to 4 columns even on large screens
 - Auto mode now scales properly: 2 cols (phones) → 3 (tablets) → 4-5 (small desktops) → 6-8 (large monitors)
 - Grid now properly responds to window resizing using LayoutBuilder
 
-### 🔍 Tag Suggestions Overhaul
+### Tag Suggestions Overhaul
 - **Fixed `-tag` and `~tag` prefix handling**: Tag suggestions now properly work when typing exclusion tags (e.g., `-scat`, `-young`) or optional tags (`~tag`)
 - **Fixed suggestions closing unexpectedly**: Removed aggressive focus-based closing that caused suggestions to disappear while typing
 - **Fixed suggestions appearing when not wanted**: Suggestions now only appear when actively typing a tag (2+ characters)
@@ -253,7 +253,7 @@ Added keyboard navigation support to the mobile post detail viewer, matching the
 - **Better word detection**: Properly extracts the current word being typed, handling cursor position correctly
 - **Prefix preservation**: When selecting a suggestion for `-tag` or `~tag`, the prefix is correctly preserved
 
-### 🖼️ Full Resolution Image Loading
+### Full Resolution Image Loading
 - Fixed mobile post viewer not loading full resolution images
 - Mobile now uses the same resolution priority as desktop: full file → sample → preview
 - Fixes issues with small images (e.g. 512x512) not displaying at full quality on alternative servers
@@ -262,7 +262,7 @@ Added keyboard navigation support to the mobile post detail viewer, matching the
 
 ## Added
 
-### 🎮 Gamepad & Controller Support (Desktop)
+### Gamepad & Controller Support (Desktop)
 Full gamepad/controller support for desktop UI — SteamOS and Steam Deck compatible.
 
 **Post Detail View Controls:**
@@ -287,29 +287,29 @@ Full gamepad/controller support for desktop UI — SteamOS and Steam Deck compat
 - `GamepadController` service for centralized input handling
 - `GamepadInputMixin` for easy widget integration
 
-### 💾 Desktop Download Functionality
+### Desktop Download Functionality
 - Download posts directly from the detail view
 - Files saved to user's Downloads folder with progress indicator
 - Confirmation dialog with option to open folder
 - Automatic detection of existing files
 
-### 📱 Live Responsive UI
+### Live Responsive UI
 - Automatic switching between mobile and desktop layouts on window resize
 - Post detail, search, favorites, and profile pages all support live layout switching
 - Threshold: Desktop UI at ≥1024px width, Mobile UI below
 
-### 🔗 Shared Navigation State
+### Shared Navigation State
 - Current page preserved when resizing between mobile and desktop
 - Navigation indices automatically mapped between UI modes
 - Seamless experience when switching layouts
 
-### 🎬 Video Settings
+### Video Settings
 New video settings section in both mobile and desktop settings:
 - **Auto Play** — Control whether videos automatically play when viewing posts
 - **Mute by Default** — Start videos muted to avoid unexpected audio
 - Settings apply to both inline video player and fullscreen viewer
 
-### 🔄 Check for Updates
+### Check for Updates
 - "Check for Updates" option in About section (mobile and desktop)
 - Fetches latest version info via Openlyst API
 - Shows current vs latest version comparison
@@ -317,7 +317,7 @@ New video settings section in both mobile and desktop settings:
 - Glassmorphic dialog design on desktop
 - Graceful network error handling
 
-### 🔒 Search History Privacy
+### Search History Privacy
 - Toggle to disable search history recording (mobile and desktop)
 - New "Data" category in desktop settings
 - Clear search history button with item count
@@ -327,7 +327,7 @@ New video settings section in both mobile and desktop settings:
 
 ## Changed
 
-### 📦 Dependency Updates
+### Dependency Updates
 | Package | From | To |
 |---------|------|-----|
 | dio | ^5.4.0 | ^5.9.0 |
@@ -341,7 +341,7 @@ New video settings section in both mobile and desktop settings:
 | url_launcher | ^6.2.5 | ^6.3.2 |
 | flutter_launcher_icons | ^0.14.3 | ^0.14.4 |
 
-### 🎨 UI Improvements
+### UI Improvements
 
 **Sidebar Collapse Button:**
 - Animated icon rotation when toggling
@@ -380,7 +380,7 @@ New video settings section in both mobile and desktop settings:
 
 ## Removed
 
-### 🗑️ List View Option
+### List View Option
 Removed list view from the entire app for a cleaner, more consistent experience:
 - Home, Hot, Popular, and Search pages now use grid view only
 - Removed grid/list toggle button from toolbars
@@ -415,7 +415,7 @@ Removed list view from the entire app for a cleaner, more consistent experience:
 - Updated openlyst url.
 
 # 2.1.0
-- Added confetti animation when favoriting a post 🎉 (can be toggled in Settings)
+- Added confetti animation when favoriting a post (can be toggled in Settings)
 - Added customizable navigation order for mobile navbar and desktop sidebar
 - **Completely redesigned the desktop settings page** with a modern macOS System Preferences-style sidebar navigation, animated transitions, and improved visual hierarchy
 - Fixed AppImage builds failing due to FUSE not being available in Docker CI environments.
