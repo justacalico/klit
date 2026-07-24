@@ -176,7 +176,8 @@ class _LoadingLayerState<T> extends State<LoadingLayer<T>> {
               throw snapshot.error!;
             }
           } else {
-            state.value = LoadingShellState(message: state.value.message);
+            state.value =
+                state.value.copyWith(loading: false);
           }
         } else if (_lastBuiltChild == null) {
           state.value = const LoadingShellState();
