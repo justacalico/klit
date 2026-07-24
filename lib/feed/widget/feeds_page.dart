@@ -139,18 +139,25 @@ class _FeedsPageState extends State<FeedsPage> {
                             ),
                       ),
                       const SizedBox(height: 24),
-                      CupertinoButton.filled(
-                        onPressed: () => _openEdit(context, null),
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Icon(Icons.add),
-                            SizedBox(width: 8),
-                            Text('Create feed'),
-                          ],
-                        ),
-                      ),
+                      Builder(builder: (context) {
+                        final primary = Theme.of(context).colorScheme.primary;
+                        final fg = primary.computeLuminance() > 0.5
+                            ? Colors.black87
+                            : Colors.white;
+                        return CupertinoButton(
+                          color: primary,
+                          onPressed: () => _openEdit(context, null),
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.add, color: fg),
+                              const SizedBox(width: 8),
+                              Text('Create feed', style: TextStyle(color: fg)),
+                            ],
+                          ),
+                        );
+                      }),
                     ],
                   ),
                 ),
