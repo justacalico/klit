@@ -1,6 +1,7 @@
 # Changelog
 
 # 11.0.0 (Unreleased)
+- Sped up Popular and Hot pages by using the dedicated `/popular.json` API endpoint for day/week/month scales instead of the general `/posts.json` with date tag queries ([!20](https://gitlab.com/Openlyst/klit/-/merge_requests/20))
 - Fixed the app flashing/reloading when switching accounts by keeping previous content visible during re-activation ([!19](https://gitlab.com/Openlyst/klit/-/merge_requests/19))
 - Fixed check-for-update failing after the app slug changed from `klit` to `kilt` on the Openlyst API ([!18](https://gitlab.com/Openlyst/klit/-/merge_requests/18))
 - Moved sidebar Klit branding box down to stop it clashing with the nav buttons ([!17](https://gitlab.com/Openlyst/klit/-/merge_requests/17))

@@ -154,9 +154,24 @@ class HotPostController extends PostController {
   @override
   @protected
   Future<List<Post>> fetch(int page, bool force) async {
-    return client.posts.byHot(
-      page: page,
-      query: query,
+    if (_scale == PopularScale.hot) {
+      return client.posts.byHot(
+        page: page,
+        query: query,
+        force: force,
+        cancelToken: cancelToken,
+      );
+    }
+    if (page > firstPageKey) return [];
+    final scale = switch (_scale) {
+      PopularScale.day => 'day',
+      PopularScale.week => 'week',
+      PopularScale.month => 'month',
+      PopularScale.hot => 'day',
+    };
+    return client.posts.byPopular(
+      scale: scale,
+      date: _apiDate.format(_referenceDate),
       force: force,
       cancelToken: cancelToken,
     );

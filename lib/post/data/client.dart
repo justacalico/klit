@@ -108,6 +108,32 @@ class PostClient {
     );
   }
 
+  Future<List<Post>> byPopular({
+    required String scale,
+    String? date,
+    bool? force,
+    CancelToken? cancelToken,
+  }) {
+    return dio
+        .get(
+          '/popular.json',
+          queryParameters: _withV2({
+            'scale': scale,
+            if (date != null) 'date': date,
+          }),
+          options: forceOptions(force),
+          cancelToken: cancelToken,
+        )
+        .then(
+          (response) => (response.data as List<dynamic>)
+              .map<Post>(E621Post.fromJson)
+              .whereNot(
+                (e) => (e.file == null && !e.isDeleted) || e.ext == 'swf',
+              )
+              .toList(),
+        );
+  }
+
   Future<List<Post>> byIds({
     required List<int> ids,
     int? limit,
