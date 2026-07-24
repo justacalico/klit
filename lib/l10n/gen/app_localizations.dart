@@ -92,10 +92,7 @@ abstract class AppLocalizations {
       ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[
-    Locale('en'),
-    Locale('en', 'AU'),
-  ];
+  static const List<Locale> supportedLocales = <Locale>[Locale('en')];
 
   /// No description provided for @settingsTitle.
   ///
@@ -156,12 +153,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'English'**
   String get settingsLanguageEnglish;
-
-  /// No description provided for @settingsLanguageEnglishTraditiation.
-  ///
-  /// In en, this message translates to:
-  /// **'English Traditiation'**
-  String get settingsLanguageEnglishTraditiation;
 
   /// No description provided for @aboutSectionTitle.
   ///
@@ -500,18 +491,6 @@ class _AppLocalizationsDelegate
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-  // Lookup logic when language+country codes are specified.
-  switch (locale.languageCode) {
-    case 'en':
-      {
-        switch (locale.countryCode) {
-          case 'AU':
-            return AppLocalizationsEnAu();
-        }
-        break;
-      }
-  }
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
     case 'en':

@@ -43,7 +43,7 @@ class Settings extends NotifiedSettings {
     values: AppTheme.values,
   );
 
-  /// `null` means "system default". Otherwise a BCP-47-ish tag like `en` or `en-AU`.
+  /// `null` means "system default". Otherwise a BCP-47-ish tag like `en`.
   late final ValueNotifier<String?> localeTag = createSetting<String?>(
     key: 'localeTag',
     initialValue: null,
