@@ -63,7 +63,6 @@
 - Settings Account (mobile): fix semantics assertion (parentDataDirty) by giving embedded account list bounded height (host settings, login, blacklist, settings, toolbar, sidebar, nav bar More menu, search, account management, post detail, loading shimmer)
 - OLED theme: use pure black for all backgrounds and bar (was grey secondary/separator)
 - Android: opt out of edge-to-edge so status bar can be hidden on Android 15+; re-apply hide after first frame so it sticks
-- Add CodeRabbit config (`.coderabbit.yaml`) for AI code reviews on PRs
 - Fix black-on-black text in Settings Account, Feeds, Profile, Favorites, and Blacklist empty states and help text (use theme-aware label/secondaryLabel on dark/OLED)
 - Android: hide system status bar (time, battery, network) for a cleaner full-screen look
 - Settings (Android): system back button now returns to the main settings list from sub-pages (e.g. Account) instead of exiting Settings
@@ -177,7 +176,7 @@
 - Swipe down from the top of the post grid to refresh latest posts
 - Smooth refresh indicator animation with haptic feedback
 
-### ⌨️ Keyboard Controls for Mobile Post Viewer
+### Keyboard Controls for Mobile Post Viewer
 Added keyboard navigation support to the mobile post detail viewer, matching the desktop experience:
 
 **Navigation:**
@@ -208,8 +207,8 @@ Added keyboard navigation support to the mobile post detail viewer, matching the
 - **Red** — Explicit content
 - Removed the text badge from the bottom-left corner for a cleaner look
 - Rating is now instantly visible at a glance without reading text
-- **Liquid Glass mode**: Enhanced glass-like aura with layered glows, soft outer bloom, and subtle highlight reflection
-- **Material mode**: Simple, performance-focused aura effect
+- **Liquid Glass mode**: layered glows and highlight reflection
+- **Material mode**: simple, performance-focused aura
 
 ### Centralized Post Grid Settings
 - New **POST GRID** section in Settings with comprehensive controls:
@@ -301,7 +300,6 @@ Full gamepad/controller support for desktop UI — SteamOS and Steam Deck compat
 ### Shared Navigation State
 - Current page preserved when resizing between mobile and desktop
 - Navigation indices automatically mapped between UI modes
-- Seamless experience when switching layouts
 
 ### Video Settings
 New video settings section in both mobile and desktop settings:
@@ -315,7 +313,6 @@ New video settings section in both mobile and desktop settings:
 - Shows current vs latest version comparison
 - Direct link to download page when update available
 - Glassmorphic dialog design on desktop
-- Graceful network error handling
 
 ### Search History Privacy
 - Toggle to disable search history recording (mobile and desktop)
@@ -381,7 +378,7 @@ New video settings section in both mobile and desktop settings:
 ## Removed
 
 ### List View Option
-Removed list view from the entire app for a cleaner, more consistent experience:
+Removed list view from the entire app:
 - Home, Hot, Popular, and Search pages now use grid view only
 - Removed grid/list toggle button from toolbars
 - Removed `PostsList` widget
@@ -417,7 +414,7 @@ Removed list view from the entire app for a cleaner, more consistent experience:
 # 2.1.0
 - Added confetti animation when favoriting a post (can be toggled in Settings)
 - Added customizable navigation order for mobile navbar and desktop sidebar
-- **Completely redesigned the desktop settings page** with a modern macOS System Preferences-style sidebar navigation, animated transitions, and improved visual hierarchy
+- **Completely redesigned the desktop settings page** with a macOS System Preferences-style sidebar navigation and animated transitions
 - Fixed AppImage builds failing due to FUSE not being available in Docker CI environments.
 - Fixed tag suggestion menu not closing when pressing Enter to search without selecting a suggestion.
 - Improved blacklist sync from e621 profile to local settings on profile load.
