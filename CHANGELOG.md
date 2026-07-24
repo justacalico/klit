@@ -1,7 +1,7 @@
 # Changelog
 
 # 11.0.0 (Unreleased)
-- Added comprehensive test suite with 897 tests covering data models, API clients, controllers, utilities, parsers, and serialization across all modules
+- Added comprehensive test suite with 897 tests covering data models, API clients, controllers, utilities, parsers, and serialization across all modules ([!26](https://gitlab.com/Openlyst/klit/-/merge_requests/26))
 - Fully internationalized the app, replacing hardcoded English strings with i18n calls across all modules (feed, post, comment, topic, reply, follow, pool, tag, user, wiki, flag, history, logs, markup, traits, settings, shared, identity, account, app, client) ([!25](https://gitlab.com/Openlyst/klit/-/merge_requests/25))
 - Added Simplified Chinese (zh) as a language option ([!24](https://gitlab.com/Openlyst/klit/-/merge_requests/24))
 - Removed the "English Traditiation" (en_AU) locale option that was identical to English ([!23](https://gitlab.com/Openlyst/klit/-/merge_requests/23))
