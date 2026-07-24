@@ -1,4 +1,5 @@
 import 'package:kilt/client/client.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
 import 'package:kilt/traits/traits.dart';
@@ -9,6 +10,7 @@ class DenyListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     Widget buildEditTextField(
       BuildContext context, {
       required String title,
@@ -39,7 +41,7 @@ class DenyListPage extends StatelessWidget {
               List<String> denylist = traits.denylist.toList();
               return AdaptiveScaffold(
                 appBar: DefaultAppBar(
-                  title: const Text('Blacklist'),
+                  title: Text(l10n.traitsBlacklist),
                   actions: [
                     IconButton(
                       icon: const Icon(Icons.edit),
@@ -54,7 +56,7 @@ class DenyListPage extends StatelessWidget {
                 floatingActionButton: PromptFloatingActionButton(
                   builder: (context) => buildEditTextField(
                     context,
-                    title: 'Add tag',
+                    title: l10n.traitsAddTag,
                     submit: (value) async {
                       value = value.trim();
                       if (value.isEmpty) return;
@@ -65,8 +67,8 @@ class DenyListPage extends StatelessWidget {
                           ),
                         );
                       } on ClientException {
-                        throw const ActionControllerException(
-                          message: 'Failed to update blacklist!',
+                        throw ActionControllerException(
+                          message: l10n.traitsFailedUpdate,
                         );
                       }
                     },
@@ -78,10 +80,10 @@ class DenyListPage extends StatelessWidget {
                     await client.accounts.pull(force: true);
                   },
                   child: denylist.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: IconMessage(
-                            icon: Icon(Icons.check),
-                            title: Text('Your blacklist is empty'),
+                            icon: const Icon(Icons.check),
+                            title: Text(l10n.traitsBlacklistEmpty),
                           ),
                         )
                       : ListView.builder(
@@ -99,7 +101,7 @@ class DenyListPage extends StatelessWidget {
                                 buildEditTextField(
                                   context,
                                   value: tag,
-                                  title: 'Edit tag',
+                                  title: l10n.traitsEditTag,
                                   submit: (value) async {
                                     value = value.trim();
                                     try {
@@ -118,8 +120,8 @@ class DenyListPage extends StatelessWidget {
                                         );
                                       }
                                     } on ClientException {
-                                      throw const ActionControllerException(
-                                        message: 'Failed to update blacklist!',
+                                      throw ActionControllerException(
+                                        message: l10n.traitsFailedUpdate,
                                       );
                                     }
                                   },

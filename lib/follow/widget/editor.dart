@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/follow/follow.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 
@@ -74,22 +75,23 @@ class _FollowEditorState extends State<FollowEditor> {
 
   @override
   Widget build(BuildContext context) {
-    Widget title = const Text('Edit follows');
+    final l10n = AppLocalizations.of(context);
+    Widget title = Text(l10n.followEditFollows);
     return FutureLoadingPage<Map<String, String>>(
       title: title,
       future: follows,
       builder: (context, value) => MultiTextEditor(
         title: title,
         content: [
-          TextEditorContent(key: notify, title: 'Notify', value: value[notify]),
+          TextEditorContent(key: notify, title: l10n.commonNotify, value: value[notify]),
           TextEditorContent(
             key: subscribe,
-            title: 'Subscribe',
+            title: l10n.followSubscribe,
             value: value[subscribe],
           ),
           TextEditorContent(
             key: bookmark,
-            title: 'Bookmark',
+            title: l10n.followBookmark,
             value: value[bookmark],
           ),
         ],

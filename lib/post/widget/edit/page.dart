@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
@@ -60,6 +61,7 @@ class _PostEditPageState extends State<PostEditPage> {
     if (_isLoading) return;
     setState(() => _isLoading = true);
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context);
 
     try {
       final editData = _editData.copyWith(
@@ -86,7 +88,7 @@ class _PostEditPageState extends State<PostEditPage> {
 
         if (mounted) {
           messenger.showSnackBar(
-            SnackBar(content: Text('Updated post #${widget.post.id}')),
+            SnackBar(content: Text(l10n.postUpdateSuccess(widget.post.id))),
           );
           Navigator.of(context).pop();
         }
@@ -97,7 +99,7 @@ class _PostEditPageState extends State<PostEditPage> {
       }
     } on ClientException {
       messenger.showSnackBar(
-        SnackBar(content: Text('Failed to update post #${widget.post.id}')),
+        SnackBar(content: Text(l10n.postUpdateFailed(widget.post.id))),
       );
     } finally {
       if (mounted) {

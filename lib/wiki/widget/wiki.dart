@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
@@ -11,13 +12,14 @@ class WikiPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return AdaptiveScaffold(
       appBar: DefaultAppBar(
         title: Text(tagToName(wiki.title)),
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline),
-            tooltip: 'Info',
+            tooltip: l10n.commonInfo,
             onPressed: () => wikiPrompt(context, wiki),
           ),
         ],

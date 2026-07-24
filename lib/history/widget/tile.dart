@@ -1,6 +1,7 @@
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/history/history.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
@@ -108,6 +109,7 @@ class _HistoryTileDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return PopupMenuButton<VoidCallback>(
       icon: Icon(Icons.more_vert, color: dimTextColor(context)),
       iconSize: 18,
@@ -124,18 +126,18 @@ class _HistoryTileDropdown extends StatelessWidget {
           ),
         if (entry.subtitle != null)
           PopupMenuTile(
-            title: 'Description',
+            title: l10n.commonDescription,
             icon: Icons.description,
             value: () => historySheet(context: context, entry: entry),
           ),
         PopupMenuTile(
-          title: 'Share',
+          title: l10n.commonShare,
           icon: Icons.share,
           value: () =>
               Share.text(context, context.read<Client>().withHost(entry.link)),
         ),
         PopupMenuTile(
-          title: 'Delete',
+          title: l10n.commonDelete,
           icon: Icons.delete,
           value: () => context.read<Client>().histories.remove(entry.id),
         ),

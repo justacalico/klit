@@ -1,4 +1,5 @@
 import 'package:kilt/history/history.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/topic/topic.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ class TopicsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return TopicProvider(
         query: query,
         child: Consumer<TopicController>(
@@ -22,13 +24,13 @@ class TopicsPage extends StatelessWidget {
               ),
             ),
             child: AdaptiveScaffold(
-              appBar: const DefaultAppBar(
-                title: Text('Topics'),
-                actions: [ContextDrawerButton()],
+              appBar: DefaultAppBar(
+                title: Text(l10n.topicTopics),
+                actions: const [ContextDrawerButton()],
               ),
               floatingActionButton: null,
               endDrawer: ContextDrawer(
-                title: const Text('Topics'),
+                title: Text(l10n.topicTopics),
                 children: [TopicTagEditingTile(controller: controller)],
               ),
               body: const TopicList(),

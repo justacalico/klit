@@ -1,5 +1,6 @@
 import 'package:kilt/app/app.dart';
 import 'package:kilt/comment/comment.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,6 +14,7 @@ class PostCommentsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final isOled = context.watch<Settings>().theme.value == AppTheme.amoled;
     final surface = isOled
@@ -25,7 +27,7 @@ class PostCommentsPage extends StatelessWidget {
       postId: postId,
       child: AdaptiveScaffold(
         appBar: DefaultAppBar(
-          title: Text('#$postId comments'),
+          title: Text(l10n.commentPostComments(postId)),
           actions: const [ContextDrawerButton()],
         ),
         endDrawer: const CommentListDrawer(),
@@ -67,6 +69,7 @@ Future<void> showPostCommentsDrawer(
           minChildSize: 0.65,
           maxChildSize: 0.97,
           builder: (context, scrollController) {
+            final l10n = AppLocalizations.of(context);
             return DecoratedBox(
               decoration: BoxDecoration(
                 color: surface,
@@ -94,7 +97,7 @@ Future<void> showPostCommentsDrawer(
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
-                              '#$postId comments',
+                              l10n.commentPostComments(postId),
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
                               ),
@@ -103,8 +106,8 @@ Future<void> showPostCommentsDrawer(
                           Consumer<CommentController>(
                             builder: (context, controller, _) => IconButton(
                               tooltip: controller.orderByOldest
-                                  ? 'Oldest first'
-                                  : 'Newest first',
+                                  ? l10n.commonSortOldestFirst
+                                  : l10n.commonSortNewestFirst,
                               onPressed: () {
                                 HapticFeedback.selectionClick();
                                 controller.orderByOldest =

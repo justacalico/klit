@@ -1,13 +1,15 @@
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 
 extension GridQuiltDescription on GridQuilt {
-  String get description {
+  String description(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     switch (this) {
       case GridQuilt.square:
-        return 'tiles are quadratic';
+        return l10n.settingsQuiltQuadratic;
       case GridQuilt.vertical:
-        return 'tiles expand vertically';
+        return l10n.settingsQuiltExpand;
     }
   }
 
@@ -29,14 +31,15 @@ class GridSettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ListTile(
-      title: const Text('Quilt'),
-      subtitle: Text(state.description),
+      title: Text(l10n.settingsQuilt),
+      subtitle: Text(state.description(context)),
       leading: Icon(state.icon),
       onTap: () => showDialog(
         context: context,
         builder: (context) => SimpleDialog(
-          title: const Text('Grid'),
+          title: Text(l10n.settingsGrid),
           children: [
             Column(
               mainAxisSize: MainAxisSize.min,
@@ -44,7 +47,7 @@ class GridSettingsTile extends StatelessWidget {
                   .map(
                     (state) => ListTile(
                       trailing: Icon(state.icon),
-                      title: Text(state.description),
+                      title: Text(state.description(context)),
                       onTap: () {
                         onChange!(state);
                         Navigator.of(context).maybePop();

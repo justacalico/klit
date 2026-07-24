@@ -1,5 +1,6 @@
 import 'package:kilt/app/routing/app_routes.dart';
 import 'package:kilt/comment/comment.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/reply/reply.dart';
 import 'package:kilt/shared/shared.dart';
@@ -103,8 +104,9 @@ class ReplyVisibilityIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!reply.hidden) return const SizedBox();
+    final l10n = AppLocalizations.of(context);
     return Tooltip(
-      message: 'This reply is hidden',
+      message: l10n.replyHidden,
       child: Icon(
         Icons.visibility_off,
         size: smallIconSize(context),

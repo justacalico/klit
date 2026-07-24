@@ -206,11 +206,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return SettingsGroupCard(
-              children: const [
+              children: [
                 CupertinoListTile(
-                  leading: Icon(Icons.warning_amber),
-                  title: Text('Failed to load accounts'),
-                  subtitle: Text('Try reopening Settings.'),
+                  leading: const Icon(Icons.warning_amber),
+                  title: Text(l10n.settingsFailedLoadAccounts),
+                  subtitle: Text(l10n.settingsTryReopen),
                 ),
               ],
             );
@@ -218,14 +218,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           final identities = snapshot.data;
           if (identities == null) {
             return SettingsGroupCard(
-              children: const [
+              children: [
                 CupertinoListTile(
-                  leading: SizedBox(
+                  leading: const SizedBox(
                     width: 18,
                     height: 18,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   ),
-                  title: Text('Loading accounts...'),
+                  title: Text(l10n.settingsLoadingAccounts),
                 ),
               ],
             );
@@ -261,21 +261,21 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             showDialog<void>(
               context: context,
               barrierDismissible: false,
-              builder: (context) => const PopScope(
+              builder: (context) => PopScope(
                 canPop: false,
                 child: Dialog(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        SizedBox(
+                        const SizedBox(
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
-                        SizedBox(width: 12),
-                        Text('Switching account...'),
+                        const SizedBox(width: 12),
+                        Text(l10n.settingsSwitchingAccount),
                       ],
                     ),
                   ),
@@ -373,13 +373,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 onError: (value) {
                   showTestResult(
                     success: false,
-                    message: value ?? 'Failed to connect to ${identity.host}',
+                    message: value ?? l10n.settingsFailedConnect(identity.host),
                   );
                 },
                 onDone: () {
                   showTestResult(
                     success: true,
-                    message: 'Connected to ${linkToDisplay(identity.host)}',
+                    message: l10n.settingsConnectedTo(linkToDisplay(identity.host)),
                   );
                 },
               ),
@@ -391,18 +391,18 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             final confirmed = await showDialog<bool>(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text('Delete account?'),
-                content: const Text(
-                  'All local data will be removed, including follows and history.',
+                title: Text(l10n.settingsDeleteAccountTitle),
+                content: Text(
+                  l10n.settingsDeleteAccountBody,
                 ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(false),
-                    child: const Text('CANCEL'),
+                    child: Text(l10n.commonCancelUpper),
                   ),
                   FilledButton(
                     onPressed: () => Navigator.of(context).pop(true),
-                    child: const Text('DELETE'),
+                    child: Text(l10n.settingsDeleteUpper),
                   ),
                 ],
               ),
@@ -417,7 +417,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 leading: IdentityAvatar(activeIdentity.id),
                 title: Text(activeIdentity.usernameOrAnon),
                 subtitle: Text(
-                  'Active account • ${linkToDisplay(activeIdentity.host)}',
+                  l10n.settingsActiveAccount(linkToDisplay(activeIdentity.host)),
                 ),
                 trailing: Container(
                   padding: const EdgeInsets.symmetric(
@@ -429,7 +429,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
-                    'Active',
+                    l10n.settingsActive,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                       fontWeight: FontWeight.w600,
@@ -444,7 +444,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   child: FilledButton.icon(
                     onPressed: addIdentity,
                     icon: const Icon(Icons.add),
-                    label: const Text('Add account'),
+                    label: Text(l10n.settingsAddAccount),
                   ),
                 ),
               ),
@@ -482,7 +482,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                                     borderRadius: BorderRadius.circular(999),
                                   ),
                                   child: Text(
-                                    'Active',
+                                    l10n.settingsActive,
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
@@ -497,22 +497,22 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                                 itemBuilder: (context) => [
                                   if (!selected)
                                     PopupMenuTile(
-                                      title: 'Activate',
+                                      title: l10n.settingsActivate,
                                       icon: Icons.check,
                                       value: () => activateIdentity(identity),
                                     ),
                                   PopupMenuTile(
-                                    title: 'Test',
+                                    title: l10n.settingsTest,
                                     icon: Icons.wifi_tethering,
                                     value: () => testIdentity(identity),
                                   ),
                                   PopupMenuTile(
-                                    title: 'Edit',
+                                    title: l10n.commonEdit,
                                     icon: Icons.edit,
                                     value: () => editIdentity(identity),
                                   ),
                                   PopupMenuTile(
-                                    title: 'Delete',
+                                    title: l10n.commonDelete,
                                     icon: Icons.delete,
                                     value: () => deleteIdentity(identity),
                                   ),
@@ -547,10 +547,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   icon: CupertinoIcons.nosign,
                   color: Color(0xFFE74C3C),
                 ),
-                title: const Text('Blacklist'),
+                title: Text(l10n.settingsBlacklist),
                 subtitle: traits.denylist.isNotEmpty
                     ? Text(
-                        '${traits.denylist.join(' ').split(' ').trim().where((e) => e.isNotEmpty && e[0] != '-').length} tags blocked',
+                        l10n.settingsTagsBlocked(traits.denylist.join(' ').split(' ').trim().where((e) => e.isNotEmpty && e[0] != '-').length),
                       )
                     : null,
                 trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
@@ -570,9 +570,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   icon: CupertinoIcons.person_add,
                   color: Color(0xFF2E86DE),
                 ),
-                title: const Text('Follows'),
+                title: Text(l10n.settingsFollows),
                 subtitle: snapshot.data != null && snapshot.data != 0
-                    ? Text('${snapshot.data} searches followed')
+                    ? Text(l10n.settingsSearchesFollowed(snapshot.data!))
                     : null,
                 trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
                 onTap: () {
@@ -599,9 +599,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       icon: CupertinoIcons.clock,
                       color: Color(0xFF16A085),
                     ),
-                    title: const Text('History'),
+                    title: Text(l10n.settingsHistory),
                     subtitle: enabled && countSnapshot.data != null
-                        ? Text('${countSnapshot.data} pages visited')
+                        ? Text(l10n.settingsPagesVisited(countSnapshot.data!))
                         : null,
                     trailing: CupertinoSwitch(
                       value: enabled,
@@ -639,14 +639,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 icon: CupertinoIcons.sun_max,
                 color: Color(0xFFF39C12),
               ),
-              title: const Text('Theme'),
+              title: Text(l10n.settingsTheme),
               subtitle: Text(value.displayName),
               trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
               onTap: () {
                 HapticFeedback.selectionClick();
                 _showPickerSheet<AppTheme>(
                   context,
-                  title: 'Theme',
+                  title: l10n.settingsTheme,
                   values: AppTheme.values,
                   current: value,
                   labelOf: (theme) => theme.displayName,
@@ -721,7 +721,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   icon: CupertinoIcons.paintbrush,
                   color: Color(0xFFEC6F91),
                 ),
-                title: const Text('Accent color'),
+                title: Text(l10n.settingsAccentColor),
                 subtitle: Text(hex),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -755,15 +755,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 icon: CupertinoIcons.square_grid_2x2,
                 color: Color(0xFF8E44AD),
               ),
-              title: const Text('Tile size'),
-              subtitle: Text('$value px'),
+              title: Text(l10n.settingsTileSize),
+              subtitle: Text(l10n.settingsTileSizeValue(value)),
               trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
               onTap: () {
                 HapticFeedback.selectionClick();
                 showCupertinoDialog<void>(
                   context: context,
                   builder: (context) => RangeDialog(
-                    title: const Text('Tile size'),
+                    title: Text(l10n.settingsTileSize),
                     value: NumberRange(value),
                     initialMode: RangeDialogMode.exact,
                     enforceMax: false,
@@ -787,17 +787,17 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 icon: value.icon,
                 color: const Color(0xFF34495E),
               ),
-              title: const Text('Quilt'),
-              subtitle: Text(value.description),
+              title: Text(l10n.settingsQuilt),
+              subtitle: Text(value.description(context)),
               trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
               onTap: () {
                 HapticFeedback.selectionClick();
                 _showPickerSheet<GridQuilt>(
                   context,
-                  title: 'Grid',
+                  title: l10n.settingsGrid,
                   values: GridQuilt.values,
                   current: value,
-                  labelOf: (state) => state.description,
+                  labelOf: (state) => state.description(context),
                   trailingBuilder: (state) => Icon(state.icon),
                   onSelected: (state) => settings.quilt.value = state,
                 );
@@ -811,8 +811,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 icon: CupertinoIcons.doc_text,
                 color: Color(0xFF2980B9),
               ),
-              title: 'Post info',
-              subtitle: value ? 'Info on post tiles' : 'Image tiles only',
+              title: l10n.settingsPostInfo,
+              subtitle: value ? l10n.settingsPostInfoOnTiles : l10n.settingsPostInfoImageOnly,
               value: value,
               onChanged: (v) => settings.showPostInfo.value = v,
             ),
@@ -826,8 +826,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   icon: CupertinoIcons.square_stack_3d_down_right,
                   color: Color(0xFF1ABC9C),
                 ),
-                title: const Text('Post action bar'),
-                subtitle: Text('${actions.length} actions pinned'),
+                title: Text(l10n.settingsPostActionBar),
+                subtitle: Text(l10n.settingsActionsPinned(actions.length)),
                 trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
                 onTap: () {
                   HapticFeedback.selectionClick();
@@ -843,10 +843,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 icon: CupertinoIcons.rectangle_stack,
                 color: Color(0xFF16A085),
               ),
-              title: 'Action bar placement',
+              title: l10n.settingsActionBarPlacement,
               subtitle: value
-                  ? 'Mobile: floating above navbar'
-                  : 'Mobile: inline on post page',
+                  ? l10n.settingsPlacementFloating
+                  : l10n.settingsPlacementInline,
               value: value,
               onChanged: (enabled) =>
                   settings.postActionBarFloatingMobile.value = enabled,
@@ -871,10 +871,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   icon: CupertinoIcons.folder,
                   color: Color(0xFFF1C40F),
                 ),
-                title: const Text('Download location'),
+                title: Text(l10n.settingsDownloadLocation),
                 subtitle: value != null
                     ? Text(Uri.decodeComponent(Uri.parse(value).path))
-                    : const Text('Choose directory'),
+                    : Text(l10n.settingsChooseDirectory),
                 trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
                 onTap: () async {
                   HapticFeedback.selectionClick();
@@ -895,8 +895,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 icon: CupertinoIcons.arrow_up,
                 color: Color(0xFF27AE60),
               ),
-              title: 'Upvote favorites',
-              subtitle: value ? 'Upvote and favorite' : 'Favorite only',
+              title: l10n.settingsUpvoteFavorites,
+              subtitle: value ? l10n.settingsUpvoteAndFav : l10n.settingsFavOnly,
               value: value,
               onChanged: (v) => settings.upvoteFavs.value = v,
             ),
@@ -910,8 +910,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     : CupertinoIcons.speaker_2,
                 color: const Color(0xFF3498DB),
               ),
-              title: 'Video volume',
-              subtitle: value ? 'Muted' : 'With sound',
+              title: l10n.settingsVideoVolume,
+              subtitle: value ? l10n.settingsMuted : l10n.settingsWithSound,
               value: value,
               onChanged: (v) => settings.muteVideos.value = v,
             ),
@@ -923,8 +923,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 icon: CupertinoIcons.play_circle,
                 color: Color(0xFF9B59B6),
               ),
-              title: 'Autoplay videos',
-              subtitle: value ? 'Play automatically' : 'Play on tap',
+              title: l10n.settingsAutoplayVideos,
+              subtitle: value ? l10n.settingsPlayAutomatically : l10n.settingsPlayOnTap,
               value: value,
               onChanged: (v) => settings.autoplayVideos.value = v,
             ),
@@ -936,14 +936,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 icon: CupertinoIcons.videocam,
                 color: Color(0xFF2ECC71),
               ),
-              title: const Text('Video resolution'),
+              title: Text(l10n.settingsVideoResolution),
               subtitle: Text(value.title),
               trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
               onTap: () {
                 HapticFeedback.selectionClick();
                 _showPickerSheet<VideoResolution>(
                   context,
-                  title: 'Video resolution',
+                  title: l10n.settingsVideoResolution,
                   values: VideoResolution.values,
                   current: value,
                   labelOf: (resolution) => resolution.title,
@@ -961,10 +961,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 icon: CupertinoIcons.checkmark_circle,
                 color: Color(0xFF1ABC9C),
               ),
-              title: 'I Finished',
+              title: l10n.settingsIFinished,
               subtitle: value
-                  ? 'Button on post detail to mark finished'
-                  : 'Off',
+                  ? l10n.settingsIFinishedDesc
+                  : l10n.settingsIFinishedOff,
               value: value,
               onChanged: (v) => settings.iFinishedEnabled.value = v,
             ),
@@ -982,10 +982,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     icon: CupertinoIcons.camera,
                     color: Color(0xFF9B59B6),
                   ),
-                  title: 'Request image on completion',
+                  title: l10n.settingsRequestPhoto,
                   subtitle: value
-                      ? 'Ask for a photo when marking I Finished'
-                      : 'No photo',
+                      ? l10n.settingsRequestPhotoDesc
+                      : l10n.settingsRequestPhotoOff,
                   value: value,
                   onChanged: (v) => settings.iFinishedRequestPhoto.value = v,
                 ),
@@ -1011,8 +1011,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   icon: CupertinoIcons.rectangle_on_rectangle_angled,
                   color: Color(0xFFE67E22),
                 ),
-                title: 'Secure display',
-                subtitle: value ? 'Screen protected' : 'Screen visible',
+                title: l10n.settingsSecureDisplay,
+                subtitle: value ? l10n.settingsScreenProtected : l10n.settingsScreenVisible,
                 value: value,
                 onChanged: (v) => settings.secureDisplay.value = v,
               ),
@@ -1025,8 +1025,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   icon: CupertinoIcons.keyboard,
                   color: Color(0xFF7F8C8D),
                 ),
-                title: 'Incognito keyboard',
-                subtitle: value ? 'Enabled' : 'Disabled',
+                title: l10n.settingsIncognitoKeyboard,
+                subtitle: value ? l10n.commonEnabled : l10n.commonDisabled,
                 value: value,
                 onChanged: (v) => settings.incognitoKeyboard.value = v,
               ),
@@ -1038,10 +1038,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 icon: CupertinoIcons.globe,
                 color: Color(0xFF95A5A6),
               ),
-              title: 'Allow HTTP hosts',
+              title: l10n.settingsAllowHttpHosts,
               subtitle: value
-                  ? 'http:// for local or self-hosted (unencrypted)'
-                  : 'https:// only',
+                  ? l10n.settingsAllowHttpDesc
+                  : l10n.settingsHttpsOnly,
               value: value,
               onChanged: (v) => settings.allowHttpHosts.value = v,
             ),
@@ -1053,8 +1053,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 icon: CupertinoIcons.lock,
                 color: Color(0xFF34495E),
               ),
-              title: 'PIN lock',
-              subtitle: value != null ? 'PIN enabled' : 'PIN disabled',
+              title: l10n.settingsPinLock,
+              subtitle: value != null ? l10n.settingsPinEnabled : l10n.settingsPinDisabled,
               value: value != null,
               onChanged: (enabled) async {
                 if (enabled) {
@@ -1078,10 +1078,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     icon: CupertinoIcons.hand_raised,
                     color: Color(0xFF16A085),
                   ),
-                  title: 'Biometric lock',
+                  title: l10n.settingsBiometricLock,
                   subtitle: value
-                      ? 'Biometrics enabled'
-                      : 'Biometrics disabled',
+                      ? l10n.settingsBiometricsEnabled
+                      : l10n.settingsBiometricsDisabled,
                   value: value,
                   onChanged: (snapshot.data ?? false)
                       ? (v) => settings.biometricAuth.value = v
@@ -1118,8 +1118,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               icon: CupertinoIcons.ant,
               color: Color(0xFF8E44AD),
             ),
-            title: 'Developer mode',
-            subtitle: 'Options shown',
+            title: l10n.settingsDeveloperMode,
+            subtitle: l10n.settingsOptionsShown,
             value: true,
             onChanged: (v) => settings.showDev.value = v,
           ),
@@ -1133,9 +1133,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     icon: CupertinoIcons.list_number,
                     color: Color(0xFFD35400),
                   ),
-                  title: const Text('Logs'),
+                  title: Text(l10n.settingsLogs),
                   subtitle: (snapshot.data?.isNotEmpty ?? false)
-                      ? Text('${snapshot.data!.length} errors logged')
+                      ? Text(l10n.settingsErrorsLogged(snapshot.data!.length))
                       : null,
                   trailing: const Icon(
                     CupertinoIcons.chevron_forward,
@@ -1155,7 +1155,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 icon: CupertinoIcons.square_stack_3d_up,
                 color: Color(0xFF2C3E50),
               ),
-              title: const Text('Database'),
+              title: Text(l10n.settingsDatabase),
               trailing: const Icon(CupertinoIcons.chevron_forward, size: 18),
               onTap: () {
                 HapticFeedback.selectionClick();
@@ -1173,6 +1173,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   void _showPostActionBarEditor(BuildContext context, Settings settings) {
+    final l10n = AppLocalizations.of(context);
     final initial = PostActionPreferences.decode(
       settings.postActionBarActions.value,
     );
@@ -1200,11 +1201,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Padding(
-                            padding: EdgeInsets.fromLTRB(8, 4, 8, 8),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
                             child: Text(
-                              'Post action bar',
-                              style: TextStyle(
+                              l10n.settingsPostActionBar,
+                              style: const TextStyle(
                                 fontSize: 19,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -1213,7 +1214,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                           Padding(
                             padding: const EdgeInsets.fromLTRB(8, 0, 8, 10),
                             child: Text(
-                              'Pinned actions are shown first on post detail. Drag to reorder.',
+                              l10n.settingsPinnedActions,
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                           ),
@@ -1276,7 +1277,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
                               child: Text(
-                                'Available',
+                                l10n.settingsAvailable,
                                 style: Theme.of(context).textTheme.titleSmall
                                     ?.copyWith(fontWeight: FontWeight.w700),
                               ),
@@ -1324,7 +1325,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                             children: [
                               TextButton(
                                 onPressed: () => Navigator.of(context).pop(),
-                                child: const Text('Cancel'),
+                                child: Text(l10n.commonCancel),
                               ),
                               const SizedBox(width: 8),
                               FilledButton(
@@ -1334,7 +1335,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                                   HapticFeedback.selectionClick();
                                   Navigator.of(context).pop();
                                 },
-                                child: const Text('Save'),
+                                child: Text(l10n.commonSave),
                               ),
                             ],
                           ),
@@ -1414,6 +1415,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   void _showAccentColorSheet(BuildContext context, Settings settings) {
+    final l10n = AppLocalizations.of(context);
     var selected = colorFromHex(settings.accentColorHex.value);
 
     showCupertinoModalPopup<void>(
@@ -1431,11 +1433,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(8, 8, 8, 10),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
                       child: Text(
-                        'Accent color',
-                        style: TextStyle(
+                        l10n.settingsAccentColor,
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                         ),
@@ -1495,7 +1497,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       children: [
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('Cancel'),
+                          child: Text(l10n.commonCancel),
                         ),
                         const SizedBox(width: 6),
                         TextButton(
@@ -1505,7 +1507,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                                 defaultAccentColorHex;
                             Navigator.of(context).pop();
                           },
-                          child: const Text('Reset'),
+                          child: Text(l10n.commonReset),
                         ),
                         const SizedBox(width: 6),
                         FilledButton(
@@ -1516,7 +1518,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                             );
                             Navigator.of(context).pop();
                           },
-                          child: const Text('Save'),
+                          child: Text(l10n.commonSave),
                         ),
                       ],
                     ),

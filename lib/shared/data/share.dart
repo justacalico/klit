@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 
 abstract final class Share {
   static Future<void> text(BuildContext context, String text) async {
@@ -21,6 +22,7 @@ abstract final class Share {
     String text,
     String name,
   ) async {
+    final l10n = AppLocalizations.of(context);
     if (Platform.isAndroid || Platform.isIOS) {
       File file = File(
         join(await getTemporaryDirectory().then((e) => e.path), name),
@@ -30,7 +32,7 @@ abstract final class Share {
     } else {
       final messenger = ScaffoldMessenger.of(context);
       String? outputFile = await FilePicker.platform.saveFile(
-        dialogTitle: 'Save file',
+        dialogTitle: l10n.commonSaveFile,
         fileName: name,
       );
       if (outputFile == null) return;
@@ -39,13 +41,14 @@ abstract final class Share {
       messenger.showSnackBar(
         SnackBar(
           duration: const Duration(seconds: 1),
-          content: Text('File saved as ${basename(outputFile)}'),
+          content: Text(l10n.commonFileSavedAs(basename(outputFile))),
         ),
       );
     }
   }
 
   static Future<void> file(BuildContext context, String path) async {
+    final l10n = AppLocalizations.of(context);
     XFile file = XFile(path);
     if (Platform.isAndroid || Platform.isIOS) {
       await SharePlus.instance.share(ShareParams(files: [file]));
@@ -55,7 +58,7 @@ abstract final class Share {
       if (!context.mounted) return;
 
       String? outputFile = await FilePicker.platform.saveFile(
-        dialogTitle: 'Save file',
+        dialogTitle: l10n.commonSaveFile,
         fileName: basename(path),
       );
       if (outputFile == null) return;
@@ -64,19 +67,20 @@ abstract final class Share {
       messenger.showSnackBar(
         SnackBar(
           duration: const Duration(seconds: 1),
-          content: Text('File saved as ${basename(outputFile)}'),
+          content: Text(l10n.commonFileSavedAs(basename(outputFile))),
         ),
       );
     }
   }
 
   static Future<void> clipboard(BuildContext context, String text) async {
+    final l10n = AppLocalizations.of(context);
     ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
     await Clipboard.setData(ClipboardData(text: text));
     messenger.showSnackBar(
-      const SnackBar(
-        duration: Duration(seconds: 1),
-        content: Text('Copied to clipboard'),
+      SnackBar(
+        duration: const Duration(seconds: 1),
+        content: Text(l10n.commonCopiedToClipboard),
       ),
     );
   }

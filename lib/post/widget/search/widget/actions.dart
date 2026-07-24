@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/follow/follow.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
@@ -14,6 +15,7 @@ class TagListActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (wikiMetaTags.any((prefix) => tag.startsWith(prefix))) {
       return const SizedBox.shrink();
     }
@@ -84,8 +86,8 @@ class TagListActions extends StatelessWidget {
                               ? const Icon(Icons.person_remove_alt_1)
                               : const Icon(Icons.person_add_alt_1),
                           label: following
-                              ? const Text('Unfollow')
-                              : const Text('Follow'),
+                              ? Text(l10n.commonUnfollow)
+                              : Text(l10n.commonFollow),
                           onTap: followBookmarkToggle(FollowType.update),
                         ),
                         CrossFade(
@@ -95,8 +97,8 @@ class TagListActions extends StatelessWidget {
                                 ? const Icon(Icons.notifications_active)
                                 : const Icon(Icons.notifications_none),
                             label: notifying
-                                ? const Text('Mute')
-                                : const Text('Notify'),
+                                ? Text(l10n.commonMute)
+                                : Text(l10n.commonNotify),
                             onTap: () {
                               if (notifying) {
                                 client.follows.update(
@@ -117,8 +119,8 @@ class TagListActions extends StatelessWidget {
                               ? const Icon(Icons.turned_in)
                               : const Icon(Icons.turned_in_not),
                           label: bookmarked
-                              ? const Text('Unbookmark')
-                              : const Text('Bookmark'),
+                              ? Text(l10n.commonUnbookmark)
+                              : Text(l10n.commonBookmark),
                           onTap: followBookmarkToggle(FollowType.bookmark),
                         ),
                       ],
@@ -133,8 +135,8 @@ class TagListActions extends StatelessWidget {
                         child: const Icon(Icons.check),
                       ),
                       label: denied
-                          ? const Text('Unblock')
-                          : const Text('Block'),
+                          ? Text(l10n.commonUnblock)
+                          : Text(l10n.commonBlock),
                       onTap: () {
                         if (denied) {
                           client.accounts.push(
@@ -179,9 +181,10 @@ class RemoveTagAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ActionButton(
       icon: const Icon(Icons.search_off),
-      label: const Text('Remove'),
+      label: Text(l10n.commonRemove),
       onTap: () {
         Navigator.of(context).maybePop();
         QueryMap result = controller.query.toQuery();
@@ -200,9 +203,10 @@ class AddTagAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ActionButton(
       icon: const Icon(Icons.zoom_in),
-      label: const Text('Add'),
+      label: Text(l10n.commonAdd),
       onTap: () {
         Navigator.of(context).maybePop();
         final result = controller.query.toQuery();
@@ -225,9 +229,10 @@ class SubtractTagAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ActionButton(
       icon: const Icon(Icons.zoom_out),
-      label: const Text('Subtract'),
+      label: Text(l10n.commonSubtract),
       onTap: () {
         Navigator.of(context).maybePop();
         final result = controller.query.toQuery();

@@ -243,10 +243,10 @@ class SettingsAboutSection extends StatelessWidget {
                 ? 'v${appInfo.version}'
                 : 'v${appInfo.version} ($buildNumber)';
             final sourceName = switch (appInfo.source) {
-              Source.IS_INSTALLED_FROM_LOCAL_SOURCE => 'Local build',
-              Source.IS_INSTALLED_FROM_OTHER_SOURCE => 'Other source',
+              Source.IS_INSTALLED_FROM_LOCAL_SOURCE => l10n.aboutSourceLocal,
+              Source.IS_INSTALLED_FROM_OTHER_SOURCE => l10n.aboutSourceOther,
               Source.UNKNOWN => null,
-              _ => 'Store install',
+              _ => l10n.aboutSourceStore,
             };
 
             return Column(

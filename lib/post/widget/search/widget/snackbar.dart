@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/logs/logs.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/settings/settings.dart';
@@ -11,6 +12,7 @@ Future<void> postDownloadingNotification(
 ) async {
   Settings settings = context.read<Settings>();
   BaseCacheManager cache = context.read<BaseCacheManager>();
+  final l10n = AppLocalizations.of(context);
   final logger = Logger('Post Downloader');
   return loadingNotification<Post>(
     context: context,
@@ -32,14 +34,14 @@ Future<void> postDownloadingNotification(
     },
     items: items,
     onDone: (items) => items.length == 1
-        ? 'Downloaded post #${items.first.id}'
-        : 'Downloaded ${items.length} posts',
+        ? l10n.postDownloadedOne(items.first.id)
+        : l10n.postDownloadedMany(items.length),
     onProgress: (items, index) => items.length == 1
-        ? 'Downloading post #${items.first.id}'
-        : 'Downloading post #${items.elementAt(index).id} (${index + 1}/${items.length})',
+        ? l10n.postDownloadingOne(items.first.id)
+        : l10n.postDownloadingProgress(items.elementAt(index).id, index + 1, items.length),
     onFailure: (items, index) =>
-        'Failed to download post #${items.elementAt(index).id}',
-    onCancel: (items, index) => 'Cancelled download',
+        l10n.postDownloadFailed(items.elementAt(index).id),
+    onCancel: (items, index) => l10n.postDownloadCancelled,
   );
 }
 
@@ -49,6 +51,7 @@ Future<void> postFavoritingNotification(
   PostController controller,
   bool isLiked,
 ) {
+  final l10n = AppLocalizations.of(context);
   PostController controller = context.read<PostController>();
   bool upvote = context.read<Settings>().upvoteFavs.value;
   return loadingNotification<Post>(
@@ -83,25 +86,25 @@ Future<void> postFavoritingNotification(
     },
     onDone: isLiked
         ? (items) => items.length == 1
-              ? 'Unfavorited post #${items.first.id}'
-              : 'Unfavorited ${items.length} posts'
+              ? l10n.postUnfavoritedOne(items.first.id)
+              : l10n.postUnfavoritedMany(items.length)
         : (items) => items.length == 1
-              ? 'Favorited post #${items.first.id}'
-              : 'Favorited ${items.length} posts',
+              ? l10n.postFavoritedOne(items.first.id)
+              : l10n.postFavoritedMany(items.length),
     onProgress: isLiked
         ? (items, index) => items.length == 1
-              ? 'Unfavoriting post #${items.first.id}'
-              : 'Unfavoriting post #${items.elementAt(index).id} (${index + 1}/${items.length})'
+              ? l10n.postUnfavoritingOne(items.first.id)
+              : l10n.postUnfavoritingProgress(items.elementAt(index).id, index + 1, items.length)
         : (items, index) => items.length == 1
-              ? 'Favoriting post #${items.first.id}'
-              : 'Favoriting post #${items.elementAt(index).id} (${index + 1}/${items.length})',
+              ? l10n.postFavoritingOne(items.first.id)
+              : l10n.postFavoritingProgress(items.elementAt(index).id, index + 1, items.length),
     onFailure: isLiked
         ? (items, index) =>
-              'Failed to unfavorite post #${items.elementAt(index).id}'
+              l10n.postUnfavoriteFailed(items.elementAt(index).id)
         : (items, index) =>
-              'Failed to favorite post #${items.elementAt(index).id}',
+              l10n.postFavoriteFailed(items.elementAt(index).id),
     onCancel: isLiked
-        ? (items, index) => 'Cancelled unfavoriting'
-        : (items, index) => 'Cancelled favoriting',
+        ? (items, index) => l10n.postUnfavoritingCancelled
+        : (items, index) => l10n.postFavoritingCancelled,
   );
 }

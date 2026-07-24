@@ -1,5 +1,6 @@
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 
 class SelectionLayoutData<T> extends InheritedWidget {
   /// Provides selection actions for a [SelectionLayout] to its subtree.
@@ -178,22 +179,23 @@ class SelectionAppBar<T> extends StatelessWidget with AppBarBuilderWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     SelectionLayoutData<T>? layoutData = SelectionLayout.maybeOf<T>(context);
     return CrossFade.builder(
       showChild: layoutData != null && layoutData.selections.isNotEmpty,
       builder: (context) => DefaultAppBar(
         title:
             titleBuilder?.call(context, layoutData!) ??
-            Text('${layoutData!.selections.length} items'),
+            Text(l10n.commonItemsCount(layoutData!.selections.length)),
         leading: IconButton(
           icon: const Icon(Icons.clear),
-          tooltip: 'Abort',
+          tooltip: l10n.commonAbort,
           onPressed: layoutData!.clear,
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.select_all),
-            tooltip: 'Select all',
+            tooltip: l10n.commonSelectAll,
             onPressed: layoutData.selectAll,
           ),
           ...actionBuilder(context, layoutData),

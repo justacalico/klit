@@ -1,5 +1,6 @@
 import 'package:kilt/client/client.dart';
 import 'package:kilt/history/history.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
@@ -10,6 +11,7 @@ class HistoryEnableTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final client = context.watch<Client>();
     return SubStream<int>(
       create: () => client.histories.count().streamed,
@@ -17,8 +19,8 @@ class HistoryEnableTile extends StatelessWidget {
       builder: (context, countSnapshot) => ValueListenableBuilder(
         valueListenable: client.traits,
         builder: (context, traits, child) => SwitchListTile(
-          title: const Text('Enabled'),
-          subtitle: Text('${countSnapshot.data ?? 0} pages visited'),
+          title: Text(l10n.historyEnabled),
+          subtitle: Text(l10n.historyPagesVisited(countSnapshot.data ?? 0)),
           secondary: const Icon(Icons.history),
           value: traits.writeHistory ?? true,
           onChanged: (value) => client.traits.value = client.traits.value
@@ -34,29 +36,30 @@ class HistoryClearTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final client = context.watch<Client>();
     return ListTile(
-      title: const Text('Clear history'),
-      subtitle: const Text('Delete all entries'),
+      title: Text(l10n.historyClearHistory),
+      subtitle: Text(l10n.historyDeleteAllEntries),
       leading: const Icon(Icons.clear_all),
       onTap: () => showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Clear history?'),
-          content: const Text(
-            'All history entries will be permanently deleted. This action cannot be undone.',
+          title: Text(l10n.historyClearHistoryTitle),
+          content: Text(
+            l10n.historyClearHistoryBody,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text(l10n.commonCancel),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 client.histories.removeAll(null);
               },
-              child: const Text('Clear'),
+              child: Text(l10n.commonClear),
             ),
           ],
         ),
@@ -73,6 +76,7 @@ class HistoryLimitTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final client = context.watch<Client>();
     return ValueListenableBuilder(
       valueListenable: client.traits,
@@ -83,15 +87,17 @@ class HistoryLimitTile extends StatelessWidget {
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text('History limit'),
+                title: Text(l10n.historyHistoryLimit),
                 content: Text(
-                  'Enabling history limit means all history entries beyond ${NumberFormat.compact().format(trimAmount)} '
-                  'and all entries older than ${trimAge.inDays ~/ 30} months are automatically deleted.',
+                  l10n.historyHistoryLimitBody(
+                    NumberFormat.compact().format(trimAmount),
+                    trimAge.inDays ~/ 30,
+                  ),
                 ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).maybePop(),
-                    child: const Text('CANCEL'),
+                    child: Text(l10n.commonCancelUpper),
                   ),
                   TextButton(
                     onPressed: () {
@@ -116,13 +122,15 @@ class HistoryLimitTile extends StatelessWidget {
               ? Icons.hourglass_bottom
               : Icons.hourglass_empty,
         ),
-        title: const Text('Limit history'),
+        title: Text(l10n.historyLimitHistory),
         subtitle: (traits.trimHistory ?? false)
             ? Text(
-                'Limited to newer than ${trimAge.inDays ~/ 30} months or '
-                'less than ${NumberFormat.compact().format(trimAmount)} entries.',
+                l10n.historyLimitedTo(
+                  trimAge.inDays ~/ 30,
+                  NumberFormat.compact().format(trimAmount),
+                ),
               )
-            : const Text('history is infinite'),
+            : Text(l10n.historyInfinite),
       ),
     );
   }
@@ -133,13 +141,14 @@ class HistoryCategoryFilterTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Consumer<HistoryController>(
       builder: (context, controller, child) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(left: 12),
-            child: ListTileHeader(title: 'Entries'),
+          Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: ListTileHeader(title: l10n.historyEntries),
           ),
           for (final filter in HistoryCategory.values)
             AnimatedBuilder(
@@ -178,13 +187,14 @@ class HistoryTypeFilterTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Consumer<HistoryController>(
       builder: (context, controller, child) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(left: 12),
-            child: ListTileHeader(title: 'Type'),
+          Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: ListTileHeader(title: l10n.commonType),
           ),
           for (final filter in HistoryType.values)
             AnimatedBuilder(

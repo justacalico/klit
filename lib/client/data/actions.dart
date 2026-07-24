@@ -1,4 +1,5 @@
 import 'package:kilt/client/client.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
@@ -15,15 +16,16 @@ Future<void> guardWithLogin({
   required VoidCallback callback,
   String? error,
 }) async {
+  final l10n = AppLocalizations.of(context);
   if (context.read<Client>().hasLogin) {
     callback();
   } else {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         duration: const Duration(seconds: 3),
-        content: Text(error ?? 'You must be logged in to perform this action.'),
+        content: Text(error ?? l10n.identityMustBeLoggedIn),
         action: SnackBarAction(
-          label: 'Choose identity',
+          label: l10n.identityChooseIdentity,
           onPressed: () => openSettingsAccounts(context),
         ),
       ),

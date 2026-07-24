@@ -1,4 +1,5 @@
 import 'package:kilt/client/client.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/user/user.dart';
@@ -11,6 +12,7 @@ class ProfilePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final client = context.watch<Client>();
+    final l10n = AppLocalizations.of(context);
     final nav = ref.watch(navigationProvider);
     final viewUserId = nav.profileViewUserId;
     final viewUsername = nav.profileViewUsername;
@@ -25,7 +27,7 @@ class ProfilePage extends ConsumerWidget {
           body: Center(
             child: IconMessage(
               icon: const Icon(Icons.person_off_outlined),
-              title: const Text('Profile is not available for anonymous users'),
+              title: Text(l10n.userProfileUnavailable),
             ),
           ),
         );
@@ -48,8 +50,8 @@ class ProfilePage extends ConsumerWidget {
                 icon: const Icon(Icons.warning_amber_outlined),
                 title: Text(
                   snapshot.hasError
-                      ? 'Failed to load profile'
-                      : 'User not found',
+                      ? l10n.userFailedLoadProfile
+                      : l10n.userNotFound,
                 ),
               ),
             ),
@@ -100,15 +102,16 @@ class _ProfileTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final stats = user.stats;
     final showUploads = (stats?.postUploadCount ?? 0) > 0;
     final showFavorites = (stats?.favoriteCount ?? 0) > 0;
 
     return Consumer<_ProfileControllers>(
       builder: (context, controllers, _) {
-        final tabs = <Widget>[const Tab(text: 'Main')];
-        if (showUploads) tabs.add(const Tab(text: 'Uploads'));
-        if (showFavorites) tabs.add(const Tab(text: 'Favorites'));
+        final tabs = <Widget>[Tab(text: l10n.commonMain)];
+        if (showUploads) tabs.add(Tab(text: l10n.commonUploads));
+        if (showFavorites) tabs.add(Tab(text: l10n.commonFavorites));
 
         final children = <Widget>[
           SingleChildScrollView(

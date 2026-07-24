@@ -1,4 +1,5 @@
 import 'package:kilt/client/client.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
 import 'package:kilt/topic/topic.dart';
@@ -34,6 +35,7 @@ class TopicSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Material(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
@@ -59,7 +61,7 @@ class TopicSheet extends StatelessWidget {
                     context,
                     context.read<Client>().withHost(topic.link),
                   ),
-                  label: const Text('Share'),
+                  label: Text(l10n.commonShare),
                 ),
               ],
             ),
@@ -83,6 +85,7 @@ class TopicInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     Widget textInfoRow(String label, String value) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -96,11 +99,11 @@ class TopicInfo extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          textInfoRow('replies', topic.responseCount.toString()),
+          textInfoRow(l10n.topicReplies, topic.responseCount.toString()),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('id'),
+              Text(l10n.commonId),
               InkWell(
                 child: Text('#${topic.id}'),
                 onLongPress: () async {
@@ -112,20 +115,20 @@ class TopicInfo extends StatelessWidget {
                   messenger.showSnackBar(
                     SnackBar(
                       duration: const Duration(seconds: 1),
-                      content: Text('Copied topic id #${topic.id}'),
+                      content: Text(l10n.topicCopiedId(topic.id)),
                     ),
                   );
                 },
               ),
             ],
           ),
-          textInfoRow('locked', topic.locked ? 'yes' : 'no'),
+          textInfoRow(l10n.topicLocked, topic.locked ? l10n.commonYes : l10n.commonNo),
           textInfoRow(
-            'created',
+            l10n.commonCreated,
             DateFormatting.dateTime(topic.createdAt.toLocal()),
           ),
           textInfoRow(
-            'updated',
+            l10n.commonUpdated,
             DateFormatting.dateTime(topic.updatedAt.toLocal()),
           ),
         ],
@@ -151,6 +154,7 @@ class TopicDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return AlertDialog(
       content: SizedBox(
         width: 800,
@@ -177,7 +181,7 @@ class TopicDialog extends StatelessWidget {
                     context,
                     context.read<Client>().withHost(topic.link),
                   ),
-                  label: const Text('Share'),
+                  label: Text(l10n.commonShare),
                 ),
               ],
             ),

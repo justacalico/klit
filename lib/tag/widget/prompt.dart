@@ -1,5 +1,6 @@
 import 'package:kilt/client/client.dart';
 import 'package:kilt/history/history.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
@@ -242,6 +243,7 @@ class _SearchTagDisplayState extends State<SearchTagDisplay> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return FutureBuilder<Wiki?>(
       future: wiki,
       builder: (context, snapshot) => CrossFade.builder(
@@ -251,9 +253,9 @@ class _SearchTagDisplayState extends State<SearchTagDisplay> {
           if (snapshot.hasData) {
             return DText(snapshot.data!.body);
           } else if (snapshot.hasError) {
-            return const IconMessage(
-              title: Text('unable to retrieve wiki entry'),
-              icon: Icon(Icons.warning_amber_outlined),
+            return IconMessage(
+              title: Text(l10n.wikiUnableRetrieve),
+              icon: const Icon(Icons.warning_amber_outlined),
               direction: Axis.horizontal,
             );
           } else {
@@ -263,7 +265,7 @@ class _SearchTagDisplayState extends State<SearchTagDisplay> {
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text(
-                    'no wiki entry',
+                    l10n.wikiNoWikiEntry,
                     style: TextStyle(
                       color: dimTextColor(context, 0.5),
                       fontStyle: FontStyle.italic,

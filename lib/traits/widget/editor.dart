@@ -1,4 +1,5 @@
 import 'package:kilt/client/client.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
@@ -16,9 +17,10 @@ class DenyListEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final client = context.read<Client>();
     return TextEditor(
-      title: const Text('Blacklist'),
+      title: Text(l10n.traitsBlacklist),
       actions: [
         IconButton(
           icon: const Icon(Icons.help_outline),
@@ -36,7 +38,7 @@ class DenyListEditor extends StatelessWidget {
             traits: client.traits.value.copyWith(denylist: tags),
           );
         } on ClientException {
-          return 'Failed to update blacklist!';
+          return l10n.traitsFailedUpdate;
         }
         return null;
       },
@@ -66,6 +68,7 @@ class _DenyListEditorDialogState extends State<_DenyListEditorDialog> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context);
     setState(() {
       _isSaving = true;
       _error = null;
@@ -82,7 +85,7 @@ class _DenyListEditorDialogState extends State<_DenyListEditorDialog> {
     } on ClientException {
       if (!mounted) return;
       setState(() {
-        _error = 'Failed to update blacklist!';
+        _error = l10n.traitsFailedUpdate;
       });
     } finally {
       if (mounted) {
@@ -93,6 +96,7 @@ class _DenyListEditorDialogState extends State<_DenyListEditorDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Dialog(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 560),
@@ -104,10 +108,10 @@ class _DenyListEditorDialogState extends State<_DenyListEditorDialog> {
             children: [
               Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Blacklist',
-                      style: TextStyle(
+                      l10n.traitsBlacklist,
+                      style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
                       ),
@@ -129,9 +133,9 @@ class _DenyListEditorDialogState extends State<_DenyListEditorDialog> {
                 maxLines: 12,
                 minLines: 10,
                 enabled: !_isSaving,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'One tag per line',
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  hintText: l10n.traitsOneTagPerLine,
                 ),
                 enableIMEPersonalizedLearning: !PrivateTextFields.of(context),
               ),
@@ -150,7 +154,7 @@ class _DenyListEditorDialogState extends State<_DenyListEditorDialog> {
                     onPressed: _isSaving
                         ? null
                         : () => Navigator.of(context).maybePop(),
-                    child: const Text('Cancel'),
+                    child: Text(l10n.commonCancel),
                   ),
                   const SizedBox(width: 10),
                   FilledButton.icon(
@@ -162,7 +166,7 @@ class _DenyListEditorDialogState extends State<_DenyListEditorDialog> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.check),
-                    label: const Text('Save'),
+                    label: Text(l10n.commonSave),
                   ),
                 ],
               ),

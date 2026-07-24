@@ -10,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 
 const double mobileBreakpoint = 600;
 const double compactBreakpoint = 900;
@@ -133,6 +134,7 @@ class _BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final viewPadding = MediaQuery.viewPaddingOf(context);
     final bottomOffset = viewPadding.bottom > 0 ? viewPadding.bottom + 8 : 12.0;
     final visible = _visibleNavEntries(
@@ -193,7 +195,7 @@ class _BottomNavBar extends StatelessWidget {
                   Expanded(
                     child: _BottomNavDestination(
                       icon: CupertinoIcons.ellipsis,
-                      label: 'More',
+                      label: l10n.commonMore,
                       selected: selectedIndex == primaryCount,
                         onTap: () {
                         HapticFeedback.selectionClick();
@@ -670,10 +672,11 @@ class _SidebarCollapseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     return Tooltip(
-      message: effectiveCollapsed ? 'Expand sidebar' : 'Shrink sidebar',
+      message: effectiveCollapsed ? l10n.commonExpandSidebar : l10n.commonShrinkSidebar,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 2),
         child: Material(
@@ -700,7 +703,7 @@ class _SidebarCollapseButton extends StatelessWidget {
                     const SizedBox(width: 14),
                     Expanded(
                       child: Text(
-                        'Shrink sidebar',
+                        l10n.commonShrinkSidebar,
                         style: theme.textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w500,
                           color: colorScheme.onSurfaceVariant,

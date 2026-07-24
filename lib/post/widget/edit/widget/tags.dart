@@ -1,4 +1,5 @@
 import 'package:kilt/client/client.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/logs/logs.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
@@ -104,6 +105,7 @@ class _TagsEditDisplayState extends State<TagsEditDisplay> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: defaultFormPadding,
       child: Column(
@@ -111,8 +113,8 @@ class _TagsEditDisplayState extends State<TagsEditDisplay> {
         children: [
           Row(
             children: [
-              const Expanded(
-                child: Text('Tags', style: TextStyle(fontSize: 16)),
+              Expanded(
+                child: Text(l10n.commonTags, style: const TextStyle(fontSize: 16)),
               ),
               IconButton(
                 onPressed: widget.enabled == false
@@ -126,7 +128,7 @@ class _TagsEditDisplayState extends State<TagsEditDisplay> {
                         }
                       },
                 icon: Icon(_isPreviewMode ? Icons.edit : Icons.visibility),
-                tooltip: _isPreviewMode ? 'Edit' : 'Preview',
+                tooltip: _isPreviewMode ? l10n.commonEdit : l10n.commonPreview,
               ),
             ],
           ),
@@ -148,7 +150,7 @@ class _TagsEditDisplayState extends State<TagsEditDisplay> {
                           .toList(),
                     )
                   : Text(
-                      'No tags',
+                      l10n.commonNoTags,
                       style: TextStyle(
                         color: dimTextColor(context),
                         fontStyle: FontStyle.italic,
@@ -158,9 +160,9 @@ class _TagsEditDisplayState extends State<TagsEditDisplay> {
           ] else ...[
             TagInput(
               controller: widget.controller,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'space separated tags',
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                hintText: l10n.postEditSpaceSeparated,
               ),
               readOnly: widget.enabled == false,
               autofocus: false,
@@ -190,25 +192,26 @@ class TagPreviewCard extends StatelessWidget {
 
   Widget? _getStatusText(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     if (tag.id == null) {
       return Text(
-        'new',
+        l10n.postEditTagNew,
         style: TextStyle(fontSize: 10, color: theme.colorScheme.primary),
       );
     } else if (tag.category == TagCategory.invalid.id) {
       return Text(
-        'invalid',
+        l10n.postEditTagInvalid,
         style: TextStyle(fontSize: 10, color: theme.colorScheme.error),
       );
     } else if (tag.postCount == 0) {
       return Text(
-        'empty',
+        l10n.postEditTagEmpty,
         style: TextStyle(fontSize: 10, color: theme.colorScheme.tertiary),
       );
     } else if (tag.postCount == 1 && tag.category == TagCategory.general.id) {
       // Underused general tag
       return Text(
-        'underused',
+        l10n.postEditTagUnderused,
         style: TextStyle(fontSize: 10, color: theme.colorScheme.secondary),
       );
     }

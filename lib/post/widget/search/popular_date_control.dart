@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 
@@ -12,6 +13,7 @@ class PopularDateInlineBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final subtle = TextStyle(color: dimTextColor(context));
     final bg = theme.brightness == Brightness.dark
         ? theme.cardColor.withValues(alpha: 0.55)
@@ -20,7 +22,7 @@ class PopularDateInlineBar extends StatelessWidget {
     return AnimatedBuilder(
       animation: controller,
       builder: (context, _) {
-        final label = popularDateLabel(controller);
+        final label = popularDateLabel(controller, l10n);
         return Padding(
           padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
           child: DecoratedBox(
@@ -39,7 +41,7 @@ class PopularDateInlineBar extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Text('Popular'),
+                      Text(l10n.postPopular),
                       const Spacer(),
                       Text(label, style: subtle),
                     ],
@@ -51,7 +53,7 @@ class PopularDateInlineBar extends StatelessWidget {
                     Row(
                       children: [
                         IconButton(
-                          tooltip: 'Previous',
+                          tooltip: l10n.commonPrevious,
                           onPressed: controller.prev,
                           icon: const Icon(Icons.chevron_left),
                         ),
@@ -61,7 +63,7 @@ class PopularDateInlineBar extends StatelessWidget {
                           ),
                         ),
                         IconButton(
-                          tooltip: 'Next',
+                          tooltip: l10n.commonNext,
                           onPressed: controller.canNext ? controller.next : null,
                           icon: const Icon(Icons.chevron_right),
                         ),
@@ -69,7 +71,7 @@ class PopularDateInlineBar extends StatelessWidget {
                         TextButton.icon(
                           onPressed: () => _pickDate(context),
                           icon: const Icon(Icons.date_range),
-                          label: const Text('Pick date'),
+                          label: Text(l10n.postPickDate),
                         ),
                       ],
                     ),
@@ -107,45 +109,46 @@ class _ScaleControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return CupertinoSlidingSegmentedControl<PopularScale>(
       groupValue: controller.scale,
       onValueChanged: (value) {
         if (value == null) return;
         controller.setScale(value);
       },
-      children: const {
+      children: {
         PopularScale.day: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Text('Day'),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Text(l10n.postDay),
         ),
         PopularScale.week: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Text('Week'),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Text(l10n.postWeek),
         ),
         PopularScale.month: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Text('Month'),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Text(l10n.postMonth),
         ),
         PopularScale.hot: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Text('Hot'),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Text(l10n.postHot),
         ),
       },
     );
   }
 }
 
-String popularDateLabel(HotPostController controller) {
+String popularDateLabel(HotPostController controller, AppLocalizations l10n) {
   if (controller.scale == PopularScale.hot) {
-    return 'Hot';
+    return l10n.postHot;
   }
 
   final d = DateUtils.dateOnly(controller.referenceDate);
   final today = DateUtils.dateOnly(DateTime.now());
 
   if (controller.scale == PopularScale.day) {
-    if (d == today) return 'Today';
-    if (d == today.subtract(const Duration(days: 1))) return 'Yesterday';
+    if (d == today) return l10n.commonToday;
+    if (d == today.subtract(const Duration(days: 1))) return l10n.commonYesterday;
     return DateFormat.yMMMd().format(d);
   }
 

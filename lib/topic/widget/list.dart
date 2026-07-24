@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/reply/reply.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/topic/topic.dart';
@@ -31,6 +32,7 @@ class SliverTopicList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     void pushReplies(Topic topic, {bool orderByOldest = true}) {
       Navigator.of(context).push(
         MaterialPageRoute(
@@ -58,8 +60,8 @@ class SliverTopicList extends StatelessWidget {
                 onCountPressed: () => pushReplies(topic, orderByOldest: false),
               ),
             ),
-            onEmpty: const Text('No topics'),
-            onError: const Text('Failed to load topics'),
+            onEmpty: Text(l10n.topicNoTopics),
+            onError: Text(l10n.topicFailedLoad),
           ),
         ),
       ),

@@ -10,6 +10,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 
 typedef DatabaseInfo = ({String name, String size});
 
@@ -64,14 +65,15 @@ class DatabaseInfoDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SubFuture<DatabaseInfo>(
       create: _loadDatabaseInfo,
       builder: (context, snapshot) {
         final dbInfo =
             snapshot.data ??
             (snapshot.error != null
-                ? (name: 'Error loading database', size: 'N/A')
-                : (name: 'Loading...', size: '...'));
+                ? (name: l10n.databaseErrorLoading, size: 'N/A')
+                : (name: l10n.commonLoading, size: '...'));
 
         return Center(
           child: Column(
@@ -107,6 +109,7 @@ class DatabaseExportTile extends StatelessWidget {
   Future<void> _exportDatabase(BuildContext context) async {
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context);
 
     try {
       showDialog(
@@ -141,7 +144,7 @@ class DatabaseExportTile extends StatelessWidget {
 
       String? outputFile = await FilePicker.platform.saveFile(
         dialogTitle: 'Export Database',
-        fileName: 'klit_database_backup.db',
+        fileName: l10n.databaseBackupFileName,
         type: FileType.custom,
         allowedExtensions: ['db'],
         bytes: await dbFile.readAsBytes(),
@@ -256,7 +259,9 @@ class DatabaseImportTile extends StatelessWidget {
     }
   }
 
-  Future<bool> _showImportWarning(BuildContext context) => showDialog<bool>(
+  Future<bool> _showImportWarning(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return showDialog<bool>(
     context: context,
     builder: (context) => Center(
       child: ConstrainedBox(
@@ -270,22 +275,25 @@ class DatabaseImportTile extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('CANCEL'),
+              child: Text(l10n.commonCancelUpper),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).colorScheme.error,
               ),
-              child: const Text('IMPORT'),
+              child: Text(l10n.commonImportUpper),
             ),
           ],
         ),
       ),
     ),
   ).then((value) => value ?? false);
+  }
 
-  Future<void> _showRestartDialog(BuildContext context) => showDialog(
+  Future<void> _showRestartDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return showDialog(
     context: context,
     barrierDismissible: false,
     builder: (context) => AlertDialog(
@@ -294,11 +302,12 @@ class DatabaseImportTile extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => AppInit.of(context).reinitialize(),
-          child: const Text('RESTART NOW'),
+          child: Text(l10n.commonRestartNowUpper),
         ),
       ],
     ),
   );
+  }
 
   @override
   Widget build(BuildContext context) {

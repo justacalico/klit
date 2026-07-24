@@ -1,4 +1,5 @@
 import 'package:kilt/logs/logs.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:recase/recase.dart';
@@ -15,6 +16,7 @@ class LogRecordDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     const List<Level> filters = [
       Level.FINE,
       Level.INFO,
@@ -32,11 +34,11 @@ class LogRecordDrawer extends StatelessWidget {
     };
 
     return ContextDrawer(
-      title: const Text('Logs'),
+      title: Text(l10n.logsLogs),
       children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 12),
-          child: ListTileHeader(title: 'Levels'),
+        Padding(
+          padding: const EdgeInsets.only(left: 12),
+          child: ListTileHeader(title: l10n.logsLevels),
         ),
         for (final filter in filters)
           Padding(

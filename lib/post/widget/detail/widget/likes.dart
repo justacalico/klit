@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
@@ -21,6 +22,7 @@ class LikeDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasLogin = context.watch<Client>().hasLogin;
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final cupertino = CupertinoTheme.of(context);
     final primary = cupertino.primaryColor;
     final iconColor = theme.iconTheme.color ?? theme.colorScheme.onSurface;
@@ -71,7 +73,7 @@ class LikeDisplay extends StatelessWidget {
                 children: [
                   buildStat(
                     icon: Icons.thumb_up,
-                    label: 'Score',
+                    label: l10n.commonScore,
                     value: formatCompactNumber(post.vote.score),
                     color: voteStatus == VoteStatus.upvoted
                         ? primary
@@ -79,13 +81,13 @@ class LikeDisplay extends StatelessWidget {
                   ),
                   buildStat(
                     icon: Icons.favorite,
-                    label: 'Favorites',
+                    label: l10n.postFavorites,
                     value: formatCompactNumber(post.favCount),
                     color: post.isFavorited ? Colors.pinkAccent : iconColor,
                   ),
                   buildStat(
                     icon: Icons.comment,
-                    label: 'Comments',
+                    label: l10n.postComments,
                     value: formatCompactNumber(post.commentCount),
                   ),
                 ],
@@ -201,6 +203,7 @@ List<Widget> _buildActionButtons({
   required List<PostActionId> actions,
 }) {
   final theme = Theme.of(context);
+  final l10n = AppLocalizations.of(context);
   final cupertino = CupertinoTheme.of(context);
   final primary = cupertino.primaryColor;
   final iconColor = theme.iconTheme.color ?? theme.colorScheme.onSurface;
@@ -217,7 +220,7 @@ List<Widget> _buildActionButtons({
           SnackBar(
             duration: const Duration(seconds: 1),
             content: Text(
-              'Failed to ${upvote ? 'upvote' : 'downvote'} Post #${post.id}',
+              l10n.postFailedVote(upvote ? 'upvote' : 'downvote', post.id),
             ),
           ),
         );
@@ -509,29 +512,30 @@ String _compactCount(int n) {
 enum _PhotoSource { camera, gallery, skip }
 
 Future<_PhotoSource?> _showPhotoSourceSheet(BuildContext context) async {
+  final l10n = AppLocalizations.of(context);
   return showCupertinoModalPopup<_PhotoSource>(
     context: context,
     builder: (ctx) => SafeArea(
       child: CupertinoActionSheet(
-        title: const Text('Take a photo?'),
+        title: Text(l10n.postTakePhoto),
         actions: [
           CupertinoActionSheetAction(
             onPressed: () => Navigator.pop(ctx, _PhotoSource.camera),
-            child: const Text('Camera'),
+            child: Text(l10n.commonCamera),
           ),
           CupertinoActionSheetAction(
             onPressed: () => Navigator.pop(ctx, _PhotoSource.gallery),
-            child: const Text('Gallery'),
+            child: Text(l10n.commonGallery),
           ),
           CupertinoActionSheetAction(
             onPressed: () => Navigator.pop(ctx, _PhotoSource.skip),
-            child: const Text('Skip'),
+            child: Text(l10n.commonSkip),
           ),
         ],
         cancelButton: CupertinoActionSheetAction(
           isDefaultAction: true,
           onPressed: () => Navigator.pop(ctx),
-          child: const Text('Cancel'),
+          child: Text(l10n.commonCancel),
         ),
       ),
     ),
@@ -656,6 +660,7 @@ Future<bool> _toggleFavorite({
   required Post post,
   required bool isLiked,
 }) async {
+  final l10n = AppLocalizations.of(context);
   PostController controller = context.read<PostController>();
   ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
   if (isLiked) {
@@ -664,7 +669,7 @@ Future<bool> _toggleFavorite({
         messenger.showSnackBar(
           SnackBar(
             duration: const Duration(seconds: 1),
-            content: Text('Failed to remove Post #${post.id} from favorites'),
+            content: Text(l10n.postUnfavoriteFailed(post.id)),
           ),
         );
       }
@@ -685,7 +690,7 @@ Future<bool> _toggleFavorite({
         messenger.showSnackBar(
           SnackBar(
             duration: const Duration(seconds: 1),
-            content: Text('Failed to add Post #${post.id} to favorites'),
+            content: Text(l10n.postFavoriteFailed(post.id)),
           ),
         );
       }

@@ -1,4 +1,5 @@
 import 'package:kilt/client/client.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 builder: (context) => PostsPage(
                   controller: controller,
-                  appBar: const DefaultAppBar(title: Text('Home')),
+                  appBar: DefaultAppBar(title: Text(AppLocalizations.of(context).postHome)),
                 ),
               ),
             ),

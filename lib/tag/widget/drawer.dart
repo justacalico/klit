@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
@@ -55,6 +56,7 @@ class DrawerTagCounterBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     List<Widget>? children;
 
     if (posts != null) {
@@ -82,9 +84,9 @@ class DrawerTagCounterBody extends StatelessWidget {
               iconColor: Theme.of(context).iconTheme.color,
             ),
             child: ExpandablePanel(
-              header: const ListTile(
-                title: Text('Tags'),
-                leading: Icon(Icons.tag),
+              header: ListTile(
+                title: Text(l10n.commonTags),
+                leading: const Icon(Icons.tag),
               ),
               collapsed: const SizedBox.shrink(),
               expanded: Column(
@@ -95,7 +97,7 @@ class DrawerTagCounterBody extends StatelessWidget {
                     builder: (context) => CrossFade(
                       showChild: children!.isNotEmpty,
                       secondChild: Text(
-                        'no tags',
+                        l10n.commonNoTags,
                         style: TextStyle(
                           fontStyle: FontStyle.italic,
                           color: dimTextColor(context),
@@ -122,7 +124,7 @@ class DrawerTagCounterBody extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: const Dimmed(
+                      child: Dimmed(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -130,7 +132,7 @@ class DrawerTagCounterBody extends StatelessWidget {
                             Padding(
                               padding: EdgeInsets.all(8),
                               child: Text(
-                                'failed to load tags',
+                                l10n.wikiFailedLoadTags,
                                 style: TextStyle(fontStyle: FontStyle.italic),
                               ),
                             ),

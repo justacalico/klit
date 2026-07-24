@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
 import 'package:kilt/topic/topic.dart';
@@ -8,6 +9,7 @@ class TopicSearchFab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Consumer<TopicController>(
       builder: (context, controller, child) => SearchPromptFloatingActionButton(
         tags: controller.query,
@@ -18,7 +20,7 @@ class TopicSearchFab extends StatelessWidget {
             unwrapper: (value) => value.substring(7, value.length - 1),
             filters: [
               PrimaryFilterConfig(
-                filter: const TextFilterTag(tag: 'title_matches', name: 'Name'),
+                filter: TextFilterTag(tag: 'title_matches', name: l10n.commonName),
               ),
             ],
           ),

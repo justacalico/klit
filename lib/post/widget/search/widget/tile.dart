@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/comment/comment.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/settings/settings.dart';
@@ -113,17 +114,18 @@ class PostTileOverlay extends StatelessWidget {
       post: post,
       builder: (context, post) {
         PostController? controller = context.watch<PostController?>();
+        final l10n = AppLocalizations.of(context);
         if (post.isDeleted) {
-          return const Center(child: Text('deleted'));
+          return Center(child: Text(l10n.postStatusDeleted));
         }
         if (post.type == PostType.unsupported) {
-          return const Center(child: Text('unsupported'));
+          return Center(child: Text(l10n.postStatusUnsupported));
         }
         if (post.file == null) {
-          return const Center(child: Text('unavailable'));
+          return Center(child: Text(l10n.postStatusUnavailable));
         }
         if (controller?.isDenied(post) ?? false) {
-          return const Center(child: Text('blacklisted'));
+          return Center(child: Text(l10n.postStatusBlacklisted));
         }
         return child;
       },
@@ -357,6 +359,7 @@ class PostFeedTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int? cacheSize = context.read<ImageCacheSize>().size;
+    final l10n = AppLocalizations.of(context);
 
     Widget actions() {
       return Dimmed(
@@ -394,7 +397,7 @@ class PostFeedTile extends StatelessWidget {
                             SnackBar(
                               duration: const Duration(seconds: 1),
                               content: Text(
-                                'Failed to upvote Post #${post.id}',
+                                l10n.postFailedUpvote(post.id),
                               ),
                             ),
                           );
@@ -419,7 +422,7 @@ class PostFeedTile extends StatelessWidget {
                             SnackBar(
                               duration: const Duration(seconds: 1),
                               content: Text(
-                                'Failed to downvote Post #${post.id}',
+                                l10n.postFailedDownvote(post.id),
                               ),
                             ),
                           );
@@ -459,12 +462,12 @@ class PostFeedTile extends StatelessWidget {
           if (post.file != null)
             PopupMenuTile(
               value: () => postDownloadingNotification(context, {post}),
-              title: 'Download',
+              title: l10n.postDownload,
               icon: Icons.file_download,
             ),
           PopupMenuTile(
             value: () => launch(context.read<Client>().withHost(post.link)),
-            title: 'Browse',
+            title: l10n.commonBrowse,
             icon: Icons.open_in_browser,
           ),
         ],

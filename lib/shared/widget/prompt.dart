@@ -4,6 +4,7 @@ import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
 import 'package:sliding_sheet/sliding_sheet.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 
 abstract class _PromptActionRoute {
   /// Whether the dialog is open.
@@ -129,7 +130,9 @@ class PromptActionController extends ActionController {
 
 class LoadingDialogActionController extends PromptActionController {
   @override
-  FutureOr<void> show(BuildContext context, [Widget? child]) => super.show(
+  FutureOr<void> show(BuildContext context, [Widget? child]) {
+    final l10n = AppLocalizations.of(context);
+    return super.show(
     context,
     ListenableBuilder(
       listenable: this,
@@ -138,7 +141,7 @@ class LoadingDialogActionController extends PromptActionController {
         child: Builder(
           builder: (context) {
             if (isLoading) {
-              return const Text('Loading...');
+              return Text(l10n.commonLoading);
             } else if (isError) {
               return Text(error!.message);
             } else {
@@ -149,6 +152,7 @@ class LoadingDialogActionController extends PromptActionController {
       ),
     ),
   );
+  }
 }
 
 class _PromptActions extends InheritedNotifier<PromptActionController> {

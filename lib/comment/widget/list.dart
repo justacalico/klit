@@ -1,4 +1,5 @@
 import 'package:kilt/comment/comment.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 
@@ -30,6 +31,7 @@ class SliverCommentList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Consumer<CommentController>(
       builder: (context, controller, child) => ListenableBuilder(
         listenable: controller,
@@ -42,8 +44,8 @@ class SliverCommentList extends StatelessWidget {
             key: ValueKey(item.id),
             child: CommentTile(comment: item),
           ),
-            onEmpty: const Text('No comments'),
-            onError: const Text('Failed to load comments'),
+            onEmpty: Text(l10n.commentNoComments),
+            onError: Text(l10n.commentFailedLoad),
           ),
         ),
       ),

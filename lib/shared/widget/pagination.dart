@@ -1,6 +1,7 @@
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 
 class PagedChildBuilderRetryButton extends StatelessWidget {
   const PagedChildBuilderRetryButton(this.onRetry, {super.key});
@@ -9,12 +10,13 @@ class PagedChildBuilderRetryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (onRetry == null) {
       return const SizedBox.shrink();
     }
     return Padding(
       padding: const EdgeInsets.all(4),
-      child: CupertinoButton(onPressed: onRetry, child: const Text('Try again')),
+      child: CupertinoButton(onPressed: onRetry, child: Text(l10n.commonTryAgain)),
     );
   }
 }
@@ -53,14 +55,14 @@ PagedChildBuilderDelegate<T> defaultPagedChildBuilderDelegate<T>({
       context,
       IconMessage(
         icon: const Icon(Icons.clear),
-        title: onEmpty ?? const Text('Nothing to see here'),
+        title: onEmpty ?? Text(AppLocalizations.of(context).commonNothingHere),
       ),
     ),
     firstPageErrorIndicatorBuilder: (context) => pageBuilder!(
       context,
       IconMessage(
         icon: const Icon(Icons.warning_amber_outlined),
-        title: onError ?? const Text('Failed to load'),
+        title: onError ?? Text(AppLocalizations.of(context).commonFailedLoad),
         action: PagedChildBuilderRetryButton(onRetry),
       ),
     ),
@@ -69,7 +71,7 @@ PagedChildBuilderDelegate<T> defaultPagedChildBuilderDelegate<T>({
       IconMessage(
         direction: Axis.horizontal,
         icon: const Icon(Icons.warning_amber_outlined),
-        title: onError ?? const Text('Failed to load'),
+        title: onError ?? Text(AppLocalizations.of(context).commonFailedLoad),
         action: PagedChildBuilderRetryButton(onRetry),
       ),
     ),

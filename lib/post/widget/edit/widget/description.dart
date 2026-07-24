@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/ticket/ticket.dart';
@@ -23,7 +24,9 @@ class _DescriptionEditDisplayState extends State<DescriptionEditDisplay> {
   bool _isPreviewMode = false;
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return LayoutBuilder(
     builder: (context, constraints) {
       const breakpoint = 600.0;
       final isWideLayout = constraints.maxWidth >= breakpoint;
@@ -35,8 +38,8 @@ class _DescriptionEditDisplayState extends State<DescriptionEditDisplay> {
           children: [
             Row(
               children: [
-                const Expanded(
-                  child: Text('Description', style: TextStyle(fontSize: 16)),
+                Expanded(
+                  child: Text(l10n.commonDescription, style: const TextStyle(fontSize: 16)),
                 ),
                 IconButton(
                   onPressed: (widget.enabled ?? true)
@@ -48,7 +51,7 @@ class _DescriptionEditDisplayState extends State<DescriptionEditDisplay> {
                                 MaterialPageRoute(
                                   builder: (context) => DTextEditor(
                                     title: Text(
-                                      '#${widget.postId} description',
+                                      l10n.postEditDescriptionTitle(widget.postId),
                                     ),
                                     content: widget.controller.text,
                                     onSubmitted: (text) {
@@ -64,8 +67,8 @@ class _DescriptionEditDisplayState extends State<DescriptionEditDisplay> {
                       ? Icon(_isPreviewMode ? Icons.edit : Icons.visibility)
                       : const Icon(Icons.edit),
                   tooltip: isWideLayout
-                      ? (_isPreviewMode ? 'Edit' : 'Preview')
-                      : 'Edit',
+                      ? (_isPreviewMode ? l10n.commonEdit : l10n.commonPreview)
+                      : l10n.commonEdit,
                 ),
               ],
             ),
@@ -81,7 +84,7 @@ class _DescriptionEditDisplayState extends State<DescriptionEditDisplay> {
                 child: widget.controller.text.trim().isNotEmpty
                     ? DText(widget.controller.text)
                     : Text(
-                        'No description',
+                        l10n.postEditNoDescription,
                         style: TextStyle(
                           color: dimTextColor(context),
                           fontStyle: FontStyle.italic,
@@ -91,9 +94,9 @@ class _DescriptionEditDisplayState extends State<DescriptionEditDisplay> {
             ] else if (isWideLayout) ...[
               TextFormField(
                 controller: widget.controller,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter post description...',
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  hintText: l10n.postEditDescriptionHint,
                 ),
                 maxLines: null,
                 enabled: widget.enabled,
@@ -109,7 +112,7 @@ class _DescriptionEditDisplayState extends State<DescriptionEditDisplay> {
                 child: widget.controller.text.trim().isNotEmpty
                     ? DText(widget.controller.text)
                     : Text(
-                        'No description',
+                        l10n.postEditNoDescription,
                         style: TextStyle(
                           color: dimTextColor(context),
                           fontStyle: FontStyle.italic,
@@ -122,4 +125,5 @@ class _DescriptionEditDisplayState extends State<DescriptionEditDisplay> {
       );
     },
   );
+  }
 }

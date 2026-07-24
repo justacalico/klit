@@ -1,5 +1,6 @@
 import 'package:kilt/app/routing/app_routes.dart';
 import 'package:kilt/comment/widget/commenter_avatar.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/tag/tag.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ class ArtistDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -34,7 +36,7 @@ class ArtistDisplay extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         duration: const Duration(seconds: 1),
-                        content: Text('Copied post id #${post.id}'),
+                        content: Text(l10n.postCopiedId(post.id)),
                       ),
                     );
                   },
@@ -75,6 +77,7 @@ class ArtistName extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     List<String> artists = filterArtists(post.tags['artist'] ?? []);
     if (artists.isNotEmpty) {
       return OverflowBar(
@@ -108,7 +111,7 @@ class ArtistName extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.all(8),
         child: Text(
-          'no artist',
+          l10n.commonNoArtist,
           style: TextStyle(
             color: Theme.of(context).textTheme.titleSmall!.color,
             fontStyle: FontStyle.italic,

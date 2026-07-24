@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/ticket/ticket.dart';
@@ -16,15 +17,17 @@ class SourcesEditDisplay extends StatelessWidget {
   final bool? enabled;
 
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
     padding: defaultFormPadding,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            const Expanded(
-              child: Text('Sources', style: TextStyle(fontSize: 16)),
+            Expanded(
+              child: Text(l10n.postSources, style: const TextStyle(fontSize: 16)),
             ),
             IconButton(
               onPressed: (enabled ?? true)
@@ -32,7 +35,7 @@ class SourcesEditDisplay extends StatelessWidget {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => TextEditor(
-                            title: Text('#$postId sources'),
+                            title: Text(l10n.postEditSourcesTitle(postId)),
                             content: controller.text,
                             onSubmitted: (text) {
                               controller.text = text;
@@ -77,7 +80,7 @@ class SourcesEditDisplay extends StatelessWidget {
                           .toList(),
                     )
                   : Text(
-                      'No sources',
+                      l10n.postEditNoSources,
                       style: TextStyle(
                         color: dimTextColor(context),
                         fontStyle: FontStyle.italic,
@@ -89,4 +92,5 @@ class SourcesEditDisplay extends StatelessWidget {
       ],
     ),
   );
+  }
 }

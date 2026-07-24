@@ -1,4 +1,5 @@
 import 'package:kilt/history/history.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/pool/pool.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
@@ -79,10 +80,11 @@ class PoolOrderSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SwitchListTile(
       secondary: const Icon(Icons.sort),
-      title: const Text('Pool order'),
-      subtitle: Text(oldestFirst ? 'oldest first' : 'newest first'),
+      title: Text(l10n.poolPoolOrder),
+      subtitle: Text(oldestFirst ? l10n.commentOldestFirst : l10n.commentNewestFirst),
       value: oldestFirst,
       onChanged: onChange,
     );
@@ -101,10 +103,11 @@ class PoolReaderSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SwitchListTile(
       secondary: const Icon(Icons.auto_stories),
-      title: const Text('Pool reader mode'),
-      subtitle: Text(readerMode ? 'large images' : 'normal grid'),
+      title: Text(l10n.poolReaderMode),
+      subtitle: Text(readerMode ? l10n.poolLargeImages : l10n.poolNormalGrid),
       value: readerMode,
       onChanged: onChange,
     );

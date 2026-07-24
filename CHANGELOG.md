@@ -1,6 +1,7 @@
 # Changelog
 
 # 11.0.0 (Unreleased)
+- Fully internationalized the app, replacing hardcoded English strings with i18n calls across all modules (feed, post, comment, topic, reply, follow, pool, tag, user, wiki, flag, history, logs, markup, traits, settings, shared, identity, account, app, client)
 - Added Simplified Chinese (zh) as a language option ([!24](https://gitlab.com/Openlyst/klit/-/merge_requests/24))
 - Removed the "English Traditiation" (en_AU) locale option that was identical to English ([!23](https://gitlab.com/Openlyst/klit/-/merge_requests/23))
 - Fixed Create feed button text contrast on light accent colors by picking black or white text based on the primary color luminance ([!22](https://gitlab.com/Openlyst/klit/-/merge_requests/22))

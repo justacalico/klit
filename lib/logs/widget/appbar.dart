@@ -1,4 +1,5 @@
 import 'package:kilt/logs/logs.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,14 +12,15 @@ class LogSelectionAppBar extends StatelessWidget with AppBarBuilderWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SelectionAppBar<LogString>(
       child: child,
       titleBuilder: (context, data) => data.selections.length == 1
           ? Text(data.selections.first.body, maxLines: 1)
-          : Text('${data.selections.length} logs'),
+          : Text(l10n.logsLogsCount(data.selections.length)),
       actionBuilder: (context, data) => [
         IconButton(
-          tooltip: 'Copy',
+          tooltip: l10n.commonCopy,
           icon: const Icon(Icons.copy),
           onPressed: () {
             Clipboard.setData(
@@ -27,9 +29,9 @@ class LogSelectionAppBar extends StatelessWidget with AppBarBuilderWidget {
               ),
             );
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                duration: Duration(seconds: 1),
-                content: Text('Copied to clipboard'),
+              SnackBar(
+                duration: const Duration(seconds: 1),
+                content: Text(l10n.commonCopiedToClipboard),
               ),
             );
             data.onChanged({});
@@ -49,15 +51,16 @@ class LogFileSelectionAppBar extends StatelessWidget with AppBarBuilderWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SelectionAppBar<LogFileInfo>(
       child: child,
       titleBuilder: (context, data) => data.selections.length == 1
-          ? Text('Logs - ${data.selections.first.date}')
-          : Text('${data.selections.length} log files'),
+          ? Text(l10n.logsLogsDate(data.selections.first.date))
+          : Text(l10n.logsLogFilesCount(data.selections.length)),
       actionBuilder: (context, data) => [
         if (onDelete != null)
           IconButton(
-            tooltip: 'Delete',
+            tooltip: l10n.commonDelete,
             icon: const Icon(Icons.delete),
             onPressed: () => showDialog(
               context: context,
@@ -87,20 +90,21 @@ class LogFileDeleteConfirmation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return AlertDialog(
-      title: Text('Delete ${files.length} log files?'),
-      content: const Text('This action cannot be undone.'),
+      title: Text(l10n.logsDeleteFilesTitle(files.length)),
+      content: Text(l10n.logsCannotUndone),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(l10n.commonCancel),
         ),
         TextButton(
           onPressed: () {
             onConfirm?.call();
             Navigator.of(context).pop();
           },
-          child: const Text('Delete'),
+          child: Text(l10n.commonDelete),
         ),
       ],
     );

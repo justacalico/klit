@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
@@ -11,12 +12,13 @@ class FileDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-          child: Text('File', style: TextStyle(fontSize: 16)),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+          child: Text(l10n.postFile, style: const TextStyle(fontSize: 16)),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
@@ -25,7 +27,7 @@ class FileDisplay extends StatelessWidget {
             children: [
               TagGesture(
                 tag: 'rating:${post.rating.name}',
-                child: Text(post.rating.title),
+                child: Text(post.rating.title(l10n)),
               ),
               Text('${post.width} x ${post.height}'),
             ],

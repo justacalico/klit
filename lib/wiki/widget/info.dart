@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/wiki/wiki.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ class WikiInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     Widget textInfoRow(String label, String value) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -26,7 +28,7 @@ class WikiInfo extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('id'),
+              Text(l10n.commonId),
               InkWell(
                 child: Text('#${wiki.id}'),
                 onLongPress: () async {
@@ -38,7 +40,7 @@ class WikiInfo extends StatelessWidget {
                   messenger.showSnackBar(
                     SnackBar(
                       duration: const Duration(seconds: 1),
-                      content: Text('Copied wiki id #${wiki.id}'),
+                      content: Text(l10n.wikiCopiedId(wiki.id)),
                     ),
                   );
                 },
@@ -46,19 +48,19 @@ class WikiInfo extends StatelessWidget {
             ],
           ),
           if (wiki.otherNames case final otherNames?)
-            textInfoRow('alias', otherNames.join(', ')),
+            textInfoRow(l10n.wikiAlias, otherNames.join(', ')),
           textInfoRow(
-            'created',
+            l10n.commonCreated,
             DateFormatting.dateTime(wiki.createdAt.toLocal()),
           ),
           textInfoRow(
-            'updated',
+            l10n.commonUpdated,
             DateFormatting.dateTime(
               (wiki.updatedAt ?? wiki.createdAt).toLocal(),
             ),
           ),
           if (wiki.isLocked case final isLocked?)
-            textInfoRow('locked', isLocked ? 'yes' : 'no'),
+            textInfoRow('locked', isLocked ? l10n.commonYes : l10n.commonNo),
         ],
       ),
     );

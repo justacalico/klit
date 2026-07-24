@@ -1,3 +1,4 @@
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
@@ -64,6 +65,7 @@ class _DTextEditorBarState extends State<DTextEditorBar> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     void enclose(String blockTag, {String? endTag}) {
       int base = widget.controller.selection.baseOffset;
       int extent = widget.controller.selection.extentOffset;
@@ -102,22 +104,22 @@ class _DTextEditorBarState extends State<DTextEditorBar> {
           IconButton(
             icon: const Icon(Icons.subject),
             onPressed: () => enclose('section,expanded=', endTag: 'section'),
-            tooltip: 'Section',
+            tooltip: l10n.markupSection,
           ),
           IconButton(
             icon: const Icon(Icons.format_quote),
             onPressed: () => enclose('quote'),
-            tooltip: 'Quote',
+            tooltip: l10n.markupQuote,
           ),
           IconButton(
             icon: const Icon(Icons.code),
             onPressed: () => enclose('code'),
-            tooltip: 'Code',
+            tooltip: l10n.markupCode,
           ),
           IconButton(
             icon: const Icon(Icons.warning),
             onPressed: () => enclose('spoiler'),
-            tooltip: 'Spoiler',
+            tooltip: l10n.markupSpoiler,
           ),
         ],
       );
@@ -130,22 +132,22 @@ class _DTextEditorBarState extends State<DTextEditorBar> {
           IconButton(
             icon: const Icon(Icons.format_bold),
             onPressed: () => enclose('b'),
-            tooltip: 'Bold',
+            tooltip: l10n.markupBold,
           ),
           IconButton(
             icon: const Icon(Icons.format_italic),
             onPressed: () => enclose('i'),
-            tooltip: 'Italic',
+            tooltip: l10n.markupItalic,
           ),
           IconButton(
             icon: const Icon(Icons.format_underlined),
             onPressed: () => enclose('u'),
-            tooltip: 'Underlined',
+            tooltip: l10n.markupUnderlined,
           ),
           IconButton(
             icon: const Icon(Icons.format_strikethrough),
             onPressed: () => enclose('s'),
-            tooltip: 'Strikethrough',
+            tooltip: l10n.markupStrikethrough,
           ),
         ],
       );

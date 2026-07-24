@@ -1,6 +1,7 @@
 import 'package:kilt/client/client.dart';
 import 'package:kilt/feed/data/feed.dart';
 import 'package:kilt/feed/feeds_provider.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -56,22 +57,23 @@ class _FeedsPageState extends State<FeedsPage> {
   }
 
   void _confirmDelete(BuildContext context, Feed feed) {
+    final l10n = AppLocalizations.of(context);
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete feed'),
+        title: Text(l10n.feedsDeleteDialogTitle),
         content: Text('Delete "${feed.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.commonCancel),
           ),
           TextButton(
             onPressed: () {
               context.read<FeedsProvider>().deleteFeed(feed.id);
               Navigator.of(ctx).pop();
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text(l10n.commonDelete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -80,6 +82,7 @@ class _FeedsPageState extends State<FeedsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (_showEditForm) {
       return Scaffold(
         appBar: DefaultAppBar(
@@ -88,7 +91,7 @@ class _FeedsPageState extends State<FeedsPage> {
             onPressed: _closeEdit, minimumSize: Size(0, 0),
             child: const Icon(Icons.arrow_back_ios_new),
           ),
-          title: Text(_editingFeed == null ? 'New feed' : 'Edit feed'),
+          title: Text(_editingFeed == null ? l10n.feedsNewFeedTitle : l10n.feedsEditFeedTitle),
         ),
         body: LimitedWidthLayout.builder(
           builder: (context) => FeedEditPage(
@@ -101,7 +104,7 @@ class _FeedsPageState extends State<FeedsPage> {
 
     return Scaffold(
       appBar: DefaultAppBar(
-        title: const Text('Feeds'),
+        title: Text(l10n.feedsTitle),
         actions: [
           CupertinoButton(
             padding: EdgeInsets.zero,
@@ -127,12 +130,12 @@ class _FeedsPageState extends State<FeedsPage> {
                       Icon(Icons.rss_feed, size: 64, color: Theme.of(context).colorScheme.outline),
                       const SizedBox(height: 16),
                       Text(
-                        'No feeds yet',
+                        l10n.feedsEmptyTitle,
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Create a feed with tags and image or video type to browse posts in one tap',
+                        l10n.feedsEmptyBody,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -153,7 +156,7 @@ class _FeedsPageState extends State<FeedsPage> {
                             children: [
                               Icon(Icons.add, color: fg),
                               const SizedBox(width: 8),
-                              Text('Create feed', style: TextStyle(color: fg)),
+                              Text(l10n.feedsCreateFeed, style: TextStyle(color: fg)),
                             ],
                           ),
                         );
@@ -232,30 +235,31 @@ class _FeedCard extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
-  static void _collectEntries(List<SubFeed> level, List<int> path, List<({List<int> path, String name, int depth})> out, int depth) {
+  static void _collectEntries(List<SubFeed> level, List<int> path, List<({List<int> path, String name, int depth})> out, int depth, AppLocalizations l10n) {
     for (var i = 0; i < level.length; i++) {
       final sub = level[i];
       final p = [...path, i];
-      out.add((path: p, name: sub.name.isEmpty ? 'Sub ${p.join('-')}' : sub.name, depth: depth));
-      _collectEntries(sub.subfeeds, p, out, depth + 1);
+      out.add((path: p, name: sub.name.isEmpty ? l10n.feedSubDefault(p.join('-')) : sub.name, depth: depth));
+      _collectEntries(sub.subfeeds, p, out, depth + 1, l10n);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final onSurfaceVariant = theme.colorScheme.onSurfaceVariant;
 
     final typeLabel = feed.mediaType == Feed.mediaTypeVideo
-        ? 'Video'
+        ? l10n.feedVideo
         : feed.mediaType == Feed.mediaTypeAll
-            ? 'Image & video'
-            : 'Image';
+            ? l10n.feedImageAndVideo
+            : l10n.feedImage;
     final includeStr = feed.includeTags.isEmpty
-        ? (feed.orTags.isEmpty ? 'no tags' : '')
+        ? (feed.orTags.isEmpty ? l10n.feedNoTags : '')
         : feed.includeTags.take(3).join(', ') + (feed.includeTags.length > 3 ? '…' : '');
     final entries = <({List<int> path, String name, int depth})>[];
-    _collectEntries(feed.subfeeds, [], entries, 0);
+    _collectEntries(feed.subfeeds, [], entries, 0, l10n);
     return _FeedCardSurface(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -285,7 +289,7 @@ class _FeedCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        feed.name.isEmpty ? 'Unnamed feed' : feed.name,
+                        feed.name.isEmpty ? l10n.feedsUnnamed : feed.name,
                         style: theme.textTheme.titleMedium,
                       ),
                       const SizedBox(height: 4),
@@ -343,6 +347,7 @@ class _FeedCard extends StatelessWidget {
   void _showFeedActionsSheet(BuildContext context) {
     final theme = Theme.of(context);
     final cupertino = CupertinoTheme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     showCupertinoModalPopup<void>(
       context: context,
@@ -373,7 +378,7 @@ class _FeedCard extends StatelessWidget {
                     CupertinoIcons.pencil,
                     color: CupertinoColors.label.resolveFrom(context),
                   ),
-                  title: const Text('Edit'),
+                  title: Text(l10n.commonEdit),
                   onTap: () {
                     HapticFeedback.selectionClick();
                     Navigator.of(context).maybePop();
@@ -385,7 +390,7 @@ class _FeedCard extends StatelessWidget {
                     CupertinoIcons.trash,
                     color: cupertino.primaryColor,
                   ),
-                  title: const Text('Delete'),
+                  title: Text(l10n.commonDelete),
                   onTap: () {
                     HapticFeedback.selectionClick();
                     Navigator.of(context).maybePop();
