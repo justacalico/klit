@@ -1,6 +1,6 @@
 # Changelog
 
-# 11.0.0
+# 11.0.0 (Unreleased)
 
 # 10.2.0
 - Fixed crash when playing video in release builds on macOS by disabling hardware acceleration
