@@ -6,6 +6,7 @@ import 'package:kilt/post/post.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class PostDetail extends StatefulWidget {
   const PostDetail({
@@ -42,6 +43,88 @@ class _PostDetailState extends State<PostDetail> {
     super.dispose();
   }
 
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+    final physicalKey = event.physicalKey;
+    final logicalKey = event.logicalKey;
+
+    if (physicalKey == PhysicalKeyboardKey.arrowLeft) {
+      _goToAdjacentPost(-1);
+      return KeyEventResult.handled;
+    }
+    if (physicalKey == PhysicalKeyboardKey.arrowRight) {
+      _goToAdjacentPost(1);
+      return KeyEventResult.handled;
+    }
+
+    final hasLogin = context.read<Client>().hasLogin;
+    if (!hasLogin) return KeyEventResult.ignored;
+
+    if (physicalKey == PhysicalKeyboardKey.arrowUp) {
+      _vote(upvote: true);
+      return KeyEventResult.handled;
+    }
+    if (physicalKey == PhysicalKeyboardKey.arrowDown) {
+      _vote(upvote: false);
+      return KeyEventResult.handled;
+    }
+    if (logicalKey == LogicalKeyboardKey.keyF) {
+      _toggleFavorite();
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
+  }
+
+  void _goToAdjacentPost(int delta) {
+    final controller = context.read<PostController>();
+    final items = controller.items;
+    if (items == null) return;
+    final pageController = PostDetailPageControllerProvider.of(context);
+    if (pageController == null || !pageController.hasClients) return;
+    final page = pageController.page?.round() ?? 0;
+    final target = page + delta;
+    if (target < 0 || target >= items.length) return;
+    pageController.animateToPage(
+      target,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _vote({required bool upvote}) {
+    final controller = context.read<PostController>();
+    final voteStatus = widget.post.vote.status;
+    final isLiked = upvote
+        ? voteStatus == VoteStatus.upvoted
+        : voteStatus == VoteStatus.downvoted;
+    HapticFeedback.selectionClick();
+    controller.vote(
+      post: widget.post,
+      upvote: upvote,
+      replace: !isLiked,
+    );
+  }
+
+  void _toggleFavorite() {
+    HapticFeedback.selectionClick();
+    final controller = context.read<PostController>();
+    if (widget.post.isFavorited) {
+      controller.unfav(widget.post);
+    } else {
+      final upvoteFavs = context.read<Settings>().upvoteFavs.value;
+      controller.fav(widget.post).then((success) {
+        if (success && upvoteFavs) {
+          controller.vote(
+            post: controller.postById(widget.post.id)!,
+            upvote: true,
+            replace: true,
+          );
+        }
+      });
+    }
+  }
+
   Widget _buildContent() {
     return _PostDetailBody(post: widget.post, onTapImage: widget.onTapImage);
   }
@@ -55,6 +138,7 @@ class _PostDetailState extends State<PostDetail> {
         child: Focus(
           focusNode: _focusNode,
           canRequestFocus: true,
+          onKeyEvent: _handleKeyEvent,
           child: widget.useShell
               ? AppShell(
                   appBar: PostDetailAppBar(post: widget.post),
