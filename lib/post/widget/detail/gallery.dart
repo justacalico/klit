@@ -114,12 +114,19 @@ class PostDetailGallery extends StatelessWidget {
               listenable: controller,
               builder: (context, _) => _PageChangeNotifier(
                 pageController: pageController,
-                onPageChanged: (index) {
-                  onPageChanged?.call(index);
+                onPageChanged: (oldIndex, newIndex) {
+                  if (controller.items != null &&
+                      oldIndex >= 0 &&
+                      oldIndex < controller.items!.length) {
+                    controller.items![oldIndex]
+                        .getVideo(context, listen: false)
+                        ?.pause();
+                  }
+                  onPageChanged?.call(newIndex);
                   if (controller.items != null) {
                     preloadPostImages(
                       context: context,
-                      index: index,
+                      index: newIndex,
                       posts: controller.items!,
                       size: PostImageSize.sample,
                     );
@@ -183,7 +190,7 @@ class _PageChangeNotifier extends StatefulWidget {
   });
 
   final PageController pageController;
-  final ValueChanged<int> onPageChanged;
+  final void Function(int oldPage, int newPage) onPageChanged;
   final Widget child;
 
   @override
@@ -217,8 +224,9 @@ class _PageChangeNotifierState extends State<_PageChangeNotifier> {
   void _onPageChanged() {
     final page = widget.pageController.page?.round() ?? 0;
     if (page != _lastReportedPage) {
+      final oldPage = _lastReportedPage;
       _lastReportedPage = page;
-      widget.onPageChanged(page);
+      widget.onPageChanged(oldPage, page);
     }
   }
 
