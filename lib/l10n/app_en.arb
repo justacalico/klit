@@ -558,6 +558,8 @@
   "settingsPostInfo": "Post info",
   "settingsPostInfoOnTiles": "Info on post tiles",
   "settingsPostInfoImageOnly": "Image tiles only",
+  "settingsPopularHotTab": "Hot tab",
+  "settingsPopularHotTabSubtitle": "Show the Hot option in the Popular page",
   "settingsPostActionBar": "Post action bar",
   "settingsActionsPinned": "{count} actions pinned",
   "@settingsActionsPinned": {

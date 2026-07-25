@@ -71,6 +71,10 @@ class Settings extends NotifiedSettings {
     key: 'showPostInfo',
     initialValue: true,
   );
+  late final ValueNotifier<bool> popularHotTab = createSetting<bool>(
+    key: 'popularHotTab',
+    initialValue: true,
+  );
   late final ValueNotifier<String> postActionBarActions = createSetting<String>(
     key: PostActionPreferences.settingKey,
     initialValue: PostActionPreferences.encode(

@@ -1071,6 +1071,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsPostInfoImageOnly => '仅图片磁贴';
 
   @override
+  String get settingsPopularHotTab => '热门标签页';
+
+  @override
+  String get settingsPopularHotTabSubtitle => '在热门页面显示热门选项';
+
+  @override
   String get settingsPostActionBar => '帖子操作栏';
 
   @override
