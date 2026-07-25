@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
+import 'package:kilt/settings/data/settings.dart';
 import 'package:kilt/shared/shared.dart';
 
 class PopularDateInlineBar extends StatelessWidget {
@@ -110,30 +111,35 @@ class _ScaleControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return CupertinoSlidingSegmentedControl<PopularScale>(
-      groupValue: controller.scale,
-      onValueChanged: (value) {
-        if (value == null) return;
-        controller.setScale(value);
-      },
-      children: {
-        PopularScale.day: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Text(l10n.postDay),
-        ),
-        PopularScale.week: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Text(l10n.postWeek),
-        ),
-        PopularScale.month: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Text(l10n.postMonth),
-        ),
+    final showHot = context.watch<Settings>().popularHotTab.value;
+    final segments = <PopularScale, Widget>{
+      PopularScale.day: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        child: Text(l10n.postDay),
+      ),
+      PopularScale.week: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        child: Text(l10n.postWeek),
+      ),
+      PopularScale.month: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        child: Text(l10n.postMonth),
+      ),
+      if (showHot)
         PopularScale.hot: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           child: Text(l10n.postHot),
         ),
+    };
+    return CupertinoSlidingSegmentedControl<PopularScale>(
+      groupValue: segments.keys.contains(controller.scale)
+          ? controller.scale
+          : PopularScale.day,
+      onValueChanged: (value) {
+        if (value == null) return;
+        controller.setScale(value);
       },
+      children: segments,
     );
   }
 }

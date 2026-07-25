@@ -1,6 +1,7 @@
 # Changelog
 
 # 11.0.0 (Unreleased)
+- Added setting to toggle the Hot tab in the Popular page, on by default ([!29](https://gitlab.com/Openlyst/klit/-/merge_requests/29))
 - Added sort by random option in the feed page ([!28](https://gitlab.com/Openlyst/klit/-/merge_requests/28))
 - Added comprehensive test suite with 897 tests covering data models, API clients, controllers, utilities, parsers, and serialization across all modules ([!26](https://gitlab.com/Openlyst/klit/-/merge_requests/26))
 - Fully internationalized the app, replacing hardcoded English strings with i18n calls across all modules (feed, post, comment, topic, reply, follow, pool, tag, user, wiki, flag, history, logs, markup, traits, settings, shared, identity, account, app, client) ([!25](https://gitlab.com/Openlyst/klit/-/merge_requests/25))

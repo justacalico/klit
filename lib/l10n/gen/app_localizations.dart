@@ -2042,6 +2042,18 @@ abstract class AppLocalizations {
   /// **'Image tiles only'**
   String get settingsPostInfoImageOnly;
 
+  /// No description provided for @settingsPopularHotTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Hot tab'**
+  String get settingsPopularHotTab;
+
+  /// No description provided for @settingsPopularHotTabSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the Hot option in the Popular page'**
+  String get settingsPopularHotTabSubtitle;
+
   /// No description provided for @settingsPostActionBar.
   ///
   /// In en, this message translates to:

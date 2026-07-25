@@ -817,6 +817,19 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               onChanged: (v) => settings.showPostInfo.value = v,
             ),
           ),
+          ValueListenableBuilder<bool>(
+            valueListenable: settings.popularHotTab,
+            builder: (context, value, _) => SettingsSwitchTile(
+              leading: const SettingsLeadingIcon(
+                icon: CupertinoIcons.flame,
+                color: Color(0xFFE67E22),
+              ),
+              title: l10n.settingsPopularHotTab,
+              subtitle: l10n.settingsPopularHotTabSubtitle,
+              value: value,
+              onChanged: (v) => settings.popularHotTab.value = v,
+            ),
+          ),
           ValueListenableBuilder<String>(
             valueListenable: settings.postActionBarActions,
             builder: (context, rawActions, _) {

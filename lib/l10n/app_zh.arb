@@ -558,6 +558,8 @@
   "settingsPostInfo": "帖子信息",
   "settingsPostInfoOnTiles": "磁贴上显示信息",
   "settingsPostInfoImageOnly": "仅图片磁贴",
+  "settingsPopularHotTab": "热门标签页",
+  "settingsPopularHotTabSubtitle": "在热门页面显示热门选项",
   "settingsPostActionBar": "帖子操作栏",
   "settingsActionsPinned": "已固定 {count} 个操作",
   "@settingsActionsPinned": {

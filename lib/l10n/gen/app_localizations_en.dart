@@ -1080,6 +1080,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsPostInfoImageOnly => 'Image tiles only';
 
   @override
+  String get settingsPopularHotTab => 'Hot tab';
+
+  @override
+  String get settingsPopularHotTabSubtitle =>
+      'Show the Hot option in the Popular page';
+
+  @override
   String get settingsPostActionBar => 'Post action bar';
 
   @override
