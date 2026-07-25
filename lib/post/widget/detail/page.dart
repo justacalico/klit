@@ -206,18 +206,22 @@ class _PostDetailBody extends StatelessWidget {
           left: 0,
           top: 0,
           bottom: 10,
-          child: GalleryPageButton(
-            controller: pageController,
-            direction: GalleryButtonDirection.left,
+          child: Center(
+            child: GalleryPageButton(
+              controller: pageController,
+              direction: GalleryButtonDirection.left,
+            ),
           ),
         ),
         Positioned(
           right: 0,
           top: 0,
           bottom: 10,
-          child: GalleryPageButton(
-            controller: pageController,
-            direction: GalleryButtonDirection.right,
+          child: Center(
+            child: GalleryPageButton(
+              controller: pageController,
+              direction: GalleryButtonDirection.right,
+            ),
           ),
         ),
       ],
