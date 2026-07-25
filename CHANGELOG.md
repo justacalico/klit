@@ -1,6 +1,7 @@
 # Changelog
 
 # 11.0.0 (Unreleased)
+- Added keyboard shortcuts in post detail: arrow keys to navigate/vote, F to toggle favorite ([!32](https://gitlab.com/Openlyst/klit/-/merge_requests/32))
 - Moved post navigation arrows from page edges to image sides so they stay next to the post on wide layouts ([!31](https://gitlab.com/Openlyst/klit/-/merge_requests/31))
 - Added setting to toggle the Hot tab in the Popular page, on by default ([!29](https://gitlab.com/Openlyst/klit/-/merge_requests/29))
 - Added sort by random option in the feed page ([!28](https://gitlab.com/Openlyst/klit/-/merge_requests/28))
