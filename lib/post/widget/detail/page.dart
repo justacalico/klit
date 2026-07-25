@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:kilt/client/client.dart';
@@ -94,21 +95,48 @@ class _PostDetailBody extends StatelessWidget {
       ),
     );
 
-    if (post.type == PostType.video) {
-      return Padding(padding: const EdgeInsets.only(bottom: 10), child: image);
+    final paddedImage = post.type == PostType.video
+        ? Padding(padding: const EdgeInsets.only(bottom: 10), child: image)
+        : Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: (constraints.maxHeight / 2),
+                maxHeight: constraints.maxWidth > constraints.maxHeight
+                    ? max(400, constraints.maxHeight * 0.8)
+                    : double.infinity,
+              ),
+              child: image,
+            ),
+          );
+
+    final pageController = PostDetailPageControllerProvider.of(context);
+    if (pageController == null || ![Platform.isWindows, Platform.isMacOS, Platform.isLinux].any((e) => e)) {
+      return paddedImage;
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minHeight: (constraints.maxHeight / 2),
-          maxHeight: constraints.maxWidth > constraints.maxHeight
-              ? max(400, constraints.maxHeight * 0.8)
-              : double.infinity,
+    return Stack(
+      children: [
+        paddedImage,
+        Positioned(
+          left: 0,
+          top: 0,
+          bottom: 10,
+          child: GalleryPageButton(
+            controller: pageController,
+            direction: GalleryButtonDirection.left,
+          ),
         ),
-        child: image,
-      ),
+        Positioned(
+          right: 0,
+          top: 0,
+          bottom: 10,
+          child: GalleryPageButton(
+            controller: pageController,
+            direction: GalleryButtonDirection.right,
+          ),
+        ),
+      ],
     );
   }
 

@@ -110,9 +110,7 @@ class PostDetailGallery extends StatelessWidget {
       builder: (context, pageController) => ChangeNotifierProvider.value(
         value: controller,
         child: Consumer<PostController>(
-          builder: (context, controller, child) => GalleryButtons(
-            controller: pageController,
-            child: ListenableBuilder(
+          builder: (context, controller, child) => ListenableBuilder(
               listenable: controller,
               builder: (context, _) => _PageChangeNotifier(
                 pageController: pageController,
@@ -171,7 +169,6 @@ class PostDetailGallery extends StatelessWidget {
                 ),
               ),
             ),
-          ),
         ),
       ),
     );
