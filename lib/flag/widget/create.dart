@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:kilt/client/client.dart';
 import 'package:kilt/flag/flag.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
