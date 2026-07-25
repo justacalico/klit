@@ -246,6 +246,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
                   DropdownMenuItem(value: 'id_asc', child: Text(l10n.commonSortOldestFirst)),
                   DropdownMenuItem(value: 'score', child: Text(l10n.commonScore)),
                   DropdownMenuItem(value: 'favcount', child: Text(l10n.commonSortFavCount)),
+                  DropdownMenuItem(value: 'random', child: Text(l10n.commonSortRandom)),
                 ],
                 onChanged: (v) => setState(() => _order = v ?? _order),
               ),
