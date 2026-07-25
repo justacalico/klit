@@ -3,7 +3,7 @@ import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
 
-class PostFullscreenGallery extends StatelessWidget {
+class PostFullscreenGallery extends StatefulWidget {
   const PostFullscreenGallery({
     super.key,
     required this.controller,
@@ -21,13 +21,26 @@ class PostFullscreenGallery extends StatelessWidget {
   final ValueChanged<int>? onPageChanged;
 
   @override
+  State<PostFullscreenGallery> createState() => _PostFullscreenGalleryState();
+}
+
+class _PostFullscreenGalleryState extends State<PostFullscreenGallery> {
+  int _previousPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _previousPage = widget.initialPage ?? 0;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SubDefault<PageController>(
-      value: pageController,
-      create: () => PageController(initialPage: initialPage ?? 0),
+      value: widget.pageController,
+      create: () => PageController(initialPage: widget.initialPage ?? 0),
       builder: (context, pageController) => ScaffoldFrame(
         child: ChangeNotifierProvider.value(
-          value: controller,
+          value: widget.controller,
           child: Consumer<PostController>(
             builder: (context, controller, child) => GalleryButtons(
               controller: pageController,
@@ -37,7 +50,15 @@ class PostFullscreenGallery extends StatelessWidget {
                 itemBuilder: (context, index) =>
                     PostFullscreen(post: controller.items![index]),
                 onPageChanged: (index) {
-                  onPageChanged?.call(index);
+                  if (controller.items != null &&
+                      _previousPage >= 0 &&
+                      _previousPage < controller.items!.length) {
+                    controller.items![_previousPage]
+                        .getVideo(context, listen: false)
+                        ?.pause();
+                  }
+                  _previousPage = index;
+                  widget.onPageChanged?.call(index);
                   if (controller.items != null) {
                     preloadPostImages(
                       context: context,

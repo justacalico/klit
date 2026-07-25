@@ -571,7 +571,7 @@ class PostVideoRouteState extends State<PostVideoRoute>
   @override
   void dispose() {
     if (widget.stopOnDispose) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => player?.pause());
+      player?.pause();
     }
     super.dispose();
   }
