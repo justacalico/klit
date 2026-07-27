@@ -163,7 +163,7 @@ class _PostEditPageState extends State<PostEditPage> {
           post: widget.post,
           onTap: () {
             PostVideoRoute.of(context).keepPlaying();
-            Navigator.of(context).push(
+            Navigator.of(context, rootNavigator: true).push(
               MaterialPageRoute(
                 builder: (context) => PostFullscreen(post: widget.post),
               ),
