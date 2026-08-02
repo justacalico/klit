@@ -156,7 +156,7 @@ class PostDetailGallery extends StatelessWidget {
                           child: PostDetail(
                             post: item,
                             useShell: !contentOnly,
-                            onTapImage: () => Navigator.of(context).push(
+                            onTapImage: () => Navigator.of(context, rootNavigator: true).push(
                               MaterialPageRoute(
                                 builder: (context) => PostsRouteConnector(
                                   controller: controller,

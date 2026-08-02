@@ -169,7 +169,7 @@ class _PostDetailBody extends StatelessWidget {
           if (onTapImage != null) {
             onTapImage!();
           } else {
-            Navigator.of(context).push(
+            Navigator.of(context, rootNavigator: true).push(
               MaterialPageRoute(
                 builder: (context) => PostFullscreen(post: post),
               ),

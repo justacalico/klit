@@ -483,7 +483,7 @@ class PostFeedTile extends StatelessWidget {
             post: post,
             onTap: () {
               PostController? controller = context.read<PostController?>();
-              Navigator.of(context).push(
+              Navigator.of(context, rootNavigator: true).push(
                 MaterialPageRoute(
                   builder: (context) => PostVideoRoute(
                     post: post,
