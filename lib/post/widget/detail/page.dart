@@ -48,11 +48,13 @@ class _PostDetailState extends State<PostDetail> {
     final physicalKey = event.physicalKey;
     final logicalKey = event.logicalKey;
 
-    if (physicalKey == PhysicalKeyboardKey.arrowLeft) {
+    if (physicalKey == PhysicalKeyboardKey.arrowLeft ||
+        logicalKey == LogicalKeyboardKey.keyA) {
       _goToAdjacentPost(-1);
       return KeyEventResult.handled;
     }
-    if (physicalKey == PhysicalKeyboardKey.arrowRight) {
+    if (physicalKey == PhysicalKeyboardKey.arrowRight ||
+        logicalKey == LogicalKeyboardKey.keyD) {
       _goToAdjacentPost(1);
       return KeyEventResult.handled;
     }
@@ -60,11 +62,13 @@ class _PostDetailState extends State<PostDetail> {
     final hasLogin = context.read<Client>().hasLogin;
     if (!hasLogin) return KeyEventResult.ignored;
 
-    if (physicalKey == PhysicalKeyboardKey.arrowUp) {
+    if (physicalKey == PhysicalKeyboardKey.arrowUp ||
+        logicalKey == LogicalKeyboardKey.keyW) {
       _vote(upvote: true);
       return KeyEventResult.handled;
     }
-    if (physicalKey == PhysicalKeyboardKey.arrowDown) {
+    if (physicalKey == PhysicalKeyboardKey.arrowDown ||
+        logicalKey == LogicalKeyboardKey.keyS) {
       _vote(upvote: false);
       return KeyEventResult.handled;
     }
