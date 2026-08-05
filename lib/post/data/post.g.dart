@@ -23,10 +23,13 @@ _Post _$PostFromJson(Map<String, dynamic> json) => _Post(
         MapEntry(k, (e as List<dynamic>).map((e) => e as String).toList()),
   ),
   uploaderId: (json['uploaderId'] as num).toInt(),
+  uploaderName: json['uploaderName'] as String?,
   createdAt: DateTime.parse(json['createdAt'] as String),
   updatedAt: json['updatedAt'] == null
       ? null
       : DateTime.parse(json['updatedAt'] as String),
+  changeSeq: (json['changeSeq'] as num?)?.toInt(),
+  approverId: (json['approverId'] as num?)?.toInt(),
   vote: VoteInfo.fromJson(json['vote'] as Map<String, dynamic>),
   isDeleted: json['isDeleted'] as bool,
   rating: $enumDecode(_$RatingEnumMap, json['rating']),
@@ -37,6 +40,9 @@ _Post _$PostFromJson(Map<String, dynamic> json) => _Post(
   sources: (json['sources'] as List<dynamic>).map((e) => e as String).toList(),
   pools: (json['pools'] as List<dynamic>?)
       ?.map((e) => (e as num).toInt())
+      .toList(),
+  lockedTags: (json['lockedTags'] as List<dynamic>?)
+      ?.map((e) => e as String)
       .toList(),
   relationships: Relationships.fromJson(json['relationships']),
 );
@@ -53,8 +59,11 @@ Map<String, dynamic> _$PostToJson(_Post instance) => <String, dynamic>{
   'variants': instance.variants,
   'tags': instance.tags,
   'uploaderId': instance.uploaderId,
+  'uploaderName': instance.uploaderName,
   'createdAt': instance.createdAt.toIso8601String(),
   'updatedAt': instance.updatedAt?.toIso8601String(),
+  'changeSeq': instance.changeSeq,
+  'approverId': instance.approverId,
   'vote': instance.vote,
   'isDeleted': instance.isDeleted,
   'rating': _$RatingEnumMap[instance.rating]!,
@@ -64,6 +73,7 @@ Map<String, dynamic> _$PostToJson(_Post instance) => <String, dynamic>{
   'description': instance.description,
   'sources': instance.sources,
   'pools': instance.pools,
+  'lockedTags': instance.lockedTags,
   'relationships': instance.relationships,
 };
 

@@ -142,7 +142,7 @@ class DatabaseExportTile extends StatelessWidget {
         throw Exception('Database file does not exist');
       }
 
-      String? outputFile = await FilePicker.platform.saveFile(
+      String? outputFile = await FilePicker.saveFile(
         dialogTitle: 'Export Database',
         fileName: l10n.databaseBackupFileName,
         type: FileType.custom,
@@ -188,7 +188,7 @@ class DatabaseImportTile extends StatelessWidget {
     if (!confirmed) return;
 
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result = await FilePicker.pickFiles(
         dialogTitle: 'Import Database',
         type: FileType.custom,
         allowedExtensions: ['db'],

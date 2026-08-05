@@ -25,7 +25,7 @@ abstract final class FileDownloader {
       );
       return dir?.uri;
     } else {
-      return FilePicker.platform.getDirectoryPath(
+      return FilePicker.getDirectoryPath(
         dialogTitle: 'Choose a folder',
         initialDirectory: initial,
       );

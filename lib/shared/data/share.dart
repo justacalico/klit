@@ -31,7 +31,7 @@ abstract final class Share {
       await SharePlus.instance.share(ShareParams(files: [XFile(file.path)]));
     } else {
       final messenger = ScaffoldMessenger.of(context);
-      String? outputFile = await FilePicker.platform.saveFile(
+      String? outputFile = await FilePicker.saveFile(
         dialogTitle: l10n.commonSaveFile,
         fileName: name,
       );
@@ -57,7 +57,7 @@ abstract final class Share {
       String content = await file.readAsString();
       if (!context.mounted) return;
 
-      String? outputFile = await FilePicker.platform.saveFile(
+      String? outputFile = await FilePicker.saveFile(
         dialogTitle: l10n.commonSaveFile,
         fileName: basename(path),
       );

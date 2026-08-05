@@ -150,7 +150,7 @@ Future<void> tryLocalAuth({
   try {
     bool success = await localAuth.authenticate(
       localizedReason: l10n.appAuthenticateToUnlock,
-      options: const AuthenticationOptions(stickyAuth: true),
+      persistAcrossBackgrounding: true,
     );
     if (success) {
       onSuccess?.call();

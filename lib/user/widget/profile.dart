@@ -4,7 +4,7 @@ import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/user/user.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart' hide Consumer, ChangeNotifierProvider;
+import 'package:flutter_riverpod/flutter_riverpod.dart' hide Consumer;
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});

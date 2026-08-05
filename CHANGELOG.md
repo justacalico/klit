@@ -1,6 +1,8 @@
 # Changelog
 
 # 11.0.0 (Unreleased)
+- Upgraded project dependencies to latest major versions and adapted to breaking API changes ([!38](https://gitlab.com/Openlyst/klit/-/merge_requests/38))
+- Added WASD as arrow-key aliases in post detail for navigation and voting ([!37](https://gitlab.com/Openlyst/klit/-/merge_requests/37))
 - Fixed sidebar staying visible when entering fullscreen by pushing fullscreen routes on the root navigator ([!36](https://gitlab.com/Openlyst/klit/-/merge_requests/36))
 - Fixed video not pausing when navigating between posts or leaving the post detail page ([!35](https://gitlab.com/Openlyst/klit/-/merge_requests/35))
 - Added keyboard shortcuts in post detail: arrow keys to navigate/vote, F to toggle favorite ([!32](https://gitlab.com/Openlyst/klit/-/merge_requests/32))
