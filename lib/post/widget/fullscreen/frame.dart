@@ -29,8 +29,7 @@ class PostFullscreenFrame extends StatefulWidget {
 
 class _PostFullscreenFrameState extends State<PostFullscreenFrame> {
   final FocusNode _focusNode = FocusNode();
-  _FullscreenAction? _action;
-  Timer? _actionTimer;
+  final GlobalKey<_FullscreenActionIndicatorState> _indicatorKey = GlobalKey();
 
   @override
   void initState() {
@@ -44,17 +43,12 @@ class _PostFullscreenFrameState extends State<PostFullscreenFrame> {
 
   @override
   void dispose() {
-    _actionTimer?.cancel();
     _focusNode.dispose();
     super.dispose();
   }
 
   void _showAction(_FullscreenAction action) {
-    _actionTimer?.cancel();
-    setState(() => _action = action);
-    _actionTimer = Timer(const Duration(milliseconds: 1400), () {
-      if (mounted) setState(() => _action = null);
-    });
+    _indicatorKey.currentState?.push(action);
   }
 
   KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
@@ -177,7 +171,11 @@ class _PostFullscreenFrameState extends State<PostFullscreenFrame> {
                       Positioned(
                         left: 16,
                         bottom: 16,
-                        child: _FullscreenActionIndicator(action: _action),
+                        child: IgnorePointer(
+                          child: _FullscreenActionIndicator(
+                            key: _indicatorKey,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -217,29 +215,155 @@ class _FullscreenAction {
   final bool active;
 }
 
-class _FullscreenActionIndicator extends StatelessWidget {
-  const _FullscreenActionIndicator({required this.action});
+class _FullscreenActionIndicator extends StatefulWidget {
+  const _FullscreenActionIndicator({super.key});
 
-  final _FullscreenAction? action;
+  @override
+  State<_FullscreenActionIndicator> createState() =>
+      _FullscreenActionIndicatorState();
+}
+
+class _IndicatorEntry {
+  const _IndicatorEntry({required this.id, required this.action});
+
+  final int id;
+  final _FullscreenAction action;
+}
+
+class _FullscreenActionIndicatorState extends State<_FullscreenActionIndicator> {
+  static const int _max = 3;
+  static const double _slotHeight = 48.0;
+  static const Duration _slideDuration = Duration(milliseconds: 240);
+
+  final List<_IndicatorEntry> _items = [];
+  int _nextId = 0;
+
+  void push(_FullscreenAction action) {
+    if (!mounted) return;
+    setState(() {
+      _items.insert(0, _IndicatorEntry(id: _nextId++, action: action));
+    });
+  }
+
+  void _dismiss(int id) {
+    if (!mounted) return;
+    setState(() {
+      _items.removeWhere((e) => e.id == id);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 180),
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Curves.easeInCubic,
-      transitionBuilder: (child, animation) {
-        return FadeTransition(
-          opacity: animation,
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.92, end: 1).animate(animation),
-            child: child,
-          ),
-        );
-      },
-      child: action == null
-          ? const SizedBox.shrink()
-          : _FullscreenActionPill(action: action!),
+    return SizedBox(
+      width: 280,
+      height: (_max + 1) * _slotHeight,
+      child: ClipRect(
+        child: Stack(
+          clipBehavior: Clip.hardEdge,
+          children: [
+            for (int i = 0; i < _items.length; i++)
+              AnimatedPositioned(
+                key: ValueKey(_items[i].id),
+                left: 0,
+                bottom: i * _slotHeight,
+                duration: _slideDuration,
+                curve: Curves.easeOutCubic,
+                child: _IndicatorItem(
+                  action: _items[i].action,
+                  evicted: i >= _max,
+                  onDismissed: () => _dismiss(_items[i].id),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _IndicatorItem extends StatefulWidget {
+  const _IndicatorItem({
+    required this.action,
+    required this.evicted,
+    required this.onDismissed,
+  });
+
+  final _FullscreenAction action;
+  final bool evicted;
+  final VoidCallback onDismissed;
+
+  @override
+  State<_IndicatorItem> createState() => _IndicatorItemState();
+}
+
+class _IndicatorItemState extends State<_IndicatorItem>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final CurvedAnimation _curve;
+  late final Animation<double> _fade;
+  Timer? _autoTimer;
+  bool _exiting = false;
+  bool _upwardExit = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+    );
+    _curve = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOutCubic,
+    );
+    _fade = _curve;
+    _controller.forward();
+    if (widget.evicted) {
+      _startExit(upward: true);
+    } else {
+      _autoTimer = Timer(const Duration(milliseconds: 1600), _startExit);
+    }
+  }
+
+  void _startExit({bool upward = false}) {
+    if (_exiting) return;
+    _exiting = true;
+    _upwardExit = upward;
+    _autoTimer?.cancel();
+    setState(() {});
+    _controller.reverse().then((_) {
+      if (mounted) widget.onDismissed();
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant _IndicatorItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!oldWidget.evicted && widget.evicted && !_exiting) {
+      _startExit(upward: true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _autoTimer?.cancel();
+    _controller.dispose();
+    _curve.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final begin = _exiting
+        ? (_upwardExit ? Offset.zero : const Offset(-1.0, 0.0))
+        : const Offset(-1.0, 0.0);
+    final slide = Tween<Offset>(begin: begin, end: Offset.zero).animate(_curve);
+    return FadeTransition(
+      opacity: _fade,
+      child: SlideTransition(
+        position: slide,
+        child: _FullscreenActionPill(action: widget.action),
+      ),
     );
   }
 }
