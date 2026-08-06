@@ -331,6 +331,76 @@ void main() {
       );
       expect(feed.toSearchQueryWithPath([99]), feed.toSearchQuery());
     });
+
+    test('subfeed exclude cancels feed include', () {
+      const feed = Feed(
+        id: 'f',
+        name: 'n',
+        mediaType: Feed.mediaTypeAll,
+        includeTags: ['video'],
+        subfeeds: [
+          SubFeed(id: 's1', name: 'S1', excludeTags: ['video']),
+        ],
+      );
+      final query = feed.toSearchQueryWithPath([0]);
+      expect(query, isNot(contains(' video ')));
+      expect(query, isNot(contains(' -video')));
+      expect(query, isNot(contains('video ')));
+    });
+
+    test('subfeed include cancels feed exclude', () {
+      const feed = Feed(
+        id: 'f',
+        name: 'n',
+        mediaType: Feed.mediaTypeImage,
+        excludeTags: ['gore'],
+        subfeeds: [
+          SubFeed(id: 's1', name: 'S1', includeTags: ['gore']),
+        ],
+      );
+      final query = feed.toSearchQueryWithPath([0]);
+      expect(query, isNot(contains('-gore')));
+      expect(query, isNot(contains(' gore ')));
+    });
+
+    test('nested subfeed exclude cancels parent subfeed include', () {
+      const feed = Feed(
+        id: 'f',
+        name: 'n',
+        mediaType: Feed.mediaTypeAll,
+        subfeeds: [
+          SubFeed(
+            id: 's1',
+            name: 'S1',
+            includeTags: ['video'],
+            subfeeds: [
+              SubFeed(id: 'ss1', name: 'SS1', excludeTags: ['video']),
+            ],
+          ),
+        ],
+      );
+      final query = feed.toSearchQueryWithPath([0, 0]);
+      expect(query, isNot(contains('video')));
+      expect(query, isNot(contains('-video')));
+    });
+
+    test('non-conflicting tags are preserved', () {
+      const feed = Feed(
+        id: 'f',
+        name: 'n',
+        mediaType: Feed.mediaTypeImage,
+        includeTags: ['cat'],
+        excludeTags: ['dog'],
+        subfeeds: [
+          SubFeed(id: 's1', name: 'S1', includeTags: ['video'], excludeTags: ['gore']),
+        ],
+      );
+      final query = feed.toSearchQueryWithPath([0]);
+      expect(query, contains('cat'));
+      expect(query, contains('-dog'));
+      expect(query, contains('video'));
+      expect(query, contains('-gore'));
+    });
   });
 
   group('Feed.toSearchQueryWithSubfeed', () {

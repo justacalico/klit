@@ -61,6 +61,18 @@ class SubFeed {
       parts.add('-${t.trim()}');
     }
   }
+
+  /// Collects this subfeed's plain include and exclude tags into the given sets.
+  void collectTags(Set<String> includes, Set<String> excludes) {
+    for (final t in includeTags) {
+      final s = t.trim();
+      if (s.isNotEmpty) includes.add(s);
+    }
+    for (final t in excludeTags) {
+      final s = t.trim();
+      if (s.isNotEmpty) excludes.add(s);
+    }
+  }
 }
 
 /// User-defined feed: saved tag filters and media type (image, video, or both).
@@ -187,39 +199,97 @@ class Feed {
       if (t.trim().isEmpty) continue;
       parts.add('-${t.trim()}');
     }
-    switch (mediaType) {
-      case mediaTypeVideo:
-        parts.add('( ~type:mp4 ~type:webm )');
-        break;
-      case mediaTypeAll:
-        parts.add('( ~type:jpg ~type:png ~type:gif ~type:webp ~type:mp4 ~type:webm )');
-        break;
-      default:
-        parts.add('( ~type:jpg ~type:png ~type:gif ~type:webp )');
-    }
+    parts.add(_mediaTypeClause());
     return parts.join(' ').trim();
   }
 
+  String _mediaTypeClause() {
+    return switch (mediaType) {
+      mediaTypeVideo => '( ~type:mp4 ~type:webm )',
+      mediaTypeAll => '( ~type:jpg ~type:png ~type:gif ~type:webp ~type:mp4 ~type:webm )',
+      _ => '( ~type:jpg ~type:png ~type:gif ~type:webp )',
+    };
+  }
+
   /// Base query plus optional subfeed chain. Path [0] = first subfeed, [0,1] = first's second sub-subfeed, etc.
+  ///
+  /// Tags that appear as both include and exclude across the feed and subfeed chain
+  /// are silently cancelled out so conflicting filters don't produce zero results.
   String toSearchQueryWithPath(List<int> path) {
-    final parts = <String>[];
-    parts.add(toSearchQuery());
-    if (path.isEmpty) return parts.first;
+    final includes = <String>{};
+    final excludes = <String>{};
+
+    for (final t in includeTags) {
+      final s = t.trim();
+      if (s.isNotEmpty) includes.add(s);
+    }
+    for (final t in excludeTags) {
+      final s = t.trim();
+      if (s.isNotEmpty) excludes.add(s);
+    }
+
     List<SubFeed> level = subfeeds;
     for (final index in path) {
       if (index < 0 || index >= level.length) break;
       final sub = level[index];
-      sub.appendTagParts(parts);
+      sub.collectTags(includes, excludes);
       level = sub.subfeeds;
     }
+
+    final cancelledIncludes = includes.difference(excludes);
+    final cancelledExcludes = excludes.difference(includes);
+
+    final parts = <String>[];
+
+    if (orTags.isNotEmpty) {
+      final orClause = orTags.map((t) => '~${t.trim()}').where((s) => s.length > 1).join(' ');
+      if (orClause.isNotEmpty) {
+        parts.add('( $orClause )');
+      }
+    }
+
+    if (cancelledIncludes.isNotEmpty) {
+      parts.add(cancelledIncludes.join(' '));
+    }
+    for (final t in cancelledExcludes) {
+      parts.add('-$t');
+    }
+
+    parts.add(_mediaTypeClause());
+
     return parts.join(' ').trim();
   }
 
   /// Single subfeed (no nesting). Kept for backward compatibility.
   String toSearchQueryWithSubfeed(SubFeed? subfeed) {
     if (subfeed == null) return toSearchQuery();
-    final parts = <String>[toSearchQuery()];
-    subfeed.appendTagParts(parts);
+    final includes = <String>{};
+    final excludes = <String>{};
+    for (final t in includeTags) {
+      final s = t.trim();
+      if (s.isNotEmpty) includes.add(s);
+    }
+    for (final t in excludeTags) {
+      final s = t.trim();
+      if (s.isNotEmpty) excludes.add(s);
+    }
+    subfeed.collectTags(includes, excludes);
+    final cancelledIncludes = includes.difference(excludes);
+    final cancelledExcludes = excludes.difference(includes);
+    final parts = <String>[];
+    if (orTags.isNotEmpty) {
+      final orClause = orTags.map((t) => '~${t.trim()}').where((s) => s.length > 1).join(' ');
+      if (orClause.isNotEmpty) {
+        parts.add('( $orClause )');
+      }
+    }
+    if (cancelledIncludes.isNotEmpty) {
+      parts.add(cancelledIncludes.join(' '));
+    }
+    for (final t in cancelledExcludes) {
+      parts.add('-$t');
+    }
+    parts.add(_mediaTypeClause());
     return parts.join(' ').trim();
   }
 }
