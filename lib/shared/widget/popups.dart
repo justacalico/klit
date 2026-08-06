@@ -15,6 +15,36 @@ class PopupMenuTile<T> extends PopupMenuItem<T> {
   final String title;
 }
 
+class PopupMenuPickerTile<T> extends PopupMenuItem<T> {
+  PopupMenuPickerTile({
+    super.key,
+    required T value,
+    required String title,
+    Widget? trailing,
+    bool selected = false,
+  }) : super(
+         value: value,
+         child: Row(
+           children: [
+             Expanded(
+               child: Padding(
+                 padding: const EdgeInsets.symmetric(vertical: 4),
+                 child: Text(title),
+               ),
+             ),
+             if (trailing != null) ...[
+              const SizedBox(width: 8),
+              trailing,
+            ],
+             if (selected) ...[
+              const SizedBox(width: 8),
+              const Icon(Icons.check, size: 18),
+            ],
+           ],
+         ),
+       );
+}
+
 class ListMenuTile extends StatelessWidget {
   const ListMenuTile({super.key, this.leading, this.title});
 

@@ -3,6 +3,7 @@ import 'package:kilt/app/routing/app_routes.dart';
 import 'package:kilt/shared/controller/navigation_controller.dart';
 import 'package:kilt/shared/data/provider.dart';
 import 'package:kilt/shared/widget/glass.dart';
+import 'package:kilt/shared/widget/popups.dart';
 import 'package:kilt/settings/widget/icon.dart';
 import 'package:kilt/identity/identity.dart';
 import 'package:kilt/user/user.dart';
@@ -193,14 +194,16 @@ class _BottomNavBar extends StatelessWidget {
                   ),
                 if (moreVisible.isNotEmpty)
                   Expanded(
-                    child: _BottomNavDestination(
-                      icon: CupertinoIcons.ellipsis,
-                      label: l10n.commonMore,
-                      selected: selectedIndex == primaryCount,
+                    child: Builder(
+                      builder: (moreContext) => _BottomNavDestination(
+                        icon: CupertinoIcons.ellipsis,
+                        label: l10n.commonMore,
+                        selected: selectedIndex == primaryCount,
                         onTap: () {
-                        HapticFeedback.selectionClick();
-                        _showMoreMenu(context, moreVisible, controller);
-                      },
+                          HapticFeedback.selectionClick();
+                          _showMoreMenu(moreContext, moreVisible, controller);
+                        },
+                      ),
                     ),
                   ),
               ],
@@ -366,67 +369,34 @@ void _showMoreMenu(
   BuildContext context,
   List<({int index, NavItem item})> entries,
   _NavAdapter nav,
-) {
+) async {
   final l10n = AppLocalizations.of(context);
-  final theme = Theme.of(context);
-  final cupertinoTheme = CupertinoTheme.of(context);
-
-  showCupertinoModalPopup<void>(
-    context: context,
-    builder: (context) => Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-      child: SafeArea(
-        top: false,
-        child: GlassSurface(
-          borderRadius: 20,
-          blurSigma: 20,
-          padding: EdgeInsets.zero,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 12, bottom: 4),
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: theme.dividerColor,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              ...entries.map((e) {
-                final selected = nav.state.currentIndex == e.index;
-                return CupertinoListTile(
-                  leading: Icon(
-                    e.item.icon,
-                    color: selected
-                        ? cupertinoTheme.primaryColor
-                        : CupertinoColors.label.resolveFrom(context),
-                  ),
-                  title: Text(
-                    e.item.label(l10n),
-                    style: TextStyle(
-                      fontWeight: selected
-                          ? FontWeight.w600
-                          : FontWeight.normal,
-                      color: selected ? cupertinoTheme.primaryColor : null,
-                    ),
-                  ),
-                  onTap: () {
-                    HapticFeedback.selectionClick();
-                    Navigator.of(context).pop();
-                    nav.goTo(e.index);
-                  },
-                );
-              }),
-              const SizedBox(height: 8),
-            ],
-          ),
-        ),
-      ),
+  final box = context.findRenderObject() as RenderBox;
+  final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+  final rect = RelativeRect.fromRect(
+    Rect.fromPoints(
+      box.localToGlobal(Offset.zero, ancestor: overlay),
+      box.localToGlobal(box.size.bottomRight(Offset.zero), ancestor: overlay),
     ),
+    Offset.zero & overlay.size,
   );
+
+  final selected = await showMenu<int>(
+    context: context,
+    position: rect,
+    items: entries
+        .map((e) => PopupMenuTile<int>(
+              title: e.item.label(l10n),
+              icon: e.item.icon,
+              value: e.index,
+            ))
+        .toList(),
+  );
+
+  if (selected != null) {
+    HapticFeedback.selectionClick();
+    nav.goTo(selected);
+  }
 }
 
 const double _sidebarExpandedWidth = 240;

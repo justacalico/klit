@@ -1373,58 +1373,36 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     required String Function(T value) labelOf,
     required ValueChanged<T> onSelected,
     Widget Function(T value)? trailingBuilder,
-  }) {
-    showCupertinoModalPopup<void>(
-      context: context,
-      builder: (context) => SafeArea(
-        top: false,
-        child: GlassSurface(
-          margin: const EdgeInsets.fromLTRB(24, 0, 24, 20),
-          padding: const EdgeInsets.all(12),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 420),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  ...values.map(
-                    (value) => CupertinoListTile(
-                      title: Text(labelOf(value)),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (trailingBuilder != null) trailingBuilder(value),
-                          if (current == value) ...[
-                            const SizedBox(width: 8),
-                            const Icon(CupertinoIcons.check_mark, size: 18),
-                          ],
-                        ],
-                      ),
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        onSelected(value);
-                        Navigator.of(context).maybePop();
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+  }) async {
+    final box = context.findRenderObject() as RenderBox;
+    final overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+    final rect = RelativeRect.fromRect(
+      Rect.fromPoints(
+        box.localToGlobal(Offset.zero, ancestor: overlay),
+        box.localToGlobal(box.size.bottomRight(Offset.zero),
+            ancestor: overlay),
       ),
+      Offset.zero & overlay.size,
     );
+
+    final selected = await showMenu<T>(
+      context: context,
+      position: rect,
+      items: values
+          .map((value) => PopupMenuPickerTile<T>(
+                value: value,
+                title: labelOf(value),
+                trailing: trailingBuilder?.call(value),
+                selected: current == value,
+              ))
+          .toList(),
+    );
+
+    if (selected != null) {
+      HapticFeedback.selectionClick();
+      onSelected(selected);
+    }
   }
 
   void _showAccentColorSheet(BuildContext context, Settings settings) {

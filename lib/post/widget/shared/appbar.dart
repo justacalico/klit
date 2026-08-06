@@ -6,7 +6,6 @@ import 'package:kilt/post/post.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/ticket/ticket.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -164,8 +163,6 @@ Future<void> showPostMenuSheet(
   Post post, {
   BuildContext? anchorContext,
 }) async {
-  final theme = Theme.of(context);
-  final cupertinoTheme = CupertinoTheme.of(context);
   final settings = context.read<Settings>();
   final hasLogin = context.read<Client>().hasLogin;
   final pinnedActions = hasLogin
@@ -181,106 +178,36 @@ Future<void> showPostMenuSheet(
   );
   final userActions = _postMenuUserActionsConfig(context, post);
 
-  Future<void> showAsPopup() async {
-    final anchor = anchorContext ?? context;
-    final overlay =
-        Overlay.of(context, rootOverlay: true).context.findRenderObject()
-            as RenderBox;
-    final anchorBox = anchor.findRenderObject() as RenderBox;
-    final anchorRect = RelativeRect.fromRect(
-      Rect.fromPoints(
-        anchorBox.localToGlobal(Offset.zero, ancestor: overlay),
-        anchorBox.localToGlobal(anchorBox.size.bottomRight(Offset.zero),
-            ancestor: overlay),
-      ),
-      Offset.zero & overlay.size,
-    );
-    final menuItems = <PopupMenuEntry<VoidCallback>>[
-      ...postActions.map(
-        (a) => PopupMenuTile(value: a.onTap, title: a.title, icon: a.icon),
-      ),
-      if (userActions.isNotEmpty && postActions.isNotEmpty)
-        const PopupMenuDivider(),
-      ...userActions.map(
-        (a) => PopupMenuTile(value: a.onTap, title: a.title, icon: a.icon),
-      ),
-    ];
-    final selected = await showMenu<VoidCallback>(
-      context: context,
-      position: anchorRect,
-      items: menuItems,
-    );
-    if (selected != null) {
-      HapticFeedback.selectionClick();
-      selected();
-    }
-  }
-
-  if (theme.isDesktop) {
-    await showAsPopup();
-    return;
-  }
-
-  await showCupertinoModalPopup<void>(
-    context: context,
-    builder: (context) => Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-      child: SafeArea(
-        top: false,
-        child: GlassSurface(
-          borderRadius: 20,
-          blurSigma: 20,
-          padding: EdgeInsets.zero,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 12, bottom: 4),
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: theme.dividerColor,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              ...postActions.map(
-                (a) => _PostMenuTile(action: a, cupertinoTheme: cupertinoTheme),
-              ),
-              if (userActions.isNotEmpty) const Divider(height: 1),
-              ...userActions.map(
-                (a) => _PostMenuTile(action: a, cupertinoTheme: cupertinoTheme),
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        ),
-      ),
+  final anchor = anchorContext ?? context;
+  final overlay =
+      Overlay.of(context, rootOverlay: true).context.findRenderObject()
+          as RenderBox;
+  final anchorBox = anchor.findRenderObject() as RenderBox;
+  final anchorRect = RelativeRect.fromRect(
+    Rect.fromPoints(
+      anchorBox.localToGlobal(Offset.zero, ancestor: overlay),
+      anchorBox.localToGlobal(anchorBox.size.bottomRight(Offset.zero),
+          ancestor: overlay),
     ),
+    Offset.zero & overlay.size,
   );
-}
-
-class _PostMenuTile extends StatelessWidget {
-  const _PostMenuTile({required this.action, required this.cupertinoTheme});
-
-  final _PostMenuAction action;
-  final CupertinoThemeData cupertinoTheme;
-
-  @override
-  Widget build(BuildContext context) {
-    final iconColor = CupertinoColors.label.resolveFrom(context);
-    return CupertinoListTile(
-      leading: Icon(action.icon, color: iconColor),
-      title: Text(
-        action.title,
-        style: const TextStyle(fontWeight: FontWeight.w500),
-      ),
-      onTap: () {
-        HapticFeedback.selectionClick();
-        Navigator.of(context).maybePop();
-        action.onTap();
-      },
-    );
+  final menuItems = <PopupMenuEntry<VoidCallback>>[
+    ...postActions.map(
+      (a) => PopupMenuTile(value: a.onTap, title: a.title, icon: a.icon),
+    ),
+    if (userActions.isNotEmpty && postActions.isNotEmpty)
+      const PopupMenuDivider(),
+    ...userActions.map(
+      (a) => PopupMenuTile(value: a.onTap, title: a.title, icon: a.icon),
+    ),
+  ];
+  final selected = await showMenu<VoidCallback>(
+    context: context,
+    position: anchorRect,
+    items: menuItems,
+  );
+  if (selected != null) {
+    HapticFeedback.selectionClick();
+    selected();
   }
 }
