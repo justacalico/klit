@@ -111,6 +111,26 @@ jobs:
             dpkg-dev rpm wget file squashfs-tools patchelf libfuse2
           flutter config --enable-linux-desktop
 
+      - name: Install appimagetool (x64)
+        if: matrix.target == 'linux-x64'
+        run: |
+          wget -q -O /tmp/appimagetool.AppImage "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
+          chmod +x /tmp/appimagetool.AppImage
+          cd /tmp && ./appimagetool.AppImage --appimage-extract
+          sudo mv /tmp/squashfs-root /opt/appimagetool
+          sudo ln -sf /opt/appimagetool/AppRun /usr/local/bin/appimagetool
+          appimagetool --version || echo "appimagetool installed"
+
+      - name: Install appimagetool (arm64)
+        if: matrix.target == 'linux-arm64'
+        run: |
+          wget -q -O /tmp/appimagetool.AppImage "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-aarch64.AppImage"
+          chmod +x /tmp/appimagetool.AppImage
+          cd /tmp && ./appimagetool.AppImage --appimage-extract
+          sudo mv /tmp/squashfs-root /opt/appimagetool
+          sudo ln -sf /opt/appimagetool/AppRun /usr/local/bin/appimagetool
+          appimagetool --version || echo "appimagetool installed"
+
       - name: Setup Android signing
         id: signing
         if: matrix.target == 'android'
@@ -212,10 +232,27 @@ jobs:
             linux-x64)
               flutter build linux --release --build-name="$VERSION"
               cd build/linux/x64/release && zip -r "$GITHUB_WORKSPACE/artifacts/kilt-linux-x64-${VERSION}-${BUILD_DATE}.zip" bundle/ && cd "$GITHUB_WORKSPACE"
+              export PATH="$PATH:$HOME/.pub-cache/bin"
+              dart pub global activate fastforge
+              timeout 300 fastforge package --platform linux --targets deb --skip-clean || echo "DEB build had warnings"
+              timeout 300 fastforge package --platform linux --targets rpm --skip-clean || echo "RPM build had warnings"
+              timeout 300 fastforge package --platform linux --targets appimage --skip-clean || echo "AppImage build had warnings"
+              find dist -name "*.deb" -exec cp {} "artifacts/kilt-linux-amd64-${VERSION}-${BUILD_DATE}.deb" \; 2>/dev/null || true
+              find dist -name "*.rpm" -exec cp {} "artifacts/kilt-linux-amd64-${VERSION}-${BUILD_DATE}.rpm" \; 2>/dev/null || true
+              find dist -name "*.AppImage" -exec cp {} "artifacts/kilt-linux-x86_64-${VERSION}-${BUILD_DATE}.AppImage" \; 2>/dev/null || true
               ;;
             linux-arm64)
               flutter build linux --release --build-name="$VERSION"
               cd build/linux/arm64/release && zip -r "$GITHUB_WORKSPACE/artifacts/kilt-linux-arm64-${VERSION}-${BUILD_DATE}.zip" bundle/ && cd "$GITHUB_WORKSPACE"
+              export PATH="$PATH:$HOME/.pub-cache/bin"
+              export PUB_CACHE="$HOME/.pub-cache"
+              dart pub global activate fastforge
+              timeout 300 fastforge package --platform linux --targets deb --skip-clean || echo "DEB build had warnings"
+              timeout 300 fastforge package --platform linux --targets rpm --skip-clean || echo "RPM build had warnings"
+              timeout 300 fastforge package --platform linux --targets appimage --skip-clean || echo "AppImage build had warnings"
+              find dist -name "*.deb" -exec cp {} "artifacts/kilt-linux-arm64-${VERSION}-${BUILD_DATE}.deb" \; 2>/dev/null || true
+              find dist -name "*.rpm" -exec cp {} "artifacts/kilt-linux-arm64-${VERSION}-${BUILD_DATE}.rpm" \; 2>/dev/null || true
+              find dist -name "*.AppImage" -exec cp {} "artifacts/kilt-linux-aarch64-${VERSION}-${BUILD_DATE}.AppImage" \; 2>/dev/null || true
               ;;
             windows)
               flutter build windows --release

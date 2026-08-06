@@ -15,3 +15,6 @@ categories:
   - Network
   - Graphics
 startup_notify: true
+dependencies:
+  - libmpv2 | libmpv1
+  - libgtk-3-0

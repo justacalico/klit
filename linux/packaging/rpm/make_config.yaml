@@ -16,3 +16,6 @@ categories:
   - Network
   - Graphics
 startup_notify: true
+requires:
+  - mpv-libs
+  - gtk3
