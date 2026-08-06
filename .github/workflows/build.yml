@@ -371,7 +371,7 @@ jobs:
     name: Nightly Release
     runs-on: ubuntu-latest
     needs: build
-    if: ${{ !cancelled() && contains(needs.build.result, 'success') && !startsWith(github.ref, 'refs/tags/v') && !startsWith(github.ref, 'refs/pull/') && (github.event_name == 'push' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.create_release == true)) }}
+    if: ${{ !cancelled() && !failure() && !startsWith(github.ref, 'refs/tags/v') && !startsWith(github.ref, 'refs/pull/') && (github.event_name == 'push' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.create_release == true)) }}
     permissions:
       contents: write
 
@@ -441,7 +441,7 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     needs: build
-    if: ${{ !cancelled() && startsWith(github.ref, 'refs/tags/v') && contains(needs.build.result, 'success') }}
+    if: ${{ !cancelled() && !failure() && startsWith(github.ref, 'refs/tags/v') }}
     permissions:
       contents: write
 
