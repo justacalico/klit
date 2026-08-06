@@ -1,6 +1,7 @@
 # Changelog
 
 # 11.0.0 (Unreleased)
+- Added keyboard shortcuts and a transient bottom-left status indicator in fullscreen view: F to toggle favorite, arrow up/down (or W/S) to vote ([!39](https://gitlab.com/Openlyst/klit/-/merge_requests/39))
 - Upgraded project dependencies to latest major versions and adapted to breaking API changes ([!38](https://gitlab.com/Openlyst/klit/-/merge_requests/38))
 - Added WASD as arrow-key aliases in post detail for navigation and voting ([!37](https://gitlab.com/Openlyst/klit/-/merge_requests/37))
 - Fixed sidebar staying visible when entering fullscreen by pushing fullscreen routes on the root navigator ([!36](https://gitlab.com/Openlyst/klit/-/merge_requests/36))
