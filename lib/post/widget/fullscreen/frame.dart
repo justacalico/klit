@@ -56,6 +56,17 @@ class _PostFullscreenFrameState extends State<PostFullscreenFrame> {
     final physicalKey = event.physicalKey;
     final logicalKey = event.logicalKey;
 
+    if (physicalKey == PhysicalKeyboardKey.arrowLeft ||
+        logicalKey == LogicalKeyboardKey.keyA) {
+      _goToAdjacentPost(-1);
+      return KeyEventResult.handled;
+    }
+    if (physicalKey == PhysicalKeyboardKey.arrowRight ||
+        logicalKey == LogicalKeyboardKey.keyD) {
+      _goToAdjacentPost(1);
+      return KeyEventResult.handled;
+    }
+
     final client = context.read<Client>();
     if (!client.hasLogin) return KeyEventResult.ignored;
     final controller = context.read<PostController?>();
@@ -77,6 +88,22 @@ class _PostFullscreenFrameState extends State<PostFullscreenFrame> {
     }
 
     return KeyEventResult.ignored;
+  }
+
+  void _goToAdjacentPost(int delta) {
+    final controller = context.read<PostController?>();
+    final items = controller?.items;
+    if (items == null) return;
+    final pageController = PostDetailPageControllerProvider.of(context);
+    if (pageController == null || !pageController.hasClients) return;
+    final page = pageController.page?.round() ?? 0;
+    final target = page + delta;
+    if (target < 0 || target >= items.length) return;
+    pageController.animateToPage(
+      target,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
   }
 
   void _vote(PostController controller, {required bool upvote}) {
