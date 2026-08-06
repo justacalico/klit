@@ -8,7 +8,7 @@ DTextElement parse(String input) {
   if (result is Failure) {
     fail('Failed to parse "$input": ${result.message}');
   }
-  return result.value as DTextElement;
+  return result.value;
 }
 
 void main() {
