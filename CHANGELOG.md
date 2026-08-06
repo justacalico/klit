@@ -1,6 +1,7 @@
 # Changelog
 
 # 11.0.0 (Unreleased)
+- Fixed subfeed tag conflicts producing zero results: when a tag appears as both include and exclude across the feed and subfeed chain, both are silently cancelled out ([!43](https://gitlab.com/Openlyst/klit/-/merge_requests/43))
 - Fixed arrow keys and A/D not navigating between posts in fullscreen view by adding left/right handling to the fullscreen key handler and exposing the page controller to fullscreen items ([!42](https://gitlab.com/Openlyst/klit/-/merge_requests/42))
 - Replaced remaining iOS-style bottom sheets (navbar more menu, post detail/fullscreen menu, settings picker sheets) with the standard popup menu used elsewhere in the app ([!41](https://gitlab.com/Openlyst/klit/-/merge_requests/41))
 - Replaced the iOS-style action sheet on feed cards with the standard popup menu used elsewhere in the app ([!40](https://gitlab.com/Openlyst/klit/-/merge_requests/40))
