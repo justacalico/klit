@@ -15,6 +15,7 @@ categories:
   - Network
   - Graphics
 startup_notify: true
+installed_size: 20000
 dependencies:
   - libmpv2 | libmpv1
   - libgtk-3-0
