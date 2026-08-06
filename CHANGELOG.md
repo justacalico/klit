@@ -1,6 +1,7 @@
 # Changelog
 
 # 11.0.0 (Unreleased)
+- Replaced the iOS-style action sheet on feed cards with the standard popup menu used elsewhere in the app ([!40](https://gitlab.com/Openlyst/klit/-/merge_requests/40))
 - Added keyboard shortcuts and a stacking bottom-left status indicator in fullscreen view: F to toggle favorite, arrow up/down (or W/S) to vote; indicators fade and slide in/out, stack up to 3, and evict the top one with a slide when a 4th arrives ([!39](https://gitlab.com/Openlyst/klit/-/merge_requests/39))
 - Upgraded project dependencies to latest major versions and adapted to breaking API changes ([!38](https://gitlab.com/Openlyst/klit/-/merge_requests/38))
 - Added WASD as arrow-key aliases in post detail for navigation and voting ([!37](https://gitlab.com/Openlyst/klit/-/merge_requests/37))

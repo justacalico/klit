@@ -5,7 +5,6 @@ import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import 'feed_edit_page.dart';
@@ -202,20 +201,33 @@ class _FeedCardSurface extends StatelessWidget {
 }
 
 class _FeedActionsButton extends StatelessWidget {
-  const _FeedActionsButton({required this.onPressed});
+  const _FeedActionsButton({required this.onEdit, required this.onDelete});
 
-  final VoidCallback onPressed;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoButton(
-      padding: EdgeInsets.zero,
-      onPressed: onPressed, minimumSize: Size(28, 28),
-      child: Icon(
+    final l10n = AppLocalizations.of(context);
+    return PopupMenuButton<VoidCallback>(
+      icon: Icon(
         Icons.more_vert,
         size: 20,
         color: CupertinoColors.label.resolveFrom(context),
       ),
+      onSelected: (value) => value(),
+      itemBuilder: (context) => [
+        PopupMenuTile(
+          title: l10n.commonEdit,
+          icon: Icons.edit,
+          value: onEdit,
+        ),
+        PopupMenuTile(
+          title: l10n.commonDelete,
+          icon: Icons.delete,
+          value: onDelete,
+        ),
+      ],
     );
   }
 }
@@ -304,7 +316,10 @@ class _FeedCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                _FeedActionsButton(onPressed: () => _showFeedActionsSheet(context)),
+                _FeedActionsButton(
+                  onEdit: onEdit,
+                  onDelete: onDelete,
+                ),
               ],
             ),
           ),
@@ -344,65 +359,4 @@ class _FeedCard extends StatelessWidget {
     );
   }
 
-  void _showFeedActionsSheet(BuildContext context) {
-    final theme = Theme.of(context);
-    final cupertino = CupertinoTheme.of(context);
-    final l10n = AppLocalizations.of(context);
-
-    showCupertinoModalPopup<void>(
-      context: context,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-        child: SafeArea(
-          top: false,
-          child: GlassSurface(
-            borderRadius: 20,
-            blurSigma: 20,
-            padding: EdgeInsets.zero,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 12, bottom: 4),
-                  child: Container(
-                    width: 36,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: theme.dividerColor,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                CupertinoListTile(
-                  leading: Icon(
-                    CupertinoIcons.pencil,
-                    color: CupertinoColors.label.resolveFrom(context),
-                  ),
-                  title: Text(l10n.commonEdit),
-                  onTap: () {
-                    HapticFeedback.selectionClick();
-                    Navigator.of(context).maybePop();
-                    onEdit();
-                  },
-                ),
-                CupertinoListTile(
-                  leading: Icon(
-                    CupertinoIcons.trash,
-                    color: cupertino.primaryColor,
-                  ),
-                  title: Text(l10n.commonDelete),
-                  onTap: () {
-                    HapticFeedback.selectionClick();
-                    Navigator.of(context).maybePop();
-                    onDelete();
-                  },
-                ),
-                const SizedBox(height: 8),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
