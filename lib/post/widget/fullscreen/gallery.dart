@@ -48,7 +48,10 @@ class _PostFullscreenGalleryState extends State<PostFullscreenGallery> {
                 itemCount: controller.items?.length ?? 0,
                 controller: pageController,
                 itemBuilder: (context, index) =>
-                    PostFullscreen(post: controller.items![index]),
+                    PostDetailPageControllerProvider(
+                      controller: pageController,
+                      child: PostFullscreen(post: controller.items![index]),
+                    ),
                 onPageChanged: (index) {
                   if (controller.items != null &&
                       _previousPage >= 0 &&

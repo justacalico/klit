@@ -30,12 +30,16 @@ class PostFullscreenFrame extends StatefulWidget {
 class _PostFullscreenFrameState extends State<PostFullscreenFrame> {
   final FocusNode _focusNode = FocusNode();
   final GlobalKey<_FullscreenActionIndicatorState> _indicatorKey = GlobalKey();
+  PageController? _pageController;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && !_focusNode.hasFocus) {
+      if (!mounted) return;
+      _pageController = PostDetailPageControllerProvider.of(context);
+      _pageController?.addListener(_onPageChanged);
+      if (!_focusNode.hasFocus) {
         _focusNode.requestFocus();
       }
     });
@@ -43,8 +47,23 @@ class _PostFullscreenFrameState extends State<PostFullscreenFrame> {
 
   @override
   void dispose() {
+    _pageController?.removeListener(_onPageChanged);
     _focusNode.dispose();
     super.dispose();
+  }
+
+  void _onPageChanged() {
+    if (!mounted || _pageController == null || !_pageController!.hasClients) {
+      return;
+    }
+    final controller = context.read<PostController?>();
+    final items = controller?.items;
+    if (items == null) return;
+    final currentPage = _pageController!.page?.round() ?? 0;
+    final myIndex = items.indexWhere((p) => p.id == widget.post.id);
+    if (myIndex == currentPage && !_focusNode.hasFocus) {
+      _focusNode.requestFocus();
+    }
   }
 
   void _showAction(_FullscreenAction action) {
@@ -55,6 +74,17 @@ class _PostFullscreenFrameState extends State<PostFullscreenFrame> {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
     final physicalKey = event.physicalKey;
     final logicalKey = event.logicalKey;
+
+    if (physicalKey == PhysicalKeyboardKey.arrowLeft ||
+        logicalKey == LogicalKeyboardKey.keyA) {
+      _goToAdjacentPost(-1);
+      return KeyEventResult.handled;
+    }
+    if (physicalKey == PhysicalKeyboardKey.arrowRight ||
+        logicalKey == LogicalKeyboardKey.keyD) {
+      _goToAdjacentPost(1);
+      return KeyEventResult.handled;
+    }
 
     final client = context.read<Client>();
     if (!client.hasLogin) return KeyEventResult.ignored;
@@ -77,6 +107,22 @@ class _PostFullscreenFrameState extends State<PostFullscreenFrame> {
     }
 
     return KeyEventResult.ignored;
+  }
+
+  void _goToAdjacentPost(int delta) {
+    final controller = context.read<PostController?>();
+    final items = controller?.items;
+    if (items == null) return;
+    final pageController = PostDetailPageControllerProvider.of(context);
+    if (pageController == null || !pageController.hasClients) return;
+    final page = pageController.page?.round() ?? 0;
+    final target = page + delta;
+    if (target < 0 || target >= items.length) return;
+    pageController.animateToPage(
+      target,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
   }
 
   void _vote(PostController controller, {required bool upvote}) {
