@@ -30,12 +30,16 @@ class PostFullscreenFrame extends StatefulWidget {
 class _PostFullscreenFrameState extends State<PostFullscreenFrame> {
   final FocusNode _focusNode = FocusNode();
   final GlobalKey<_FullscreenActionIndicatorState> _indicatorKey = GlobalKey();
+  PageController? _pageController;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && !_focusNode.hasFocus) {
+      if (!mounted) return;
+      _pageController = PostDetailPageControllerProvider.of(context);
+      _pageController?.addListener(_onPageChanged);
+      if (!_focusNode.hasFocus) {
         _focusNode.requestFocus();
       }
     });
@@ -43,8 +47,23 @@ class _PostFullscreenFrameState extends State<PostFullscreenFrame> {
 
   @override
   void dispose() {
+    _pageController?.removeListener(_onPageChanged);
     _focusNode.dispose();
     super.dispose();
+  }
+
+  void _onPageChanged() {
+    if (!mounted || _pageController == null || !_pageController!.hasClients) {
+      return;
+    }
+    final controller = context.read<PostController?>();
+    final items = controller?.items;
+    if (items == null) return;
+    final currentPage = _pageController!.page?.round() ?? 0;
+    final myIndex = items.indexWhere((p) => p.id == widget.post.id);
+    if (myIndex == currentPage && !_focusNode.hasFocus) {
+      _focusNode.requestFocus();
+    }
   }
 
   void _showAction(_FullscreenAction action) {
