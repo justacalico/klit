@@ -686,6 +686,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get postTakePhoto => '拍照？';
 
   @override
+  String get cameraCapture => '拍摄';
+
+  @override
+  String get cameraRetake => '重拍';
+
+  @override
+  String get cameraNoCameras => '未找到摄像头';
+
+  @override
+  String get cameraInitError => '无法初始化摄像头';
+
+  @override
   String get postStatusDeleted => '已删除';
 
   @override

@@ -1388,6 +1388,30 @@ abstract class AppLocalizations {
   /// **'Take a photo?'**
   String get postTakePhoto;
 
+  /// No description provided for @cameraCapture.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture'**
+  String get cameraCapture;
+
+  /// No description provided for @cameraRetake.
+  ///
+  /// In en, this message translates to:
+  /// **'Retake'**
+  String get cameraRetake;
+
+  /// No description provided for @cameraNoCameras.
+  ///
+  /// In en, this message translates to:
+  /// **'No cameras found'**
+  String get cameraNoCameras;
+
+  /// No description provided for @cameraInitError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not initialize the camera'**
+  String get cameraInitError;
+
   /// No description provided for @postStatusDeleted.
   ///
   /// In en, this message translates to:

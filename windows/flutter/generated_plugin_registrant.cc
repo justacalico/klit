@@ -7,6 +7,7 @@
 #include "generated_plugin_registrant.h"
 
 #include <app_links/app_links_plugin_c_api.h>
+#include <camera_desktop/camera_desktop_plugin.h>
 #include <file_selector_windows/file_selector_windows.h>
 #include <local_auth_windows/local_auth_plugin.h>
 #include <media_kit_libs_windows_video/media_kit_libs_windows_video_plugin_c_api.h>
@@ -20,6 +21,8 @@
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   AppLinksPluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("AppLinksPluginCApi"));
+  CameraDesktopPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("CameraDesktopPlugin"));
   FileSelectorWindowsRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("FileSelectorWindows"));
   LocalAuthPluginRegisterWithRegistrar(

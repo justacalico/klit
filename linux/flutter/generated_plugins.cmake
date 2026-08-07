@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  camera_desktop
   file_selector_linux
   gtk
   media_kit_libs_linux

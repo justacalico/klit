@@ -298,6 +298,10 @@
     }
   },
   "postTakePhoto": "拍照？",
+  "cameraCapture": "拍摄",
+  "cameraRetake": "重拍",
+  "cameraNoCameras": "未找到摄像头",
+  "cameraInitError": "无法初始化摄像头",
   "postStatusDeleted": "已删除",
   "postStatusUnsupported": "不支持",
   "postStatusUnavailable": "不可用",
