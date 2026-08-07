@@ -1059,6 +1059,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAccentColor => 'Accent color';
 
   @override
+  String get settingsAccentPreset => 'Preset';
+
+  @override
+  String get settingsAccentPresetDefault => 'Default';
+
+  @override
+  String get settingsAccentPresetPink => 'Pink';
+
+  @override
+  String get settingsAccentPresetRed => 'Red';
+
+  @override
+  String get settingsAccentPresetPurple => 'Purple';
+
+  @override
+  String get settingsAccentPresetIndigo => 'Indigo';
+
+  @override
+  String get settingsAccentPresetBlue => 'Blue';
+
+  @override
+  String get settingsAccentPresetTeal => 'Teal';
+
+  @override
+  String get settingsAccentPresetGreen => 'Green';
+
+  @override
   String get settingsTileSize => 'Tile size';
 
   @override

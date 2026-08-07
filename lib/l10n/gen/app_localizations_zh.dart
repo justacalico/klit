@@ -1048,6 +1048,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsAccentColor => '强调色';
 
   @override
+  String get settingsAccentPreset => '预设';
+
+  @override
+  String get settingsAccentPresetDefault => '默认';
+
+  @override
+  String get settingsAccentPresetPink => '粉色';
+
+  @override
+  String get settingsAccentPresetRed => '红色';
+
+  @override
+  String get settingsAccentPresetPurple => '紫色';
+
+  @override
+  String get settingsAccentPresetIndigo => '靛蓝';
+
+  @override
+  String get settingsAccentPresetBlue => '蓝色';
+
+  @override
+  String get settingsAccentPresetTeal => '青色';
+
+  @override
+  String get settingsAccentPresetGreen => '绿色';
+
+  @override
   String get settingsTileSize => '磁贴大小';
 
   @override

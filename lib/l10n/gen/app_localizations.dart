@@ -2000,6 +2000,60 @@ abstract class AppLocalizations {
   /// **'Accent color'**
   String get settingsAccentColor;
 
+  /// No description provided for @settingsAccentPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset'**
+  String get settingsAccentPreset;
+
+  /// No description provided for @settingsAccentPresetDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get settingsAccentPresetDefault;
+
+  /// No description provided for @settingsAccentPresetPink.
+  ///
+  /// In en, this message translates to:
+  /// **'Pink'**
+  String get settingsAccentPresetPink;
+
+  /// No description provided for @settingsAccentPresetRed.
+  ///
+  /// In en, this message translates to:
+  /// **'Red'**
+  String get settingsAccentPresetRed;
+
+  /// No description provided for @settingsAccentPresetPurple.
+  ///
+  /// In en, this message translates to:
+  /// **'Purple'**
+  String get settingsAccentPresetPurple;
+
+  /// No description provided for @settingsAccentPresetIndigo.
+  ///
+  /// In en, this message translates to:
+  /// **'Indigo'**
+  String get settingsAccentPresetIndigo;
+
+  /// No description provided for @settingsAccentPresetBlue.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get settingsAccentPresetBlue;
+
+  /// No description provided for @settingsAccentPresetTeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Teal'**
+  String get settingsAccentPresetTeal;
+
+  /// No description provided for @settingsAccentPresetGreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Green'**
+  String get settingsAccentPresetGreen;
+
   /// No description provided for @settingsTileSize.
   ///
   /// In en, this message translates to:

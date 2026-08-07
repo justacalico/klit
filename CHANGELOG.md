@@ -1,6 +1,7 @@
 # Changelog
 
 # 11.0.0 (Unreleased)
+- Replaced the Cupertino-style accent color picker popup with a Material dialog popout matching the add account UI ([!46](https://gitlab.com/Openlyst/klit/-/merge_requests/46))
 - Added a star toggle button next to the menu on feed cards to quickly include or exclude favorited posts without opening the editor: filled star when favorites are included, struck-through star when excluded ([!45](https://gitlab.com/Openlyst/klit/-/merge_requests/45))
 - Fixed subfeed tag conflicts producing zero results: when a tag appears as both include and exclude across the feed and subfeed chain, both are silently cancelled out ([!43](https://gitlab.com/Openlyst/klit/-/merge_requests/43))
 - Fixed arrow keys and A/D not navigating between posts in fullscreen view by adding left/right handling to the fullscreen key handler and exposing the page controller to fullscreen items ([!42](https://gitlab.com/Openlyst/klit/-/merge_requests/42))
