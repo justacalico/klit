@@ -1,6 +1,7 @@
 # Changelog
 
 # 11.0.0 (Unreleased)
+- Added desktop camera support for the iFinished photo feature on macOS, Windows, and Linux via a new capture dialog with live preview, capture, and retake; removed the mobile-only restriction on the Request Photo setting ([!47](https://gitlab.com/Openlyst/klit/-/merge_requests/47))
 - Replaced the Cupertino-style accent color picker popup with a Material dialog popout matching the add account UI ([!46](https://gitlab.com/Openlyst/klit/-/merge_requests/46))
 - Added a star toggle button next to the menu on feed cards to quickly include or exclude favorited posts without opening the editor: filled star when favorites are included, struck-through star when excluded ([!45](https://gitlab.com/Openlyst/klit/-/merge_requests/45))
 - Fixed subfeed tag conflicts producing zero results: when a tag appears as both include and exclude across the feed and subfeed chain, both are silently cancelled out ([!43](https://gitlab.com/Openlyst/klit/-/merge_requests/43))
