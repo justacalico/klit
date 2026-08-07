@@ -11,6 +11,7 @@ import 'package:kilt/settings/settings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:photo_view/photo_view.dart';
 
 class FinishesPage extends StatelessWidget {
   const FinishesPage({super.key});
@@ -152,49 +153,36 @@ class _FinishTile extends StatelessWidget {
             File(finish.photoPath!).existsSync();
         return Material(
           type: MaterialType.transparency,
-          child: InkWell(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (context) => PostLoadingPage(finish.postId),
-                ),
-              );
-            },
+          child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _buildPostImage(context, postThumb),
+                      ),
+                      if (hasFinishPhoto) ...[
+                        const SizedBox(width: 4),
                         Expanded(
-                          child: _buildPostImage(context, postThumb),
+                          child: _buildFinishPhoto(context, finish.photoPath!),
                         ),
-                        if (hasFinishPhoto) ...[
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: Image.file(
-                                File(finish.photoPath!),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        ],
                       ],
-                    ),
+                    ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 6,
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 6,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          onTap: () => _openPost(context),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
@@ -221,21 +209,21 @@ class _FinishTile extends StatelessWidget {
                             ],
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.delete_outline),
-                          onPressed: onDelete,
-                          iconSize: 20,
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(
-                            minWidth: 32,
-                            minHeight: 32,
-                          ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline),
+                        onPressed: onDelete,
+                        iconSize: 20,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: 32,
+                          minHeight: 32,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
@@ -243,12 +231,32 @@ class _FinishTile extends StatelessWidget {
     );
   }
 
+  void _openPost(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => PostLoadingPage(finish.postId),
+      ),
+    );
+  }
+
+  void _openFinishPhoto(BuildContext context, String path) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => _FinishPhotoViewer(path: path),
+      ),
+    );
+  }
+
   Widget _buildPostImage(BuildContext context, String? postThumb) {
+    void openPost() => _openPost(context);
     if (postThumb == null) {
-      return ColoredBox(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        child: const Center(
-          child: Icon(Icons.image_not_supported, size: 40),
+      return GestureDetector(
+        onTap: openPost,
+        child: ColoredBox(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+          child: const Center(
+            child: Icon(Icons.image_not_supported, size: 40),
+          ),
         ),
       );
     }
@@ -256,17 +264,33 @@ class _FinishTile extends StatelessWidget {
     final imageUrl = (parsed?.hasScheme ?? false)
         ? postThumb
         : context.read<Client>().withHost(postThumb);
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(4),
-      child: CachedNetworkImage(
-        imageUrl: imageUrl,
-        fit: BoxFit.cover,
-        cacheManager: context.read<BaseCacheManager>(),
-        errorWidget: (context, url, error) => ColoredBox(
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          child: const Center(
-            child: Icon(Icons.image_not_supported, size: 40),
+    return GestureDetector(
+      onTap: openPost,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: CachedNetworkImage(
+          imageUrl: imageUrl,
+          fit: BoxFit.cover,
+          cacheManager: context.read<BaseCacheManager>(),
+          errorWidget: (context, url, error) => ColoredBox(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            child: const Center(
+              child: Icon(Icons.image_not_supported, size: 40),
+            ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFinishPhoto(BuildContext context, String path) {
+    return GestureDetector(
+      onTap: () => _openFinishPhoto(context, path),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: Image.file(
+          File(path),
+          fit: BoxFit.cover,
         ),
       ),
     );
@@ -281,5 +305,30 @@ class _FinishTile extends StatelessWidget {
     }
     return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')} '
         '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+  }
+}
+
+class _FinishPhotoViewer extends StatelessWidget {
+  const _FinishPhotoViewer({required this.path});
+
+  final String path;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      body: PhotoView.customChild(
+        backgroundDecoration: const BoxDecoration(color: Colors.black),
+        minScale: PhotoViewComputedScale.contained,
+        maxScale: PhotoViewComputedScale.covered * 4,
+        initialScale: PhotoViewComputedScale.contained,
+        child: Image.file(File(path)),
+      ),
+    );
   }
 }
