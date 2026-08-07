@@ -48,6 +48,11 @@ class _PostDetailState extends State<PostDetail> {
     final physicalKey = event.physicalKey;
     final logicalKey = event.logicalKey;
 
+    if (logicalKey == LogicalKeyboardKey.escape) {
+      Navigator.of(context).maybePop();
+      return KeyEventResult.handled;
+    }
+
     if (physicalKey == PhysicalKeyboardKey.arrowLeft ||
         logicalKey == LogicalKeyboardKey.keyA) {
       _goToAdjacentPost(-1);
