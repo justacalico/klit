@@ -1136,6 +1136,18 @@ abstract class AppLocalizations {
   /// **'Don\'t show posts you\'ve favorited in this feed'**
   String get feedsExcludeFavoritedHelper;
 
+  /// No description provided for @feedsIncludeFavoritesTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Includes favorited posts. Tap to exclude them.'**
+  String get feedsIncludeFavoritesTooltip;
+
+  /// No description provided for @feedsExcludeFavoritesTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Excludes favorited posts. Tap to include them.'**
+  String get feedsExcludeFavoritesTooltip;
+
   /// No description provided for @feedImage.
   ///
   /// In en, this message translates to:

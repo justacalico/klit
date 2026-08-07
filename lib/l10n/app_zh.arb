@@ -205,6 +205,8 @@
   "feedsExtraExcludeTagsLabel": "在此子订阅源中排除的标签",
   "feedsExcludeFavorited": "排除已收藏",
   "feedsExcludeFavoritedHelper": "不显示您已收藏的帖子",
+  "feedsIncludeFavoritesTooltip": "包含已收藏的帖子。点击以排除。",
+  "feedsExcludeFavoritesTooltip": "排除已收藏的帖子。点击以包含。",
   "feedImage": "图片",
   "feedVideo": "视频",
   "feedImageAndVideo": "图片和视频",
