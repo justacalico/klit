@@ -20,10 +20,21 @@ VideoControllerConfiguration _videoControllerConfig() {
 }
 
 class VideoPlayer extends Player {
-  VideoPlayer() {
+  VideoPlayer(this.key) {
     controller.waitUntilFirstFrameRendered.then((_) => _initialized.add(true));
     stream.error.first.then((_) => _initialized.add(true));
+    // Loop manually instead of using PlaylistMode.single. mpv's loop-file
+    // can freeze the video frame on loop while audio keeps playing, and
+    // the position stream sometimes stalls at 0:00 after a loop boundary.
+    // Re-opening the media fully resets the decoder state on each loop.
+    _completedSubscription = stream.completed.listen((completed) async {
+      if (completed && looping && !_disposed) {
+        await open(Media(key), play: true);
+      }
+    });
   }
+
+  final String key;
 
   late final VideoController _controller =
       VideoController(this, configuration: _videoControllerConfig());
@@ -33,6 +44,18 @@ class VideoPlayer extends Player {
   Stream<bool> get initialized => _initialized.stream;
 
   bool get isInitialized => _initialized.value;
+
+  bool looping = true;
+
+  bool _disposed = false;
+  StreamSubscription<bool>? _completedSubscription;
+
+  @override
+  Future<void> dispose() {
+    _disposed = true;
+    _completedSubscription?.cancel();
+    return super.dispose();
+  }
 }
 
 class VideoService extends ChangeNotifier {
@@ -68,9 +91,8 @@ class VideoService extends ChangeNotifier {
       disposeVideo(loaded.keys.first);
     }
     return _videos.putIfAbsent(key, () {
-      VideoPlayer player = VideoPlayer();
+      VideoPlayer player = VideoPlayer(key);
       player.open(Media(key), play: false);
-      player.setPlaylistMode(PlaylistMode.single);
       player.setVolume(_muteVideos ? 0 : 100);
       return player;
     });
