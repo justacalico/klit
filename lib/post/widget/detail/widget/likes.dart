@@ -5,6 +5,7 @@ import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
+import 'package:kilt/post/widget/detail/widget/desktop_camera_dialog.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
@@ -424,28 +425,55 @@ class _IFinishedButtonState extends State<_IFinishedButton> {
     HapticFeedback.selectionClick();
     final client = context.read<Client>();
     String? photoPath;
-    final requestPhoto =
-        widget.settings.iFinishedRequestPhoto.value &&
-        (Platform.isIOS || Platform.isAndroid);
+    final requestPhoto = widget.settings.iFinishedRequestPhoto.value;
     if (requestPhoto) {
-      final source = await _showPhotoSourceSheet(context);
-      if (source == null) {
-        setState(() => _lock = false);
-        return;
-      }
-      if (source != _PhotoSource.skip) {
-        final picker = ImagePicker();
-        final sourceType = source == _PhotoSource.camera
-            ? ImageSource.camera
-            : ImageSource.gallery;
-        final file = await picker.pickImage(source: sourceType);
-        if (file != null) {
-          final dir = await getTemporaryDirectory();
-          final name =
-              'finish_${widget.post.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-          final dest = File('${dir.path}/$name');
-          await dest.writeAsBytes(await file.readAsBytes());
-          photoPath = dest.path;
+      final isDesktop =
+          Platform.isMacOS || Platform.isWindows || Platform.isLinux;
+      if (isDesktop) {
+        final source = await _showPhotoSourceSheet(context);
+        if (source == null) {
+          setState(() => _lock = false);
+          return;
+        }
+        if (source == _PhotoSource.skip) {
+          // skip: no photo
+        } else if (!mounted) {
+          return;
+        } else if (source == _PhotoSource.camera) {
+          final path = await showDesktopCameraDialog(context);
+          if (path != null) photoPath = path;
+        } else {
+          final picker = ImagePicker();
+          final file = await picker.pickImage(source: ImageSource.gallery);
+          if (file != null) {
+            final dir = await getTemporaryDirectory();
+            final name =
+                'finish_${widget.post.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+            final dest = File('${dir.path}/$name');
+            await dest.writeAsBytes(await file.readAsBytes());
+            photoPath = dest.path;
+          }
+        }
+      } else {
+        final source = await _showPhotoSourceSheet(context);
+        if (source == null) {
+          setState(() => _lock = false);
+          return;
+        }
+        if (source != _PhotoSource.skip) {
+          final picker = ImagePicker();
+          final sourceType = source == _PhotoSource.camera
+              ? ImageSource.camera
+              : ImageSource.gallery;
+          final file = await picker.pickImage(source: sourceType);
+          if (file != null) {
+            final dir = await getTemporaryDirectory();
+            final name =
+                'finish_${widget.post.id}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+            final dest = File('${dir.path}/$name');
+            await dest.writeAsBytes(await file.readAsBytes());
+            photoPath = dest.path;
+          }
         }
       }
     }

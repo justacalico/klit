@@ -987,8 +987,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             valueListenable: settings.iFinishedEnabled,
             builder: (context, enabled, _) {
               if (!enabled) return const SizedBox.shrink();
-              final isMobile = Platform.isIOS || Platform.isAndroid;
-              if (!isMobile) return const SizedBox.shrink();
               return ValueListenableBuilder<bool>(
                 valueListenable: settings.iFinishedRequestPhoto,
                 builder: (context, value, _) => SettingsSwitchTile(

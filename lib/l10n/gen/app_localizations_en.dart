@@ -695,6 +695,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get postTakePhoto => 'Take a photo?';
 
   @override
+  String get cameraCapture => 'Capture';
+
+  @override
+  String get cameraRetake => 'Retake';
+
+  @override
+  String get cameraNoCameras => 'No cameras found';
+
+  @override
+  String get cameraInitError => 'Could not initialize the camera';
+
+  @override
   String get postStatusDeleted => 'deleted';
 
   @override

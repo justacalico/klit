@@ -298,6 +298,10 @@
     }
   },
   "postTakePhoto": "Take a photo?",
+  "cameraCapture": "Capture",
+  "cameraRetake": "Retake",
+  "cameraNoCameras": "No cameras found",
+  "cameraInitError": "Could not initialize the camera",
   "postStatusDeleted": "deleted",
   "postStatusUnsupported": "unsupported",
   "postStatusUnavailable": "unavailable",
