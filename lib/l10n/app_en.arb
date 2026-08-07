@@ -205,6 +205,8 @@
   "feedsExtraExcludeTagsLabel": "Tags to exclude in this subfeed",
   "feedsExcludeFavorited": "Exclude favorited",
   "feedsExcludeFavoritedHelper": "Don't show posts you've favorited in this feed",
+  "feedsIncludeFavoritesTooltip": "Includes favorited posts. Tap to exclude them.",
+  "feedsExcludeFavoritesTooltip": "Excludes favorited posts. Tap to include them.",
   "feedImage": "Image",
   "feedVideo": "Video",
   "feedImageAndVideo": "Image & video",

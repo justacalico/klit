@@ -177,6 +177,11 @@ class _FeedsPageState extends State<FeedsPage> {
                   onOpenSubfeed: (path) => _openFeed(context, feed, path: path),
                   onEdit: () => _openEdit(context, feed),
                   onDelete: () => _confirmDelete(context, feed),
+                  onToggleExcludeFavorites: () {
+                    context
+                        .read<FeedsProvider>()
+                        .updateFeed(feed.copyWith(excludeFavorites: !feed.excludeFavorites));
+                  },
                 );
               },
             );
@@ -232,6 +237,65 @@ class _FeedActionsButton extends StatelessWidget {
   }
 }
 
+class _FeedFavoritesToggle extends StatelessWidget {
+  const _FeedFavoritesToggle({
+    required this.excludeFavorites,
+    required this.onToggle,
+  });
+
+  final bool excludeFavorites;
+  final VoidCallback onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final color = CupertinoColors.label.resolveFrom(context);
+    final icon = excludeFavorites
+        ? _StrikethroughIcon(Icons.star, color: color)
+        : Icon(Icons.star, size: 20, color: color);
+    return Tooltip(
+      message: excludeFavorites
+          ? l10n.feedsExcludeFavoritesTooltip
+          : l10n.feedsIncludeFavoritesTooltip,
+      child: CupertinoButton(
+        padding: EdgeInsets.zero,
+        minimumSize: const Size(0, 0),
+        onPressed: onToggle,
+        child: icon,
+      ),
+    );
+  }
+}
+
+class _StrikethroughIcon extends StatelessWidget {
+  const _StrikethroughIcon(this.iconData, {required this.color});
+
+  final IconData iconData;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 20,
+      height: 20,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Icon(iconData, size: 20, color: color),
+          Transform.rotate(
+            angle: 0.5,
+            child: Container(
+              width: 26,
+              height: 1.6,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _FeedCard extends StatelessWidget {
   const _FeedCard({
     required this.feed,
@@ -239,6 +303,7 @@ class _FeedCard extends StatelessWidget {
     required this.onOpenSubfeed,
     required this.onEdit,
     required this.onDelete,
+    required this.onToggleExcludeFavorites,
   });
 
   final Feed feed;
@@ -246,6 +311,7 @@ class _FeedCard extends StatelessWidget {
   final void Function(List<int> path) onOpenSubfeed;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final VoidCallback onToggleExcludeFavorites;
 
   static void _collectEntries(List<SubFeed> level, List<int> path, List<({List<int> path, String name, int depth})> out, int depth, AppLocalizations l10n) {
     for (var i = 0; i < level.length; i++) {
@@ -315,6 +381,10 @@ class _FeedCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),
+                _FeedFavoritesToggle(
+                  excludeFavorites: feed.excludeFavorites,
+                  onToggle: onToggleExcludeFavorites,
                 ),
                 _FeedActionsButton(
                   onEdit: onEdit,

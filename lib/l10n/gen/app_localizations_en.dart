@@ -544,6 +544,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Don\'t show posts you\'ve favorited in this feed';
 
   @override
+  String get feedsIncludeFavoritesTooltip =>
+      'Includes favorited posts. Tap to exclude them.';
+
+  @override
+  String get feedsExcludeFavoritesTooltip =>
+      'Excludes favorited posts. Tap to include them.';
+
+  @override
   String get feedImage => 'Image';
 
   @override

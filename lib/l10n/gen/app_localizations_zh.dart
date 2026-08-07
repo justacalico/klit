@@ -540,6 +540,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get feedsExcludeFavoritedHelper => '不显示您已收藏的帖子';
 
   @override
+  String get feedsIncludeFavoritesTooltip => '包含已收藏的帖子。点击以排除。';
+
+  @override
+  String get feedsExcludeFavoritesTooltip => '排除已收藏的帖子。点击以包含。';
+
+  @override
   String get feedImage => '图片';
 
   @override
