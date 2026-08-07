@@ -13,7 +13,7 @@ on:
       create_release:
         description: 'Publish a nightly release from this build (leave unchecked for plain branch builds)'
         type: boolean
-        default: false
+        default: true
 
 permissions:
   contents: write
