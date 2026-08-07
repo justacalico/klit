@@ -541,31 +541,33 @@ enum _PhotoSource { camera, gallery, skip }
 
 Future<_PhotoSource?> _showPhotoSourceSheet(BuildContext context) async {
   final l10n = AppLocalizations.of(context);
-  return showCupertinoModalPopup<_PhotoSource>(
+  return showDialog<_PhotoSource>(
     context: context,
-    builder: (ctx) => SafeArea(
-      child: CupertinoActionSheet(
-        title: Text(l10n.postTakePhoto),
-        actions: [
-          CupertinoActionSheetAction(
-            onPressed: () => Navigator.pop(ctx, _PhotoSource.camera),
-            child: Text(l10n.commonCamera),
+    builder: (ctx) => SimpleDialog(
+      title: Text(l10n.postTakePhoto),
+      children: [
+        SimpleDialogOption(
+          onPressed: () => Navigator.pop(ctx, _PhotoSource.camera),
+          child: ListMenuTile(
+            leading: const Icon(Icons.camera_alt),
+            title: Text(l10n.commonCamera),
           ),
-          CupertinoActionSheetAction(
-            onPressed: () => Navigator.pop(ctx, _PhotoSource.gallery),
-            child: Text(l10n.commonGallery),
-          ),
-          CupertinoActionSheetAction(
-            onPressed: () => Navigator.pop(ctx, _PhotoSource.skip),
-            child: Text(l10n.commonSkip),
-          ),
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          isDefaultAction: true,
-          onPressed: () => Navigator.pop(ctx),
-          child: Text(l10n.commonCancel),
         ),
-      ),
+        SimpleDialogOption(
+          onPressed: () => Navigator.pop(ctx, _PhotoSource.gallery),
+          child: ListMenuTile(
+            leading: const Icon(Icons.photo_library),
+            title: Text(l10n.commonGallery),
+          ),
+        ),
+        SimpleDialogOption(
+          onPressed: () => Navigator.pop(ctx, _PhotoSource.skip),
+          child: ListMenuTile(
+            leading: const Icon(Icons.skip_next),
+            title: Text(l10n.commonSkip),
+          ),
+        ),
+      ],
     ),
   );
 }
