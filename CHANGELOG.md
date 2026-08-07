@@ -1,6 +1,7 @@
 # Changelog
 
 # 11.0.0 (Unreleased)
+- Pressing ESC now closes the post detail page on desktop ([!51](https://gitlab.com/Openlyst/klit/-/merge_requests/51))
 - Fixed Linux x64/arm64 builds failing due to missing GStreamer development packages required by the camera_desktop plugin ([!50](https://gitlab.com/Openlyst/klit/-/merge_requests/50))
 - Replaced the Cupertino-style photo source action sheet (camera/gallery/skip) with a Material SimpleDialog matching the popup menu style used elsewhere in the app ([!49](https://gitlab.com/Openlyst/klit/-/merge_requests/49))
 - On the Finishes page, tapping a post thumbnail now opens that post's detail view, and tapping the finish photo opens a fullscreen zoomable image viewer ([!48](https://gitlab.com/Openlyst/klit/-/merge_requests/48))
