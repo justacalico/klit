@@ -108,6 +108,7 @@ jobs:
             clang cmake ninja-build pkg-config \
             libgtk-3-dev liblzma-dev libstdc++-12-dev libsecret-1-dev \
             libmpv-dev libasound2-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
             dpkg-dev rpm wget file squashfs-tools patchelf libfuse2
           flutter config --enable-linux-desktop
 
