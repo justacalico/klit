@@ -1409,112 +1409,103 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final l10n = AppLocalizations.of(context);
     var selected = colorFromHex(settings.accentColorHex.value);
 
-    showCupertinoModalPopup<void>(
+    showDialog<void>(
       context: context,
-      builder: (context) => SafeArea(
-        top: false,
-        child: StatefulBuilder(
-          builder: (context, setSheetState) => GlassSurface(
-            margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-            padding: const EdgeInsets.all(12),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 560),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
-                      child: Text(
-                        l10n.settingsAccentColor,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: _accentPresets.map((color) {
-                        final isSelected =
-                            hexFromColor(color) == hexFromColor(selected);
-                        return GestureDetector(
-                          onTap: () {
-                            HapticFeedback.selectionClick();
-                            setSheetState(() => selected = color);
-                          },
-                          child: Container(
-                            width: 34,
-                            height: 34,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: color,
-                              border: Border.all(
-                                color: isSelected
-                                    ? Theme.of(context).colorScheme.onSurface
-                                    : Theme.of(context).dividerColor,
-                                width: isSelected ? 2 : 1,
-                              ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setSheetState) => Dialog(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    l10n.settingsAccentColor,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: _accentPresets.map((color) {
+                      final isSelected =
+                          hexFromColor(color) == hexFromColor(selected);
+                      return GestureDetector(
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          setSheetState(() => selected = color);
+                        },
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: color,
+                            border: Border.all(
+                              color: isSelected
+                                  ? Theme.of(context).colorScheme.onSurface
+                                  : Theme.of(context).dividerColor,
+                              width: isSelected ? 2 : 1,
                             ),
                           ),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 14),
-                    ColorPicker(
-                      pickerColor: selected,
-                      onColorChanged: (value) {
-                        setSheetState(() => selected = value.withAlpha(255));
-                      },
-                      colorPickerWidth: 300,
-                      pickerAreaHeightPercent: 0.6,
-                      enableAlpha: false,
-                      displayThumbColor: true,
-                      portraitOnly: true,
-                      hexInputBar: false,
-                      labelTypes: const [],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      hexFromColor(selected),
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: Text(l10n.commonCancel),
                         ),
-                        const SizedBox(width: 6),
-                        TextButton(
-                          onPressed: () {
-                            HapticFeedback.selectionClick();
-                            settings.accentColorHex.value =
-                                defaultAccentColorHex;
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(l10n.commonReset),
-                        ),
-                        const SizedBox(width: 6),
-                        FilledButton(
-                          onPressed: () {
-                            HapticFeedback.selectionClick();
-                            settings.accentColorHex.value = hexFromColor(
-                              selected,
-                            );
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(l10n.commonSave),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 14),
+                  ColorPicker(
+                    pickerColor: selected,
+                    onColorChanged: (value) {
+                      setSheetState(() => selected = value.withAlpha(255));
+                    },
+                    colorPickerWidth: 300,
+                    pickerAreaHeightPercent: 0.6,
+                    enableAlpha: false,
+                    displayThumbColor: true,
+                    portraitOnly: true,
+                    hexInputBar: false,
+                    labelTypes: const [],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    hexFromColor(selected),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text(l10n.commonCancel),
+                      ),
+                      const SizedBox(width: 6),
+                      TextButton(
+                        onPressed: () {
+                          HapticFeedback.selectionClick();
+                          settings.accentColorHex.value =
+                              defaultAccentColorHex;
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(l10n.commonReset),
+                      ),
+                      const SizedBox(width: 6),
+                      FilledButton(
+                        onPressed: () {
+                          HapticFeedback.selectionClick();
+                          settings.accentColorHex.value = hexFromColor(
+                            selected,
+                          );
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(l10n.commonSave),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
