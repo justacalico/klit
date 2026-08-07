@@ -1,6 +1,7 @@
 # Changelog
 
 # 11.0.0 (Unreleased)
+- Replaced the Cupertino-style photo source action sheet (camera/gallery/skip) with a Material SimpleDialog matching the popup menu style used elsewhere in the app ([!49](https://gitlab.com/Openlyst/klit/-/merge_requests/49))
 - On the Finishes page, tapping a post thumbnail now opens that post's detail view, and tapping the finish photo opens a fullscreen zoomable image viewer ([!48](https://gitlab.com/Openlyst/klit/-/merge_requests/48))
 - Added desktop camera support for the iFinished photo feature on macOS, Windows, and Linux via a new capture dialog with live preview, capture, and retake; removed the mobile-only restriction on the Request Photo setting ([!47](https://gitlab.com/Openlyst/klit/-/merge_requests/47))
 - Replaced the Cupertino-style accent color picker popup with a Material dialog popout matching the add account UI ([!46](https://gitlab.com/Openlyst/klit/-/merge_requests/46))
