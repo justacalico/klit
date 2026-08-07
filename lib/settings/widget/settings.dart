@@ -1496,7 +1496,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     portraitOnly: true,
                     labelTypes: const [],
                     displayThumbColor: false,
-                    hexInputBar: true,
+                    hexInputBar: false,
                     pickerAreaBorderRadius: BorderRadius.circular(12),
                   ),
                   const SizedBox(height: 12),
