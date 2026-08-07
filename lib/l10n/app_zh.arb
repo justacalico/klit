@@ -546,6 +546,7 @@
   },
   "settingsTheme": "主题",
   "settingsAccentColor": "强调色",
+  "settingsAccentPreset": "预设",
   "settingsTileSize": "磁贴大小",
   "settingsTileSizeValue": "{value} 像素",
   "@settingsTileSizeValue": {

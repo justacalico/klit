@@ -546,6 +546,7 @@
   },
   "settingsTheme": "Theme",
   "settingsAccentColor": "Accent color",
+  "settingsAccentPreset": "Preset",
   "settingsTileSize": "Tile size",
   "settingsTileSizeValue": "{value} px",
   "@settingsTileSizeValue": {

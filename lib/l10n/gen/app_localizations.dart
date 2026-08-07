@@ -2000,6 +2000,12 @@ abstract class AppLocalizations {
   /// **'Accent color'**
   String get settingsAccentColor;
 
+  /// No description provided for @settingsAccentPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset'**
+  String get settingsAccentPreset;
+
   /// No description provided for @settingsTileSize.
   ///
   /// In en, this message translates to:

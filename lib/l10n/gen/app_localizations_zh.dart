@@ -1048,6 +1048,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsAccentColor => '强调色';
 
   @override
+  String get settingsAccentPreset => '预设';
+
+  @override
   String get settingsTileSize => '磁贴大小';
 
   @override

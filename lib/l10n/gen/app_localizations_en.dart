@@ -1059,6 +1059,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAccentColor => 'Accent color';
 
   @override
+  String get settingsAccentPreset => 'Preset';
+
+  @override
   String get settingsTileSize => 'Tile size';
 
   @override

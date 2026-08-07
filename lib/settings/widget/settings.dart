@@ -1444,39 +1444,46 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: _accentPresets.map((color) {
-                      final isSelected =
-                          hexFromColor(color) == hexFromColor(selected);
-                      return GestureDetector(
-                        onTap: () {
-                          HapticFeedback.selectionClick();
-                          setSheetState(() => selected = color);
-                        },
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: color,
-                            border: Border.all(
-                              color: Theme.of(context).dividerColor,
-                            ),
+                  InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: l10n.settingsAccentPreset,
+                      border: const OutlineInputBorder(),
+                    ),
+                    child: DropdownButton<Color>(
+                      value: _accentPresets
+                              .where((c) => hexFromColor(c) == hexFromColor(selected))
+                              .firstOrNull,
+                      isExpanded: true,
+                      underline: const SizedBox(),
+                      hint: Text(hexFromColor(selected)),
+                      items: _accentPresets.map((color) {
+                        return DropdownMenuItem<Color>(
+                          value: color,
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 22,
+                                height: 22,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: color,
+                                  border: Border.all(
+                                    color: Theme.of(context).dividerColor,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Text(hexFromColor(color)),
+                            ],
                           ),
-                          child: isSelected
-                              ? Icon(
-                                  Icons.check,
-                                  size: 18,
-                                  color: color.computeLuminance() > 0.5
-                                      ? Colors.black87
-                                      : Colors.white,
-                                )
-                              : null,
-                        ),
-                      );
-                    }).toList(),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        if (value == null) return;
+                        HapticFeedback.selectionClick();
+                        setSheetState(() => selected = value);
+                      },
+                    ),
                   ),
                   const SizedBox(height: 16),
                   ColorPicker(
