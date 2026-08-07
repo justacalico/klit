@@ -1410,6 +1410,17 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final l10n = AppLocalizations.of(context);
     var selected = colorFromHex(settings.accentColorHex.value);
 
+    final presets = <({Color color, String name})>[
+      (color: _accentPresets[0], name: l10n.settingsAccentPresetDefault),
+      (color: _accentPresets[1], name: l10n.settingsAccentPresetPink),
+      (color: _accentPresets[2], name: l10n.settingsAccentPresetRed),
+      (color: _accentPresets[3], name: l10n.settingsAccentPresetPurple),
+      (color: _accentPresets[4], name: l10n.settingsAccentPresetIndigo),
+      (color: _accentPresets[5], name: l10n.settingsAccentPresetBlue),
+      (color: _accentPresets[6], name: l10n.settingsAccentPresetTeal),
+      (color: _accentPresets[7], name: l10n.settingsAccentPresetGreen),
+    ];
+
     showDialog<void>(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -1455,10 +1466,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                               .firstOrNull,
                       isExpanded: true,
                       underline: const SizedBox(),
-                      hint: Text(hexFromColor(selected)),
-                      items: _accentPresets.map((color) {
+                      hint: Text(l10n.settingsAccentPresetDefault),
+                      items: presets.map((preset) {
                         return DropdownMenuItem<Color>(
-                          value: color,
+                          value: preset.color,
                           child: Row(
                             children: [
                               Container(
@@ -1466,14 +1477,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                                 height: 22,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: color,
+                                  color: preset.color,
                                   border: Border.all(
                                     color: Theme.of(context).dividerColor,
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 10),
-                              Text(hexFromColor(color)),
+                              Text(preset.name),
                             ],
                           ),
                         );
