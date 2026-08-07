@@ -15,7 +15,8 @@ import 'package:kilt/settings/widget/settings_shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart' show ColorPicker;
+import 'package:flutter_colorpicker/flutter_colorpicker.dart'
+    show ColorPicker, PaletteType;
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:flutter_sub/flutter_sub.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' hide Consumer;
@@ -1414,18 +1415,35 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       builder: (context) => StatefulBuilder(
         builder: (context, setSheetState) => Dialog(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 560),
+            constraints: const BoxConstraints(maxWidth: 400),
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    l10n.settingsAccentColor,
-                    style: Theme.of(context).textTheme.titleLarge,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          l10n.settingsAccentColor,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: selected,
+                          border: Border.all(
+                            color: Theme.of(context).dividerColor,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   Wrap(
                     spacing: 10,
                     runSpacing: 10,
@@ -1438,51 +1456,45 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                           setSheetState(() => selected = color);
                         },
                         child: Container(
-                          width: 34,
-                          height: 34,
+                          width: 36,
+                          height: 36,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: color,
                             border: Border.all(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.onSurface
-                                  : Theme.of(context).dividerColor,
-                              width: isSelected ? 2 : 1,
+                              color: Theme.of(context).dividerColor,
                             ),
                           ),
+                          child: isSelected
+                              ? Icon(
+                                  Icons.check,
+                                  size: 18,
+                                  color: color.computeLuminance() > 0.5
+                                      ? Colors.black87
+                                      : Colors.white,
+                                )
+                              : null,
                         ),
                       );
                     }).toList(),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   ColorPicker(
                     pickerColor: selected,
                     onColorChanged: (value) {
                       setSheetState(() => selected = value.withAlpha(255));
                     },
-                    colorPickerWidth: 300,
-                    pickerAreaHeightPercent: 0.6,
+                    paletteType: PaletteType.hueWheel,
                     enableAlpha: false,
-                    displayThumbColor: true,
                     portraitOnly: true,
-                    hexInputBar: false,
                     labelTypes: const [],
+                    displayThumbColor: false,
+                    hexInputBar: true,
+                    pickerAreaBorderRadius: BorderRadius.circular(12),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    hexFromColor(selected),
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: Text(l10n.commonCancel),
-                      ),
-                      const SizedBox(width: 6),
                       TextButton(
                         onPressed: () {
                           HapticFeedback.selectionClick();
@@ -1491,6 +1503,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                           Navigator.of(context).pop();
                         },
                         child: Text(l10n.commonReset),
+                      ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text(l10n.commonCancel),
                       ),
                       const SizedBox(width: 6),
                       FilledButton(
