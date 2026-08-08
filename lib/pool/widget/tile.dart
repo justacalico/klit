@@ -90,7 +90,7 @@ class PoolTile extends StatelessWidget {
                             ),
                           ),
                         ),
-                      if (image != null) image,
+                      ?image,
                     ],
                   ),
                 ),

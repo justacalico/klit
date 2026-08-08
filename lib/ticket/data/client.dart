@@ -18,7 +18,7 @@ class TicketClient {
         'ticket[qtype]': type.id,
         'ticket[disp_id]': item,
         'ticket[reason]': reason,
-        if (postReportType != null) 'ticket[report_reason]': postReportType,
+        'ticket[report_reason]': ?postReportType,
       },
       options: Options(validateStatus: (status) => status == 302),
     );

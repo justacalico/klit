@@ -61,7 +61,7 @@ class PostImageTile extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (bottomBar != null) bottomBar!,
+                ?bottomBar,
               ],
             ),
             Positioned(top: 0, right: 0, child: PostImageTag(post: post)),

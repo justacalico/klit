@@ -76,7 +76,7 @@ class LogRecordExpandable extends StatelessWidget {
                         color: Theme.of(context).cardColor,
                         child: Row(
                           children: [
-                            if (actions != null) ...actions!,
+                            ...?actions,
                             if (fullContent != null)
                               Builder(
                                 builder: (context) => InkWell(

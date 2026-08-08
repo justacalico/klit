@@ -119,7 +119,7 @@ class PostClient {
           '/popular.json',
           queryParameters: _withV2({
             'scale': scale,
-            if (date != null) 'date': date,
+            'date': ?date,
           }),
           options: forceOptions(force),
           cancelToken: cancelToken,

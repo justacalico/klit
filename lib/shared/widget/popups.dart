@@ -55,7 +55,7 @@ class ListMenuTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        if (leading != null) leading!,
+        ?leading,
         if (title != null)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

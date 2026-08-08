@@ -339,7 +339,7 @@ class _UserPageControllers {
   List<PostController> get all => [
     favoritePosts,
     uploadedPosts,
-    if (profilePost != null) profilePost!,
+    ?profilePost,
   ];
 
   final PostController favoritePosts;
