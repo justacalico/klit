@@ -25,14 +25,14 @@ abstract final class E621Post {
         final origH = video('original', 'height').asIntOrNull();
         final origUrl = video('original', 'url').asStringOrNull();
         if (origW != null && origH != null && origUrl != null) {
-          result['${origW}x${origH}'] = origUrl;
+          result['${origW}x$origH'] = origUrl;
         }
 
         final mp4W = video('variants', 'mp4', 'width').asIntOrNull();
         final mp4H = video('variants', 'mp4', 'height').asIntOrNull();
         final mp4Url = video('variants', 'mp4', 'url').asStringOrNull();
         if (mp4W != null && mp4H != null && mp4Url != null) {
-          result['${mp4W}x${mp4H}'] = mp4Url;
+          result['${mp4W}x$mp4H'] = mp4Url;
         }
 
         video('samples').asMapOrEmpty().forEach((_, value) {
@@ -40,7 +40,7 @@ abstract final class E621Post {
           final h = pick(value, 'height').asIntOrNull();
           final url = pick(value, 'url').asStringOrNull();
           if (w != null && h != null && url != null) {
-            result['${w}x${h}'] = url;
+            result['${w}x$h'] = url;
           }
         });
 
