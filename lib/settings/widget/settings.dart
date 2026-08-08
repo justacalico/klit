@@ -1235,11 +1235,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                             physics: const NeverScrollableScrollPhysics(),
                             buildDefaultDragHandles: false,
                             itemCount: selected.length,
-                            onReorder: (oldIndex, newIndex) {
+                            onReorderItem: (oldIndex, newIndex) {
                               setSheetState(() {
-                                if (newIndex > oldIndex) {
-                                  newIndex -= 1;
-                                }
                                 final action = selected.removeAt(oldIndex);
                                 selected.insert(newIndex, action);
                               });
