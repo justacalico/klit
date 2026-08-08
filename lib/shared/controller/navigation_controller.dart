@@ -11,6 +11,7 @@ class NavigationState {
     this.mobilePrimaryCount = 4,
     this.currentPath = AppRoutes.home,
     this.sidebarCollapsed = false,
+    this.sidebarUserCollapsed = false,
     this.profileViewUserId,
     this.profileViewUsername,
     this.searchInitialQuery,
@@ -20,6 +21,7 @@ class NavigationState {
   final int mobilePrimaryCount;
   final String currentPath;
   final bool sidebarCollapsed;
+  final bool sidebarUserCollapsed;
   final int? profileViewUserId;
   final String? profileViewUsername;
   final String? searchInitialQuery;
@@ -34,6 +36,7 @@ class NavigationState {
     int? mobilePrimaryCount,
     String? currentPath,
     bool? sidebarCollapsed,
+    bool? sidebarUserCollapsed,
     int? profileViewUserId,
     String? profileViewUsername,
     String? searchInitialQuery,
@@ -44,6 +47,7 @@ class NavigationState {
       mobilePrimaryCount: mobilePrimaryCount ?? this.mobilePrimaryCount,
       currentPath: currentPath ?? this.currentPath,
       sidebarCollapsed: sidebarCollapsed ?? this.sidebarCollapsed,
+      sidebarUserCollapsed: sidebarUserCollapsed ?? this.sidebarUserCollapsed,
       profileViewUserId: profileViewUserId ?? this.profileViewUserId,
       profileViewUsername: profileViewUsername ?? this.profileViewUsername,
       searchInitialQuery:
@@ -97,11 +101,20 @@ class NavigationNotifier extends Notifier<NavigationState> {
   }
 
   void toggleSidebar() {
-    state = state.copyWith(sidebarCollapsed: !state.sidebarCollapsed);
+    final next = !state.sidebarCollapsed;
+    state = state.copyWith(
+      sidebarCollapsed: next,
+      sidebarUserCollapsed: next,
+    );
   }
 
   void setSidebarCollapsed(bool collapsed) {
     state = state.copyWith(sidebarCollapsed: collapsed);
+  }
+
+  void autoExpandSidebar() {
+    if (state.sidebarUserCollapsed) return;
+    state = state.copyWith(sidebarCollapsed: false);
   }
 
   String goTo(int index) {
