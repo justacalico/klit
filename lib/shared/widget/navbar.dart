@@ -41,6 +41,8 @@ class _NavAdapter {
   void toggleSidebar() => _ref.read(navigationProvider.notifier).toggleSidebar();
   void setSidebarCollapsed(bool v) =>
       _ref.read(navigationProvider.notifier).setSidebarCollapsed(v);
+  void autoExpandSidebar() =>
+      _ref.read(navigationProvider.notifier).autoExpandSidebar();
 }
 
 class ResponsiveNavbar extends ConsumerWidget {
@@ -450,7 +452,7 @@ class _SidebarState extends State<_Sidebar> {
       if (newWidth >= sidebarAutoCollapseBreakpoint && wasNarrow) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
-          widget.controller.setSidebarCollapsed(false);
+          widget.controller.autoExpandSidebar();
         });
       } else if (!wasNarrow && isNarrow) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -479,7 +481,7 @@ class _SidebarState extends State<_Sidebar> {
         _lastLayoutWidth! < sidebarAutoCollapseBreakpoint) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        widget.controller.setSidebarCollapsed(false);
+        widget.controller.autoExpandSidebar();
         setState(() => _lastLayoutWidth = layoutWidth);
       });
     }
