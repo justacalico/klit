@@ -30,7 +30,7 @@ class DTextGrammar extends GrammarDefinition<DTextElement> {
     Parser<void>? limit,
   ]) => condense(
     [
-      if (other != null) other,
+      ?other,
       ref0(character),
     ].toChoiceParser().starLazy(limit ?? endOfInput()).map(DTextElements.new),
   );

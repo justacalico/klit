@@ -40,14 +40,14 @@ class ColoredCard extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
               ),
-            if (leading != null) leading!,
+            ?leading,
             Flexible(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                 child: child,
               ),
             ),
-            if (trailing case final trailing?) trailing,
+            ?trailing,
           ],
         );
     final body = (onTap != null || onLongPress != null)

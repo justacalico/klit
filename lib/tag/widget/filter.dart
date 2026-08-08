@@ -8,7 +8,7 @@ Widget? mergeSuffixIcons(InputDecoration? decoration, Widget? icon) {
       ? Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (icon != null) icon,
+            ?icon,
             const SizedBox(width: 8),
             decoration!.suffixIcon!,
           ],

@@ -67,7 +67,7 @@ class IconMessage extends StatelessWidget {
               Padding(padding: const EdgeInsets.only(bottom: 8), child: title),
             ],
           ),
-          if (action != null) action!,
+          ?action,
         ],
       ),
     );
