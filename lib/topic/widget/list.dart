@@ -3,6 +3,7 @@ import 'package:kilt/reply/reply.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/topic/topic.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 class TopicList extends StatelessWidget {
   const TopicList({super.key});
@@ -14,7 +15,7 @@ class TopicList extends StatelessWidget {
         onRefresh: () => controller.refresh(force: true, background: true),
         child: CustomScrollView(
           primary: true,
-          cacheExtent: 400,
+          scrollCacheExtent: ScrollCacheExtent.pixels(400),
           slivers: [
             SliverPadding(
               padding: defaultActionListPadding,

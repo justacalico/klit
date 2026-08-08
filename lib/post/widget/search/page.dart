@@ -4,6 +4,7 @@ import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
 import 'package:kilt/traits/traits.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 PreferredSizeWidget _emptyAppBar() => const PreferredSize(
     preferredSize: Size.zero,
@@ -75,7 +76,7 @@ class _PostsPageState extends State<PostsPage> {
                           ),
                           child: CustomScrollView(
                             primary: true,
-                            cacheExtent: 400,
+                            scrollCacheExtent: ScrollCacheExtent.pixels(400),
                             slivers: [
                               SliverPadding(
                                 padding: defaultActionListPadding,
@@ -106,7 +107,7 @@ class _PostsPageState extends State<PostsPage> {
                                   ),
                                   child: CustomScrollView(
                                     primary: true,
-                                    cacheExtent: 400,
+                                    scrollCacheExtent: ScrollCacheExtent.pixels(400),
                                     slivers: [
                                       SliverPadding(
                                         padding: defaultActionListPadding,
@@ -131,7 +132,7 @@ class _PostsPageState extends State<PostsPage> {
                                 widget.controller.refresh(force: true, background: true),
                             child: CustomScrollView(
                               primary: true,
-                              cacheExtent: 400,
+                              scrollCacheExtent: ScrollCacheExtent.pixels(400),
                               slivers: [
                                 SliverPadding(
                                   padding: defaultActionListPadding,
