@@ -462,30 +462,12 @@ class _SidebarState extends State<_Sidebar> {
       }
     }
 
-    final transitioningToWide =
-        newWidth != null &&
-        previousWidth != null &&
-        previousWidth < sidebarAutoCollapseBreakpoint &&
-        newWidth >= sidebarAutoCollapseBreakpoint;
-    if (!transitioningToWide) {
-      _lastLayoutWidth = newWidth;
-    }
+    _lastLayoutWidth = newWidth;
   }
 
   @override
   Widget build(BuildContext context) {
     final layoutWidth = widget.layoutWidth;
-    if (layoutWidth != null &&
-        layoutWidth >= sidebarAutoCollapseBreakpoint &&
-        _lastLayoutWidth != null &&
-        _lastLayoutWidth! < sidebarAutoCollapseBreakpoint) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        widget.controller.autoExpandSidebar();
-        setState(() => _lastLayoutWidth = layoutWidth);
-      });
-    }
-
     final controllerCollapsed = widget.controller.sidebarCollapsed;
       final forceCollapsed =
           layoutWidth != null &&
