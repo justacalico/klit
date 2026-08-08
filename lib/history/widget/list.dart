@@ -2,6 +2,7 @@ import 'package:kilt/history/history.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:grouped_list/grouped_list.dart';
 
 class HistoryList extends StatelessWidget {
@@ -15,7 +16,7 @@ class HistoryList extends StatelessWidget {
           onRefresh: () => controller.refresh(force: true, background: true),
           child: CustomScrollView(
             primary: true,
-            cacheExtent: 400,
+            scrollCacheExtent: ScrollCacheExtent.pixels(400),
             slivers: [
               SliverPadding(
                 padding: defaultActionListPadding,

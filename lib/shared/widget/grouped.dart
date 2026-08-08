@@ -25,7 +25,7 @@ class PagedGroupedListView<PageKeyType, ItemType, SortType>
     super.physics,
     super.shrinkWrap,
     super.padding,
-    super.cacheExtent,
+    super.scrollCacheExtent,
     super.semanticChildCount,
     super.dragStartBehavior,
     super.keyboardDismissBehavior,
