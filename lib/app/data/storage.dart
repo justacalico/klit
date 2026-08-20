@@ -52,10 +52,9 @@ class AppDatabase extends $AppDatabase {
     },
     onUpgrade: (m, from, to) async {
       if (from < 4) {
-        await customStatement('''
-              DELETE FROM identities_table
-              WHERE type != 'e621';
-              ''');
+        // Previously this migration deleted all non-e621 identities.
+        // We no longer drop them silently; TableMigration will migrate
+        // the remaining rows into the new schema instead.
         await m.alterTable(TableMigration(identitiesTable));
         await m.alterTable(
           TableMigration(
