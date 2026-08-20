@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/shared/widget/appbar.dart' as shared_appbar;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/shared/widget/appbar.dart' as shared_appbar;
 
 class DefaultCupertinoAppBar extends StatelessWidget
     implements ObstructingPreferredSizeWidget {
@@ -71,7 +71,7 @@ class DefaultCupertinoAppBar extends StatelessWidget
                 const Border(
                   bottom: BorderSide(
                     color: CupertinoColors.separator,
-                    width: 0.0,
+                    width: 0,
                   ),
                 ),
           );
@@ -101,4 +101,3 @@ class DefaultCupertinoAppBar extends StatelessWidget
     return leading;
   }
 }
-

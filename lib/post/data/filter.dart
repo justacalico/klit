@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0
 
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/foundation.dart';
 
 mixin PostFilterableController<KeyType> on DataController<KeyType, Post> {
   Client get client;
@@ -65,7 +65,7 @@ mixin PostFilterableController<KeyType> on DataController<KeyType, Post> {
   @override
   @protected
   List<Post>? filter(List<Post>? items) {
-    List<String> denylist = [];
+    var denylist = <String>[];
     if (denying && filterMode != PostFilterMode.unavailable) {
       denylist = client.traits.value.denylist
           .whereNot(_allowedTags.contains)
@@ -80,7 +80,7 @@ mixin PostFilterableController<KeyType> on DataController<KeyType, Post> {
     }
 
     _deniedPosts = {};
-    List<Post>? result = super.filter(items);
+    var result = super.filter(items);
     if (result != null) {
       result = {for (final p in result) p.id: p}.values.toList();
     }
@@ -89,11 +89,11 @@ mixin PostFilterableController<KeyType> on DataController<KeyType, Post> {
       if (_allowedPosts.contains(item.id)) return false;
       List<String>? deniers;
       if (previousDeniedPosts?.containsKey(item) ?? false) {
-        deniers = previousDeniedPosts![item]!;
+        deniers = previousDeniedPosts![item];
       } else {
         deniers = item.getDeniers(denylist).toList();
       }
-      if (deniers.isNotEmpty) {
+      if (deniers != null && deniers.isNotEmpty) {
         _deniedPosts![item] = deniers;
         if (filterMode != PostFilterMode.plain) return true;
       }

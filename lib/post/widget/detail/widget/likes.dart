@@ -2,6 +2,9 @@
 
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
@@ -10,9 +13,6 @@ import 'package:kilt/post/post.dart';
 import 'package:kilt/post/widget/detail/widget/desktop_camera_dialog.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:like_button/like_button.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -213,8 +213,8 @@ List<Widget> _buildActionButtons({
   final voteStatus = post.vote.status;
 
   Future<void> vote({required bool upvote, required bool isLiked}) async {
-    PostController controller = context.read<PostController>();
-    ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+    final controller = context.read<PostController>();
+    final messenger = ScaffoldMessenger.of(context);
     controller.vote(post: post, upvote: upvote, replace: !isLiked).then((
       value,
     ) {
@@ -642,7 +642,7 @@ class _AnimatedPostActionButtonState extends State<_AnimatedPostActionButton> {
               child: CupertinoButton(
                 onPressed: widget.onPressed,
                 padding: const EdgeInsets.symmetric(vertical: 10),
-                minimumSize: const Size(0, 0),
+                minimumSize: Size.zero,
                 child:
                     widget.child ??
                     Icon(widget.icon, size: 20, color: widget.foregroundColor),
@@ -693,8 +693,8 @@ Future<bool> _toggleFavorite({
   required bool isLiked,
 }) async {
   final l10n = AppLocalizations.of(context);
-  PostController controller = context.read<PostController>();
-  ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+  final controller = context.read<PostController>();
+  final messenger = ScaffoldMessenger.of(context);
   if (isLiked) {
     controller.unfav(post).then((value) {
       if (!value) {
@@ -708,7 +708,7 @@ Future<bool> _toggleFavorite({
     });
     return false;
   } else {
-    bool upvote = context.read<Settings>().upvoteFavs.value;
+    final upvote = context.read<Settings>().upvoteFavs.value;
     controller.fav(post).then((value) {
       if (value) {
         if (upvote) {

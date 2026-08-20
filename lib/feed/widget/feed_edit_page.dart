@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kilt/feed/data/feed.dart';
 import 'package:kilt/feed/feeds_provider.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 const OutlineInputBorder _roundedInputBorder = OutlineInputBorder(
   borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -300,7 +300,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
         actions: [
           CupertinoButton(
             padding: EdgeInsets.zero,
-            onPressed: _save, minimumSize: Size(0, 0),
+            onPressed: _save, minimumSize: Size.zero,
             child: Text(l10n.commonSave),
           ),
         ],
@@ -322,8 +322,6 @@ class _SectionCard extends StatelessWidget {
 
     if (isOled) {
       return GlassCard(
-        borderRadius: 16,
-        padding: const EdgeInsets.all(16),
         child: child,
       );
     }
@@ -446,7 +444,7 @@ class _SubfeedEditCardState extends State<_SubfeedEditCard> {
     final l10n = AppLocalizations.of(context);
     final isOled = theme.scaffoldBackgroundColor == Colors.black;
 
-    Widget content = Column(
+    final Widget content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
           Row(
@@ -530,7 +528,7 @@ class _SubfeedEditCardState extends State<_SubfeedEditCard> {
 
     if (isOled) {
       return GlassCard(
-        margin: const EdgeInsets.only(bottom: 0),
+        margin: EdgeInsets.zero,
         padding: const EdgeInsets.all(12),
         borderRadius: 12,
         child: content,
@@ -538,7 +536,7 @@ class _SubfeedEditCardState extends State<_SubfeedEditCard> {
     }
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 0),
+      margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(12),

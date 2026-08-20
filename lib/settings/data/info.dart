@@ -33,13 +33,10 @@ final class AppInfo extends PackageInfo {
     required String? kofi,
     required String? email,
   }) async {
-    PackageInfo info = await PackageInfo.fromPlatform();
-    Source source = await Future(() {
-      if (!Platform.isAndroid && !Platform.isIOS) {
-        return Source.UNKNOWN;
-      }
-      return StoreChecker.getSource;
-    });
+    final info = await PackageInfo.fromPlatform();
+    final source = (Platform.isAndroid || Platform.isIOS)
+        ? await StoreChecker.getSource
+        : Source.UNKNOWN;
     _instance = AppInfo._(
       developer: developer,
       github: github,

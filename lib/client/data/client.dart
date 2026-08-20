@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:kilt/account/account.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
@@ -20,7 +21,6 @@ import 'package:kilt/topic/topic.dart';
 import 'package:kilt/traits/traits.dart';
 import 'package:kilt/user/user.dart';
 import 'package:kilt/wiki/wiki.dart';
-import 'package:flutter/foundation.dart';
 
 export 'package:dio/dio.dart' show CancelToken;
 
@@ -91,7 +91,7 @@ class Client with Disposable {
   @override
   void dispose() {
     dio.close();
-    for (final client in [
+    [
       accounts,
       users,
       posts,
@@ -108,9 +108,7 @@ class Client with Disposable {
       historyServer,
       histories,
       finishes,
-    ]) {
-      Disposable.tryDispose(client);
-    }
+    ].forEach(Disposable.tryDispose);
     super.dispose();
   }
 }

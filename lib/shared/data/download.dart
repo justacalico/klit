@@ -77,7 +77,7 @@ abstract final class FileDownloader {
           target = directory;
         }
 
-        String lastSegment = Uri.parse(target).pathSegments.last;
+        final lastSegment = Uri.parse(target).pathSegments.last;
         if (folderName != null && lastSegment == 'Pictures') {
           try {
             final targetDir = await SafUtil().mkdirp(target, [folderName]);
@@ -102,23 +102,29 @@ abstract final class FileDownloader {
         // This should probably only happen in [downloadImage].
         await MediaScanner.loadMedia(path: target);
       } else {
-        String directoryPath =
-            directory ??
-            await _throwOnNull(pickDirectory(), 'No directory was selected.');
+        final directoryPath =
+            (directory ??
+                await _throwOnNull(
+                  pickDirectory(),
+                  'No directory was selected.',
+                ))!;
 
         onDirectoryChanged?.call(directoryPath);
 
+        final String effectivePath;
         if (folderName != null && basename(directoryPath) == 'Pictures') {
-          directoryPath = join(directoryPath, folderName);
+          effectivePath = join(directoryPath, folderName);
+        } else {
+          effectivePath = directoryPath;
         }
 
-        final targetDir = Directory(directoryPath);
+        final targetDir = Directory(effectivePath);
         if (!targetDir.existsSync()) {
           await targetDir.create(recursive: true);
         }
 
         final targetFile = File(
-          join(directoryPath, fileName ?? basename(file.path)),
+          join(effectivePath, fileName ?? basename(file.path)),
         );
         await targetFile.writeAsBytes(await file.readAsBytes());
       }
@@ -149,7 +155,7 @@ abstract final class FileDownloader {
   }
 
   static Future<T> _throwOnNull<T>(FutureOr<T?> future, String message) async {
-    T? result = await future;
+    final result = await future;
     if (result == null) {
       throw FileDownloadException(message);
     }

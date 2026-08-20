@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0
 
 import 'package:collection/collection.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/identity/identity.dart';
 import 'package:kilt/logs/logs.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:petitparser/core.dart';
 
 class DText extends StatefulWidget {
@@ -68,7 +68,7 @@ class _DTextState extends State<DText> {
   @override
   Widget build(BuildContext context) {
     if (error != null) {
-      Color errorColor = Theme.of(context).colorScheme.error;
+      final errorColor = Theme.of(context).colorScheme.error;
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -164,9 +164,9 @@ class DTextBody extends StatelessWidget {
   }
 
   InlineSpan _buildSpoiler(BuildContext context, DTextSpoiler element) {
-    SpoilerController spoilerController = context.watch<SpoilerController>();
+    final spoilerController = context.watch<SpoilerController>();
     spoilerController.register(element.id);
-    bool hidden = spoilerController.hidden(element.id);
+    final hidden = spoilerController.hidden(element.id);
     return TextSpan(
       children: wrapWithGesture(
         spans: [_buildSpan(context, element.children)],
@@ -188,24 +188,24 @@ class DTextBody extends StatelessWidget {
     bool? local,
   }) {
     local ??= false;
-    VoidCallback action = () => launch(link);
-    Uri? uri = Uri.tryParse(link);
+    VoidCallback? action = () { launch(link); };
+    final uri = Uri.tryParse(link);
     final clientHost = Uri.parse(normalizeHostUrl(context.read<Client>().host)).host;
     final home = uri != null && uri.host == clientHost;
     if (local || home) {
-      VoidCallback? linkAction = const E621LinkParser().parseOnTap(
+      final linkAction = const E621LinkParser().parseOnTap(
         context,
         link,
       );
       if (linkAction != null) {
         action = linkAction;
       } else {
-        action = () => launch(context.read<Client>().withHost(link));
+        action = () { launch(context.read<Client>().withHost(link)); };
       }
     }
 
-    LinkPreviewProviderState preview = LinkPreviewProvider.of(context);
-    String previewLink = local ? context.read<Client>().withHost(link) : link;
+    final preview = LinkPreviewProvider.of(context);
+    final previewLink = local ? context.read<Client>().withHost(link) : link;
 
     return TextSpan(
       children: wrapWithGesture(

@@ -49,7 +49,7 @@ class GlassSurface extends StatelessWidget {
               ),
             ),
             child: Padding(
-              padding: padding ?? const EdgeInsets.all(0),
+              padding: padding ?? EdgeInsets.zero,
               child: child,
             ),
           ),
@@ -148,4 +148,3 @@ class GlassBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 }
-

@@ -28,7 +28,7 @@ class TraitsTable extends Table {
 @DriftAccessor(tables: [IdentitiesTable, TraitsTable])
 class TraitsRepository extends DatabaseAccessor<GeneratedDatabase>
     with $TraitsRepositoryMixin {
-  TraitsRepository(super.db);
+  TraitsRepository(super.attachedDatabase);
 
   StreamFuture<Traits?> getOrNull(int id) {
     return (select(

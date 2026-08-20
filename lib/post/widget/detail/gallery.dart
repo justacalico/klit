@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/post/post.dart';
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/shared/shared.dart';
 
 class PostDetailGalleryWithShell extends StatefulWidget {
   const PostDetailGalleryWithShell({
@@ -51,9 +51,10 @@ class _PostDetailGalleryWithShellState extends State<PostDetailGalleryWithShell>
                   _currentIndex < items.length
               ? items[_currentIndex]
               : null;
-          final PreferredSizeWidget? appBar = post != null
-              ? PostDetailAppBar(post: post)
-              : const TransparentAppBar(child: DefaultAppBar());
+          final appBar = (post != null
+                  ? PostDetailAppBar(post: post)
+                  : const TransparentAppBar(child: DefaultAppBar()))
+              as PreferredSizeWidget;
           final body = PostDetailGallery(
             controller: widget.controller,
             pageController: _pageController,
@@ -71,7 +72,6 @@ class _PostDetailGalleryWithShellState extends State<PostDetailGalleryWithShell>
           if (widget.useShell) {
             return AppShell(
               appBar: appBar,
-              floatingActionButton: null,
               body: body,
             );
           }

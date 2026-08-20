@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/client/client.dart';
-import 'package:kilt/feed/data/feed.dart';
-import 'package:kilt/feed/feeds_provider.dart';
-import 'package:kilt/l10n/gen/app_localizations.dart';
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import 'feed_edit_page.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/feed/data/feed.dart';
+import 'package:kilt/feed/feeds_provider.dart';
+import 'package:kilt/feed/widget/feed_edit_page.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/shared/shared.dart';
 
 class FeedsPage extends StatefulWidget {
   const FeedsPage({super.key});
@@ -89,7 +88,7 @@ class _FeedsPageState extends State<FeedsPage> {
         appBar: DefaultAppBar(
           leading: CupertinoButton(
             padding: EdgeInsets.zero,
-            onPressed: _closeEdit, minimumSize: Size(0, 0),
+            onPressed: _closeEdit, minimumSize: Size.zero,
             child: const Icon(Icons.arrow_back_ios_new),
           ),
           title: Text(_editingFeed == null ? l10n.feedsNewFeedTitle : l10n.feedsEditFeedTitle),
@@ -109,7 +108,7 @@ class _FeedsPageState extends State<FeedsPage> {
         actions: [
           CupertinoButton(
             padding: EdgeInsets.zero,
-            onPressed: () => _openEdit(context, null), minimumSize: Size(0, 0),
+            onPressed: () => _openEdit(context, null), minimumSize: Size.zero,
             child: const Icon(Icons.add),
           ),
         ],
@@ -261,7 +260,7 @@ class _FeedFavoritesToggle extends StatelessWidget {
           : l10n.feedsIncludeFavoritesTooltip,
       child: CupertinoButton(
         padding: EdgeInsets.zero,
-        minimumSize: const Size(0, 0),
+        minimumSize: Size.zero,
         onPressed: onToggle,
         child: icon,
       ),
@@ -349,7 +348,6 @@ class _FeedCard extends StatelessWidget {
             behavior: HitTestBehavior.opaque,
             onTap: onOpen,
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
                   width: 40,
