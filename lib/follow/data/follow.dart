@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'follow.freezed.dart';
@@ -17,7 +19,7 @@ abstract class Follow with _$Follow {
     required DateTime? updated,
   }) = _Follow;
 
-  factory Follow.fromJson(dynamic json) => _$FollowFromJson(json);
+  factory Follow.fromJson(Map<String, dynamic> json) => _$FollowFromJson(json);
 }
 
 @freezed

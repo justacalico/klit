@@ -1,8 +1,11 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:async';
 import 'dart:io';
 
 import 'package:async/async.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:kilt/follow/follow.dart';
 import 'package:kilt/identity/identity.dart';
 import 'package:kilt/logs/logs.dart';
@@ -11,7 +14,6 @@ import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
 import 'package:kilt/traits/traits.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:rxdart/rxdart.dart';
 
 class FollowSync {
@@ -76,7 +78,7 @@ class FollowSync {
   List<String> _previousTags = [];
 
   void _assertNoDuplicates(List<String> tags) {
-    bool tagsAreDifferent = !const DeepCollectionEquality().equals(
+    final tagsAreDifferent = !const DeepCollectionEquality().equals(
       _previousTags,
       tags,
     );
@@ -98,7 +100,7 @@ class FollowSync {
       if (force ?? false) {
         logger.fine('Force refreshing follows...');
         await repository.transaction(() async {
-          List<Follow> follows = await repository.all(
+          final follows = await repository.all(
             types: [FollowType.notify, FollowType.update],
           );
           for (final follow in follows) {
@@ -108,7 +110,7 @@ class FollowSync {
       }
 
       while (!cancelled) {
-        List<Follow> follows = [];
+        final follows = <Follow>[];
 
         follows.addAll(
           await repository.outdated(
@@ -128,9 +130,9 @@ class FollowSync {
         _total ??= follows.length;
         _remaining.add(_total! - follows.length);
 
-        List<Follow> singles = follows.where((e) => e.isSingle).toList();
+        final singles = follows.where((e) => e.isSingle).toList();
         if (singles.isNotEmpty) {
-          List<Follow> updates = await _refreshSingles(singles);
+          final updates = await _refreshSingles(singles);
           await repository.transaction(() async {
             for (final update in updates) {
               await repository.replace(update);
@@ -139,9 +141,9 @@ class FollowSync {
           continue;
         }
 
-        List<Follow> multiples = follows.whereNot(singles.contains).toList();
+        final multiples = follows.whereNot(singles.contains).toList();
         if (multiples.isNotEmpty) {
-          Follow update = await _refreshMultiples(multiples);
+          final update = await _refreshMultiples(multiples);
           await repository.replace(update);
           continue;
         }
@@ -156,17 +158,17 @@ class FollowSync {
   }
 
   Future<List<Follow>> _refreshSingles(List<Follow> singles) async {
-    List<Follow> follows = singles.take(40).toList();
-    List<String> tags = follows.map((e) => e.tags).toList();
+    final follows = singles.take(40).toList();
+    final tags = follows.map((e) => e.tags).toList();
     _assertNoDuplicates(tags);
 
-    int limit = follows.length * refreshAmount;
-    List<Post> allPosts = await rateLimit(
+    final limit = follows.length * refreshAmount;
+    final allPosts = await rateLimit(
       postsClient.byTags(tags: tags, page: 1, limit: limit, force: force),
     );
 
     Map<Follow, List<Post>> assign(List<Follow> follows, List<Post> posts) {
-      Map<Follow, List<Post>> result = {};
+      final result = <Follow, List<Post>>{};
       for (final follow in follows) {
         result.putIfAbsent(follow, () => []);
         for (final post in posts) {
@@ -178,11 +180,11 @@ class FollowSync {
       return result;
     }
 
-    Map<Follow, List<Post>> updates = assign(follows, allPosts);
+    var updates = assign(follows, allPosts);
 
     bool hasLeftovers() {
-      List<Post> picked = updates.values.flattened.toList();
-      List<Post> leftovers = allPosts.whereNot(picked.contains).toList();
+      final picked = updates.values.flattened.toList();
+      final leftovers = allPosts.whereNot(picked.contains).toList();
       if (leftovers.isNotEmpty) {
         logger.info(
           'Sync found ${leftovers.length} leftover posts!\n'
@@ -194,14 +196,14 @@ class FollowSync {
 
     if (hasLeftovers() && tagsClient != null) {
       for (final update in Map.from(updates).entries) {
-        Follow follow = update.key;
-        List<Post> posts = update.value;
+        final Follow follow = update.key;
+        final List<Post> posts = update.value;
         if (posts.isNotEmpty) continue;
-        String? alias = await rateLimit(
+        final alias = await rateLimit(
           tagsClient!.aliases(query: {'search[antecedent_name]': follow.tags}),
         );
         if (alias != follow.alias) {
-          Follow updated = follow.copyWith(alias: alias);
+          final updated = follow.copyWith(alias: alias);
           updates[updated] = updates.remove(follow)!;
           await repository.replace(updated);
           updates = assign(updates.keys.toList(), allPosts);
@@ -210,13 +212,13 @@ class FollowSync {
       }
     }
 
-    List<Follow> result = [];
+    final result = <Follow>[];
     for (final update in updates.entries) {
-      Follow follow = update.key;
-      List<Post> posts = update.value;
-      bool limitReached = posts.length >= 5;
-      bool latestReached = posts.any((e) => e.id == follow.latest);
-      bool depleted = allPosts.length < limit;
+      final follow = update.key;
+      final posts = update.value;
+      final limitReached = posts.length >= 5;
+      final latestReached = posts.any((e) => e.id == follow.latest);
+      final depleted = allPosts.length < limit;
       if ([limitReached, latestReached, depleted].any((e) => e)) {
         posts.removeWhere((e) => e.isDeniedBy(traits.value.denylist));
         result.add(follow.withUnseen(posts));
@@ -226,10 +228,10 @@ class FollowSync {
   }
 
   Future<Follow> _refreshMultiples(List<Follow> multiples) async {
-    Follow follow = multiples.first;
+    var follow = multiples.first;
     _assertNoDuplicates([follow.tags]);
 
-    List<Post> posts = await rateLimit(
+    final posts = await rateLimit(
       postsClient.page(
         query: {'tags': follow.tags},
         limit: refreshAmount,
@@ -240,7 +242,7 @@ class FollowSync {
     posts.removeWhere((e) => e.isDeniedBy(traits.value.denylist));
     follow = follow.withUnseen(posts);
     if (poolsClient != null) {
-      RegExpMatch? match = poolRegex().firstMatch(follow.tags);
+      final match = poolRegex().firstMatch(follow.tags);
       if (follow.title == null && match != null) {
         try {
           follow = follow.withPool(

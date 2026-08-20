@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
 import 'package:kilt/history/history.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/reply/reply.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/topic/topic.dart';
-import 'package:flutter/material.dart';
 
 class TopicRepliesPage extends StatelessWidget {
   const TopicRepliesPage({super.key, required this.topic, this.orderByOldest});
@@ -21,7 +23,7 @@ class TopicRepliesPage extends StatelessWidget {
         builder: (context, controller, child) => ControllerHistoryConnector(
           controller: controller,
           addToHistory: (context, client, controller) => client.histories.add(
-            TopicHistoryRequest.item(topic: topic, replies: controller.items!),
+            TopicHistoryRequest.item(topic: topic, replies: controller.items),
           ),
           child: AdaptiveScaffold(
             appBar: DefaultAppBar(

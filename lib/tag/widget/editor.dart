@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:async';
 
-import 'package:kilt/shared/shared.dart';
-import 'package:kilt/tag/tag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/tag/tag.dart';
 
 class TagEditor extends StatelessWidget {
   const TagEditor({

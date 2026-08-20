@@ -1,4 +1,8 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/history/history.dart';
@@ -7,8 +11,6 @@ import 'package:kilt/pool/data/controller.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class PoolsPageFloatingActionButton extends StatelessWidget {
   const PoolsPageFloatingActionButton({super.key, required this.controller});
@@ -32,12 +34,12 @@ class PoolsPageFloatingActionButton extends StatelessWidget {
                 TextFilterTag(
                   tag: 'description_matches',
                   name: l10n.commonDescription,
-                  icon: Icon(Icons.description),
+                  icon: const Icon(Icons.description),
                 ),
                 TextFilterTag(
                   tag: 'creator_name',
                   name: l10n.poolCreator,
-                  icon: Icon(Icons.person),
+                  icon: const Icon(Icons.person),
                 ),
                 ToggleFilterTag(
                   tag: 'is_active',
@@ -49,7 +51,7 @@ class PoolsPageFloatingActionButton extends StatelessWidget {
                 ChoiceFilterTag(
                   tag: 'category',
                   name: l10n.poolCategory,
-                  icon: Icon(Icons.category),
+                  icon: const Icon(Icons.category),
                   options: [
                     ChoiceFilterTagValue(value: null, name: l10n.commonSortDefault),
                     ChoiceFilterTagValue(value: 'series', name: l10n.poolCategorySeries),
@@ -62,7 +64,7 @@ class PoolsPageFloatingActionButton extends StatelessWidget {
                 ChoiceFilterTag(
                   tag: 'order',
                   name: l10n.commonSortBy,
-                  icon: Icon(Icons.sort),
+                  icon: const Icon(Icons.sort),
                   options: [
                     ChoiceFilterTagValue(value: null, name: l10n.commonSortDefault),
                     ChoiceFilterTagValue(value: 'name', name: l10n.commonName),
@@ -110,7 +112,7 @@ class PoolNameFilter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    FilterTagThemeData theme = FilterTagTheme.of(context);
+    final theme = FilterTagTheme.of(context);
     return SubTextValue(
       value: state.value,
       onChanged: state.onChanged,

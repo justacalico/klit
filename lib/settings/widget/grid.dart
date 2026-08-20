@@ -1,6 +1,8 @@
-import 'package:kilt/shared/shared.dart';
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/shared/shared.dart';
 
 extension GridQuiltDescription on GridQuilt {
   String description(BuildContext context) {

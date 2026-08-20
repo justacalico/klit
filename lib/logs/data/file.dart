@@ -1,5 +1,7 @@
-import 'package:kilt/shared/shared.dart';
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:intl/intl.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:path/path.dart';
 
 final DateFormat logFileDateFormat = DateFormat('yyyy-MM-dd-HH-mm-ss-SSS');
@@ -8,7 +10,7 @@ class LogFileInfo {
   LogFileInfo({required this.path, required this.date, required this.type});
 
   factory LogFileInfo.parse(String path) {
-    String raw = basenameWithoutExtension(path);
+    var raw = basenameWithoutExtension(path);
     String? type = extension(raw);
     if (type.isNotEmpty) {
       type = type.substring(1);
@@ -16,7 +18,7 @@ class LogFileInfo {
     } else {
       type = null;
     }
-    DateTime date = logFileDateFormat.parse(raw);
+    final date = logFileDateFormat.parse(raw);
     return LogFileInfo(path: path, date: date, type: type);
   }
 

@@ -1,12 +1,14 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:kilt/l10n/gen/app_localizations.dart';
 
 abstract final class Share {
   static Future<void> text(BuildContext context, String text) async {
@@ -24,14 +26,14 @@ abstract final class Share {
   ) async {
     final l10n = AppLocalizations.of(context);
     if (Platform.isAndroid || Platform.isIOS) {
-      File file = File(
+      final file = File(
         join(await getTemporaryDirectory().then((e) => e.path), name),
       );
       await file.writeAsString(text);
       await SharePlus.instance.share(ShareParams(files: [XFile(file.path)]));
     } else {
       final messenger = ScaffoldMessenger.of(context);
-      String? outputFile = await FilePicker.saveFile(
+      final outputFile = await FilePicker.saveFile(
         dialogTitle: l10n.commonSaveFile,
         fileName: name,
       );
@@ -49,15 +51,15 @@ abstract final class Share {
 
   static Future<void> file(BuildContext context, String path) async {
     final l10n = AppLocalizations.of(context);
-    XFile file = XFile(path);
+    final file = XFile(path);
     if (Platform.isAndroid || Platform.isIOS) {
       await SharePlus.instance.share(ShareParams(files: [file]));
     } else {
       final messenger = ScaffoldMessenger.of(context);
-      String content = await file.readAsString();
+      final content = await file.readAsString();
       if (!context.mounted) return;
 
-      String? outputFile = await FilePicker.saveFile(
+      final outputFile = await FilePicker.saveFile(
         dialogTitle: l10n.commonSaveFile,
         fileName: basename(path),
       );
@@ -75,7 +77,7 @@ abstract final class Share {
 
   static Future<void> clipboard(BuildContext context, String text) async {
     final l10n = AppLocalizations.of(context);
-    ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+    final messenger = ScaffoldMessenger.of(context);
     await Clipboard.setData(ClipboardData(text: text));
     messenger.showSnackBar(
       SnackBar(

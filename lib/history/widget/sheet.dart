@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/history/history.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 Future<void> historySheet({
   required BuildContext context,
@@ -23,7 +25,7 @@ class HistorySheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    VoidCallback? onTap = const E621LinkParser().parseOnTap(
+    final onTap = const E621LinkParser().parseOnTap(
       context,
       entry.link,
     );

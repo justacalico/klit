@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 class NoUserLoginException implements Exception {
   NoUserLoginException();
@@ -48,11 +50,11 @@ String? findFavicon(String html) {
   final headMatch = headRegExp.firstMatch(html);
   if (headMatch == null) return null;
 
-  String headContent = headMatch.group(0)!;
+  final headContent = headMatch.group(0)!;
 
   final favicons = linkRegExp.allMatches(headContent);
   String? highestResFavicon;
-  int highestResolution = 0;
+  var highestResolution = 0;
 
   String? extractAttribute(String tag, String attributeName) {
     final attrRegExp = RegExp('$attributeName="([^"]+)"', caseSensitive: false);
@@ -61,12 +63,12 @@ String? findFavicon(String html) {
   }
 
   for (final match in favicons) {
-    String linkTag = match.group(0)!;
+    final linkTag = match.group(0)!;
 
-    String? rel = extractAttribute(linkTag, 'rel');
-    String? href = extractAttribute(linkTag, 'href');
-    String? type = extractAttribute(linkTag, 'type');
-    String? sizes = extractAttribute(linkTag, 'sizes');
+    final rel = extractAttribute(linkTag, 'rel');
+    final href = extractAttribute(linkTag, 'href');
+    final type = extractAttribute(linkTag, 'type');
+    var sizes = extractAttribute(linkTag, 'sizes');
 
     if (href == null) continue;
     if (type != null && type.contains('svg+xml')) continue;

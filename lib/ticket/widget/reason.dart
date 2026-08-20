@@ -1,6 +1,8 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/ticket/ticket.dart';
-import 'package:flutter/material.dart';
 
 class ReportFormReason extends StatelessWidget {
   const ReportFormReason({
@@ -92,8 +94,8 @@ class _ReasonReportScreenState extends State<ReasonReportScreen> {
                           duration: defaultAnimationDuration,
                           curve: Curves.easeInOut,
                         );
-                        NavigatorState navigator = Navigator.of(context);
-                        ScaffoldMessengerState messenger = ScaffoldMessenger.of(
+                        final navigator = Navigator.of(context);
+                        final messenger = ScaffoldMessenger.of(
                           context,
                         );
                         if (await widget.onReport(

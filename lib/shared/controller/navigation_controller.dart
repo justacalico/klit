@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kilt/app/data/nav_items.dart';
@@ -63,7 +65,6 @@ class NavigationNotifier extends Notifier<NavigationState> {
   NavigationState build() {
     return NavigationState(
       items: appNavItems,
-      mobilePrimaryCount: 4,
     );
   }
 

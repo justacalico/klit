@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/history/history.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 class HistoriesPage extends StatelessWidget {
   const HistoriesPage({super.key});
@@ -16,11 +18,11 @@ class HistoriesPage extends StatelessWidget {
         builder: (context, controller, child) => SelectionLayout<History>(
           items: controller.items,
           child: AdaptiveScaffold(
-            appBar: HistoryAppBar(),
-            floatingActionButton: HistorySearchFab(),
+            appBar: const HistoryAppBar(),
+            floatingActionButton: const HistorySearchFab(),
             endDrawer: ContextDrawer(
               title: Text(l10n.historyHistory),
-              children: [
+              children: const [
                 HistoryEnableTile(),
                 HistoryLimitTile(),
                 HistoryClearTile(),
@@ -29,7 +31,7 @@ class HistoriesPage extends StatelessWidget {
                 HistoryTypeFilterTile(),
               ],
             ),
-            body: HistoryList(),
+            body: const HistoryList(),
           ),
         ),
       ),

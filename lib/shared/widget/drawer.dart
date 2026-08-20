@@ -1,5 +1,7 @@
-import 'package:kilt/shared/shared.dart';
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
+import 'package:kilt/shared/shared.dart';
 
 class ContextDrawer extends StatelessWidget {
   const ContextDrawer({super.key, this.title, required this.children});

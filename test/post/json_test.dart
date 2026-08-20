@@ -73,8 +73,8 @@ void main() {
       expect(post.uploaderId, 100);
       expect(post.uploaderName, 'testuser');
       expect(post.approverId, 200);
-      expect(post.createdAt, DateTime.utc(2024, 1, 15, 12, 0, 0));
-      expect(post.updatedAt, DateTime.utc(2024, 2, 20, 8, 30, 0));
+      expect(post.createdAt, DateTime.utc(2024, 1, 15, 12));
+      expect(post.updatedAt, DateTime.utc(2024, 2, 20, 8, 30));
       expect(post.changeSeq, 999);
       expect(post.vote.score, 50);
       expect(post.vote.status, VoteStatus.upvoted);
@@ -120,7 +120,7 @@ void main() {
       expect(post.uploaderId, 100);
       expect(post.uploaderName, isNull);
       expect(post.approverId, isNull);
-      expect(post.createdAt, DateTime.utc(2024, 1, 15, 12, 0, 0));
+      expect(post.createdAt, DateTime.utc(2024, 1, 15, 12));
       expect(post.updatedAt, isNull);
       expect(post.changeSeq, isNull);
       expect(post.vote.score, 0);

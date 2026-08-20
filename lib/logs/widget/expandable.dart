@@ -1,5 +1,7 @@
-import 'package:kilt/shared/shared.dart';
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
+import 'package:kilt/shared/shared.dart';
 
 class LogRecordExpandable extends StatelessWidget {
   const LogRecordExpandable({
@@ -65,7 +67,7 @@ class LogRecordExpandable extends StatelessWidget {
                               vertical: 4,
                               horizontal: 10,
                             ),
-                            child: title!,
+                            child: title,
                           ),
                         ),
                       ),

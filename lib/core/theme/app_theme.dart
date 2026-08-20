@@ -1,10 +1,12 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../utils/helpers.dart';
+import 'package:kilt/core/utils/helpers.dart';
 
-export '../utils/helpers.dart' show defaultAccentColorHex, defaultAccentColor, colorFromHex, hexFromColor;
+export '../utils/helpers.dart' show colorFromHex, defaultAccentColor, defaultAccentColorHex, hexFromColor;
 
 enum AppTheme {
   dark,
@@ -84,12 +86,12 @@ extension AppThemeCupertino on AppTheme {
 
 extension M2ThemeData on ThemeData {
   static ThemeData from({required ColorScheme colorScheme}) {
-    final bool isDark = colorScheme.brightness == Brightness.dark;
+    final isDark = colorScheme.brightness == Brightness.dark;
 
-    final Color primarySurfaceColor = isDark
+    final primarySurfaceColor = isDark
         ? colorScheme.surface
         : colorScheme.primary;
-    final Color onPrimarySurfaceColor = isDark
+    final onPrimarySurfaceColor = isDark
         ? colorScheme.onSurface
         : colorScheme.onPrimary;
 
@@ -197,7 +199,7 @@ class SnapshotlessPageTransitionTheme extends PageTransitionsTheme {
   ) {
     const snappyZoom =
         SnappySnapshotlessZoomPageTransitionsBuilder();
-    Map<TargetPlatform, PageTransitionsBuilder> builders = {};
+    final builders = <TargetPlatform, PageTransitionsBuilder>{};
     if (parent != null) {
       builders.addAll(
         Map.fromEntries(

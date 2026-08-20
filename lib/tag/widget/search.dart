@@ -1,7 +1,9 @@
-import 'package:kilt/shared/shared.dart';
-import 'package:kilt/tag/tag.dart';
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/tag/tag.dart';
 
 class SearchPromptFloatingActionButton extends StatelessWidget {
   const SearchPromptFloatingActionButton({
@@ -19,7 +21,7 @@ class SearchPromptFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isDesktop = Theme.of(context).isDesktop;
+    final isDesktop = Theme.of(context).isDesktop;
     return SubValue<PromptActionController>(
       create: () => PromptActionController(),
       builder: (context, actionController) => PromptFloatingActionButton(

@@ -1,6 +1,8 @@
-import 'package:kilt/shared/shared.dart';
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/shared/shared.dart';
 
 enum LoadingNotificationStatus { loading, cancelled, failed, done }
 
@@ -38,11 +40,11 @@ Future<void> loadingNotification<T>({
     };
   }
 
-  LoadingNotificationStatus status = LoadingNotificationStatus.loading;
-  final ValueNotifier<int> progress = ValueNotifier<int>(0);
+  var status = LoadingNotificationStatus.loading;
+  final progress = ValueNotifier<int>(0);
 
-  ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
-  Color? iconColor =
+  final messenger = ScaffoldMessenger.of(context);
+  final iconColor =
       (Theme.of(context).snackBarTheme.contentTextStyle ??
               ThemeData(
                 brightness: Theme.of(context).brightness == Brightness.dark
@@ -70,7 +72,7 @@ Future<void> loadingNotification<T>({
     ),
   );
 
-  for (T item in items) {
+  for (final item in items) {
     if (await process(item)) {
       await Future.delayed(timeout ?? defaultAnimationDuration);
       if (progress.value < items.length - 1) {

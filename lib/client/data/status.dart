@@ -1,5 +1,7 @@
-import 'package:kilt/traits/traits.dart';
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:kilt/traits/traits.dart';
 
 part 'status.freezed.dart';
 part 'status.g.dart';

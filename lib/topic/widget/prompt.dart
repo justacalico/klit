@@ -1,10 +1,12 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
 import 'package:kilt/topic/topic.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:sliding_sheet/sliding_sheet.dart';
 
 Future<void> showTopicPrompt({
@@ -107,7 +109,7 @@ class TopicInfo extends StatelessWidget {
               InkWell(
                 child: Text('#${topic.id}'),
                 onLongPress: () async {
-                  ScaffoldMessengerState messenger = ScaffoldMessenger.of(
+                  final messenger = ScaffoldMessenger.of(
                     context,
                   );
                   Clipboard.setData(ClipboardData(text: topic.id.toString()));

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'account.freezed.dart';
@@ -13,5 +15,5 @@ abstract class Account with _$Account {
     required int? perPage,
   }) = _Account;
 
-  factory Account.fromJson(dynamic json) => _$AccountFromJson(json);
+  factory Account.fromJson(Map<String, dynamic> json) => _$AccountFromJson(json);
 }

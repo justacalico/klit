@@ -1,3 +1,8 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kilt/app/routing/app_routes.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/comment/comment.dart';
@@ -5,9 +10,6 @@ import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/ticket/ticket.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
 
 class CommentTile extends StatelessWidget {
   const CommentTile({super.key, required this.comment, this.hasActions = true});
@@ -28,7 +30,7 @@ class CommentTile extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(right: 8, top: 4),
-                  child: CommenterAvatar(userId: comment.creatorId, radius: 16),
+                  child: CommenterAvatar(userId: comment.creatorId),
                 ),
                 Expanded(
                   child: Column(
@@ -126,7 +128,7 @@ class CommentVotes extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final client = context.watch<Client>();
-    VoteInfo? vote = comment.vote;
+    final vote = comment.vote;
     if (vote == null) return const SizedBox();
 
     final controller = context.read<CommentController>();
@@ -220,7 +222,7 @@ class CommentMenu extends StatelessWidget {
             value: () => guardWithLogin(
               context: context,
               callback: () {
-                CommentController controller = context
+                final controller = context
                     .read<CommentController>();
                 editComment(context: context, comment: comment).then((value) {
                   if (value) {
@@ -237,7 +239,7 @@ class CommentMenu extends StatelessWidget {
           value: () => guardWithLogin(
             context: context,
             callback: () {
-              CommentController controller = context.read<CommentController>();
+              final controller = context.read<CommentController>();
               replyComment(context: context, comment: comment).then((value) {
                 if (value) {
                   controller.refresh(force: true);
@@ -285,7 +287,7 @@ class CommentWarnings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    WarningType? warning = comment.warning;
+    final warning = comment.warning;
     if (warning == null) return const SizedBox();
     return Padding(
       padding: const EdgeInsets.only(left: 24),

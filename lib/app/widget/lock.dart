@@ -1,14 +1,16 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:async';
 
 import 'package:animations/animations.dart';
-import 'package:kilt/app/data/capabilities.dart';
-import 'package:kilt/l10n/gen/app_localizations.dart';
-import 'package:kilt/settings/settings.dart';
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screen_lock/flutter_screen_lock.dart';
 import 'package:flutter_sub/flutter_sub.dart';
+import 'package:kilt/app/data/capabilities.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:local_auth/local_auth.dart';
 
 class LockScreen extends StatefulWidget {
@@ -56,7 +58,7 @@ class _LockScreenState extends State<LockScreen> {
       lock = BiometricsLockScreen(onSuccess: unlock);
     }
 
-    bool showLock = lock != null && enabled && locked;
+    final showLock = lock != null && enabled && locked;
 
     return SubListener(
       listener: this.lock,
@@ -144,11 +146,11 @@ Future<void> tryLocalAuth({
   VoidCallback? onFailure,
 }) async {
   final l10n = AppLocalizations.of(context);
-  ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
-  final LocalAuthentication localAuth = LocalAuthentication();
+  final messenger = ScaffoldMessenger.of(context);
+  final localAuth = LocalAuthentication();
   await localAuth.stopAuthentication();
   try {
-    bool success = await localAuth.authenticate(
+    final success = await localAuth.authenticate(
       localizedReason: l10n.appAuthenticateToUnlock,
       persistAcrossBackgrounding: true,
     );
@@ -170,7 +172,7 @@ Future<void> tryLocalAuth({
 
 Future<String?> registerPin(BuildContext context) async {
   final l10n = AppLocalizations.of(context);
-  Completer<String?> completer = Completer();
+  final completer = Completer<String?>();
   await screenLockCreate(
     title: Text(l10n.appEnterNewPin),
     confirmTitle: Text(l10n.appConfirmNewPin),

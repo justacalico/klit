@@ -1,4 +1,4 @@
-import 'package:drift/drift.dart' hide isNull, isNotNull;
+import 'package:drift/drift.dart' hide isNotNull, isNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kilt/app/data/storage.dart';
@@ -13,7 +13,7 @@ void main() {
     database = AppDatabase(NativeDatabase.memory());
     final repo = IdentityRepository(database);
     final inserted = await repo.add(
-      IdentityRequest(host: 'e621.net', username: 'testuser'),
+      const IdentityRequest(host: 'e621.net', username: 'testuser'),
     );
     identity = inserted;
   });
@@ -100,7 +100,7 @@ void main() {
     test('returns paginated follows', () async {
       final client = createClient();
 
-      for (int i = 0; i < 5; i++) {
+      for (var i = 0; i < 5; i++) {
         await client.create(tags: 'tag_$i', type: FollowType.update);
       }
 
@@ -150,7 +150,7 @@ void main() {
       );
       final repo = IdentityRepository(database);
       final identity2 = await repo.add(
-        IdentityRequest(host: 'e621.net', username: 'other'),
+        const IdentityRequest(host: 'e621.net', username: 'other'),
       );
       final client2 = FollowClient(
         database: database,
@@ -297,7 +297,7 @@ void main() {
       );
       final repo = IdentityRepository(database);
       final identity2 = await repo.add(
-        IdentityRequest(host: 'e621.net', username: 'other'),
+        const IdentityRequest(host: 'e621.net', username: 'other'),
       );
       final client2 = FollowClient(
         database: database,

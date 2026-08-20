@@ -1,12 +1,14 @@
-import 'package:kilt/logs/logs.dart';
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/widgets.dart';
+import 'package:kilt/logs/logs.dart';
 
 class RouteLoggerObserver extends NavigatorObserver {
   final Logger logger = Logger('Routes');
 
   void logRoute(Route<dynamic>? route, String action) {
     if (route == null) return;
-    String? name = route.settings.name;
+    final name = route.settings.name;
     if (name == null) return;
     logger.fine('$name $action');
   }

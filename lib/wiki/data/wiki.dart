@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'wiki.freezed.dart';
@@ -15,5 +17,5 @@ abstract class Wiki with _$Wiki {
     bool? isLocked,
   }) = _Wiki;
 
-  factory Wiki.fromJson(dynamic json) => _$WikiFromJson(json);
+  factory Wiki.fromJson(Map<String, dynamic> json) => _$WikiFromJson(json);
 }

@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter/material.dart';
 
 class SearchPageAppBar extends StatefulWidget implements PreferredSizeWidget {
   const SearchPageAppBar({
@@ -57,7 +59,7 @@ class _SearchPageAppBarState extends State<SearchPageAppBar> {
 
     return DefaultAppBar(
       title: Text(l10n.postSearch),
-      actions: [Builder(builder: (context) => ContextDrawerButton())],
+      actions: [Builder(builder: (context) => const ContextDrawerButton())],
       secondary: TagInput(
         controller: _textController,
         focusNode: _focusNode,

@@ -1,12 +1,14 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:async';
 import 'dart:collection';
 
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
 import 'package:kilt/history/history.dart';
 import 'package:kilt/identity/identity.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/traits/traits.dart';
-import 'package:flutter/foundation.dart';
 
 class HistoryServer with Disposable {
   HistoryServer({

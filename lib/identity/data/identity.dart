@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'identity.freezed.dart';
@@ -12,7 +14,7 @@ abstract class Identity with _$Identity {
     required Map<String, String>? headers,
   }) = _Identity;
 
-  factory Identity.fromJson(dynamic json) => _$IdentityFromJson(json);
+  factory Identity.fromJson(Map<String, dynamic> json) => _$IdentityFromJson(json);
 }
 
 @freezed
@@ -23,6 +25,6 @@ abstract class IdentityRequest with _$IdentityRequest {
     Map<String, String>? headers,
   }) = _IdentityRequest;
 
-  factory IdentityRequest.fromJson(dynamic json) =>
+  factory IdentityRequest.fromJson(Map<String, dynamic> json) =>
       _$IdentityRequestFromJson(json);
 }

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:async';
 
 import 'package:kilt/history/history.dart';

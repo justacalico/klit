@@ -88,13 +88,13 @@ void main() {
 
     test('setter sets formatted date', () {
       final query = HistoryQuery();
-      query.date = DateTime(2024, 6, 1);
+      query.date = DateTime(2024, 6);
       expect(query.self['search[date]'], '2024-06-01');
-      expect(query.date, DateTime(2024, 6, 1));
+      expect(query.date, DateTime(2024, 6));
     });
 
     test('setter removes date when set to null', () {
-      final query = HistoryQuery(date: DateTime(2024, 1, 1));
+      final query = HistoryQuery(date: DateTime(2024));
       expect(query.self['search[date]'], isNotNull);
       query.date = null;
       expect(query.self['search[date]'], isNull);
@@ -196,7 +196,7 @@ void main() {
       final query = HistoryQuery(
         link: '/posts/1',
         title: 'Original',
-        date: DateTime(2024, 1, 1),
+        date: DateTime(2024),
       );
       final copy = query.copy();
 

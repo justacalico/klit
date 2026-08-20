@@ -1,26 +1,28 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:async';
 import 'dart:io';
 
-import 'package:kilt/app/app.dart';
-import 'package:kilt/app/routing/app_routes.dart';
-import 'package:kilt/client/client.dart';
-import 'package:kilt/follow/follow.dart';
-import 'package:kilt/identity/identity.dart';
-import 'package:kilt/logs/logs.dart';
-import 'package:kilt/settings/settings.dart';
-import 'package:kilt/shared/shared.dart';
-import 'package:kilt/traits/traits.dart';
-import 'package:kilt/user/user.dart';
-import 'package:kilt/settings/widget/settings_shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart'
     show ColorPicker, PaletteType;
-import 'package:kilt/l10n/gen/app_localizations.dart';
-import 'package:flutter_sub/flutter_sub.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' hide Consumer;
+import 'package:flutter_sub/flutter_sub.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/app/routing/app_routes.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/follow/follow.dart';
+import 'package:kilt/identity/identity.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/logs/logs.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/settings/widget/settings_shared.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/traits/traits.dart';
+import 'package:kilt/user/user.dart';
 import 'package:local_auth/local_auth.dart';
 
 const String settingsSectionArgumentKey = 'settingsSection';
@@ -94,7 +96,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         maxWidth: 1200,
         tolerance: 20,
         builder: (context) {
-          final contentPadding = EdgeInsets.fromLTRB(
+          final contentPadding = const EdgeInsets.fromLTRB(
             16,
             12,
             16,
@@ -124,7 +126,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 hasLogs: hasLogs,
               ),
             ),
-            SettingsSectionEntry(weight: 3, child: const SettingsAboutSection()),
+            const SettingsSectionEntry(weight: 3, child: SettingsAboutSection()),
           ];
 
           return LayoutBuilder(
@@ -132,7 +134,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               final isDesktop =
                   constraints.maxWidth >= SettingsPage._desktopBreakpoint;
 
-              return Container(
+              return ColoredBox(
                 color: CupertinoColors.systemGroupedBackground.resolveFrom(
                   context,
                 ),
@@ -1306,7 +1308,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                               title: Text(
                                 action.label,
                                 style: iFinishedDisabled
-                                    ? TextStyle(
+                                    ? const TextStyle(
                                         color: CupertinoColors.systemGrey,
                                       )
                                     : null,
@@ -1361,7 +1363,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
   }
 
-  void _showPickerSheet<T>(
+  Future<void> _showPickerSheet<T>(
     BuildContext context, {
     required String title,
     required List<T> values,
@@ -1370,9 +1372,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     required ValueChanged<T> onSelected,
     Widget Function(T value)? trailingBuilder,
   }) async {
-    final box = context.findRenderObject() as RenderBox;
+    final box = context.findRenderObject()! as RenderBox;
     final overlay =
-        Overlay.of(context).context.findRenderObject() as RenderBox;
+        Overlay.of(context).context.findRenderObject()! as RenderBox;
     final rect = RelativeRect.fromRect(
       Rect.fromPoints(
         box.localToGlobal(Offset.zero, ancestor: overlay),
@@ -1501,8 +1503,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     enableAlpha: false,
                     portraitOnly: true,
                     labelTypes: const [],
-                    displayThumbColor: false,
-                    hexInputBar: false,
                     pickerAreaBorderRadius: BorderRadius.circular(12),
                   ),
                   const SizedBox(height: 12),

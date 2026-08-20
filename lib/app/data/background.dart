@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:kilt/app/app.dart';
 import 'package:kilt/follow/follow.dart';
 import 'package:kilt/logs/logs.dart';
@@ -23,7 +25,7 @@ void executeBackgroundTasks() =>
           logger.info('Task $task was cancelled: ${e.error}');
         });
 
-        FlutterLocalNotificationsPlugin notifications =
+        final notifications =
             await initializeNotifications();
 
         switch (task) {

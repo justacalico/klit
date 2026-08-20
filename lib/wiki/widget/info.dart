@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/wiki/wiki.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class WikiInfo extends StatelessWidget {
   const WikiInfo({super.key, required this.wiki});
@@ -32,7 +34,7 @@ class WikiInfo extends StatelessWidget {
               InkWell(
                 child: Text('#${wiki.id}'),
                 onLongPress: () async {
-                  ScaffoldMessengerState messenger = ScaffoldMessenger.of(
+                  final messenger = ScaffoldMessenger.of(
                     context,
                   );
                   Clipboard.setData(ClipboardData(text: wiki.id.toString()));

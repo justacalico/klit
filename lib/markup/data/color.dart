@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
 
 Color? parseColor(String colorString) {
@@ -5,7 +7,7 @@ Color? parseColor(String colorString) {
     if (colorString.length == 7) {
       return Color(int.parse(colorString.substring(1), radix: 16) + 0xFF000000);
     } else {
-      String expandedHex = colorString
+      final expandedHex = colorString
           .substring(1)
           .split('')
           .map((hex) => hex * 2)

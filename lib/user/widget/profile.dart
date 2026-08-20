@@ -1,10 +1,12 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' hide Consumer;
 import 'package:kilt/client/client.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/user/user.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart' hide Consumer;
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -118,12 +120,10 @@ class _ProfileTabs extends StatelessWidget {
             padding: defaultListPadding,
             child: UserInfo(
               user: user,
-              compact: true,
               aboutLeading: SizedBox(
                 width: 48,
                 height: 48,
                 child: FittedBox(
-                  fit: BoxFit.contain,
                   child: PostAvatar(id: user.avatarId),
                 ),
               ),

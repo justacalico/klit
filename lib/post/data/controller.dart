@@ -1,7 +1,9 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/foundation.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/foundation.dart';
 
 class PostController extends PageClientDataController<Post>
     with PostActionController, PostFilterableController {
@@ -92,7 +94,6 @@ class SinglePostController extends PostController {
 class PostProvider extends SubChangeNotifierProvider<Client, PostController> {
   PostProvider({
     QueryMap? query,
-    bool orderFavorites = false,
     bool orderPools = true,
     bool denying = true,
     bool canSearch = true,

@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:filesize/filesize.dart';
+import 'package:flutter/material.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:filesize/filesize.dart';
-import 'package:flutter/material.dart';
 
 class FileDisplay extends StatelessWidget {
   const FileDisplay({super.key, required this.post});

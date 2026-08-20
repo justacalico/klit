@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -47,7 +49,7 @@ class GlassSurface extends StatelessWidget {
               ),
             ),
             child: Padding(
-              padding: padding ?? const EdgeInsets.all(0),
+              padding: padding ?? EdgeInsets.zero,
               child: child,
             ),
           ),
@@ -146,4 +148,3 @@ class GlassBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 }
-

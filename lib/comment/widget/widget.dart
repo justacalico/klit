@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 export 'commenter_avatar.dart';
 export 'composer.dart';
 export 'drawer.dart';

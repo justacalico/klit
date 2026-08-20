@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:collection/collection.dart';
-import 'package:kilt/markup/markup.dart';
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/markup/markup.dart';
+import 'package:kilt/shared/shared.dart';
 
 typedef SpoilerMap = Map<DTextId, SpoilerInfo>;
 
@@ -45,14 +47,14 @@ class SpoilerController extends ChangeNotifier
         spoilered: true,
         recognizer: TapGestureRecognizer()
           ..onTap = () {
-            List<DTextId> spoilers = parents(id);
-            DTextId? top = spoilers.firstWhereOrNull(spoilered);
+            final spoilers = parents(id);
+            final top = spoilers.firstWhereOrNull(spoilered);
             toggle(top ?? id);
           },
       );
 
   void _with(SpoilerMap Function(SpoilerMap value) call) {
-    SpoilerMap result = call(Map.from(value));
+    final result = call(Map.from(value));
     if (!mapEquals(value, result)) {
       value = result;
     }
@@ -103,7 +105,7 @@ class SpoilerController extends ChangeNotifier
 
   @override
   void dispose() {
-    for (SpoilerInfo info in value.values) {
+    for (final info in value.values) {
       info.recognizer.dispose();
     }
     super.dispose();

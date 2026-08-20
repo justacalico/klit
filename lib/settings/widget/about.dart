@@ -1,14 +1,16 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:async';
 
-import 'package:kilt/app/app.dart';
-import 'package:kilt/settings/settings.dart';
-import 'package:kilt/settings/widget/settings_shared.dart';
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:kilt/app/app.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/settings/widget/settings_shared.dart';
+import 'package:kilt/shared/shared.dart';
 
 class DevOptionEnabler extends StatefulWidget {
   const DevOptionEnabler({super.key, required this.child});
@@ -36,7 +38,7 @@ class _DevOptionEnablerState extends State<DevOptionEnabler> {
           messenger.clearSnackBars();
           messenger.showSnackBar(
             SnackBar(
-              duration: Duration(seconds: 2),
+              duration: const Duration(seconds: 2),
               content: Text(l10n.aboutDevEnabled),
             ),
           );
@@ -62,7 +64,7 @@ class AboutVersion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Future<void> openDownload() async {
-      AppInfoClient? updater = context.read<AppInfoClient?>();
+      final updater = context.read<AppInfoClient?>();
       if (updater == null) return;
       final url = await updater.getDownloadUrl();
       if (url != null && context.mounted) launch(url);
@@ -187,7 +189,7 @@ class AboutLinks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppInfo appInfo = AppInfo.instance;
+    final appInfo = AppInfo.instance;
     final l10n = AppLocalizations.of(context);
 
     Widget linkListTile({
@@ -264,7 +266,7 @@ class SettingsAboutSection extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            const AppIcon(radius: 20),
+                            const AppIcon(),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Column(

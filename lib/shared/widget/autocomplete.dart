@@ -1,10 +1,12 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:async';
 
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/shared/shared.dart';
 
 // TODO: This was built with narrow assumptions that we now pay for.
 // The autocomplete should be more configurable, with better defaults.
@@ -49,7 +51,7 @@ class AutocompleteTextField<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool hasFab = Scaffold.maybeOf(context)?.hasFloatingActionButton ?? false;
+    final hasFab = Scaffold.maybeOf(context)?.hasFloatingActionButton ?? false;
     return TypeAheadField<T>(
       controller: controller,
       direction: direction,
@@ -70,7 +72,7 @@ class AutocompleteTextField<T> extends StatelessWidget {
         maxLines: maxLines,
       ),
       decorationBuilder: (context, child) {
-        Widget result = Card(
+        final Widget result = Card(
           margin: EdgeInsets.zero,
           color: Theme.of(context).colorScheme.surface,
           child: child,
@@ -124,12 +126,12 @@ class AutocompleteCutout extends ShapeBorder {
   Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
     const shape = CircularNotchedRectangle();
 
-    Size size = rect.size;
-    double edgeDistance = 16;
-    double padding = 2;
-    double offset = 4;
-    double width = 56;
-    double radius = width / 2;
+    final size = rect.size;
+    const double edgeDistance = 16;
+    const double padding = 2;
+    const double offset = 4;
+    const double width = 56;
+    const radius = width / 2;
 
     return shape
         .getOuterPath(
@@ -144,7 +146,7 @@ class AutocompleteCutout extends ShapeBorder {
             1,
             -1,
             1,
-          )..translateByDouble(0.0, -size.height - offset, 0.0, 0.0)).storage,
+          )..translateByDouble(0, -size.height - offset, 0, 0)).storage,
         );
   }
 

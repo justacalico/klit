@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
 
 const Duration defaultAnimationDuration = Duration(milliseconds: 200);
@@ -50,7 +52,7 @@ class CrossFade extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Duration duration = this.duration ?? defaultAnimationDuration;
+    final duration = this.duration ?? defaultAnimationDuration;
     switch (style) {
       case FadeAnimationStyle.stacked:
         return AnimatedCrossFade(

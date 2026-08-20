@@ -22,7 +22,7 @@ void main() {
     mockClient = MockClient();
     mockPosts = MockPostClient();
     traits = ValueNotifier(
-      Traits(
+      const Traits(
         id: 1,
         userId: null,
         denylist: [],
@@ -68,7 +68,6 @@ void main() {
     test('day scale with today produces date:today', () {
       final today = DateUtils.dateOnly(DateTime.now());
       final controller = makeController(
-        scale: PopularScale.day,
         referenceDate: today,
       );
       expect(controller.query['tags'], 'date:today');
@@ -79,7 +78,6 @@ void main() {
         DateTime.now().subtract(const Duration(days: 1)),
       );
       final controller = makeController(
-        scale: PopularScale.day,
         referenceDate: yesterday,
       );
       expect(controller.query['tags'], 'date:yesterday');
@@ -87,7 +85,6 @@ void main() {
 
     test('day scale with a specific date produces date:yyyy-MM-dd', () {
       final controller = makeController(
-        scale: PopularScale.day,
         referenceDate: DateTime(2024, 1, 15),
       );
       expect(controller.query['tags'], 'date:2024-01-15');
@@ -122,7 +119,6 @@ void main() {
   group('HotPostController.setScale', () {
     test('changes the query when the scale changes', () {
       final controller = makeController(
-        scale: PopularScale.day,
         referenceDate: DateTime(2024, 1, 15),
       );
       expect(controller.query['tags'], 'date:2024-01-15');
@@ -133,7 +129,6 @@ void main() {
 
     test('does nothing when the scale stays the same', () {
       final controller = makeController(
-        scale: PopularScale.day,
         referenceDate: DateTime(2024, 1, 15),
       );
       final initialQuery = Map.of(controller.query);
@@ -146,7 +141,6 @@ void main() {
   group('HotPostController.setReferenceDate', () {
     test('changes the query when the date changes', () {
       final controller = makeController(
-        scale: PopularScale.day,
         referenceDate: DateTime(2024, 1, 15),
       );
       expect(controller.query['tags'], 'date:2024-01-15');
@@ -157,7 +151,6 @@ void main() {
 
     test('does nothing when the date stays the same', () {
       final controller = makeController(
-        scale: PopularScale.day,
         referenceDate: DateTime(2024, 1, 15),
       );
       final initialQuery = Map.of(controller.query);
@@ -170,7 +163,6 @@ void main() {
   group('HotPostController.prev', () {
     test('day scale moves back one day', () {
       final controller = makeController(
-        scale: PopularScale.day,
         referenceDate: DateTime(2024, 1, 15),
       );
       controller.prev();
@@ -202,7 +194,6 @@ void main() {
   group('HotPostController.next', () {
     test('day scale moves forward one day', () {
       final controller = makeController(
-        scale: PopularScale.day,
         referenceDate: DateTime(2024, 1, 15),
       );
       controller.next();
@@ -233,7 +224,6 @@ void main() {
     test('does nothing when next would be in the future', () {
       final today = DateUtils.dateOnly(DateTime.now());
       final controller = makeController(
-        scale: PopularScale.day,
         referenceDate: today,
       );
       final initialQuery = Map.of(controller.query);
@@ -247,7 +237,6 @@ void main() {
     test('false when the next day is in the future', () {
       final today = DateUtils.dateOnly(DateTime.now());
       final controller = makeController(
-        scale: PopularScale.day,
         referenceDate: today,
       );
       expect(controller.canNext, isFalse);
@@ -258,7 +247,6 @@ void main() {
         DateTime.now().subtract(const Duration(days: 1)),
       );
       final controller = makeController(
-        scale: PopularScale.day,
         referenceDate: yesterday,
       );
       expect(controller.canNext, isTrue);
@@ -266,7 +254,6 @@ void main() {
 
     test('true for a date far in the past', () {
       final controller = makeController(
-        scale: PopularScale.day,
         referenceDate: DateTime(2024, 1, 15),
       );
       expect(controller.canNext, isTrue);

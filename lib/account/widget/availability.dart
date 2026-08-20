@@ -1,10 +1,12 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:kilt/account/account.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/logs/logs.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 class AvailabilityCheck extends StatefulWidget {
   const AvailabilityCheck({
@@ -40,7 +42,7 @@ class _AvailabilityCheckState extends State<AvailabilityCheck> {
         logger.fine('Client availability check cancelled!');
         return;
       }
-      int? statusCode = e.response?.statusCode;
+      final statusCode = e.response?.statusCode;
       if (statusCode == null) return;
       switch (statusCode) {
         case HttpStatus.serviceUnavailable:

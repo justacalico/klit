@@ -1,10 +1,12 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:kilt/post/post.dart';
 import 'package:kilt/tag/tag.dart';
 
 Map<String, int> countTags(List<String> tags, [Map<String, int>? counts]) {
   counts ??= {};
 
-  for (String tag in tags) {
+  for (final tag in tags) {
     counts[tag] = (counts[tag] ?? 0) + 1;
   }
 
@@ -12,21 +14,21 @@ Map<String, int> countTags(List<String> tags, [Map<String, int>? counts]) {
 }
 
 List<CountedTag> countTagsByPosts(List<Post> posts) {
-  Map<String, Map<String, int>> categoryCounts = {};
-  for (String category in TagCategory.names) {
+  final categoryCounts = <String, Map<String, int>>{};
+  for (final category in TagCategory.names) {
     categoryCounts[category] = {};
   }
-  List<CountedTag> counted = [];
+  final counted = <CountedTag>[];
 
-  for (Post post in posts) {
-    for (String category in TagCategory.names) {
-      List<String> tags = post.tags[category] ?? [];
+  for (final post in posts) {
+    for (final category in TagCategory.names) {
+      final tags = post.tags[category] ?? [];
       categoryCounts[category] = countTags(tags, categoryCounts[category]);
     }
   }
 
-  for (MapEntry<String, Map<String, int>> category in categoryCounts.entries) {
-    for (MapEntry<String, int> tags in category.value.entries) {
+  for (final category in categoryCounts.entries) {
+    for (final tags in category.value.entries) {
       counted.add(
         CountedTag(category: category.key, tag: tags.key, count: tags.value),
       );

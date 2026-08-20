@@ -1,19 +1,21 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_custom_tabs/flutter_custom_tabs.dart' as tabs;
+import 'package:go_router/go_router.dart';
 import 'package:kilt/app/routing/app_routes.dart';
 import 'package:kilt/pool/pool.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/reply/reply.dart';
 import 'package:kilt/topic/topic.dart';
 import 'package:kilt/wiki/wiki.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter_custom_tabs/flutter_custom_tabs.dart' as tabs;
 import 'package:path_to_regexp/path_to_regexp.dart';
 import 'package:url_launcher/url_launcher.dart' as urls;
 
 Future<void> launch(String url) async {
-  Uri uri = Uri.parse(url);
+  final uri = Uri.parse(url);
   if ((Platform.isAndroid || Platform.isIOS) &&
       ['e621.net', 'e926.net'].contains(uri.host)) {
     await tabs.launchUrl(
@@ -59,18 +61,18 @@ class LeafLinkParser extends LinkParser {
 
   @override
   Link? parse(String link) {
-    Uri? uri = Uri.tryParse(link);
+    final uri = Uri.tryParse(link);
     if (uri == null) return null;
 
-    List<String> names = [];
-    Match? match = pathToRegExp(
+    final names = <String>[];
+    final Match? match = pathToRegExp(
       path,
       parameters: names,
       caseSensitive: false,
     ).firstMatch(uri.path);
 
     if (match != null) {
-      Map<String, String> arguments = extract(names, match);
+      final arguments = extract(names, match);
       Map<String, String>? query = uri.queryParameters;
       if (query.isEmpty) query = null;
       return transformer(arguments, query);
@@ -87,8 +89,8 @@ abstract class BranchLinkParser extends LinkParser {
 
   @override
   Link? parse(String link) {
-    for (LinkParser parser in parsers) {
-      Link? result = parser.parse(link);
+    for (final parser in parsers) {
+      final result = parser.parse(link);
       if (result != null) {
         return result;
       }
@@ -173,7 +175,7 @@ class E621LinkParser extends BranchLinkParser {
 
 extension LinkOnTapExtension on LinkParser {
   VoidCallback? parseOnTap(BuildContext context, String link) {
-    final Link? result = this.parse(link);
+    final result = this.parse(link);
     if (result == null) return null;
 
     VoidCallback navWrapper(WidgetBuilder builder, [bool root = false]) {
@@ -187,19 +189,19 @@ extension LinkOnTapExtension on LinkParser {
 
     switch (result.type) {
       case LinkType.post:
-        int? id = result.id as int?;
+        final id = result.id as int?;
         if (id != null) {
           return navWrapper((context) => PostLoadingPage(id));
         }
         return navWrapper((context) => PostsSearchPage(query: result.query));
       case LinkType.pool:
-        int? id = result.id as int?;
+        final id = result.id as int?;
         if (id != null) {
           return navWrapper((context) => PoolLoadingPage(id));
         }
         return navWrapper((context) => PoolsPage(search: result.query), true);
       case LinkType.user:
-        Object? id = result.id;
+        final id = result.id;
         if (id != null) {
           return () {
             final q = id is int
@@ -210,19 +212,19 @@ extension LinkOnTapExtension on LinkParser {
         }
         break;
       case LinkType.wiki:
-        Object? id = result.id;
+        final id = result.id;
         if (id != null) {
           return navWrapper((context) => WikiLoadingPage(id.toString()));
         }
         break;
       case LinkType.topic:
-        int? id = result.id as int?;
+        final id = result.id as int?;
         if (id != null) {
           return navWrapper((context) => TopicLoadingPage(id));
         }
         return navWrapper((context) => TopicsPage(query: result.query), true);
       case LinkType.reply:
-        int? id = result.id as int?;
+        final id = result.id as int?;
         if (id != null) {
           return navWrapper((context) => ReplyLoadingPage(id));
         }
@@ -232,7 +234,7 @@ extension LinkOnTapExtension on LinkParser {
   }
 
   bool open(BuildContext context, String link) {
-    VoidCallback? callback = parseOnTap(context, link);
+    final callback = parseOnTap(context, link);
     if (callback != null) {
       callback();
       return true;

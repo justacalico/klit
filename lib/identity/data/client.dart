@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:async';
 
 import 'package:async/async.dart';
 import 'package:drift/drift.dart';
-import 'package:kilt/identity/identity.dart';
 import 'package:flutter/foundation.dart';
+import 'package:kilt/identity/identity.dart';
 
 class IdentityClient extends IdentityRepository with ChangeNotifier {
   IdentityClient({required GeneratedDatabase database, this.onCreate})

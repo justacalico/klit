@@ -1,11 +1,13 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/identity/identity.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 import 'package:webview_cookie_manager_plus/webview_cookie_manager_plus.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -26,14 +28,14 @@ class _CookieCapturePageState extends State<CookieCapturePage> {
     ..loadRequest(Uri.parse(context.read<Client>().identity.host));
 
   Future<void> setCookies(BuildContext context) async {
-    IdentityClient client = context.read<IdentityClient>();
-    WebviewCookieManager cookieManager = WebviewCookieManager();
-    List<Cookie> cookies = await cookieManager.getCookies(client.identity.host);
-    Map<String, String> headers = client.identity.headers ?? {};
-    String? cookieHeader = headers['Cookie'];
+    final client = context.read<IdentityClient>();
+    final cookieManager = WebviewCookieManager();
+    final cookies = await cookieManager.getCookies(client.identity.host);
+    final headers = client.identity.headers ?? {};
+    final cookieHeader = headers['Cookie'];
     if (cookieHeader != null) {
       cookieHeader.split('; ').forEach((String cookie) {
-        List<String> splitCookie = cookie.split('=');
+        final splitCookie = cookie.split('=');
         if (splitCookie.length == 2) {
           headers[splitCookie[0]] = splitCookie[1];
         }
@@ -42,11 +44,11 @@ class _CookieCapturePageState extends State<CookieCapturePage> {
     for (final cookie in cookies) {
       headers[cookie.name] = cookie.value;
     }
-    List<String> cookieList = [];
+    final cookieList = <String>[];
     for (final cookie in headers.entries) {
       cookieList.add('${cookie.key}=${cookie.value}');
     }
-    String newCookieHeader = cookieList.join('; ');
+    final newCookieHeader = cookieList.join('; ');
     headers[HttpHeaders.cookieHeader] = newCookieHeader;
     client.replace(client.identity.copyWith(headers: headers));
   }

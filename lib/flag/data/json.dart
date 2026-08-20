@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:deep_pick/deep_pick.dart';
 import 'package:kilt/flag/flag.dart';
 

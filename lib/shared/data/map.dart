@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:collection/collection.dart';
 
 typedef QueryMap = Map<String, String>;
@@ -6,7 +8,7 @@ extension QueryMapping on Map<String, dynamic> {
   String? _serialize(Object? value) {
     if (value == null) return null;
     switch (value) {
-      case Enum e:
+      case final Enum e:
         return e.name;
       default:
         return value.toString();
@@ -16,12 +18,12 @@ extension QueryMapping on Map<String, dynamic> {
   void _serializeNested(Map<String, String> result, String key, Object? value) {
     if (value == null) return;
     switch (value) {
-      case Map m:
+      case final Map m:
         for (final e in m.entries) {
           final k = e.key.toString();
           _serializeNested(result, '$key[$k]', e.value);
         }
-      case Iterable i:
+      case final Iterable i:
         final serialized = i.map(_serialize).whereType<String>().join(',');
         if (serialized.isNotEmpty) result[key] = serialized;
       default:

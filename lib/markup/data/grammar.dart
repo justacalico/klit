@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:kilt/markup/markup.dart';
 import 'package:petitparser/petitparser.dart';
 
@@ -39,7 +41,7 @@ class DTextGrammar extends GrammarDefinition<DTextElement> {
     return parser.map((l) {
       DTextElement trim(DTextElement element, [bool? left]) {
         if (element is DTextContent) {
-          String text = element.content;
+          final text = element.content;
           if (left == null) {
             return DTextContent(text.trim());
           } else if (left) {
@@ -48,11 +50,11 @@ class DTextGrammar extends GrammarDefinition<DTextElement> {
             return DTextContent(text.trimRight());
           }
         } else if (element is DTextElements) {
-          List<DTextElement> elements = element.elements;
+          final elements = element.elements;
           if (elements.isEmpty) return element;
           if (left == null) {
-            DTextElement first = elements.first;
-            DTextElement last = elements.last;
+            final first = elements.first;
+            final last = elements.last;
             if (first == last) return trim(first);
             elements.remove(first);
             elements.remove(last);
@@ -62,11 +64,11 @@ class DTextGrammar extends GrammarDefinition<DTextElement> {
               trim(last, false),
             ]);
           } else if (left) {
-            DTextElement first = elements.first;
+            final first = elements.first;
             elements.remove(first);
             return DTextElements([trim(first, true), ...elements]);
           } else {
-            DTextElement last = elements.last;
+            final last = elements.last;
             elements.remove(last);
             return DTextElements([...elements, trim(last, false)]);
           }
@@ -80,17 +82,17 @@ class DTextGrammar extends GrammarDefinition<DTextElement> {
 
   DTextElement condenseDText(DTextElement element) {
     if (element is DTextElements) {
-      List<DTextElement> result = [];
+      final result = <DTextElement>[];
 
-      StringBuffer bread = StringBuffer();
+      final bread = StringBuffer();
       void bake() {
         if (bread.isEmpty) return;
         result.add(DTextContent(bread.toString()));
         bread.clear();
       }
 
-      for (DTextElement child in element.elements) {
-        DTextElement output = condenseDText(child);
+      for (final child in element.elements) {
+        final output = condenseDText(child);
         if (output is DTextContent) {
           bread.write(output.content);
         } else if (output is DTextElements) {
@@ -179,7 +181,7 @@ class DTextGrammar extends GrammarDefinition<DTextElement> {
     String end,
     Parser<DTextElement>? inner,
   ) {
-    Parser<void> limit = string('[/$end]', ignoreCase: true) | endOfInput();
+    final Parser<void> limit = string('[/$end]', ignoreCase: true) | endOfInput();
     return (
       (
         char('['),

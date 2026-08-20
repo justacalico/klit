@@ -1,6 +1,8 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter/material.dart';
 
 class TagSearchFilterTag extends BuilderFilterTag {
   TagSearchFilterTag({required super.tag, super.name})
@@ -14,7 +16,7 @@ class TagSearchFilter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FilterTagThemeData theme = FilterTagTheme.of(context);
+    final theme = FilterTagTheme.of(context);
     return SubTextValue(
       value: state.value,
       onChanged: (value) => state.onChanged(TagMap(value).toString()),
@@ -50,7 +52,7 @@ class EditTagPrompt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isDesktop = Theme.of(context).isDesktop;
+    final isDesktop = Theme.of(context).isDesktop;
     return ConstrainedBox(
       constraints: BoxConstraints(minWidth: isDesktop ? 600 : 0),
       child: Material(
@@ -86,7 +88,7 @@ class AddTagFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PromptActionController controller =
+    final controller =
         this.controller ?? PromptActions.of(context);
 
     return PromptFloatingActionButton(

@@ -1,8 +1,10 @@
-import 'package:kilt/logs/logs.dart';
-import 'package:kilt/l10n/gen/app_localizations.dart';
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/logs/logs.dart';
 
 class LoggerErrorNotifier extends StatelessWidget {
   const LoggerErrorNotifier({
@@ -19,12 +21,12 @@ class LoggerErrorNotifier extends StatelessWidget {
   void onMessage(BuildContext context, List<LogRecord> event) {
     if (kReleaseMode) return;
     final l10n = AppLocalizations.of(context);
-    ScaffoldMessengerState? messenger = ScaffoldMessenger.maybeOf(context);
+    final messenger = ScaffoldMessenger.maybeOf(context);
     if (messenger == null) return;
     if (event.isEmpty) return;
-    LogRecord item = event.last;
+    final item = event.last;
     if (item.level == Level.SHOUT) {
-      Color background = item.level.color;
+      final background = item.level.color;
       try {
         messenger.clearSnackBars();
         messenger.showSnackBar(
@@ -32,11 +34,11 @@ class LoggerErrorNotifier extends StatelessWidget {
             duration: const Duration(seconds: 3),
             content: Builder(
               builder: (context) {
-                TextStyle style = Theme.of(context).textTheme.bodyMedium!;
-                Color textColor =
+                final style = Theme.of(context).textTheme.bodyMedium!;
+                var textColor =
                     style.color ?? Theme.of(context).colorScheme.onSurface;
-                double textLuminance = textColor.computeLuminance();
-                double colorDifference =
+                final textLuminance = textColor.computeLuminance();
+                final colorDifference =
                     background.computeLuminance() - textLuminance;
                 if (colorDifference.abs() < 0.2) {
                   if (textLuminance > 0.5) {

@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:async';
 
 import 'package:async/async.dart';
 import 'package:drift/drift.dart';
-import 'package:kilt/traits/traits.dart';
 import 'package:flutter/foundation.dart';
+import 'package:kilt/traits/traits.dart';
 
 class TraitsClient extends TraitsRepository with ChangeNotifier {
   TraitsClient({required GeneratedDatabase database, this.onCreate})
@@ -29,7 +31,7 @@ class TraitsClient extends TraitsRepository with ChangeNotifier {
         );
       }
       if (_disposed) return;
-      TraitsRequest? request = await onCreate!(id);
+      final request = await onCreate!(id);
       if (request == null) return; // assuming the identity was deleted
       result = await add(request);
     }
@@ -65,16 +67,9 @@ class TraitsClient extends TraitsRepository with ChangeNotifier {
   }
 
   ValueNotifier<Traits> get notifier {
-    Stream<Traits> stream = _find(traits.id).transform(
-      StreamTransformer.fromHandlers(
-        handleData: (value, sink) {
-          // we drop null events. this is fine because [_onChanged] will
-          // be called and repupulate the value in the database
-          if (value == null) return;
-          sink.add(value);
-        },
-      ),
-    );
+    final stream = _find(traits.id)
+        .where((value) => value != null)
+        .cast<Traits>();
     final result = _StreamedValueNotifier<Traits>(
       initial: traits,
       stream: stream,

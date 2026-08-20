@@ -1,17 +1,19 @@
-import 'package:go_router/go_router.dart';
-import 'package:kilt/app/routing/app_routes.dart';
-import 'package:kilt/shared/controller/navigation_controller.dart';
-import 'package:kilt/shared/data/provider.dart';
-import 'package:kilt/shared/widget/glass.dart';
-import 'package:kilt/shared/widget/popups.dart';
-import 'package:kilt/settings/widget/icon.dart';
-import 'package:kilt/identity/identity.dart';
-import 'package:kilt/user/user.dart';
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kilt/app/routing/app_routes.dart';
+import 'package:kilt/identity/identity.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/settings/widget/icon.dart';
+import 'package:kilt/shared/controller/navigation_controller.dart';
+import 'package:kilt/shared/data/provider.dart';
+import 'package:kilt/shared/widget/glass.dart';
+import 'package:kilt/shared/widget/popups.dart';
+import 'package:kilt/user/user.dart';
 
 const double mobileBreakpoint = 600;
 const double compactBreakpoint = 900;
@@ -367,14 +369,14 @@ class _BottomNavDestination extends StatelessWidget {
   }
 }
 
-void _showMoreMenu(
+Future<void> _showMoreMenu(
   BuildContext context,
   List<({int index, NavItem item})> entries,
   _NavAdapter nav,
 ) async {
   final l10n = AppLocalizations.of(context);
-  final box = context.findRenderObject() as RenderBox;
-  final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+  final box = context.findRenderObject()! as RenderBox;
+  final overlay = Overlay.of(context).context.findRenderObject()! as RenderBox;
   final rect = RelativeRect.fromRect(
     Rect.fromPoints(
       box.localToGlobal(Offset.zero, ancestor: overlay),
@@ -494,7 +496,6 @@ class _SidebarState extends State<_Sidebar> {
             curve: Curves.easeInOut,
             width: width,
             child: Column(
-              mainAxisSize: MainAxisSize.max,
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(8, 28, 8, 8),
@@ -519,10 +520,10 @@ class _SidebarState extends State<_Sidebar> {
                             vertical: 12,
                           ),
                           child: collapsed
-                              ? Center(child: AppIcon(radius: 11))
+                              ? const Center(child: AppIcon(radius: 11))
                               : Row(
                                   children: [
-                                    AppIcon(radius: 11),
+                                    const AppIcon(radius: 11),
                                     const SizedBox(width: 14),
                                     Expanded(
                                       child: Text(
@@ -602,7 +603,7 @@ class _SidebarActiveAccountAvatar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Tooltip(
-        message: identity.username!,
+        message: identity.username,
         child: Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(

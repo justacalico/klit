@@ -24,134 +24,134 @@ void main() {
 
   group('TagValue.toString', () {
     test('simple tag', () {
-      expect(TagValue('tag').toString(), 'tag');
+      expect(const TagValue('tag').toString(), 'tag');
     });
 
     test('tag with value', () {
-      expect(TagValue('key', 'value').toString(), 'key:value');
+      expect(const TagValue('key', 'value').toString(), 'key:value');
     });
 
     test('value with spaces is quoted', () {
-      expect(TagValue('key', 'value with spaces').toString(), 'key:"value with spaces"');
+      expect(const TagValue('key', 'value with spaces').toString(), 'key:"value with spaces"');
     });
 
     test('quotes inside values are escaped', () {
-      expect(TagValue('key', 'value "with" quotes').toString(), 'key:"value \\"with\\" quotes"');
+      expect(const TagValue('key', 'value "with" quotes').toString(), r'key:"value \"with\" quotes"');
     });
 
     test('isRoot parameter is accepted', () {
-      expect(TagValue('key', 'value').toString(isRoot: false), 'key:value');
+      expect(const TagValue('key', 'value').toString(isRoot: false), 'key:value');
     });
   });
 
   group('TagValue equality', () {
     test('equal when name and value match', () {
-      expect(TagValue('a', 'b'), TagValue('a', 'b'));
+      expect(const TagValue('a', 'b'), const TagValue('a', 'b'));
     });
 
     test('not equal when value differs', () {
-      expect(TagValue('a', 'b') == TagValue('a', 'c'), isFalse);
+      expect(const TagValue('a', 'b') == const TagValue('a', 'c'), isFalse);
     });
 
     test('not equal when name differs', () {
-      expect(TagValue('a', 'b') == TagValue('c', 'b'), isFalse);
+      expect(const TagValue('a', 'b') == const TagValue('c', 'b'), isFalse);
     });
 
     test('hashCode matches for equal values', () {
-      expect(TagValue('a', 'b').hashCode, TagValue('a', 'b').hashCode);
+      expect(const TagValue('a', 'b').hashCode, const TagValue('a', 'b').hashCode);
     });
   });
 
   group('TagValue.compareTo', () {
     test('values sort before non-values', () {
-      expect(TagValue('a', 'b').compareTo(TagValue('a')), -1);
-      expect(TagValue('a').compareTo(TagValue('a', 'b')), 1);
+      expect(const TagValue('a', 'b').compareTo(const TagValue('a')), -1);
+      expect(const TagValue('a').compareTo(const TagValue('a', 'b')), 1);
     });
 
     test('alphabetical by name', () {
-      expect(TagValue('a').compareTo(TagValue('b')), lessThan(0));
-      expect(TagValue('b').compareTo(TagValue('a')), greaterThan(0));
+      expect(const TagValue('a').compareTo(const TagValue('b')), lessThan(0));
+      expect(const TagValue('b').compareTo(const TagValue('a')), greaterThan(0));
     });
 
     test('falls back to value when names equal', () {
-      expect(TagValue('a', 'b').compareTo(TagValue('a', 'c')), lessThan(0));
+      expect(const TagValue('a', 'b').compareTo(const TagValue('a', 'c')), lessThan(0));
     });
 
     test('equal tags compare as zero', () {
-      expect(TagValue('a', 'b').compareTo(TagValue('a', 'b')), 0);
+      expect(const TagValue('a', 'b').compareTo(const TagValue('a', 'b')), 0);
     });
   });
 
   group('TagGroup', () {
     test('name joins prefix and children', () {
-      final group = TagGroup('', [TagValue('a'), TagValue('b')]);
+      const group = TagGroup('', [TagValue('a'), TagValue('b')]);
       expect(group.name, '( a b )');
     });
 
     test('name includes prefix', () {
-      final group = TagGroup('-', [TagValue('a'), TagValue('b')]);
+      const group = TagGroup('-', [TagValue('a'), TagValue('b')]);
       expect(group.name, '-( a b )');
     });
 
     test('value is always empty', () {
-      final group = TagGroup('-', [TagValue('a')]);
+      const group = TagGroup('-', [TagValue('a')]);
       expect(group.value, '');
     });
 
     test('toString equals name', () {
-      final group = TagGroup('~', [TagValue('a'), TagValue('b')]);
+      const group = TagGroup('~', [TagValue('a'), TagValue('b')]);
       expect(group.toString(), '~( a b )');
     });
 
     test('equality compares prefix and children', () {
       expect(
-        TagGroup('-', [TagValue('a'), TagValue('b')]),
-        TagGroup('-', [TagValue('a'), TagValue('b')]),
+        const TagGroup('-', [TagValue('a'), TagValue('b')]),
+        const TagGroup('-', [TagValue('a'), TagValue('b')]),
       );
     });
 
     test('not equal when prefix differs', () {
       expect(
-        TagGroup('-', [TagValue('a')]) == TagGroup('~', [TagValue('a')]),
+        const TagGroup('-', [TagValue('a')]) == const TagGroup('~', [TagValue('a')]),
         isFalse,
       );
     });
 
     test('not equal when children differ', () {
       expect(
-        TagGroup('-', [TagValue('a')]) == TagGroup('-', [TagValue('b')]),
+        const TagGroup('-', [TagValue('a')]) == const TagGroup('-', [TagValue('b')]),
         isFalse,
       );
     });
 
     test('hashCode matches for equal groups', () {
       expect(
-        TagGroup('-', [TagValue('a'), TagValue('b')]).hashCode,
-        TagGroup('-', [TagValue('a'), TagValue('b')]).hashCode,
+        const TagGroup('-', [TagValue('a'), TagValue('b')]).hashCode,
+        const TagGroup('-', [TagValue('a'), TagValue('b')]).hashCode,
       );
     });
   });
 
   group('TagComment', () {
     test('name is prefixed with hash', () {
-      expect(TagComment('hello').name, '#hello');
+      expect(const TagComment('hello').name, '#hello');
     });
 
     test('value is always empty', () {
-      expect(TagComment('hello').value, '');
+      expect(const TagComment('hello').value, '');
     });
 
     test('toString equals name', () {
-      expect(TagComment('hello').toString(), '#hello');
+      expect(const TagComment('hello').toString(), '#hello');
     });
 
     test('equality compares comment text', () {
-      expect(TagComment('a'), TagComment('a'));
-      expect(TagComment('a') == TagComment('b'), isFalse);
+      expect(const TagComment('a'), const TagComment('a'));
+      expect(const TagComment('a') == const TagComment('b'), isFalse);
     });
 
     test('hashCode matches for equal comments', () {
-      expect(TagComment('a').hashCode, TagComment('a').hashCode);
+      expect(const TagComment('a').hashCode, const TagComment('a').hashCode);
     });
   });
 }

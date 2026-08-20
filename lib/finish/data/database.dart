@@ -1,8 +1,12 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:drift/drift.dart';
 import 'package:kilt/finish/data/database.drift.dart';
 import 'package:kilt/finish/data/finish.dart';
 import 'package:kilt/identity/data/database.dart';
 
+@TableIndex(name: 'finishes_identity_finished_at', columns: {#identityId, #finishedAt})
+@TableIndex(name: 'finishes_post_id', columns: {#postId})
 @UseRowClass(Finish, generateInsertable: true)
 class FinishesTable extends Table {
   IntColumn get id => integer().autoIncrement()();

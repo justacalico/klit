@@ -1,11 +1,13 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/logs/logs.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
 import 'package:kilt/ticket/ticket.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class TagsEditDisplay extends StatefulWidget {
   const TagsEditDisplay({super.key, required this.controller, this.enabled});

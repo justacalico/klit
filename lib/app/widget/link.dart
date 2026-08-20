@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:async';
 
 import 'package:app_links/app_links.dart';
-import 'package:kilt/app/app.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/app/app.dart';
 
 typedef LinkCallback = FutureOr<void> Function(Uri? url);
 
@@ -26,7 +28,7 @@ class _AppLinkHandlerState extends State<AppLinkHandler> {
 
   Future<void> onInitialLink(Uri? url) async {
     if (url != null) {
-      VoidCallback? action = const E621LinkParser().parseOnTap(
+      final action = const E621LinkParser().parseOnTap(
         widget.navigatorKey.currentContext!,
         url.toString(),
       );

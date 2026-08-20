@@ -1,7 +1,9 @@
-import 'package:kilt/shared/shared.dart';
-import 'package:kilt/tag/tag.dart';
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/tag/tag.dart';
 
 Widget? mergeSuffixIcons(InputDecoration? decoration, Widget? icon) {
   return decoration?.suffixIcon != null
@@ -24,7 +26,7 @@ class FilterTagTheme extends InheritedTheme {
   static FilterTagThemeData of(BuildContext context) => maybeOf(context)!;
 
   static FilterTagThemeData? maybeOf(BuildContext context) {
-    final FilterTagTheme? result = context
+    final result = context
         .dependOnInheritedWidgetOfExactType<FilterTagTheme>();
     return result?.data;
   }
@@ -134,7 +136,7 @@ class FilterList extends StatelessWidget {
   final List<FilterConfig> filters;
 
   Widget buildFilter(BuildContext context, FilterConfig config) {
-    FilterTagThemeData? theme = FilterTagTheme.maybeOf(context);
+    final theme = FilterTagTheme.maybeOf(context);
     return FilterTagTheme(
       data:
           theme ??
@@ -154,9 +156,9 @@ class FilterList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = [];
+    final children = <Widget>[];
 
-    List<FilterConfig> filters = List.of(this.filters);
+    final filters = List<FilterConfig>.of(this.filters);
 
     for (final filter in filters) {
       if (filters.indexOf(filter) != 0) {
@@ -196,7 +198,7 @@ class PrimaryFilter extends StatelessWidget {
           child: ExpandableNotifier(
             child: Builder(
               builder: (context) {
-                ExpandableController expandableController =
+                final expandableController =
                     ExpandableController.of(
                       context,
                       required: true,
@@ -212,8 +214,8 @@ class PrimaryFilter extends StatelessWidget {
                     }
                   },
                   builder: (context) {
-                    bool hasChildren = filters.isNotEmpty;
-                    FilterTagThemeData? theme = FilterTagTheme.maybeOf(context);
+                    final hasChildren = filters.isNotEmpty;
+                    var theme = FilterTagTheme.maybeOf(context);
                     theme ??= const FilterTagThemeData();
 
                     Widget? submitIcon;
@@ -311,7 +313,7 @@ class _TextFilterState extends State<TextFilter> {
 
   @override
   Widget build(BuildContext context) {
-    FilterTagThemeData theme = FilterTagTheme.of(context);
+    final theme = FilterTagTheme.of(context);
     return TextFormField(
       key: Key('FilterList/${state.filter.tag}'),
       autofocus: theme.primary,
@@ -337,7 +339,7 @@ class NumberRangeFilter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FilterTagThemeData theme = FilterTagTheme.of(context);
+    final theme = FilterTagTheme.of(context);
     return InkWell(
       onTap: () => showDialog(
         context: context,
@@ -375,7 +377,7 @@ class ChoiceFilter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FilterTagThemeData theme = FilterTagTheme.of(context);
+    final theme = FilterTagTheme.of(context);
     String? value;
     if (state.filter.options.map((e) => e.value).contains(state.value)) {
       value = state.value;
@@ -402,10 +404,10 @@ class ToggleFilter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FilterTagThemeData theme = FilterTagTheme.of(context);
-    String enabled = state.filter.enabled;
-    String? disabled = state.filter.disabled;
-    bool tristate = disabled != null;
+    final theme = FilterTagTheme.of(context);
+    final enabled = state.filter.enabled;
+    final disabled = state.filter.disabled;
+    final tristate = disabled != null;
 
     bool? value;
     if (tristate) {

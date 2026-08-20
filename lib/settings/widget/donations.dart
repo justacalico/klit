@@ -1,10 +1,12 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:kilt/identity/data/client.dart';
-import 'package:kilt/settings/settings.dart';
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kilt/identity/data/client.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/shared/shared.dart';
 
 extension DonationSummaryExtension on Donor {
   double totalForCurrency(String currency) {
@@ -14,7 +16,7 @@ extension DonationSummaryExtension on Donor {
   }
 
   String formattedAmounts() {
-    Map<String, double> totals = {};
+    final totals = <String, double>{};
     for (final currency in donations.map((e) => e.currency).toSet()) {
       totals[currency] = totalForCurrency(currency);
     }
@@ -27,10 +29,10 @@ extension DonationSummaryExtension on Donor {
 
 extension DonorSortingExtension on List<Donor> {
   List<Donor> sortByDonation({String preferredCurrency = 'USD'}) {
-    List<Donor> sortedDonors = List.from(this);
+    final sortedDonors = List<Donor>.from(this);
     sortedDonors.sort((Donor a, Donor b) {
-      double totalA = a.totalForCurrency(preferredCurrency);
-      double totalB = b.totalForCurrency(preferredCurrency);
+      final totalA = a.totalForCurrency(preferredCurrency);
+      final totalB = b.totalForCurrency(preferredCurrency);
 
       if (totalA > 0 && totalB > 0) {
         return totalB.compareTo(totalA);
@@ -39,9 +41,9 @@ extension DonorSortingExtension on List<Donor> {
       } else if (totalB > 0) {
         return 1;
       } else {
-        List<String> currenciesA =
+        final currenciesA =
             a.donations.map((donation) => donation.currency).toList()..sort();
-        List<String> currenciesB =
+        final currenciesB =
             b.donations.map((donation) => donation.currency).toList()..sort();
         return currenciesA.first.compareTo(currenciesB.first);
       }
@@ -59,7 +61,7 @@ class Donors extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    String? username = context.watch<IdentityClient>().identity.username;
+    final username = context.watch<IdentityClient>().identity.username;
     return Column(
       children: [
         ...donors.sortByDonation().map(

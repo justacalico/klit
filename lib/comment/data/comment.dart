@@ -1,5 +1,7 @@
-import 'package:kilt/shared/shared.dart';
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:kilt/shared/shared.dart';
 
 part 'comment.freezed.dart';
 part 'comment.g.dart';
@@ -19,7 +21,7 @@ abstract class Comment with _$Comment {
     required bool hidden,
   }) = _Comment;
 
-  factory Comment.fromJson(dynamic json) => _$CommentFromJson(json);
+  factory Comment.fromJson(Map<String, dynamic> json) => _$CommentFromJson(json);
 }
 
 @JsonEnum()

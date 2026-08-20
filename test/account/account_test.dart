@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kilt/account/data/account.dart';
 
 void main() {
-  final account = Account(
+  const account = Account(
     id: 1,
     name: 'testuser',
     avatarId: 42,
@@ -39,7 +39,7 @@ void main() {
     });
 
     test('handles null optional fields', () {
-      final accountNull = Account(
+      const accountNull = Account(
         id: 2,
         name: 'minimal',
         avatarId: null,

@@ -1,14 +1,16 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:async';
 
-import 'package:kilt/app/app.dart';
-import 'package:kilt/l10n/gen/app_localizations.dart';
-import 'package:kilt/settings/settings.dart';
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_sub/flutter_sub.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/shared/shared.dart';
 
 typedef _AppInitData = ({Logs logs, AppStorage storage, VoidCallback dispose});
 

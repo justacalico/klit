@@ -1,12 +1,14 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:async';
 
 import 'package:deep_pick/deep_pick.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/isolate.dart';
+import 'package:flutter/foundation.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/logs/logs.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
 abstract class ClientDataController<KeyType, ItemType>
@@ -79,7 +81,7 @@ abstract class PageClientDataController<T> extends ClientDataController<int, T>
   @override
   Future<PageResponse<int, T>> performRequest(int page, bool force) async =>
       withError(() async {
-        List<T> items = await withStream(fetch(page, force));
+        final items = await withStream(fetch(page, force));
         if (items.isEmpty) {
           return PageResponse.last(items: items);
         } else {

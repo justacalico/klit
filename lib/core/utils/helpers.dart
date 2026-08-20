@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
 
 const String defaultAccentColorHex = '#F7A8B8';
 
-final Color defaultAccentColor = Color(0xFFF7A8B8);
+const Color defaultAccentColor = Color(0xFFF7A8B8);
 
 Color colorFromHex(String hex) {
   final normalized = hex.trim().replaceFirst('#', '');

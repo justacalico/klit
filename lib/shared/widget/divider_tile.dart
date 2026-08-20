@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -39,7 +41,6 @@ class DividerListTile extends StatelessWidget {
               leading: leading,
               trailing: trailing,
               onTap: onTap,
-              additionalInfo: null,
             ),
           ),
           if (separated != null)

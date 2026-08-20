@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/pool/pool.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class PoolInfo extends StatelessWidget {
   const PoolInfo({super.key, required this.pool});
@@ -33,7 +35,7 @@ class PoolInfo extends StatelessWidget {
               InkWell(
                 child: Text('#${pool.id}'),
                 onLongPress: () async {
-                  ScaffoldMessengerState messenger = ScaffoldMessenger.of(
+                  final messenger = ScaffoldMessenger.of(
                     context,
                   );
                   Clipboard.setData(ClipboardData(text: pool.id.toString()));

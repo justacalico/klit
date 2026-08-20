@@ -1,10 +1,12 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
 extension ConditionalListenables on Listenable {
   Future<void> listenFor(bool Function() condition) async {
-    Completer<void> completer = Completer();
+    final completer = Completer<void>();
     void listener() {
       if (condition()) {
         removeListener(listener);

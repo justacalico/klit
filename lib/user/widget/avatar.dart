@@ -1,6 +1,11 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:flutter_sub/flutter_sub.dart';
 import 'package:kilt/account/account.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
@@ -8,9 +13,6 @@ import 'package:kilt/identity/identity.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/traits/traits.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_sub/flutter_sub.dart';
 
 /// In-memory cache of avatar URLs keyed by identity id, so each identity's
 /// avatar is only looked up once per session. The image bytes themselves are
@@ -107,8 +109,8 @@ class UserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int? id = this.id;
-    PostController? controller = this.controller;
+    final id = this.id;
+    final controller = this.controller;
     if (id == null || controller == null) {
       return const EmptyAvatar();
     }

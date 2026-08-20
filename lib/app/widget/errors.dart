@@ -1,6 +1,8 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
 import 'package:kilt/logs/logs.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 class ErrorNotifier extends StatelessWidget {
   const ErrorNotifier({
@@ -14,7 +16,7 @@ class ErrorNotifier extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Logs? logs = context.watch<Logs?>();
+    final logs = context.watch<Logs?>();
     if (logs == null) return child;
     return LoggerErrorNotifier(
       logs: logs,

@@ -1,4 +1,8 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/follow/follow.dart';
@@ -6,8 +10,6 @@ import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class FollowTile extends StatelessWidget {
   const FollowTile({super.key, required this.follow});
@@ -18,8 +20,8 @@ class FollowTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final client = context.watch<Client>();
     final l10n = AppLocalizations.of(context);
-    PromptActionController? promptController = PromptActions.maybeOf(context);
-    bool active = follow.latest != null && follow.thumbnail != null;
+    final promptController = PromptActions.maybeOf(context);
+    final active = follow.latest != null && follow.thumbnail != null;
 
     void editTitle() {
       promptController!.show(
@@ -33,7 +35,7 @@ class FollowTile extends StatelessWidget {
             actionController: promptController,
             textController: TextEditingController(text: follow.name),
             submit: (value) {
-              String? title = value.trim();
+              final title = value.trim();
               if (follow.title != value) {
                 client.follows.update(id: follow.id, title: title);
               }
@@ -63,8 +65,8 @@ class FollowTile extends StatelessWidget {
     }
 
     Widget contextMenu() {
-      bool notified = follow.type == FollowType.notify;
-      bool bookmarked = follow.type == FollowType.bookmark;
+      final notified = follow.type == FollowType.notify;
+      final bookmarked = follow.type == FollowType.bookmark;
 
       return PopupMenuButton<VoidCallback>(
         icon: const Dimmed(child: Icon(Icons.more_vert)),
@@ -112,7 +114,7 @@ class FollowTile extends StatelessWidget {
     }
 
     String getStatusText() {
-      int unseen = follow.unseen ?? 0;
+      final unseen = follow.unseen ?? 0;
       if (unseen == 1) {
         return l10n.followNewPost;
       }

@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' hide Consumer;
+import 'package:flutter_sub/flutter_sub.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/follow/follow.dart';
 import 'package:kilt/history/history.dart';
@@ -5,10 +11,6 @@ import 'package:kilt/pool/pool.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart' hide Consumer;
-import 'package:flutter_sub/flutter_sub.dart';
 
 class PostsSearchPage extends ConsumerStatefulWidget {
   const PostsSearchPage({
@@ -42,7 +44,7 @@ class _PostsSearchPageState extends ConsumerState<PostsSearchPage> {
         builder: (context, controller, child) {
           final client = context.read<Client>();
           Future<void> updateFollow() async {
-            String? tags = controller.query['tags'];
+            final tags = controller.query['tags'];
             if (tags?.nullWhenEmpty != null) {
               follow = await client.follows.getByTags(tags: tags!);
             } else {
@@ -55,7 +57,7 @@ class _PostsSearchPageState extends ConsumerState<PostsSearchPage> {
                 pool: pool,
               );
               if (!context.mounted) return;
-              Follow updated = await client.follows.get(id: follow!.id);
+              final updated = await client.follows.get(id: follow!.id);
               if (follow == updated) return;
               if (!context.mounted) return;
               setState(() => follow = updated);
@@ -67,7 +69,7 @@ class _PostsSearchPageState extends ConsumerState<PostsSearchPage> {
             setState(() {
               loadingInfo = true;
             });
-            RegExpMatch? match = poolRegex().firstMatch(
+            final match = poolRegex().firstMatch(
               controller.query['tags'] ?? '',
             );
             if (match != null) {

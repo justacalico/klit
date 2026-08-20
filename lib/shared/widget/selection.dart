@@ -1,6 +1,8 @@
-import 'package:kilt/shared/shared.dart';
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/shared/shared.dart';
 
 class SelectionLayoutData<T> extends InheritedWidget {
   /// Provides selection actions for a [SelectionLayout] to its subtree.
@@ -73,7 +75,7 @@ class SelectionLayoutData<T> extends InheritedWidget {
 
   @override
   bool updateShouldNotify(covariant SelectionLayoutData<T> oldWidget) =>
-      (oldWidget.selections != selections || oldWidget.onChanged != onChanged);
+      oldWidget.selections != selections || oldWidget.onChanged != onChanged;
 }
 
 class SelectionLayout<T> extends StatefulWidget {
@@ -114,7 +116,7 @@ class _SelectionLayoutState<T> extends State<SelectionLayout<T>> {
   void didUpdateWidget(covariant SelectionLayout<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.items != widget.items) {
-      Set<T> updated = Set.from(selections);
+      final updated = Set<T>.from(selections);
       updated.removeWhere(
         (element) => !(widget.items?.contains(element) ?? false),
       );
@@ -180,7 +182,7 @@ class SelectionAppBar<T> extends StatelessWidget with AppBarBuilderWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    SelectionLayoutData<T>? layoutData = SelectionLayout.maybeOf<T>(context);
+    final layoutData = SelectionLayout.maybeOf<T>(context);
     return CrossFade.builder(
       showChild: layoutData != null && layoutData.selections.isNotEmpty,
       builder: (context) => DefaultAppBar(
@@ -226,7 +228,7 @@ class SelectionItemOverlay<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SelectionLayoutData<T>? layoutData = SelectionLayout.maybeOf<T>(context);
+    final layoutData = SelectionLayout.maybeOf<T>(context);
     if (layoutData != null) {
       return Stack(
         fit: StackFit.passthrough,

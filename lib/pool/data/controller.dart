@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/foundation.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/pool/pool.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/foundation.dart';
 
 class PoolController extends PageClientDataController<Pool> {
   PoolController({required this.client, QueryMap? query})
@@ -31,13 +33,13 @@ class PoolController extends PageClientDataController<Pool> {
   @override
   @protected
   Future<List<Pool>> fetch(int page, bool force) async {
-    List<Pool> pools = await client.pools.page(
+    final pools = await client.pools.page(
       page: page,
       query: query,
       force: force,
       cancelToken: cancelToken,
     );
-    List<int> ids = pools
+    final ids = pools
         .map((e) => e.postIds.isNotEmpty ? e.postIds.first : null)
         .where((e) => e != null)
         .toList()
@@ -74,9 +76,9 @@ class ThumbnailController extends PostController {
   @override
   @protected
   Future<List<Post>> fetch(int page, bool force) async {
-    List<int>? ids = _ids[page];
+    final ids = _ids[page];
     if (ids == null) return [];
-    List<int> available = rawItems?.map((e) => e.id).toList() ?? [];
+    final available = rawItems?.map((e) => e.id).toList() ?? [];
     ids.removeWhere(available.contains);
     return client.posts.byIds(ids: ids, force: force, cancelToken: cancelToken);
   }

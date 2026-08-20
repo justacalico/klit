@@ -1,10 +1,12 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:async';
 
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
-import 'package:sliding_sheet/sliding_sheet.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:sliding_sheet/sliding_sheet.dart';
 
 abstract class _PromptActionRoute {
   /// Whether the dialog is open.
@@ -24,7 +26,7 @@ class _PromptActionDialog extends _PromptActionRoute {
 
   @override
   void close() {
-    NavigatorState? navigator = route.navigator;
+    final navigator = route.navigator;
     if (route.isActive) {
       if (navigator != null) {
         if (route.isCurrent) {
@@ -257,7 +259,7 @@ class PromptFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PromptActionController controller =
+    final controller =
         this.controller ?? PromptActions.of(context);
 
     return AnimatedBuilder(
@@ -284,9 +286,9 @@ class PromptTextFieldSuffix extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PromptActionController controller =
+    final controller =
         this.controller ?? PromptActions.of(context);
-    bool hasFab = Scaffold.maybeOf(context)?.hasFloatingActionButton ?? false;
+    final hasFab = Scaffold.maybeOf(context)?.hasFloatingActionButton ?? false;
     if (hasFab || !controller.isShown) {
       return const SizedBox();
     } else {
@@ -382,7 +384,7 @@ class SheetHandle extends StatelessWidget {
           margin: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(4),
-            color: Theme.of(context).iconTheme.color!,
+            color: Theme.of(context).iconTheme.color,
           ),
           height: 3,
           width: 32,

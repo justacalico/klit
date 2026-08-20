@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
 import 'package:kilt/history/history.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/topic/topic.dart';
-import 'package:flutter/material.dart';
 
 class TopicsPage extends StatelessWidget {
   const TopicsPage({super.key, this.query});
@@ -20,7 +22,7 @@ class TopicsPage extends StatelessWidget {
             addToHistory: (context, client, controller) => client.histories.add(
               TopicHistoryRequest.search(
                 query: controller.query,
-                topics: controller.items!,
+                topics: controller.items,
               ),
             ),
             child: AdaptiveScaffold(
@@ -28,7 +30,6 @@ class TopicsPage extends StatelessWidget {
                 title: Text(l10n.topicTopics),
                 actions: const [ContextDrawerButton()],
               ),
-              floatingActionButton: null,
               endDrawer: ContextDrawer(
                 title: Text(l10n.topicTopics),
                 children: [TopicTagEditingTile(controller: controller)],

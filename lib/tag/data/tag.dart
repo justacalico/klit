@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'tag.freezed.dart';
@@ -12,5 +14,5 @@ abstract class Tag with _$Tag {
     required int category,
   }) = _Tag;
 
-  factory Tag.fromJson(dynamic json) => _$TagFromJson(json);
+  factory Tag.fromJson(Map<String, dynamic> json) => _$TagFromJson(json);
 }

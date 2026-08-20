@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:deep_pick/deep_pick.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
@@ -19,7 +21,7 @@ abstract final class E621Post {
       size: post('files', 'meta').letOrNull((meta) => meta('size').asIntOrNull()) ?? 0,
       variants: post('files', 'video').letOrNull((video) {
         if (video('has').asBoolOrNull() != true) return null;
-        final Map<String, String?> result = {};
+        final result = <String, String?>{};
 
         final origW = video('original', 'width').asIntOrNull();
         final origH = video('original', 'height').asIntOrNull();

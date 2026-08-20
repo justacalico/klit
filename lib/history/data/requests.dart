@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:kilt/history/history.dart';
 import 'package:kilt/pool/pool.dart';
 import 'package:kilt/post/post.dart';
@@ -12,7 +14,7 @@ List<String> getPostHistoryThumbnails(List<Post>? posts) =>
 
 String getHistorySubtitle(Map<String, String> items) => items.entries
     .take(5)
-    .map((e) => '* "${e.value.replaceAll(r'"', '\'')}":${e.key}')
+    .map((e) => '* "${e.value.replaceAll(r'"', "'")}":${e.key}')
     .join('\n');
 
 abstract final class PostHistoryRequest {

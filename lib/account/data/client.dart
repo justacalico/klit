@@ -1,11 +1,13 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:deep_pick/deep_pick.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:kilt/account/account.dart';
 import 'package:kilt/identity/identity.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/traits/traits.dart';
-import 'package:flutter/foundation.dart';
 
 class AccountClient {
   AccountClient({
@@ -23,12 +25,12 @@ class AccountClient {
   Future<void> available() => dio.get('');
 
   Future<void> push({required Traits traits, CancelToken? cancelToken}) async {
-    Traits previous = this.traits.value;
+    final previous = this.traits.value;
     this.traits.value = traits;
     if (identity.username == null) return;
     try {
       if (!listEquals(previous.denylist, traits.denylist)) {
-        Map<String, dynamic> body = {
+        final body = <String, dynamic>{
           'user[blacklisted_tags]': traits.denylist.join('\n'),
         };
 
@@ -53,7 +55,7 @@ class AccountClient {
     if (identity.username == null) return null;
 
     try {
-      Account result = await dio
+      final result = await dio
           .get(
             '/users/${identity.username}.json',
             options: ClientCacheConfig(

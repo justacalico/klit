@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter/material.dart';
 
 Future<void> showDenyListEditorDialog(BuildContext context) {
   return showDialog<void>(
@@ -30,7 +32,7 @@ class DenyListEditor extends StatelessWidget {
       ],
       content: client.traits.value.denylist.join('\n'),
       onSubmitted: (value) async {
-        List<String> tags = value.split('\n');
+        var tags = value.split('\n');
         tags = tags.trim();
         tags.removeWhere((tag) => tag.isEmpty);
         try {
@@ -74,7 +76,7 @@ class _DenyListEditorDialogState extends State<_DenyListEditorDialog> {
       _error = null;
     });
     final client = context.read<Client>();
-    var tags = _controller.text.split('\n').trim();
+    final tags = _controller.text.split('\n').trim();
     tags.removeWhere((tag) => tag.isEmpty);
 
     try {

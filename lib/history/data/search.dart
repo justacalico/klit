@@ -1,5 +1,7 @@
-import 'package:kilt/history/history.dart';
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
+import 'package:kilt/history/history.dart';
 
 extension HistorySearchFilterDisplaying on HistoryCategory {
   String get title {

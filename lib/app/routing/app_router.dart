@@ -1,6 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:kilt/app/pages/blacklist_page.dart';
 import 'package:kilt/app/pages/feeds_page.dart';
 import 'package:kilt/app/pages/finishes_page.dart';
@@ -8,10 +9,10 @@ import 'package:kilt/app/pages/history_page.dart';
 import 'package:kilt/app/pages/home_page.dart';
 import 'package:kilt/app/pages/hot_page.dart';
 import 'package:kilt/app/pages/pools_page.dart';
+import 'package:kilt/app/pages/post/post_loading_page.dart';
 import 'package:kilt/app/pages/profile_page.dart';
 import 'package:kilt/app/pages/search_page.dart';
 import 'package:kilt/app/pages/settings_page.dart';
-import 'package:kilt/app/pages/post/post_loading_page.dart';
 import 'package:kilt/app/pages/topics_page.dart';
 import 'package:kilt/app/routing/app_routes.dart';
 import 'package:kilt/app/widget/main_shell.dart';

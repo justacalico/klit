@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/widgets.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/comment/comment.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/widgets.dart';
 
 class CommentLoadingPage extends StatefulWidget {
   const CommentLoadingPage(this.id, {super.key});

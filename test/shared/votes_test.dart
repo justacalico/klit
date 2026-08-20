@@ -16,14 +16,14 @@ void main() {
 
   group('VoteInfo.withVote', () {
     test('unknown status, upvote increments score and sets upvoted', () {
-      const info = VoteInfo(score: 10, status: VoteStatus.unknown);
+      const info = VoteInfo(score: 10);
       final result = info.withVote(true);
       expect(result.score, 11);
       expect(result.status, VoteStatus.upvoted);
     });
 
     test('unknown status, downvote decrements score and sets downvoted', () {
-      const info = VoteInfo(score: 10, status: VoteStatus.unknown);
+      const info = VoteInfo(score: 10);
       final result = info.withVote(false);
       expect(result.score, 9);
       expect(result.status, VoteStatus.downvoted);
@@ -127,7 +127,7 @@ void main() {
     });
 
     test('roundtrip with unknown status', () {
-      const original = VoteInfo(score: 0, status: VoteStatus.unknown);
+      const original = VoteInfo(score: 0);
       final restored = VoteInfo.fromJson(original.toJson());
       expect(restored, original);
     });

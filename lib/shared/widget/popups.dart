@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
 
 class PopupMenuTile<T> extends PopupMenuItem<T> {
@@ -59,7 +61,7 @@ class ListMenuTile extends StatelessWidget {
         if (title != null)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: title!,
+            child: title,
           ),
       ],
     );

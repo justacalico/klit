@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:kilt/follow/follow.dart';
 import 'package:kilt/pool/pool.dart';
 import 'package:kilt/post/post.dart';
@@ -9,7 +11,7 @@ extension Updating on Follow {
   bool get isSingle => !(tags.contains(' ') || tags.contains(':'));
 
   Follow withTitle(String title) {
-    Follow updated = this;
+    var updated = this;
     if (this.title != title) {
       updated = updated.copyWith(title: title);
     }
@@ -17,7 +19,7 @@ extension Updating on Follow {
   }
 
   Follow withAlias(String alias) {
-    Follow updated = this;
+    var updated = this;
     if (this.alias != alias) {
       updated = updated.copyWith(alias: alias);
     }
@@ -25,7 +27,7 @@ extension Updating on Follow {
   }
 
   Follow withPool(Pool pool) {
-    Follow updated = this;
+    var updated = this;
     updated = updated.withTitle(tagToName(pool.name));
     if (!pool.active) {
       updated = updated.copyWith(type: FollowType.bookmark);
@@ -34,7 +36,7 @@ extension Updating on Follow {
   }
 
   Follow withTimestamp() {
-    Follow updated = this;
+    var updated = this;
     if (updated.updated == null ||
         DateTime.now().difference(updated.updated!) >
             const Duration(minutes: 10)) {
@@ -44,7 +46,7 @@ extension Updating on Follow {
   }
 
   Follow withSeen() {
-    Follow updated = this;
+    var updated = this;
     if ((updated.unseen ?? 0) > 0) {
       updated = updated.copyWith(unseen: 0);
     }
@@ -52,7 +54,7 @@ extension Updating on Follow {
   }
 
   Follow withLatest(Post? post, {bool foreground = false}) {
-    Follow updated = this;
+    var updated = this;
     if (foreground && updated.unseen != 0) {
       updated = updated.copyWith(unseen: 0);
     }
@@ -71,13 +73,13 @@ extension Updating on Follow {
   }
 
   Follow withUnseen(List<Post> posts) {
-    Follow updated = this;
+    var updated = this;
     if (posts.isNotEmpty) {
       posts.sort((a, b) => b.id.compareTo(a.id));
-      Post? newest = posts.first;
+      final newest = posts.first;
       if (updated.latest != null) {
         posts = posts.takeWhile((e) => e.id > updated.latest!).toList();
-        int length = posts.length;
+        final length = posts.length;
         if (length > 0) {
           updated = updated.copyWith(unseen: updated.unseen! + length);
         }

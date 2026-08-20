@@ -1,7 +1,9 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/foundation.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/history/history.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/foundation.dart';
 
 class HistoryController extends PageClientDataController<History> {
   HistoryController({required this.client, QueryMap? query})

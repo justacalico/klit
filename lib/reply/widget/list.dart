@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/reply/reply.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 class ReplyList extends StatelessWidget {
   const ReplyList({super.key});
@@ -14,7 +16,7 @@ class ReplyList extends StatelessWidget {
         onRefresh: () => controller.refresh(force: true, background: true),
         child: CustomScrollView(
           primary: true,
-          scrollCacheExtent: ScrollCacheExtent.pixels(400),
+          scrollCacheExtent: const ScrollCacheExtent.pixels(400),
           slivers: [
             SliverPadding(
               padding: defaultActionListPadding,

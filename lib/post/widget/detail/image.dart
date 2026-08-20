@@ -1,7 +1,9 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 class PostDetailImage extends StatelessWidget {
   const PostDetailImage({super.key, required this.post});
@@ -27,7 +29,7 @@ class PostDetailVideo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    VideoPlayer player = post.getVideo(context)!;
+    final player = post.getVideo(context)!;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => player.state.playing ? player.pause() : player.play(),
@@ -104,7 +106,7 @@ class PostDetailImageToggle extends StatelessWidget {
       builder: (context, post) {
         if (post.isDeleted) return const SizedBox.shrink();
         if (post.file == null) return const SizedBox.shrink();
-        PostController controller = context.watch<PostController>();
+        final controller = context.watch<PostController>();
         return CrossFade.builder(
           showChild:
               (!post.isFavorited && controller.isDenied(post)) ||
@@ -166,8 +168,8 @@ class PostDetailImageActions extends StatelessWidget {
       builder: (context, post) {
         VoidCallback? onTap;
 
-        PostController controller = context.watch<PostController>();
-        bool visible =
+        final controller = context.watch<PostController>();
+        final visible =
             post.file != null &&
             (!controller.isDenied(post) || post.isFavorited);
 
@@ -213,7 +215,7 @@ class PostDetailImageActions extends StatelessWidget {
           );
         }
 
-        VideoPlayer? player = post.getVideo(context);
+        final player = post.getVideo(context);
 
         return Stack(
           fit: StackFit.passthrough,
@@ -294,7 +296,6 @@ class PostDetailImageDisplay extends StatelessWidget {
             final fittedWidth = (maxHeight * aspectRatio).clamp(1.0, maxWidth);
 
             return Align(
-              alignment: Alignment.center,
               child: SizedBox(
                 width: fittedWidth,
                 child: AspectRatio(

@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter/material.dart';
 
 class DrawerTagCounter extends StatelessWidget {
   const DrawerTagCounter({super.key, required this.controller});
@@ -30,7 +32,7 @@ class DrawerMultiTagCounter extends StatelessWidget {
       animation: Listenable.merge(controllers),
       builder: (context, child) {
         List<Post>? posts;
-        for (PostController controller in controllers) {
+        for (final controller in controllers) {
           if (controller.items != null) {
             posts ??= [];
             posts.addAll(controller.items!);
@@ -60,10 +62,10 @@ class DrawerTagCounterBody extends StatelessWidget {
     List<Widget>? children;
 
     if (posts != null) {
-      List<CountedTag> tags = countTagsByPosts(posts!);
+      final tags = countTagsByPosts(posts!);
       tags.sort((a, b) => b.count.compareTo(a.count));
       children = [];
-      for (CountedTag tag in tags.take(limit)) {
+      for (final tag in tags.take(limit)) {
         children.add(
           TagCounterCard(
             tag: tag.tag,
@@ -128,12 +130,12 @@ class DrawerTagCounterBody extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.warning_amber, size: 12),
+                            const Icon(Icons.warning_amber, size: 12),
                             Padding(
-                              padding: EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(8),
                               child: Text(
                                 l10n.wikiFailedLoadTags,
-                                style: TextStyle(fontStyle: FontStyle.italic),
+                                style: const TextStyle(fontStyle: FontStyle.italic),
                               ),
                             ),
                           ],

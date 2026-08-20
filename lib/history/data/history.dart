@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'history.freezed.dart';
@@ -16,7 +18,7 @@ abstract class History with _$History {
     required List<String> thumbnails,
   }) = _History;
 
-  factory History.fromJson(dynamic json) => _$HistoryFromJson(json);
+  factory History.fromJson(Map<String, dynamic> json) => _$HistoryFromJson(json);
 }
 
 @freezed
@@ -31,7 +33,7 @@ abstract class HistoryRequest with _$HistoryRequest {
     @Default([]) List<String> thumbnails,
   }) = _HistoryRequest;
 
-  factory HistoryRequest.fromJson(dynamic json) =>
+  factory HistoryRequest.fromJson(Map<String, dynamic> json) =>
       _$HistoryRequestFromJson(json);
 }
 

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 final Map<FaIconData, List<String>> hostIcons = {
@@ -20,7 +22,7 @@ final Map<FaIconData, List<String>> hostIcons = {
 };
 
 FaIconData? getHostIcon(String url) {
-  Uri? uri = Uri.tryParse(url);
+  final uri = Uri.tryParse(url);
   if (uri != null) {
     for (final entry in hostIcons.entries) {
       for (final host in entry.value) {

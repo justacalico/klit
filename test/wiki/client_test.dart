@@ -45,7 +45,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/wiki_pages/fox.json'),
-                data: wikiJson(id: 1, title: 'fox'),
+                data: wikiJson(),
               ));
 
       final wiki = await client.get(id: 'fox');
@@ -97,7 +97,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/wiki_pages.json'),
-                data: [wikiJson(id: 1), wikiJson(id: 2, title: 'dog')],
+                data: [wikiJson(), wikiJson(id: 2, title: 'dog')],
               ));
 
       final wikis = await client.page(page: 1, limit: 20);

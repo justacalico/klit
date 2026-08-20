@@ -90,9 +90,9 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "Openlyst" "\0"
-            VALUE "FileDescription", "Kiit" "\0"
+            VALUE "FileDescription", "Kilt" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "Kllt" "\0"
+            VALUE "InternalName", "Kilt" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 Openlyst. All rights reserved." "\0"
             VALUE "OriginalFilename", "Kilt.exe" "\0"
             VALUE "ProductName", "Kilt" "\0"

@@ -1,5 +1,7 @@
-import 'package:kilt/ticket/ticket.dart';
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
+import 'package:kilt/ticket/ticket.dart';
 
 class ReportFormHeader extends StatelessWidget {
   const ReportFormHeader({super.key, required this.title, this.icon});

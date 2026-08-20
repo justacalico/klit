@@ -1,5 +1,8 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:math';
 
+import 'package:flutter/material.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/comment/comment.dart';
@@ -8,7 +11,6 @@ import 'package:kilt/markup/markup.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 class PostImageTile extends StatelessWidget {
   const PostImageTile({
@@ -113,7 +115,7 @@ class PostTileOverlay extends StatelessWidget {
     return PostsConnector(
       post: post,
       builder: (context, post) {
-        PostController? controller = context.watch<PostController?>();
+        final controller = context.watch<PostController?>();
         final l10n = AppLocalizations.of(context);
         if (post.isDeleted) {
           return Center(child: Text(l10n.postStatusDeleted));
@@ -287,8 +289,8 @@ class PostInfoOverlay extends StatelessWidget {
 }
 
 void defaultPushPostDetail(BuildContext context, Post post) {
-  PostController? controller = context.read<PostController?>();
-  int? cacheSize = context.read<ImageCacheSize>().size;
+  final controller = context.read<PostController?>();
+  final cacheSize = context.read<ImageCacheSize>().size;
   Navigator.of(context).push(
     MaterialPageRoute(
       builder: (context) => ImageCacheSizeProvider(
@@ -299,10 +301,9 @@ void defaultPushPostDetail(BuildContext context, Post post) {
                 child: PostDetailGalleryWithShell(
                   controller: controller,
                   initialPage: controller.items!.indexOf(post),
-                  useShell: false,
                 ),
               )
-            : PostDetail(post: post, useShell: false),
+            : PostDetail(post: post),
       ),
     ),
   );
@@ -358,7 +359,7 @@ class PostFeedTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int? cacheSize = context.read<ImageCacheSize>().size;
+    final cacheSize = context.read<ImageCacheSize>().size;
     final l10n = AppLocalizations.of(context);
 
     Widget actions() {
@@ -384,8 +385,8 @@ class PostFeedTile extends StatelessWidget {
               status: post.vote.status,
               score: post.vote.score,
               onUpvote: (isLiked) async {
-                PostController controller = context.read<PostController>();
-                ScaffoldMessengerState messenger = ScaffoldMessenger.of(
+                final controller = context.read<PostController>();
+                final messenger = ScaffoldMessenger.of(
                   context,
                 );
                 if (context.read<Client>().hasLogin) {
@@ -409,8 +410,8 @@ class PostFeedTile extends StatelessWidget {
                 }
               },
               onDownvote: (isLiked) async {
-                PostController controller = context.read<PostController>();
-                ScaffoldMessengerState messenger = ScaffoldMessenger.of(
+                final controller = context.read<PostController>();
+                final messenger = ScaffoldMessenger.of(
                   context,
                 );
                 if (context.read<Client>().hasLogin) {
@@ -482,7 +483,7 @@ class PostFeedTile extends StatelessWidget {
           child: PostImageTile(
             post: post,
             onTap: () {
-              PostController? controller = context.read<PostController?>();
+              final controller = context.read<PostController?>();
               Navigator.of(context, rootNavigator: true).push(
                 MaterialPageRoute(
                   builder: (context) => PostVideoRoute(

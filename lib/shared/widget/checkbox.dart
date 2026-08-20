@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
 
 class CheckboxFormField extends StatelessWidget {
@@ -20,7 +22,7 @@ class CheckboxFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    InputDecoration decoration =
+    final decoration =
         this.decoration ?? const InputDecoration(border: OutlineInputBorder());
     return InkWell(
       onTap: () {

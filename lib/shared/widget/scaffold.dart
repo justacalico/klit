@@ -1,6 +1,8 @@
-import 'package:kilt/shared/shared.dart';
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/shared/shared.dart';
 
 class AdaptiveScaffold extends StatefulWidget {
   /// Displays Scaffold drawer and end drawer next to the body if breakpoints are met.
@@ -145,7 +147,7 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
   /// If an [AdaptiveScaffoldController] is available from context, it will be used to define the default value.
   bool get isInlineDrawerOpen => _isInlineDrawerOpen;
   set isInlineDrawerOpen(bool value) {
-    AdaptiveScaffoldController? controller = context
+    final controller = context
         .read<AdaptiveScaffoldController?>();
     if (controller != null) {
       controller.isDrawerOpen = value;
@@ -165,7 +167,7 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
   /// If an [AdaptiveScaffoldController] is available from context, it will be used to define the default value.
   bool get isInlineEndDrawerOpen => _isInlineEndDrawerOpen;
   set isInlineEndDrawerOpen(bool value) {
-    AdaptiveScaffoldController? controller = context
+    final controller = context
         .read<AdaptiveScaffoldController?>();
     if (controller != null) {
       controller.isEndDrawerOpen = value;
@@ -177,7 +179,7 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        AdaptiveScaffoldConfig effectiveConfig = AdaptiveScaffoldConfig(
+        final effectiveConfig = AdaptiveScaffoldConfig(
           drawerBreakpoint:
               widget.config?.drawerBreakpoint ??
               _defaultConfig.drawerBreakpoint,
@@ -192,7 +194,7 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
               widget.config?.adaptEndDrawer ?? _defaultConfig.adaptEndDrawer,
         );
 
-        Widget? effectiveDrawer = widget.drawer;
+        var effectiveDrawer = widget.drawer;
         Widget? inlineDrawer;
         if (widget.drawer != null &&
             effectiveConfig.adaptDrawer &&
@@ -201,7 +203,7 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
           inlineDrawer = widget.drawer;
         }
 
-        Widget? effectiveEndDrawer = widget.endDrawer;
+        var effectiveEndDrawer = widget.endDrawer;
         Widget? inlineEndDrawer;
         if (widget.endDrawer != null &&
             effectiveConfig.adaptEndDrawer &&
@@ -228,8 +230,8 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
           );
         }
 
-        bool showInlineDrawer = (drawerAction?.isDrawerOpen ?? true);
-        bool showInlineEndDrawer = (endDrawerAction?.isDrawerOpen ?? true);
+        final showInlineDrawer = drawerAction?.isDrawerOpen ?? true;
+        final showInlineEndDrawer = endDrawerAction?.isDrawerOpen ?? true;
 
         if (!showInlineDrawer) {
           effectiveDrawer = inlineDrawer;
@@ -238,7 +240,7 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> {
           effectiveEndDrawer = inlineEndDrawer;
         }
 
-        List<Widget> bodyChildren = [
+        final bodyChildren = <Widget>[
           CrossFade.builder(
             showChild: inlineDrawer != null && showInlineDrawer,
             builder: (context) => inlineDrawer!,

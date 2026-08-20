@@ -47,7 +47,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/comments.json/1.json'),
-                data: commentJson(id: 1),
+                data: commentJson(),
               ));
 
       final comment = await client.get(id: 1);
@@ -76,7 +76,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/comments.json'),
-                data: [commentJson(id: 1), commentJson(id: 2)],
+                data: [commentJson(), commentJson(id: 2)],
               ));
 
       final comments = await client.page(page: 2, limit: 50);
@@ -106,7 +106,7 @@ void main() {
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/comments.json'),
                 data: {
-                  'comments': [commentJson(id: 1)],
+                  'comments': [commentJson()],
                 },
               ));
 
@@ -142,7 +142,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/comments.json'),
-                data: [commentJson(id: 1, postId: 100)],
+                data: [commentJson()],
               ));
 
       final comments = await client.byPost(id: 100);

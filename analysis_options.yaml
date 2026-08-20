@@ -1,1 +1,41 @@
-include: package:flutter_lints/flutter.yaml
+include: package:very_good_analysis/analysis_options.10.3.0.yaml
+
+linter:
+  rules:
+    # documentation / style rules that are too noisy for a legacy codebase
+    public_member_api_docs: false
+    lines_longer_than_80_chars: false
+    flutter_style_todos: false
+    # rules that would require large, behavior-neutral refactors
+    always_put_required_named_parameters_first: false
+    avoid_positional_boolean_parameters: false
+    avoid_types_on_closure_parameters: false
+    unnecessary_lambdas: false
+    unnecessary_breaks: false
+    unnecessary_raw_strings: false
+    no_runtimetype_tostring: false
+    unnecessary_ignore: false
+    document_ignores: false
+    # rules that are too noisy to fix in a single pass; re-enable incrementally
+    discarded_futures: false
+    unawaited_futures: false
+    cascade_invocations: false
+    avoid_dynamic_calls: false
+    avoid_catches_without_on_clauses: false
+    parameter_assignments: false
+    no_default_cases: false
+    sort_pub_dependencies: false
+
+analyzer:
+  language:
+    # strict-casts/strict-raw-types/strict-inference are disabled for now
+    # because the legacy code contains many implicit dynamic casts and
+    # untyped collections. They should be enabled after a focused type audit.
+    strict-casts: false
+    strict-raw-types: false
+    strict-inference: false
+  exclude:
+    - lib/**.freezed.dart
+    - lib/**.g.dart
+    - lib/**.drift.dart
+    - lib/l10n/gen/**

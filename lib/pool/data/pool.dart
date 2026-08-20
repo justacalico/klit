@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'pool.freezed.dart';
@@ -16,5 +18,5 @@ abstract class Pool with _$Pool {
     required bool active,
   }) = _Pool;
 
-  factory Pool.fromJson(dynamic json) => _$PoolFromJson(json);
+  factory Pool.fromJson(Map<String, dynamic> json) => _$PoolFromJson(json);
 }

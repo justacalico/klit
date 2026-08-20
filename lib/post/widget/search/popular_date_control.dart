@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -94,7 +96,7 @@ class PopularDateInlineBar extends StatelessWidget {
     final result = await showDatePicker(
       context: context,
       initialDate: initial,
-      firstDate: DateTime(2007, 1, 1),
+      firstDate: DateTime(2007),
       lastDate: now,
       initialEntryMode: DatePickerEntryMode.calendarOnly,
     );
@@ -170,4 +172,3 @@ String popularDateLabel(HotPostController controller, AppLocalizations l10n) {
   }
   return '${DateFormat.MMMd().format(start)} – ${DateFormat.MMMd().format(end)}';
 }
-

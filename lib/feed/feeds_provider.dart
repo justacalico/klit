@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/foundation.dart';
 
 import 'package:kilt/feed/data/feed.dart';

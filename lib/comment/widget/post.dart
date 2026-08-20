@@ -1,11 +1,13 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/comment/comment.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class PostCommentsPage extends StatelessWidget {
   const PostCommentsPage({super.key, required this.postId});

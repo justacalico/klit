@@ -1,4 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:kilt/account/account.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
@@ -18,7 +21,6 @@ import 'package:kilt/topic/topic.dart';
 import 'package:kilt/traits/traits.dart';
 import 'package:kilt/user/user.dart';
 import 'package:kilt/wiki/wiki.dart';
-import 'package:flutter/foundation.dart';
 
 export 'package:dio/dio.dart' show CancelToken;
 
@@ -30,85 +32,86 @@ class Client with Disposable {
   final AppStorage storage;
   final Identity identity;
   final ValueNotifier<Traits> traits;
+  final List<Object?> _disposables = [];
 
-  late final AccountClient accounts = AccountClient(
-    dio: dio,
-    identity: identity,
-    traits: traits,
-    postsService: posts,
+  late final AccountClient accounts = _track(
+    AccountClient(
+      dio: dio,
+      identity: identity,
+      traits: traits,
+      postsService: posts,
+    ),
   );
-  late final UserClient users = UserClient(dio: dio);
+  late final UserClient users = _track(UserClient(dio: dio));
 
-  late final PostClient posts = PostClient(
-    dio: dio,
-    identity: identity,
-    poolsService: pools,
+  late final PostClient posts = _track(
+    PostClient(
+      dio: dio,
+      identity: identity,
+      poolsService: pools,
+    ),
   );
 
-  late final TagClient tags = TagClient(dio: dio);
-  late final WikiClient wikis = WikiClient(dio: dio);
+  late final TagClient tags = _track(TagClient(dio: dio));
+  late final WikiClient wikis = _track(WikiClient(dio: dio));
 
-  late final CommentClient comments = CommentClient(dio: dio);
+  late final CommentClient comments = _track(CommentClient(dio: dio));
 
-  late final PoolClient pools = PoolClient(dio: dio);
+  late final PoolClient pools = _track(PoolClient(dio: dio));
   // TODO: add Sets
 
-  late final TopicClient topics = TopicClient(dio: dio);
-  late final ReplyClient replies = ReplyClient(dio: dio);
+  late final TopicClient topics = _track(TopicClient(dio: dio));
+  late final ReplyClient replies = _track(ReplyClient(dio: dio));
 
-  late final FlagClient flags = FlagClient(dio: dio);
-  late final TicketClient tickets = TicketClient(dio: dio);
+  late final FlagClient flags = _track(FlagClient(dio: dio));
+  late final TicketClient tickets = _track(TicketClient(dio: dio));
 
-  late final FollowClient follows = FollowClient(
-    database: storage.sqlite,
-    identity: identity,
+  late final FollowClient follows = _track(
+    FollowClient(
+      database: storage.sqlite,
+      identity: identity,
+    ),
   );
 
-  late final FollowServer followServer = FollowServer(
-    database: storage.sqlite,
-    identity: identity,
-    traits: traits,
-    postsClient: posts,
-    poolsClient: pools,
-    tagsClient: tags,
+  late final FollowServer followServer = _track(
+    FollowServer(
+      database: storage.sqlite,
+      identity: identity,
+      traits: traits,
+      postsClient: posts,
+      poolsClient: pools,
+      tagsClient: tags,
+    ),
   );
 
-  late final HistoryServer historyServer = HistoryServer(
-    database: storage.sqlite,
-    identity: identity,
-    traits: traits,
+  late final HistoryServer historyServer = _track(
+    HistoryServer(
+      database: storage.sqlite,
+      identity: identity,
+      traits: traits,
+    ),
   );
 
-  late final HistoryClient histories = HistoryClient(server: historyServer);
-
-  late final FinishServer finishes = FinishServer(
-    database: storage.sqlite,
-    identity: identity,
+  late final HistoryClient histories = _track(
+    HistoryClient(server: historyServer),
   );
+
+  late final FinishServer finishes = _track(
+    FinishServer(
+      database: storage.sqlite,
+      identity: identity,
+    ),
+  );
+
+  T _track<T>(T client) {
+    _disposables.add(client);
+    return client;
+  }
 
   @override
   void dispose() {
     dio.close();
-    for (final client in [
-      accounts,
-      users,
-      posts,
-      tags,
-      wikis,
-      comments,
-      pools,
-      topics,
-      replies,
-      flags,
-      tickets,
-      follows,
-      followServer,
-      historyServer,
-      histories,
-      finishes,
-    ]) {
-      Disposable.tryDispose(client);
-    }
+    _disposables.forEach(Disposable.tryDispose);
     super.dispose();
   }
 }

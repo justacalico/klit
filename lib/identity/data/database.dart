@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:math';
 
 import 'package:drift/drift.dart';
@@ -32,10 +34,10 @@ class IdentitiesTable extends Table {
 @DriftAccessor(tables: [IdentitiesTable])
 class IdentityRepository extends DatabaseAccessor<GeneratedDatabase>
     with $IdentityRepositoryMixin {
-  IdentityRepository(super.db);
+  IdentityRepository(super.attachedDatabase);
 
   StreamFuture<int> length() {
-    final Expression<int> count = identitiesTable.id.count();
+    final count = identitiesTable.id.count();
 
     return (selectOnly(
       identitiesTable,
@@ -87,7 +89,7 @@ class IdentityRepository extends DatabaseAccessor<GeneratedDatabase>
     String? hostRegex,
   }) {
     limit ??= 80;
-    int offset = (max(1, page) - 1) * limit;
+    final offset = (max(1, page) - 1) * limit;
     return _queryExpression(
       nameRegex: nameRegex,
       hostRegex: hostRegex,

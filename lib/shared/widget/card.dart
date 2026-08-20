@@ -1,7 +1,9 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'glass.dart';
+import 'package:kilt/shared/widget/glass.dart';
 
 class ColoredCard extends StatelessWidget {
   const ColoredCard({
@@ -59,7 +61,6 @@ class ColoredCard extends StatelessWidget {
           )
         : content;
     return GlassCard(
-      margin: null,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       borderRadius: 8,
       elevation: 0,
@@ -84,7 +85,6 @@ class IndentedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassCard(
-      margin: null,
       padding: EdgeInsets.zero,
       borderRadius: 8,
       elevation: 0,

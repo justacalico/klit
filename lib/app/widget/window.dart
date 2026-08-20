@@ -1,11 +1,13 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:io';
 
-import 'package:kilt/app/app.dart';
-import 'package:kilt/settings/settings.dart';
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_sub_provider/developer.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:window_manager/window_manager.dart';
 
 class WindowFrame extends StatefulWidget {
@@ -91,7 +93,7 @@ class _WindowFrameState extends State<WindowFrame> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
-    WindowManager? manager = context.read<WindowManager?>();
+    final manager = context.read<WindowManager?>();
     if (manager == null || Platform.isMacOS) return widget.child;
     return Column(
       children: [
@@ -217,7 +219,7 @@ class WindowShortcuts extends StatelessWidget {
         const SingleActivator(LogicalKeyboardKey.escape): () =>
             navigatorKey.currentState!.maybePop(),
         const SingleActivator(LogicalKeyboardKey.f11): () async {
-          WindowManager? manager = context.read<WindowManager?>();
+          final manager = context.read<WindowManager?>();
           if (manager == null) return;
           if (await manager.isMaximized()) {
             await manager.unmaximize();
@@ -251,6 +253,6 @@ class _WindowProviderState extends SingleChildState<WindowProvider> {
 
   @override
   Widget buildWithChild(BuildContext context, Widget? child) {
-    return Provider.value(value: manager, child: child!);
+    return Provider.value(value: manager, child: child);
   }
 }

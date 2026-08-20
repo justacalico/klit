@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/ticket/ticket.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class ParentEditDisplay extends StatefulWidget {
   const ParentEditDisplay({super.key, required this.controller, this.enabled});
@@ -32,7 +34,7 @@ class _ParentEditDisplayState extends State<ParentEditDisplay> {
     super.dispose();
   }
 
-  void _onFocusChanged() async {
+  Future<void> _onFocusChanged() async {
     if (!_focusNode.hasFocus) {
       final l10n = AppLocalizations.of(context);
       final value = widget.controller.text;

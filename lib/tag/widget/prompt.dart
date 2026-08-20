@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/history/history.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
@@ -6,8 +10,6 @@ import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
 import 'package:kilt/wiki/wiki.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 Future<void> showTagSearchPrompt({
   required BuildContext context,
@@ -24,7 +26,7 @@ Future<void> showTagSearchSheet({
   required BuildContext context,
   required String tag,
 }) async {
-  PostController? controller = context.read<PostController?>();
+  final controller = context.read<PostController?>();
   return showDefaultSlidingBottomSheet(
     context,
     (context, sheetState) => TagSearchSheet(tag: tag, controller: controller),
@@ -98,7 +100,7 @@ class TagSearchInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<String> tags = TagMap(tag).toString().split(' ');
+    final tags = TagMap(tag).toString().split(' ');
 
     if (tags.length > 1) {
       return SingleChildScrollView(
@@ -145,7 +147,7 @@ class TagSearchInfoChild extends StatelessWidget {
       );
     }
 
-    bool alignRight =
+    final alignRight =
         context.findAncestorWidgetOfExactType<TagSearchDialog>() != null;
     return ExpandableNotifier(
       child: ExpandableTheme(
@@ -157,7 +159,7 @@ class TagSearchInfoChild extends StatelessWidget {
         child: ExpandablePanel(
           header: Builder(
             builder: (context) {
-              bool expanded = ExpandableController.of(context)!.expanded;
+              final expanded = ExpandableController.of(context)!.expanded;
               return Row(
                 children: [
                   Expanded(
@@ -212,7 +214,7 @@ class _SearchTagDisplayState extends State<SearchTagDisplay> {
 
   Future<Wiki?> retrieveWiki() async {
     final client = context.read<Client>();
-    List<Wiki> results = await client.wikis.page(
+    final results = await client.wikis.page(
       query: {'search[title]': tagToRaw(widget.tag)},
     );
     for (final e in results) {
@@ -294,7 +296,7 @@ Future<void> showTagSearchDialog({
   required BuildContext context,
   required String tag,
 }) {
-  PostController? controller = context.read<PostController?>();
+  final controller = context.read<PostController?>();
   return showDialog(
     context: context,
     builder: (context) => TagSearchDialog(tag: tag, controller: controller),

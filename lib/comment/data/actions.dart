@@ -1,15 +1,17 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/comment/comment.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 Future<bool> replyComment({
   required BuildContext context,
   required Comment comment,
 }) {
-  String body = comment.body;
+  var body = comment.body;
   body = body
       .replaceFirstMapped(
         RegExp(
@@ -34,16 +36,16 @@ Future<bool> writeComment({
   String? text,
   Comment? comment,
 }) async {
-  bool sent = false;
+  var sent = false;
   await Navigator.of(context).push(
     MaterialPageRoute(
       builder: (context) {
         final l10n = AppLocalizations.of(context);
         return DTextEditor(
           title: Text(l10n.commentDialogTitle(postId)),
-          content: text ?? (comment?.body),
+          content: text ?? comment?.body,
           onSubmitted: (text) async {
-            ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+            final messenger = ScaffoldMessenger.of(context);
             if (text.isNotEmpty) {
               String? error;
               if (comment == null) {

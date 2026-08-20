@@ -35,18 +35,18 @@ void main() {
       });
 
       test('id does not match a different id', () {
-        final post = makePost(id: 1);
+        final post = makePost();
         expect(post.hasTag('id:99'), isFalse);
       });
 
       test('rating matches by short name', () {
-        expect(makePost(rating: Rating.s).hasTag('rating:s'), isTrue);
+        expect(makePost().hasTag('rating:s'), isTrue);
         expect(makePost(rating: Rating.q).hasTag('rating:q'), isTrue);
         expect(makePost(rating: Rating.e).hasTag('rating:e'), isTrue);
       });
 
       test('rating matches by title name', () {
-        expect(makePost(rating: Rating.s).hasTag('rating:safe'), isTrue);
+        expect(makePost().hasTag('rating:safe'), isTrue);
         expect(
           makePost(rating: Rating.q).hasTag('rating:questionable'),
           isTrue,
@@ -55,54 +55,54 @@ void main() {
       });
 
       test('rating does not match a different rating', () {
-        expect(makePost(rating: Rating.s).hasTag('rating:e'), isFalse);
+        expect(makePost().hasTag('rating:e'), isFalse);
       });
 
       test('type matches the file extension', () {
-        final post = makePost(ext: 'jpg');
+        final post = makePost();
         expect(post.hasTag('type:jpg'), isTrue);
       });
 
       test('type is case insensitive', () {
-        final post = makePost(ext: 'jpg');
+        final post = makePost();
         expect(post.hasTag('type:JPG'), isTrue);
       });
 
       test('type does not match a different extension', () {
-        final post = makePost(ext: 'jpg');
+        final post = makePost();
         expect(post.hasTag('type:png'), isFalse);
       });
 
       test('width matches an exact value', () {
-        final post = makePost(width: 1000);
+        final post = makePost();
         expect(post.hasTag('width:1000'), isTrue);
       });
 
       test('width matches a less-than range', () {
-        final post = makePost(width: 1000);
+        final post = makePost();
         expect(post.hasTag('width:<2000'), isTrue);
         expect(post.hasTag('width:<500'), isFalse);
       });
 
       test('width matches a greater-than range', () {
-        final post = makePost(width: 1000);
+        final post = makePost();
         expect(post.hasTag('width:>500'), isTrue);
         expect(post.hasTag('width:>2000'), isFalse);
       });
 
       test('width matches a bounded range', () {
-        final post = makePost(width: 1000);
+        final post = makePost();
         expect(post.hasTag('width:500..2000'), isTrue);
         expect(post.hasTag('width:100..500'), isFalse);
       });
 
       test('height matches an exact value', () {
-        final post = makePost(height: 800);
+        final post = makePost();
         expect(post.hasTag('height:800'), isTrue);
       });
 
       test('filesize matches an exact value', () {
-        final post = makePost(size: 500000);
+        final post = makePost();
         expect(post.hasTag('filesize:500000'), isTrue);
       });
 
@@ -112,22 +112,22 @@ void main() {
       });
 
       test('favcount matches an exact value', () {
-        final post = makePost(favCount: 10);
+        final post = makePost();
         expect(post.hasTag('favcount:10'), isTrue);
       });
 
       test('fav matches when the post is favorited', () {
         expect(makePost(isFavorited: true).hasTag('fav:'), isTrue);
-        expect(makePost(isFavorited: false).hasTag('fav:'), isFalse);
+        expect(makePost().hasTag('fav:'), isFalse);
       });
 
       test('uploader matches the uploader id', () {
-        final post = makePost(uploaderId: 100);
+        final post = makePost();
         expect(post.hasTag('uploader:100'), isTrue);
       });
 
       test('userid matches the uploader id', () {
-        final post = makePost(uploaderId: 100);
+        final post = makePost();
         expect(post.hasTag('userid:100'), isTrue);
       });
 
@@ -138,7 +138,7 @@ void main() {
       });
 
       test('pool does not match when the post has no pools', () {
-        final post = makePost(pools: null);
+        final post = makePost();
         expect(post.hasTag('pool:1'), isFalse);
       });
 
@@ -148,10 +148,7 @@ void main() {
       });
 
       test('tagcount matches the total number of tags', () {
-        final post = makePost(tags: const {
-          'general': ['fox', 'canine'],
-          'species': ['dog'],
-        });
+        final post = makePost();
         expect(post.hasTag('tagcount:3'), isTrue);
         expect(post.hasTag('tagcount:2'), isFalse);
       });

@@ -4,51 +4,51 @@ import 'package:kilt/markup/data/types.dart';
 void main() {
   group('DTextId', () {
     test('contains returns true when span covers other', () {
-      final outer = const DTextId(start: 0, end: 10);
-      final inner = const DTextId(start: 2, end: 8);
+      const outer = DTextId(start: 0, end: 10);
+      const inner = DTextId(start: 2, end: 8);
       expect(outer.contains(inner), isTrue);
     });
 
     test('contains returns true for identical spans', () {
-      final id = const DTextId(start: 5, end: 15);
+      const id = DTextId(start: 5, end: 15);
       expect(id.contains(id), isTrue);
     });
 
     test('contains returns false when span does not cover other', () {
-      final a = const DTextId(start: 0, end: 5);
-      final b = const DTextId(start: 6, end: 10);
+      const a = DTextId(start: 0, end: 5);
+      const b = DTextId(start: 6, end: 10);
       expect(a.contains(b), isFalse);
     });
 
     test('contains returns false for partial overlap', () {
-      final a = const DTextId(start: 0, end: 5);
-      final b = const DTextId(start: 3, end: 10);
+      const a = DTextId(start: 0, end: 5);
+      const b = DTextId(start: 3, end: 10);
       expect(a.contains(b), isFalse);
     });
 
     test('isContainedBy is the inverse of contains', () {
-      final outer = const DTextId(start: 0, end: 10);
-      final inner = const DTextId(start: 2, end: 8);
+      const outer = DTextId(start: 0, end: 10);
+      const inner = DTextId(start: 2, end: 8);
       expect(inner.isContainedBy(outer), isTrue);
       expect(outer.isContainedBy(inner), isFalse);
     });
 
     test('equality compares start and end', () {
-      final a = const DTextId(start: 1, end: 5);
-      final b = const DTextId(start: 1, end: 5);
-      final c = const DTextId(start: 1, end: 6);
+      const a = DTextId(start: 1, end: 5);
+      const b = DTextId(start: 1, end: 5);
+      const c = DTextId(start: 1, end: 6);
       expect(a == b, isTrue);
       expect(a == c, isFalse);
     });
 
     test('hashCode is consistent with equality', () {
-      final a = const DTextId(start: 1, end: 5);
-      final b = const DTextId(start: 1, end: 5);
+      const a = DTextId(start: 1, end: 5);
+      const b = DTextId(start: 1, end: 5);
       expect(a.hashCode, b.hashCode);
     });
 
     test('toString contains start and end', () {
-      final id = const DTextId(start: 3, end: 7);
+      const id = DTextId(start: 3, end: 7);
       expect(id.toString(), contains('3'));
       expect(id.toString(), contains('7'));
     });
@@ -56,21 +56,21 @@ void main() {
 
   group('DTextContent', () {
     test('operator + concatenates content', () {
-      final a = const DTextContent('hello ');
-      final b = const DTextContent('world');
+      const a = DTextContent('hello ');
+      const b = DTextContent('world');
       final result = a + b;
       expect(result.content, 'hello world');
     });
 
     test('operator + with empty content', () {
-      final a = const DTextContent('');
-      final b = const DTextContent('text');
+      const a = DTextContent('');
+      const b = DTextContent('text');
       expect((a + b).content, 'text');
     });
 
     test('operator + returns DTextContent', () {
-      final a = const DTextContent('a');
-      final b = const DTextContent('b');
+      const a = DTextContent('a');
+      const b = DTextContent('b');
       expect(a + b, isA<DTextContent>());
     });
   });
@@ -127,9 +127,9 @@ void main() {
 
   group('DTextElement types', () {
     test('DTextElements holds a list of elements', () {
-      final elements = DTextElements([
-        const DTextContent('a'),
-        const DTextContent('b'),
+      const elements = DTextElements([
+        DTextContent('a'),
+        DTextContent('b'),
       ]);
       expect(elements.elements.length, 2);
     });

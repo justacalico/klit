@@ -21,9 +21,9 @@ if (keystorePropertiesFile != null) {
 }
 
 android {
-    namespace = "gitlab.openlyst.klit"
+    namespace = "gitlab.openlyst.kilt"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973" // flutter.ndkVersion
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 // ignore_for_file: experimental_member_use
 import 'package:drift/drift.dart';
 import 'package:kilt/finish/data/database.dart';
@@ -26,7 +28,7 @@ class AppDatabase extends $AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -72,6 +74,22 @@ class AppDatabase extends $AppDatabase {
       }
       if (from < 6) {
         await m.createTable(finishesTable);
+      }
+      if (from < 7) {
+        const indexes = [
+          'CREATE INDEX IF NOT EXISTS follows_tags ON follows_table(tags);',
+          'CREATE INDEX IF NOT EXISTS follows_updated ON follows_table(updated);',
+          'CREATE INDEX IF NOT EXISTS follows_latest ON follows_table(latest);',
+          'CREATE INDEX IF NOT EXISTS follows_unseen ON follows_table(unseen);',
+          'CREATE INDEX IF NOT EXISTS histories_visited_at ON histories_table(visited_at);',
+          'CREATE INDEX IF NOT EXISTS histories_category_visited_at ON histories_table(category, visited_at);',
+          'CREATE INDEX IF NOT EXISTS histories_type_visited_at ON histories_table(type, visited_at);',
+          'CREATE INDEX IF NOT EXISTS finishes_identity_finished_at ON finishes_table(identity_id, finished_at);',
+          'CREATE INDEX IF NOT EXISTS finishes_post_id ON finishes_table(post_id);',
+        ];
+        for (final statement in indexes) {
+          await customStatement(statement);
+        }
       }
     },
     beforeOpen: (details) => customStatement('PRAGMA foreign_keys = ON'),

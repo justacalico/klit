@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:io';
 
 import 'package:camera/camera.dart';
-import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 
 /// Opens a desktop camera capture dialog and returns the path to a captured
 /// JPEG, or null if the user cancelled / no camera was available.

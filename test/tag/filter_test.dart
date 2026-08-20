@@ -8,7 +8,7 @@ void main() {
       void onChanged(QueryMap tags) {}
       void onSubmit(QueryMap tags) {}
       final state = FilterConfigState(
-        tags: {},
+        tags: const {},
         onChanged: onChanged,
         onSubmit: onSubmit,
       );
@@ -25,7 +25,7 @@ void main() {
         tags: {'existing': 'value'},
         onChanged: _noop,
       );
-      final state = config.apply(TextFilterTag(tag: 'existing'));
+      final state = config.apply(const TextFilterTag(tag: 'existing'));
       expect(state.value, 'value');
     });
 
@@ -34,7 +34,7 @@ void main() {
         tags: {'existing': 'value'},
         onChanged: _noop,
       );
-      final state = config.apply(TextFilterTag(tag: 'missing'));
+      final state = config.apply(const TextFilterTag(tag: 'missing'));
       expect(state.value, isNull);
     });
 
@@ -42,10 +42,10 @@ void main() {
       QueryMap? captured;
       void onChanged(QueryMap tags) => captured = tags;
       final config = FilterConfigState(
-        tags: {'existing': 'value'},
+        tags: const {'existing': 'value'},
         onChanged: onChanged,
       );
-      final state = config.apply(TextFilterTag(tag: 'new'));
+      final state = config.apply(const TextFilterTag(tag: 'new'));
       state.onChanged('hello');
       expect(captured, {'existing': 'value', 'new': 'hello'});
     });
@@ -54,10 +54,10 @@ void main() {
       QueryMap? captured;
       void onChanged(QueryMap tags) => captured = tags;
       final config = FilterConfigState(
-        tags: {'existing': 'value'},
+        tags: const {'existing': 'value'},
         onChanged: onChanged,
       );
-      final state = config.apply(TextFilterTag(tag: 'existing'));
+      final state = config.apply(const TextFilterTag(tag: 'existing'));
       state.onChanged(null);
       expect(captured, isEmpty);
     });
@@ -66,18 +66,18 @@ void main() {
       QueryMap? captured;
       void onSubmit(QueryMap tags) => captured = tags;
       final config = FilterConfigState(
-        tags: {'existing': 'value'},
+        tags: const {'existing': 'value'},
         onChanged: _noop,
         onSubmit: onSubmit,
       );
-      final state = config.apply(TextFilterTag(tag: 'new'));
+      final state = config.apply(const TextFilterTag(tag: 'new'));
       state.onSubmit?.call('hello');
       expect(captured, {'existing': 'value', 'new': 'hello'});
     });
 
     test('onSubmit is null when config has no submit handler', () {
       const config = FilterConfigState(tags: {}, onChanged: _noop);
-      final state = config.apply(TextFilterTag(tag: 'new'));
+      final state = config.apply(const TextFilterTag(tag: 'new'));
       expect(state.onSubmit, isNull);
     });
 
@@ -86,7 +86,7 @@ void main() {
         tags: {'existing': 'value'},
         onChanged: _noop,
       );
-      final state = config.apply(TextFilterTag(tag: 'existing'));
+      final state = config.apply(const TextFilterTag(tag: 'existing'));
       expect(state.toString(), contains('existing'));
       expect(state.toString(), contains('value'));
     });
@@ -96,8 +96,8 @@ void main() {
         tags: {'existing': 'value'},
         onChanged: _noop,
       );
-      final state1 = config.apply(TextFilterTag(tag: 'existing'));
-      final state2 = config.apply(TextFilterTag(tag: 'existing'));
+      final state1 = config.apply(const TextFilterTag(tag: 'existing'));
+      final state2 = config.apply(const TextFilterTag(tag: 'existing'));
       expect(state1, state2);
     });
 
@@ -110,8 +110,8 @@ void main() {
         tags: {'existing': 'different'},
         onChanged: _noop,
       );
-      final state1 = config1.apply(TextFilterTag(tag: 'existing'));
-      final state2 = config2.apply(TextFilterTag(tag: 'existing'));
+      final state1 = config1.apply(const TextFilterTag(tag: 'existing'));
+      final state2 = config2.apply(const TextFilterTag(tag: 'existing'));
       expect(state1 == state2, isFalse);
     });
 
@@ -120,7 +120,7 @@ void main() {
         tags: {'existing': 'value'},
         onChanged: _noop,
       );
-      final filter = TextFilterTag(tag: 'existing');
+      const filter = TextFilterTag(tag: 'existing');
       final state1 = config.apply(filter);
       final state2 = config.apply(filter);
       expect(state1.hashCode, state2.hashCode);
@@ -148,7 +148,7 @@ void main() {
     });
 
     test('copyWith applies new values', () {
-      const theme = FilterTagThemeData(primary: false);
+      const theme = FilterTagThemeData();
       final copied = theme.copyWith(primary: true);
       expect(copied.primary, isTrue);
     });

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
 
 class LimitedWidthLayoutData extends InheritedWidget {
@@ -51,7 +53,7 @@ class LimitedWidthLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        double padding = (constraints.maxWidth - maxWidth) / 2;
+        var padding = (constraints.maxWidth - maxWidth) / 2;
         if (padding < tolerance) {
           padding = 0;
         }

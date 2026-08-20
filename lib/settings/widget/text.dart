@@ -1,6 +1,8 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 class PrivateTextFields extends StatelessWidget {
   const PrivateTextFields({super.key, required this.child});

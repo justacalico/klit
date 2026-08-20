@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:async';
 import 'dart:io';
 
@@ -65,7 +67,7 @@ Future<FlutterLocalNotificationsPlugin> initializeNotifications({
   DidReceiveBackgroundNotificationResponseCallback?
   onDidReceiveBackgroundNotificationResponse,
 }) async {
-  FlutterLocalNotificationsPlugin notifications =
+  final notifications =
       FlutterLocalNotificationsPlugin();
   await notifications.initialize(
     settings: const InitializationSettings(

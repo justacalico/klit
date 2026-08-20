@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'topic.freezed.dart';
@@ -21,5 +23,5 @@ abstract class Topic with _$Topic {
     required int categoryId,
   }) = _Topic;
 
-  factory Topic.fromJson(dynamic json) => _$TopicFromJson(json);
+  factory Topic.fromJson(Map<String, dynamic> json) => _$TopicFromJson(json);
 }

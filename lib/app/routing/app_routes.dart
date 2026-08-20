@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart' show IconData, Icons;
 
 abstract class AppRoutes {

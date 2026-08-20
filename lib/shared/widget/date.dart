@@ -1,5 +1,7 @@
-import 'package:kilt/shared/shared.dart';
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:relative_time/relative_time.dart';
 
 class TimedText extends StatelessWidget {

@@ -74,11 +74,11 @@ void main() {
     });
 
     test('escapes special regex characters', () {
-      expect('a.b*c'.infixRegex, '.*a\\.b\\*c.*');
+      expect('a.b*c'.infixRegex, r'.*a\.b\*c.*');
     });
 
     test('escapes parentheses', () {
-      expect('(test)'.infixRegex, '.*\\(test\\).*');
+      expect('(test)'.infixRegex, r'.*\(test\).*');
     });
 
     test('produces a working regex', () {

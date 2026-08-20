@@ -1,12 +1,14 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_sub/flutter_sub.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/follow/follow.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_sub/flutter_sub.dart';
 
 class TagListActions extends StatelessWidget {
   const TagListActions({super.key, required this.tag});
@@ -36,17 +38,17 @@ class TagListActions extends StatelessWidget {
               );
             }
 
-            Follow? follow = snapshot.data;
-            bool hasFollow = follow != null;
+            final follow = snapshot.data;
+            final hasFollow = follow != null;
 
-            bool following = [
+            final following = [
               FollowType.update,
               FollowType.notify,
             ].contains(follow?.type);
 
-            bool notifying = follow?.type == FollowType.notify;
-            bool bookmarked = follow?.type == FollowType.bookmark;
-            bool denied = traits.denylist.contains(tag);
+            final notifying = follow?.type == FollowType.notify;
+            final bookmarked = follow?.type == FollowType.bookmark;
+            final denied = traits.denylist.contains(tag);
 
             VoidCallback followBookmarkToggle(FollowType type) {
               return () {
@@ -187,7 +189,7 @@ class RemoveTagAction extends StatelessWidget {
       label: Text(l10n.commonRemove),
       onTap: () {
         Navigator.of(context).maybePop();
-        QueryMap result = controller.query.toQuery();
+        final result = controller.query.toQuery();
         result['tags'] = (TagMap(result['tags'])..remove(tag)).toString();
         controller.query = result;
       },
@@ -262,7 +264,7 @@ class TagSearchActions extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        bool isSearched = TagMap(controller.query['tags']).containsKey(tag);
+        final isSearched = TagMap(controller.query['tags']).containsKey(tag);
 
         if (isSearched) {
           return RemoveTagAction(controller: controller, tag: tag);

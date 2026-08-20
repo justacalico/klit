@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:flutter/material.dart';
 import 'package:grouped_list/sliver_grouped_list.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';

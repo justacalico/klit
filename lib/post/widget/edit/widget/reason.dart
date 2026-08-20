@@ -1,6 +1,8 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/ticket/ticket.dart';
-import 'package:flutter/material.dart';
 
 class EditReasonDisplay extends StatelessWidget {
   const EditReasonDisplay({super.key, required this.controller, this.enabled});

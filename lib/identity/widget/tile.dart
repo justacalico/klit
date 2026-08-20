@@ -1,10 +1,12 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kilt/app/routing/app_routes.dart';
 import 'package:kilt/identity/identity.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/user/user.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class IdentityTile extends StatelessWidget {
   const IdentityTile({

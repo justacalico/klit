@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: AGPL-3.0
+
+import 'package:flutter/material.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/follow/follow.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 class FollowSelectionAppBar extends StatelessWidget with AppBarBuilderWidget {
   const FollowSelectionAppBar({super.key, required this.child});
@@ -21,11 +23,11 @@ class FollowSelectionAppBar extends StatelessWidget with AppBarBuilderWidget {
           ? Text(data.selections.first.name)
           : Text(l10n.followFollowsCount(data.selections.length)),
       actionBuilder: (context, data) {
-        int unseen = data.selections.fold(0, (a, b) => a + (b.unseen ?? 0));
-        bool bookmarked = data.selections.every(
+        final unseen = data.selections.fold(0, (a, b) => a + (b.unseen ?? 0));
+        final bookmarked = data.selections.every(
           (e) => e.type == FollowType.bookmark,
         );
-        bool notified = data.selections.every(
+        final notified = data.selections.every(
           (e) => e.type == FollowType.notify,
         );
         return [
