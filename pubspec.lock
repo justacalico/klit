@@ -89,14 +89,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.13.1"
-  auto_size_text_pk:
-    dependency: transitive
-    description:
-      name: auto_size_text_pk
-      sha256: ced55de5336fa7f438c1f5a9aa234e25d7a120c1d40d376a7cdc2af28cdb6995
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -1077,14 +1069,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
-  lint:
-    dependency: transitive
-    description:
-      name: lint
-      sha256: "4a539aa34ec5721a2c7574ae2ca0336738ea4adc2a34887d54b7596310b33c85"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.10.0"
   lints:
     dependency: transitive
     description:
@@ -1798,7 +1782,7 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "0.6.0"
+      ref: be64d6d69750ba00f4473fe1548c30e300df663d
       resolved-ref: be64d6d69750ba00f4473fe1548c30e300df663d
       url: "https://github.com/clragon/sliding_sheet.git"
     source: git
@@ -1908,7 +1892,7 @@ packages:
     source: hosted
     version: "3.5.1"
   sqlite3_flutter_libs:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: sqlite3_flutter_libs
       sha256: "3ed7553eee7bb368f8950f58ba29f634e06e813c029aff6a0d60862b96de8454"
@@ -1971,14 +1955,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
-  styled_widget:
-    dependency: "direct main"
-    description:
-      name: styled_widget
-      sha256: "4d439802919b6ccf10d1488798656da8804633b03012682dd1c8ca70a084aa84"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.4.1"
   synchronized:
     dependency: transitive
     description:
@@ -2171,14 +2147,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
-  velocity_x:
-    dependency: "direct main"
-    description:
-      name: velocity_x
-      sha256: "45c1584d00c625d15132d1ec88b71427b907980f8ba7445a8d9052931d573c15"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.3.1"
   very_good_analysis:
     dependency: "direct dev"
     description:
@@ -2195,14 +2163,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "15.2.0"
-  vxstate:
-    dependency: transitive
-    description:
-      name: vxstate
-      sha256: ed5a880018191c5cfed8528bd77f2a942b04847168ca12636a306c323d311086
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.3.0"
   wakelock_plus:
     dependency: "direct main"
     description:
