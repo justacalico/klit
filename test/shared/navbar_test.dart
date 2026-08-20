@@ -1,15 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kilt/app/data/nav_items.dart';
 import 'package:kilt/app/routing/app_routes.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
-import 'package:kilt/shared/controller/navigation_controller.dart';
 import 'package:kilt/shared/shared.dart';
 
 void main() {
@@ -18,30 +14,23 @@ void main() {
     double? width,
     List<NavItem>? items,
   }) {
-    final overrides = <Override>[];
-    if (items != null) {
-      overrides.add(
-        navigationProvider.overrideWith(() => _TestNavigationNotifier(items)),
-      );
-    }
-
     return ProviderScope(
-      overrides: overrides,
+      overrides: [
+        if (items != null)
+          navigationProvider.overrideWith(() => _TestNavigationNotifier(items)),
+      ],
       child: MaterialApp(
         locale: const Locale('en'),
         localizationsDelegates: const [
           AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: ResponsiveNavbar(
             placement: placement,
-            showFavorites: true,
-            showHistory: true,
-            showFinishes: true,
             layoutWidth: width,
           ),
         ),

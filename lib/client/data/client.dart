@@ -24,94 +24,49 @@ import 'package:kilt/wiki/wiki.dart';
 
 export 'package:dio/dio.dart' show CancelToken;
 
+/// A facade around [ClientServices] for a single identity.
+///
+/// [Client] owns the network [Dio] instance and the collection of services,
+/// but the construction and disposal of individual service clients is handled
+/// by [ClientServices].
 class Client with Disposable {
   Client({required this.identity, required this.traits, required this.storage})
-    : dio = createDefaultDio(identity, cache: storage.httpCache);
+    : dio = createDefaultDio(identity, cache: storage.httpCache) {
+    services = ClientServices(
+      dio: dio,
+      storage: storage,
+      identity: identity,
+      traits: traits,
+    );
+  }
 
   final Dio dio;
   final AppStorage storage;
   final Identity identity;
   final ValueNotifier<Traits> traits;
-  final List<Object?> _disposables = [];
+  late final ClientServices services;
 
-  late final AccountClient accounts = _track(
-    AccountClient(
-      dio: dio,
-      identity: identity,
-      traits: traits,
-      postsService: posts,
-    ),
-  );
-  late final UserClient users = _track(UserClient(dio: dio));
-
-  late final PostClient posts = _track(
-    PostClient(
-      dio: dio,
-      identity: identity,
-      poolsService: pools,
-    ),
-  );
-
-  late final TagClient tags = _track(TagClient(dio: dio));
-  late final WikiClient wikis = _track(WikiClient(dio: dio));
-
-  late final CommentClient comments = _track(CommentClient(dio: dio));
-
-  late final PoolClient pools = _track(PoolClient(dio: dio));
-  // TODO: add Sets
-
-  late final TopicClient topics = _track(TopicClient(dio: dio));
-  late final ReplyClient replies = _track(ReplyClient(dio: dio));
-
-  late final FlagClient flags = _track(FlagClient(dio: dio));
-  late final TicketClient tickets = _track(TicketClient(dio: dio));
-
-  late final FollowClient follows = _track(
-    FollowClient(
-      database: storage.sqlite,
-      identity: identity,
-    ),
-  );
-
-  late final FollowServer followServer = _track(
-    FollowServer(
-      database: storage.sqlite,
-      identity: identity,
-      traits: traits,
-      postsClient: posts,
-      poolsClient: pools,
-      tagsClient: tags,
-    ),
-  );
-
-  late final HistoryServer historyServer = _track(
-    HistoryServer(
-      database: storage.sqlite,
-      identity: identity,
-      traits: traits,
-    ),
-  );
-
-  late final HistoryClient histories = _track(
-    HistoryClient(server: historyServer),
-  );
-
-  late final FinishServer finishes = _track(
-    FinishServer(
-      database: storage.sqlite,
-      identity: identity,
-    ),
-  );
-
-  T _track<T>(T client) {
-    _disposables.add(client);
-    return client;
-  }
+  AccountClient get accounts => services.accounts;
+  UserClient get users => services.users;
+  PostClient get posts => services.posts;
+  TagClient get tags => services.tags;
+  WikiClient get wikis => services.wikis;
+  CommentClient get comments => services.comments;
+  PoolClient get pools => services.pools;
+  TopicClient get topics => services.topics;
+  ReplyClient get replies => services.replies;
+  FlagClient get flags => services.flags;
+  TicketClient get tickets => services.tickets;
+  FollowClient get follows => services.follows;
+  FollowServer get followServer => services.followServer;
+  HistoryServer get historyServer => services.historyServer;
+  HistoryClient get histories => services.histories;
+  FinishServer get finishes => services.finishes;
 
   @override
   void dispose() {
     dio.close();
-    _disposables.forEach(Disposable.tryDispose);
+    services.dispose();
     super.dispose();
   }
 }
