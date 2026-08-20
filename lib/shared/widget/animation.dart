@@ -52,7 +52,7 @@ class CrossFade extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Duration duration = this.duration ?? defaultAnimationDuration;
+    final duration = this.duration ?? defaultAnimationDuration;
     switch (style) {
       case FadeAnimationStyle.stacked:
         return AnimatedCrossFade(

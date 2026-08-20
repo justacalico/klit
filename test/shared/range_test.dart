@@ -4,33 +4,33 @@ import 'package:kilt/shared/widget/range.dart';
 void main() {
   group('NumberRange.has', () {
     test('exact match returns true', () {
-      expect(NumberRange(5).has(5), isTrue);
+      expect(const NumberRange(5).has(5), isTrue);
     });
 
     test('exact match returns false for different value', () {
-      expect(NumberRange(5).has(6), isFalse);
+      expect(const NumberRange(5).has(6), isFalse);
     });
 
     test('lessThan excludes the boundary', () {
-      final range = NumberRange(5, comparison: NumberComparison.lessThan);
+      const range = NumberRange(5, comparison: NumberComparison.lessThan);
       expect(range.has(4), isTrue);
       expect(range.has(5), isFalse);
     });
 
     test('lessThanOrEqual includes the boundary', () {
-      final range = NumberRange(5, comparison: NumberComparison.lessThanOrEqual);
+      const range = NumberRange(5, comparison: NumberComparison.lessThanOrEqual);
       expect(range.has(5), isTrue);
       expect(range.has(6), isFalse);
     });
 
     test('greaterThan excludes the boundary', () {
-      final range = NumberRange(5, comparison: NumberComparison.greaterThan);
+      const range = NumberRange(5, comparison: NumberComparison.greaterThan);
       expect(range.has(6), isTrue);
       expect(range.has(5), isFalse);
     });
 
     test('greaterThanOrEqual includes the boundary', () {
-      final range = NumberRange(
+      const range = NumberRange(
         5,
         comparison: NumberComparison.greaterThanOrEqual,
       );
@@ -39,7 +39,7 @@ void main() {
     });
 
     test('range is exclusive on both ends', () {
-      final range = NumberRange(5, endValue: 10);
+      const range = NumberRange(5, endValue: 10);
       expect(range.has(7), isTrue);
       expect(range.has(5), isFalse);
       expect(range.has(10), isFalse);
@@ -108,19 +108,19 @@ void main() {
 
   group('NumberRange.toString', () {
     test('exact value', () {
-      expect(NumberRange(5).toString(), '5');
+      expect(const NumberRange(5).toString(), '5');
     });
 
     test('lessThan', () {
       expect(
-        NumberRange(5, comparison: NumberComparison.lessThan).toString(),
+        const NumberRange(5, comparison: NumberComparison.lessThan).toString(),
         '<5',
       );
     });
 
     test('lessThanOrEqual', () {
       expect(
-        NumberRange(
+        const NumberRange(
           5,
           comparison: NumberComparison.lessThanOrEqual,
         ).toString(),
@@ -130,14 +130,14 @@ void main() {
 
     test('greaterThan', () {
       expect(
-        NumberRange(5, comparison: NumberComparison.greaterThan).toString(),
+        const NumberRange(5, comparison: NumberComparison.greaterThan).toString(),
         '>5',
       );
     });
 
     test('greaterThanOrEqual', () {
       expect(
-        NumberRange(
+        const NumberRange(
           5,
           comparison: NumberComparison.greaterThanOrEqual,
         ).toString(),
@@ -146,39 +146,39 @@ void main() {
     });
 
     test('range', () {
-      expect(NumberRange(5, endValue: 10).toString(), '5..10');
+      expect(const NumberRange(5, endValue: 10).toString(), '5..10');
     });
   });
 
   group('NumberRange.clamp', () {
     test('value within bounds is unchanged', () {
-      final clamped = NumberRange(5).clamp(0, 10);
+      final clamped = const NumberRange(5).clamp(0, 10);
       expect(clamped.value, 5);
     });
 
     test('value above upper bound is clamped', () {
-      final clamped = NumberRange(15).clamp(0, 10);
+      final clamped = const NumberRange(15).clamp(0, 10);
       expect(clamped.value, 10);
     });
 
     test('value below lower bound is clamped', () {
-      final clamped = NumberRange(-5).clamp(0, 10);
+      final clamped = const NumberRange(-5).clamp(0, 10);
       expect(clamped.value, 0);
     });
 
     test('endValue is clamped', () {
-      final clamped = NumberRange(5, endValue: 15).clamp(0, 10);
+      final clamped = const NumberRange(5, endValue: 15).clamp(0, 10);
       expect(clamped.value, 5);
       expect(clamped.endValue, 10);
     });
 
     test('null bounds leave value unchanged', () {
-      final clamped = NumberRange(5).clamp(null, null);
+      final clamped = const NumberRange(5).clamp(null, null);
       expect(clamped.value, 5);
     });
 
     test('comparison is preserved', () {
-      final clamped = NumberRange(
+      final clamped = const NumberRange(
         5,
         comparison: NumberComparison.lessThan,
       ).clamp(0, 10);

@@ -22,7 +22,7 @@ abstract final class DateFormatting {
 
   static String named(DateTime date, [BuildContext? context]) {
     final l10n = context != null ? AppLocalizations.of(context) : null;
-    DateTime today = DateUtils.dateOnly(DateTime.now());
+    final today = DateUtils.dateOnly(DateTime.now());
     if (today.isAtSameMomentAs(DateUtils.dateOnly(date))) {
       return l10n?.commonToday ?? 'Today';
     }

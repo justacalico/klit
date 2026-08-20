@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
 import 'package:kilt/topic/topic.dart';
-import 'package:flutter/material.dart';
 
 class TopicSearchFab extends StatelessWidget {
   const TopicSearchFab({super.key});

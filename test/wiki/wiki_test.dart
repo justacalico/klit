@@ -55,9 +55,6 @@ void main() {
         title: 'minimal',
         body: 'body',
         createdAt: createdAt,
-        updatedAt: null,
-        otherNames: null,
-        isLocked: null,
       );
       final restored = Wiki.fromJson(wikiNull.toJson());
       expect(restored.updatedAt, isNull);

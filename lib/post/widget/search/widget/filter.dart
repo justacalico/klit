@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter/material.dart';
 
 class PostsPageFloatingActionButton extends StatelessWidget {
   const PostsPageFloatingActionButton({super.key, required this.controller});
@@ -32,7 +32,7 @@ class PostsPageFloatingActionButton extends StatelessWidget {
                   min: 0,
                   max: 100,
                   division: 10,
-                  initial: NumberRange(
+                  initial: const NumberRange(
                     20,
                     comparison: NumberComparison.greaterThanOrEqual,
                   ),
@@ -44,7 +44,7 @@ class PostsPageFloatingActionButton extends StatelessWidget {
                   min: 0,
                   max: 100,
                   division: 10,
-                  initial: NumberRange(
+                  initial: const NumberRange(
                     20,
                     comparison: NumberComparison.greaterThanOrEqual,
                   ),

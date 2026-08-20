@@ -4,8 +4,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:kilt/logs/logs.dart';
 import 'package:flutter/foundation.dart';
+import 'package:kilt/logs/logs.dart';
 import 'package:rxdart/rxdart.dart';
 
 export 'package:logging/logging.dart';
@@ -62,7 +62,7 @@ class Logs extends LogPrinter {
       },
       onCancel: () => controller.close(),
     );
-    Stream<List<LogRecord>> stream = controller.stream;
+    var stream = controller.stream;
     if (filter != null) {
       stream = stream.map(
         (e) => e.where((v) => filter(v.level, v.runtimeType)).toList(),
@@ -105,7 +105,7 @@ class FileLogPrinter extends LogPrinter {
   final StreamController<LogRecord> _stream = StreamController.broadcast();
   IOSink? _sink;
 
-  void _write() async {
+  Future<void> _write() async {
     _sink = file.openWrite(mode: FileMode.append);
     await for (final batch
         in _stream.stream

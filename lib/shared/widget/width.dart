@@ -53,7 +53,7 @@ class LimitedWidthLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        double padding = (constraints.maxWidth - maxWidth) / 2;
+        var padding = (constraints.maxWidth - maxWidth) / 2;
         if (padding < tolerance) {
           padding = 0;
         }

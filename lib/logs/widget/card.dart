@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
 import 'package:kilt/logs/logs.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 import 'package:recase/recase.dart';
 
 class LogStringCard extends StatelessWidget {
@@ -13,8 +13,8 @@ class LogStringCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String long = '${item.logger}: ${item.body}';
-    String short = long.ellipse(100).split('\n').first;
+    final long = '${item.logger}: ${item.body}';
+    final short = long.ellipse(100).split('\n').first;
     return LogRecordExpandable(
       key: ValueKey(item),
       color: item.level.color,
@@ -35,28 +35,28 @@ class LogStringBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String value = '${item.logger}: ${item.body}';
+    var value = '${item.logger}: ${item.body}';
     value = value.replaceAllMapped(RegExp(r'\r\n'), (_) => '\n');
-    RegExp sectionRegex = RegExp(
+    final sectionRegex = RegExp(
       r'╔(?<title>[^═╗\n]*)(═*╗)?\n(?<content>(║.*?\n)*)(╚═*╝)',
     );
-    List<RegExpMatch> matches = sectionRegex.allMatches(value).toList();
+    final matches = sectionRegex.allMatches(value).toList();
     if (matches.isEmpty) {
       return Text(value.ellipse(500).split('\n').take(10).join('\n'));
     }
-    int processed = 0;
-    List<InlineSpan> spans = [];
+    var processed = 0;
+    final spans = <InlineSpan>[];
     for (final match in matches) {
       spans.add(TextSpan(text: value.substring(processed, match.start)));
       processed = match.end;
-      String title = match.namedGroup('title')!.trim();
-      String content = match
+      final title = match.namedGroup('title')!.trim();
+      var content = match
           .namedGroup('content')!
           .trim()
           .split('\n')
           .map((e) => e.substring(1).trim())
           .join('\n');
-      String short = content.ellipse(100);
+      final short = content.ellipse(100);
       content = content.ellipse(1000).split('\n').take(10).join('\n');
       spans.add(
         WidgetSpan(

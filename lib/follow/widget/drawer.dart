@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
+import 'package:flutter_sub/flutter_sub.dart';
+import 'package:intl/intl.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/follow/follow.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_sub/flutter_sub.dart';
-import 'package:intl/intl.dart';
 
 class FollowMarkReadTile extends StatelessWidget {
   const FollowMarkReadTile({super.key, this.onTap});
@@ -19,7 +19,7 @@ class FollowMarkReadTile extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return Consumer<FollowController>(
       builder: (context, controller, child) {
-        int unseenCount =
+        final unseenCount =
             controller.items?.fold<int>(0, (a, b) => a + (b.unseen ?? 0)) ?? 0;
         return ListTile(
           enabled: unseenCount > 0,
@@ -101,8 +101,8 @@ class FollowForceSyncTile extends StatelessWidget {
       create: () => client.followServer.syncStream,
       keys: [client],
       builder: (context, syncSnapshot) {
-        bool enabled = false;
-        FollowSync? sync = syncSnapshot.data;
+        var enabled = false;
+        final sync = syncSnapshot.data;
         if (syncSnapshot.connectionState == ConnectionState.active) {
           enabled = sync == null;
         }

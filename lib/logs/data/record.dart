@@ -22,7 +22,7 @@ class LogString {
   }
 
   static String _buildRecordMessage(LogRecord record) {
-    StringBuffer buffer = StringBuffer();
+    final buffer = StringBuffer();
     buffer.writeln(record.message);
     if (record.error != null) {
       buffer.write(
@@ -42,8 +42,8 @@ class LogString {
   }
 
   static List<LogString> parse(String value) {
-    List<LogString> logs = [];
-    RegExp fullRegex = RegExp(
+    final logs = <LogString>[];
+    final fullRegex = RegExp(
       r'^\s*(?<level>'
       '(${Level.LEVELS.map((e) => e.name).join('|')})'
       r')\s*\|\s*(?<time>'
@@ -52,21 +52,21 @@ class LogString {
       caseSensitive: false,
       multiLine: true,
     );
-    List<RegExpMatch> matches = fullRegex.allMatches(value).toList();
-    for (int i = 0; i < matches.length; i++) {
-      RegExpMatch match = matches[i];
-      DateTime time = logStringDateFormat.parse(
+    final matches = fullRegex.allMatches(value).toList();
+    for (var i = 0; i < matches.length; i++) {
+      final match = matches[i];
+      final time = logStringDateFormat.parse(
         match.namedGroup('time')!.trim(),
       );
-      Level level = Level.LEVELS.singleWhere(
+      final level = Level.LEVELS.singleWhere(
         (e) => e.name == match.namedGroup('level')!.trim().toUpperCase(),
       );
-      String loggerName = match.namedGroup('loggerName')!.trim();
+      final loggerName = match.namedGroup('loggerName')!.trim();
       RegExpMatch? next;
       if (i + 1 < matches.length) {
         next = matches[i + 1];
       }
-      String body = value.substring(match.end, next?.start).trim();
+      final body = value.substring(match.end, next?.start).trim();
       logs.add(
         LogString(time: time, level: level, logger: loggerName, body: body),
       );
@@ -91,7 +91,7 @@ extension LogStringRecord on LogRecord {
 }
 
 String prettyLogObject(Object data, {String? header, int? chars}) {
-  StringBuffer buffer = StringBuffer();
+  final buffer = StringBuffer();
   String value;
 
   value = '║  ${data.toString().replaceAll('\n', '\n║  ')}';
@@ -100,7 +100,7 @@ String prettyLogObject(Object data, {String? header, int? chars}) {
     value = value.split('').take(chars).join();
   }
 
-  String fullHeader = header != null ? ' $header ' : '';
+  final fullHeader = header != null ? ' $header ' : '';
   buffer.writeln('╔$fullHeader${'═' * (90 - fullHeader.length)}╗');
   buffer.writeln('║');
   if (value.isNotEmpty) {
@@ -113,7 +113,7 @@ String prettyLogObject(Object data, {String? header, int? chars}) {
 
 extension LogLevelColor on Level? {
   Color get color {
-    Level? level = this;
+    final level = this;
     if (level == null) {
       return Colors.grey[400]!;
     }

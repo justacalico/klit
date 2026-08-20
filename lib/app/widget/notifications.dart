@@ -3,14 +3,14 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_sub/flutter_sub.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/follow/follow.dart';
 import 'package:kilt/logs/logs.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_sub/flutter_sub.dart';
-import 'package:go_router/go_router.dart';
 
 class NotificationHandler extends StatefulWidget {
   const NotificationHandler({
@@ -45,10 +45,10 @@ class _NotificationHandlerState extends State<NotificationHandler> {
 
   Future<void> initialize() async {
     if (!PlatformCapabilities.hasNotifications || _notifications == null) return;
-    NotificationAppLaunchDetails? details =
+    final details =
         await (await _notifications!).getNotificationAppLaunchDetails();
     if (details != null && details.didNotificationLaunchApp) {
-      NotificationResponse? response = details.notificationResponse;
+      final response = details.notificationResponse;
       if (response != null) {
         handle(response);
       }
@@ -57,10 +57,10 @@ class _NotificationHandlerState extends State<NotificationHandler> {
 
   Future<void> setupFollowBackground(List<Follow> follows) async {
     if (!PlatformCapabilities.hasNotifications) return;
-    bool wasNotifying =
+    final wasNotifying =
         previousFollows != null &&
         previousFollows!.where((e) => e.type == FollowType.notify).isNotEmpty;
-    bool isNotifying = follows
+    final isNotifying = follows
         .where((e) => e.type == FollowType.notify)
         .isNotEmpty;
     if (wasNotifying == isNotifying) return;
@@ -96,7 +96,7 @@ class _NotificationHandlerState extends State<NotificationHandler> {
 
   Future<void> handle(NotificationResponse response) async {
     if (!context.mounted) return;
-    String? payload = response.payload;
+    final payload = response.payload;
     if (payload == null) return;
     NotificationPayload? notification;
     try {

@@ -4,15 +4,15 @@ import 'dart:io';
 
 import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:drift_flutter/drift_flutter.dart';
-import 'package:kilt/app/app.dart';
-import 'package:kilt/app/widget/initialize.dart';
-import 'package:kilt/logs/logs.dart';
-import 'package:kilt/shared/shared.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/app/widget/initialize.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/logs/logs.dart';
+import 'package:kilt/shared/shared.dart';
 
 typedef DatabaseInfo = ({String name, String size});
 
@@ -144,7 +144,7 @@ class DatabaseExportTile extends StatelessWidget {
         throw Exception('Database file does not exist');
       }
 
-      String? outputFile = await FilePicker.saveFile(
+      final outputFile = await FilePicker.saveFile(
         dialogTitle: 'Export Database',
         fileName: l10n.databaseBackupFileName,
         type: FileType.custom,
@@ -190,7 +190,7 @@ class DatabaseImportTile extends StatelessWidget {
     if (!confirmed) return;
 
     try {
-      FilePickerResult? result = await FilePicker.pickFiles(
+      final result = await FilePicker.pickFiles(
         dialogTitle: 'Import Database',
         type: FileType.custom,
         allowedExtensions: ['db'],

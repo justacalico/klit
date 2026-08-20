@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
@@ -7,7 +8,6 @@ import 'package:kilt/pool/pool.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter/material.dart';
 
 Future<void> showPoolPrompt({
   required BuildContext context,
@@ -67,7 +67,7 @@ class PoolSheet extends StatelessWidget {
                   ? DText(pool.description)
                   : Text(
                       l10n.commonNoDescription,
-                      style: TextStyle(fontStyle: FontStyle.italic),
+                      style: const TextStyle(fontStyle: FontStyle.italic),
                     ),
             ),
             const Divider(),
@@ -132,7 +132,7 @@ class PoolDialog extends StatelessWidget {
                           ? DText(pool.description)
                           : Text(
                               l10n.commonNoDescription,
-                              style: TextStyle(fontStyle: FontStyle.italic),
+                              style: const TextStyle(fontStyle: FontStyle.italic),
                             ),
                     ),
                     const Divider(),

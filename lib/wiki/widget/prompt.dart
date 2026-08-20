@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
 import 'package:kilt/wiki/wiki.dart';
-import 'package:flutter/material.dart';
 
 Future<void> wikiPrompt(BuildContext context, Wiki wiki) async {
   if (Theme.of(context).isDesktop) {

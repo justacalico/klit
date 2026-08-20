@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/logs/logs.dart';
-import 'package:kilt/l10n/gen/app_localizations.dart';
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/logs/logs.dart';
+import 'package:kilt/shared/shared.dart';
 import 'package:recase/recase.dart';
 
 class LogRecordDrawer extends StatelessWidget {
@@ -19,7 +19,7 @@ class LogRecordDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    const List<Level> filters = [
+    const filters = <Level>[
       Level.FINE,
       Level.INFO,
       Level.WARNING,
@@ -27,7 +27,7 @@ class LogRecordDrawer extends StatelessWidget {
       Level.SHOUT,
     ];
 
-    Map<Level, Widget> icons = {
+    final icons = <Level, Widget>{
       Level.FINE: const Icon(Icons.monitor_heart_outlined),
       Level.INFO: const Icon(Icons.info_outline),
       Level.WARNING: const Icon(Icons.warning_amber),
@@ -53,7 +53,7 @@ class LogRecordDrawer extends StatelessWidget {
                 if (value == null) {
                   return;
                 }
-                List<int> levels = List.of(this.levels);
+                final levels = List<int>.of(this.levels);
                 if (value) {
                   levels.add(filter.value);
                 } else {

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/foundation.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/topic/topic.dart';
-import 'package:flutter/foundation.dart';
 
 class TopicController extends PageClientDataController<Topic> {
   TopicController({required this.client, QueryMap? query})
@@ -39,7 +39,7 @@ class TopicController extends PageClientDataController<Topic> {
 
   @override
   List<Topic>? filter(List<Topic>? items) {
-    List<Topic>? result = super.filter(items);
+    final result = super.filter(items);
     if (hideTagEditing) {
       return result?.where((e) => e.categoryId != 2).toList();
     }

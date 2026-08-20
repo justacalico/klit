@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/post/widget/search/popular_date_control.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 class HotPage extends StatelessWidget {
   const HotPage({super.key});

@@ -39,7 +39,7 @@ enum PostReportType {
     description =>
       'The description is used to harass someone, or if a valid description is being vandalized.',
     note =>
-      'Notes in languages that aren\'t in english, or insult users, or are completely unrelated to the image itself.',
+      "Notes in languages that aren't in english, or insult users, or are completely unrelated to the image itself.",
     tagging =>
       'Adding wrong tags, removing valid tags, creating insulting tags are all reasons to report a post for tagging abuse.',
   };

@@ -2,13 +2,13 @@
 
 import 'dart:math';
 
+import 'package:flutter/material.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
 import 'package:kilt/ticket/ticket.dart';
-import 'package:flutter/material.dart';
 
 class PostReportImage extends StatelessWidget {
   const PostReportImage({
@@ -86,7 +86,7 @@ class _PostReportScreenState extends State<PostReportScreen> {
         duration: defaultAnimationDuration,
         curve: Curves.easeInOut,
       );
-      ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+      final messenger = ScaffoldMessenger.of(context);
       try {
         await context.read<Client>().tickets.create(
           type: TicketType.post,

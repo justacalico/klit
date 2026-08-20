@@ -9,15 +9,15 @@ library;
 
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:flutter_sub/flutter_sub.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/identity/identity.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/traits/traits.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_sub/flutter_sub.dart';
 
 class IdentityClientProvider
     extends
@@ -66,7 +66,7 @@ class TraitsClientProvider
         create: (context, storage, identities, factory) => TraitsClient(
           database: storage.sqlite,
           onCreate: (id) async {
-            Identity? identity = await identities.getOrNull(id);
+            final identity = await identities.getOrNull(id);
             if (identity == null) return null;
             return factory.createDefaultTraits(identity);
           },

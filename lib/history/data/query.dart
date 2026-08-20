@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:intl/intl.dart';
 import 'package:kilt/history/history.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:intl/intl.dart';
 
 // TODO: we need something like this for other services too
 extension type HistoryQuery._(QueryMap self) implements QueryMap {

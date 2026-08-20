@@ -41,7 +41,6 @@ class DividerListTile extends StatelessWidget {
               leading: leading,
               trailing: trailing,
               onTap: onTap,
-              additionalInfo: null,
             ),
           ),
           if (separated != null)

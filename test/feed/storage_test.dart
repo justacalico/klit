@@ -23,7 +23,7 @@ void main() {
     });
 
     test('returns parsed feeds from valid json', () async {
-      final feed = Feed(
+      const feed = Feed(
         id: 'f1',
         name: 'Feed One',
         mediaType: Feed.mediaTypeImage,
@@ -56,7 +56,7 @@ void main() {
   group('setFeeds', () {
     test('stores feeds and roundtrips through getFeeds', () async {
       final feeds = [
-        Feed(
+        const Feed(
           id: 'f1',
           name: 'Feed One',
           mediaType: Feed.mediaTypeVideo,

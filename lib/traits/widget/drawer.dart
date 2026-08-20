@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter/material.dart';
 
 class DrawerDenySwitch extends StatelessWidget {
   const DrawerDenySwitch({super.key, required this.controller});
@@ -41,14 +41,14 @@ class _DrawerMultiDenySwitchState extends State<DrawerMultiDenySwitch> {
 
   void updateDenying(bool value) {
     denying = value;
-    for (var e in widget.controllers) {
+    for (final e in widget.controllers) {
       e.denying = denying;
     }
   }
 
   void updateAllowedList(List<String> value) {
     allowedList = value;
-    for (var e in widget.controllers) {
+    for (final e in widget.controllers) {
       e.allowedTags = allowedList;
     }
   }
@@ -64,9 +64,9 @@ class _DrawerMultiDenySwitchState extends State<DrawerMultiDenySwitch> {
     return AnimatedBuilder(
       animation: Listenable.merge(widget.controllers),
       builder: (context, child) {
-        Map<Post, List<String>> denied = {};
-        List<String> allowedList = [];
-        for (PostController controller in widget.controllers) {
+        final denied = <Post, List<String>>{};
+        var allowedList = <String>[];
+        for (final controller in widget.controllers) {
           if (controller.deniedPosts != null) {
             denied.addAll(controller.deniedPosts!);
           }
@@ -152,7 +152,7 @@ class DrawerDenySwitchBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    Map<String, List<Post>> entries = {};
+    var entries = <String, List<Post>>{};
 
     denied.forEach((key, value) {
       for (final denier in value) {
@@ -166,7 +166,7 @@ class DrawerDenySwitchBody extends StatelessWidget {
       entries.entries.toList()..sort((a, b) => a.key.compareTo(b.key)),
     );
 
-    int count = denied.keys.length;
+    final count = denied.keys.length;
 
     return Column(
       children: [
@@ -194,7 +194,7 @@ class DrawerDenySwitchBody extends StatelessWidget {
                   entry: entry,
                   isAllowed: !allowedList.contains(entry.key),
                   onChanged: (value) {
-                    List<String> allowed = List.from(allowedList);
+                    final allowed = List<String>.from(allowedList);
                     if (value!) {
                       allowed.remove(entry.key);
                     } else {

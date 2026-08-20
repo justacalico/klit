@@ -3,12 +3,12 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/pool/pool.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter/material.dart';
 
 class PoolTile extends StatelessWidget {
   const PoolTile({super.key, required this.pool, this.onPressed});
@@ -42,11 +42,11 @@ class PoolTile extends StatelessWidget {
     }
 
     Widget? image;
-    PoolController? controller = context.watch<PoolController?>();
+    final controller = context.watch<PoolController?>();
 
     if (pool.postIds.isNotEmpty && controller != null) {
-      int thumbnail = pool.postIds.first;
-      Post? post = controller.thumbnails.items?.firstWhereOrNull(
+      final thumbnail = pool.postIds.first;
+      final post = controller.thumbnails.items?.firstWhereOrNull(
         (e) => e.id == thumbnail,
       );
       if (post != null) {

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/post/post.dart';
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/shared/shared.dart';
 
 class PostDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
   const PostDetailAppBar({super.key, required this.post});

@@ -25,7 +25,7 @@ void executeBackgroundTasks() =>
           logger.info('Task $task was cancelled: ${e.error}');
         });
 
-        FlutterLocalNotificationsPlugin notifications =
+        final notifications =
             await initializeNotifications();
 
         switch (task) {

@@ -15,7 +15,7 @@ void main() {
   setUp(() {
     mockClient = MockClient();
     traits = ValueNotifier(
-      Traits(
+      const Traits(
         id: 1,
         userId: null,
         denylist: ['fox'],
@@ -41,7 +41,7 @@ void main() {
   group('PostFilterableController.denying', () {
     test('setter triggers applyFilter and removes denied posts', () {
       final controller = makeController();
-      final withFox = makePost(id: 1, tags: const {'general': ['fox']});
+      final withFox = makePost(tags: const {'general': ['fox']});
       final withoutFox = makePost(id: 2, tags: const {'general': ['dog']});
 
       controller.rawItems = [withFox, withoutFox];
@@ -55,7 +55,7 @@ void main() {
 
     test('setter does nothing when value stays the same', () {
       final controller = makeController();
-      controller.rawItems = [makePost(id: 1, tags: const {'general': ['fox']})];
+      controller.rawItems = [makePost(tags: const {'general': ['fox']})];
       final itemsBefore = List.of(controller.items!);
 
       controller.denying = true;
@@ -66,7 +66,7 @@ void main() {
   group('PostFilterableController.allowedTags', () {
     test('setter triggers applyFilter and exempts allowed tags', () {
       final controller = makeController();
-      final withFox = makePost(id: 1, tags: const {'general': ['fox']});
+      final withFox = makePost(tags: const {'general': ['fox']});
       final withoutFox = makePost(id: 2, tags: const {'general': ['dog']});
 
       controller.rawItems = [withFox, withoutFox];
@@ -79,7 +79,7 @@ void main() {
 
     test('setter does nothing when value stays the same', () {
       final controller = makeController();
-      controller.rawItems = [makePost(id: 1, tags: const {'general': ['fox']})];
+      controller.rawItems = [makePost(tags: const {'general': ['fox']})];
       controller.allowedTags = ['cat'];
       final itemsBefore = List.of(controller.items!);
 
@@ -91,7 +91,7 @@ void main() {
   group('PostFilterableController.allow', () {
     test('adds a post to the allowed list', () {
       final controller = makeController();
-      final withFox = makePost(id: 1, tags: const {'general': ['fox']});
+      final withFox = makePost(tags: const {'general': ['fox']});
 
       controller.rawItems = [withFox];
       expect(controller.isAllowed(withFox), isFalse);
@@ -102,7 +102,7 @@ void main() {
 
     test('keeps an allowed post in items even if it matches the denylist', () {
       final controller = makeController();
-      final withFox = makePost(id: 1, tags: const {'general': ['fox']});
+      final withFox = makePost(tags: const {'general': ['fox']});
 
       controller.rawItems = [withFox];
       expect(controller.items, isNot(contains(withFox)));
@@ -115,7 +115,7 @@ void main() {
   group('PostFilterableController.unallow', () {
     test('removes a post from the allowed list', () {
       final controller = makeController();
-      final withFox = makePost(id: 1, tags: const {'general': ['fox']});
+      final withFox = makePost(tags: const {'general': ['fox']});
 
       controller.rawItems = [withFox];
       controller.allow(withFox);
@@ -130,7 +130,7 @@ void main() {
   group('PostFilterableController.isAllowed', () {
     test('returns false before allowing and true after', () {
       final controller = makeController();
-      final post = makePost(id: 1, tags: const {'general': ['dog']});
+      final post = makePost(tags: const {'general': ['dog']});
 
       controller.rawItems = [post];
       expect(controller.isAllowed(post), isFalse);
@@ -143,7 +143,7 @@ void main() {
   group('PostFilterableController.isDenied', () {
     test('returns true for a post that matches the denylist', () {
       final controller = makeController();
-      final withFox = makePost(id: 1, tags: const {'general': ['fox']});
+      final withFox = makePost(tags: const {'general': ['fox']});
       final withoutFox = makePost(id: 2, tags: const {'general': ['dog']});
 
       controller.rawItems = [withFox, withoutFox];
@@ -153,7 +153,7 @@ void main() {
 
     test('returns false for an allowed post that matched the denylist', () {
       final controller = makeController();
-      final withFox = makePost(id: 1, tags: const {'general': ['fox']});
+      final withFox = makePost(tags: const {'general': ['fox']});
 
       controller.rawItems = [withFox];
       expect(controller.isDenied(withFox), isTrue);
@@ -166,7 +166,7 @@ void main() {
   group('PostFilterableController.filter', () {
     test('removes denied posts from items', () {
       final controller = makeController();
-      final withFox = makePost(id: 1, tags: const {'general': ['fox']});
+      final withFox = makePost(tags: const {'general': ['fox']});
       final withoutFox = makePost(id: 2, tags: const {'general': ['dog']});
 
       controller.rawItems = [withFox, withoutFox];
@@ -176,7 +176,7 @@ void main() {
 
     test('keeps allowed posts even if they match the denylist', () {
       final controller = makeController();
-      final withFox = makePost(id: 1, tags: const {'general': ['fox']});
+      final withFox = makePost(tags: const {'general': ['fox']});
 
       controller.rawItems = [withFox];
       controller.allow(withFox);
@@ -185,7 +185,7 @@ void main() {
 
     test('does not filter when denying is false', () {
       final controller = makeController();
-      final withFox = makePost(id: 1, tags: const {'general': ['fox']});
+      final withFox = makePost(tags: const {'general': ['fox']});
 
       controller.rawItems = [withFox];
       controller.denying = false;
@@ -194,7 +194,7 @@ void main() {
 
     test('does not filter when filterMode is unavailable', () {
       final controller = makeController(filterMode: PostFilterMode.unavailable);
-      final withFox = makePost(id: 1, tags: const {'general': ['fox']});
+      final withFox = makePost(tags: const {'general': ['fox']});
 
       controller.rawItems = [withFox];
       expect(controller.items, contains(withFox));
@@ -202,7 +202,7 @@ void main() {
 
     test('marks denied posts but keeps them in plain mode', () {
       final controller = makeController(filterMode: PostFilterMode.plain);
-      final withFox = makePost(id: 1, tags: const {'general': ['fox']});
+      final withFox = makePost(tags: const {'general': ['fox']});
 
       controller.rawItems = [withFox];
       expect(controller.items, contains(withFox));

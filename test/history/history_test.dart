@@ -35,7 +35,7 @@ void main() {
   });
 
   group('History', () {
-    final visitedAt = DateTime(2024, 6, 15, 10, 30, 0);
+    final visitedAt = DateTime(2024, 6, 15, 10, 30);
 
     final history = History(
       id: 1,
@@ -62,7 +62,7 @@ void main() {
 
       final fromJson = History.fromJson(json);
       expect(fromJson.id, 42);
-      expect(fromJson.visitedAt, DateTime(2024, 1, 20, 12, 0, 0));
+      expect(fromJson.visitedAt, DateTime(2024, 1, 20, 12));
       expect(fromJson.link, '/pools/5');
       expect(fromJson.category, HistoryCategory.searches);
       expect(fromJson.type, HistoryType.pools);
@@ -147,7 +147,7 @@ void main() {
   });
 
   group('HistoryRequest', () {
-    final visitedAt = DateTime(2024, 3, 1, 8, 0, 0);
+    final visitedAt = DateTime(2024, 3, 1, 8);
 
     test('creates with required fields', () {
       final request = HistoryRequest(
@@ -187,7 +187,6 @@ void main() {
         category: HistoryCategory.items,
         type: HistoryType.posts,
         title: 'Title',
-        subtitle: null,
         thumbnails: ['a.jpg', 'b.jpg'],
       );
       final json = request.toJson();

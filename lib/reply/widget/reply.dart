@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kilt/app/routing/app_routes.dart';
 import 'package:kilt/comment/comment.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/reply/reply.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class ReplyTile extends StatelessWidget {
   const ReplyTile({super.key, required this.reply});
@@ -29,7 +29,7 @@ class ReplyTile extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(right: 8, top: 4),
-                    child: CommenterAvatar(userId: reply.creatorId, radius: 16),
+                    child: CommenterAvatar(userId: reply.creatorId),
                   ),
                   Expanded(
                     child: Column(
@@ -125,7 +125,7 @@ class ReplyWarning extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    WarningType? warning = reply.warning;
+    final warning = reply.warning;
     if (warning == null) return const SizedBox();
     return Row(
       children: [

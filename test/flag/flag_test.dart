@@ -22,7 +22,7 @@ void main() {
       expect(flag.reason, 'inferior version');
       expect(flag.creatorId, 100);
       expect(flag.isResolved, isFalse);
-      expect(flag.updatedAt, DateTime(2024, 1, 16, 12, 0));
+      expect(flag.updatedAt, DateTime(2024, 1, 16, 12));
       expect(flag.isDeletion, isFalse);
       expect(flag.type, PostFlagType.flag);
     });
@@ -48,12 +48,12 @@ void main() {
     test('toJson roundtrip', () {
       final flag = PostFlag(
         id: 5,
-        createdAt: DateTime(2024, 3, 1, 10, 0),
+        createdAt: DateTime(2024, 3, 1, 10),
         postId: 777,
         reason: 'test reason',
         creatorId: 42,
         isResolved: true,
-        updatedAt: DateTime(2024, 3, 2, 11, 0),
+        updatedAt: DateTime(2024, 3, 2, 11),
         isDeletion: false,
         type: PostFlagType.flag,
       );

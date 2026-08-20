@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/tag/tag.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/tag/tag.dart';
 
 final List<String> wikiMetaTags = List.unmodifiable([
   'help:',
@@ -87,7 +87,7 @@ enum TagCategory {
 }
 
 List<String> filterArtists(List<String> artists) {
-  List<String> excluded = [
+  final excluded = <String>[
     'epilepsy_warning',
     'conditional_dnp',
     'sound_warning',

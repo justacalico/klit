@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/shared/shared.dart';
-import 'package:kilt/tag/tag.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/tag/tag.dart';
 
 class TagCard extends StatelessWidget {
   const TagCard({
@@ -91,7 +91,7 @@ class DenyListTagCard extends StatelessWidget {
   final String tag;
 
   Color? getTagColor(String tag) {
-    String prefix = tag[0];
+    final prefix = tag[0];
     switch (prefix) {
       case '-':
         return Colors.green[300];

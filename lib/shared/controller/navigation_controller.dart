@@ -65,7 +65,6 @@ class NavigationNotifier extends Notifier<NavigationState> {
   NavigationState build() {
     return NavigationState(
       items: appNavItems,
-      mobilePrimaryCount: 4,
     );
   }
 

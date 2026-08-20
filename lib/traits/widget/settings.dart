@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
 import 'package:kilt/traits/traits.dart';
-import 'package:flutter/material.dart';
 
 class DenyListPage extends StatelessWidget {
   const DenyListPage({super.key});
@@ -40,7 +40,7 @@ class DenyListPage extends StatelessWidget {
           builder: (context, client, child) => ValueListenableBuilder(
             valueListenable: client.traits,
             builder: (context, traits, child) {
-              List<String> denylist = traits.denylist.toList();
+              final denylist = traits.denylist.toList();
               return AdaptiveScaffold(
                 appBar: DefaultAppBar(
                   title: Text(l10n.traitsBlacklist),
@@ -97,7 +97,7 @@ class DenyListPage extends StatelessWidget {
                           itemBuilder: (context, index) => DenylistTile(
                             tag: denylist[index],
                             onEdit: () {
-                              String tag = denylist[index];
+                              final tag = denylist[index];
                               PromptActions.of(context).show(
                                 context,
                                 buildEditTextField(

@@ -2,10 +2,10 @@
 
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/history/history.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 class HistorySearchFab extends StatelessWidget {
   const HistorySearchFab({super.key});
@@ -31,7 +31,7 @@ class HistorySearchFab extends StatelessWidget {
     Client client,
     Locale locale,
   ) async {
-    List<DateTime> days = await client.histories.days();
+    final days = await client.histories.days();
     if (days.isEmpty) {
       days.add(DateTime.now());
     }

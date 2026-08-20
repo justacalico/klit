@@ -22,7 +22,7 @@ final Map<FaIconData, List<String>> hostIcons = {
 };
 
 FaIconData? getHostIcon(String url) {
-  Uri? uri = Uri.tryParse(url);
+  final uri = Uri.tryParse(url);
   if (uri != null) {
     for (final entry in hostIcons.entries) {
       for (final host in entry.value) {

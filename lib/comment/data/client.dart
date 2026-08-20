@@ -14,7 +14,7 @@ class CommentClient {
     bool? force,
     CancelToken? cancelToken,
   }) async {
-    Map<String, dynamic> body = await dio
+    final body = await dio
         .get(
           '/comments.json/$id.json',
           options: forceOptions(force),
@@ -67,7 +67,7 @@ class CommentClient {
       RegExp(RegExp.escape('/comments.json')),
       queryParams: {'search[post_id]': postId.toString()},
     );
-    Map<String, dynamic> body = {
+    final body = <String, dynamic>{
       'comment[body]': content,
       'comment[post_id]': postId,
       'commit': 'Submit',
@@ -88,7 +88,7 @@ class CommentClient {
     await dio.cache?.deleteFromPath(
       RegExp(RegExp.escape('/comments/$id.json')),
     );
-    Map<String, dynamic> body = {'comment[body]': content, 'commit': 'Submit'};
+    final body = <String, dynamic>{'comment[body]': content, 'commit': 'Submit'};
 
     await dio.patch('/comments/$id.json', data: FormData.fromMap(body));
   }

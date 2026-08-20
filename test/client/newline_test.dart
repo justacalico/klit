@@ -14,24 +14,24 @@ void main() {
     interceptor = NewlineReplaceInterceptor();
     handler = _MockResponseInterceptorHandler();
     registerFallbackValue(
-      Response<dynamic>(requestOptions: RequestOptions(path: '')),
+      Response<dynamic>(requestOptions: RequestOptions()),
     );
     when(() => handler.next(any())).thenAnswer((_) {});
   });
 
   Response<String> makeResponse(String data) => Response<String>(
         data: data,
-        requestOptions: RequestOptions(path: ''),
+        requestOptions: RequestOptions(),
       );
 
   group('NewlineReplaceInterceptor.onResponse', () {
-    test('replaces \\r\\n with \\n in string response', () {
+    test(r'replaces \r\n with \n in string response', () {
       final response = makeResponse('line1\r\nline2\r\nline3');
       interceptor.onResponse(response, handler);
       expect(response.data, 'line1\nline2\nline3');
     });
 
-    test('leaves string without \\r\\n unchanged', () {
+    test(r'leaves string without \r\n unchanged', () {
       final response = makeResponse('line1\nline2\nline3');
       interceptor.onResponse(response, handler);
       expect(response.data, 'line1\nline2\nline3');
@@ -43,7 +43,7 @@ void main() {
       expect(response.data, '');
     });
 
-    test('handles single \\r\\n', () {
+    test(r'handles single \r\n', () {
       final response = makeResponse('a\r\nb');
       interceptor.onResponse(response, handler);
       expect(response.data, 'a\nb');
@@ -52,7 +52,7 @@ void main() {
     test('does not modify non-string response data', () {
       final response = Response<Map<String, dynamic>>(
         data: {'key': 'value\r\nmore'},
-        requestOptions: RequestOptions(path: ''),
+        requestOptions: RequestOptions(),
       );
       interceptor.onResponse(response, handler);
       expect(response.data, {'key': 'value\r\nmore'});

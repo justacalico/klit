@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/history/history.dart';
@@ -11,8 +13,6 @@ import 'package:kilt/tag/tag.dart';
 import 'package:kilt/ticket/ticket.dart';
 import 'package:kilt/traits/traits.dart';
 import 'package:kilt/user/user.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 enum UserPageSection { favorites, uploads, info }
 
@@ -36,7 +36,7 @@ class UserPage extends StatelessWidget {
           builder: (context, constraints) {
             Widget body;
             PreferredSizeWidget? appbar;
-            Map<Widget, WidgetBuilder> tabs = {
+            final tabs = <Widget, WidgetBuilder>{
               Tab(text: l10n.commonFavorites): (context) =>
                   ChangeNotifierProvider<PostController>.value(
                     value: controllers.favoritePosts,
@@ -227,12 +227,12 @@ class UserSliverAppBar extends StatelessWidget {
       expandedHeight: 250,
       flexibleSpace: Builder(
         builder: (context) {
-          FlexibleSpaceBarSettings settings = context
+          final settings = context
               .dependOnInheritedWidgetOfExactType<FlexibleSpaceBarSettings>()!;
-          double extension =
+          final extension =
               (settings.currentExtent - settings.minExtent) /
               settings.maxExtent;
-          double? leadingWidth = context
+          final leadingWidth = context
               .findAncestorWidgetOfExactType<SliverAppBar>()
               ?.leadingWidth;
           return FlexibleSpaceBar(
@@ -284,9 +284,9 @@ class _UserProfileActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    ValueNotifier<Traits> traits = context.watch<Client>().traits;
-    String userTag = 'user:${user.id}';
-    bool blocked = traits.value.denylist.contains(userTag);
+    final traits = context.watch<Client>().traits;
+    final userTag = 'user:${user.id}';
+    final blocked = traits.value.denylist.contains(userTag);
     return PopupMenuButton<VoidCallback>(
       icon: const Icon(Icons.more_vert),
       onSelected: (value) => value(),

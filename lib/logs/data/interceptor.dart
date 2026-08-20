@@ -19,21 +19,21 @@ class LoggingDioInterceptor extends Interceptor {
   final bool responseBody;
 
   @override
-  void onRequest(
+  Future<void> onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    StringBuffer buffer = StringBuffer();
+    final buffer = StringBuffer();
 
-    final Uri uri = options.uri;
-    final String method = options.method;
+    final uri = options.uri;
+    final method = options.method;
     buffer.writeln('>>> Request │ $method │ $uri');
 
     if (requestHeader) {
       buffer.write(
         prettyLogObject(options.queryParameters, header: 'Query Parameters'),
       );
-      final Map<String, dynamic> requestHeaders = <String, dynamic>{};
+      final requestHeaders = <String, dynamic>{};
       requestHeaders.addAll(options.headers);
       requestHeaders['contentType'] = options.contentType?.toString();
       requestHeaders['responseType'] = options.responseType.toString();
@@ -48,7 +48,7 @@ class LoggingDioInterceptor extends Interceptor {
     final Object? data = options.data;
     if (data != null) {
       if (data is FormData) {
-        final Map<String, Object> formDataMap = <String, Object>{}
+        final formDataMap = <String, Object>{}
           ..addEntries(data.fields)
           ..addEntries(data.files);
         buffer.write(
@@ -64,14 +64,14 @@ class LoggingDioInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(
+  Future<void> onResponse(
     Response<dynamic> response,
     ResponseInterceptorHandler handler,
   ) async {
-    StringBuffer buffer = StringBuffer();
+    final buffer = StringBuffer();
 
-    final Uri uri = response.requestOptions.uri;
-    final String method = response.requestOptions.method;
+    final uri = response.requestOptions.uri;
+    final method = response.requestOptions.method;
     buffer.writeln(
       '<<< Response │ $method │ ${response.statusCode} ${response.statusMessage} │ $uri',
     );
@@ -92,9 +92,9 @@ class LoggingDioInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    StringBuffer buffer = StringBuffer();
+    final buffer = StringBuffer();
 
-    bool isOkay = CancelToken.isCancel(err);
+    var isOkay = CancelToken.isCancel(err);
 
     if (err.type == DioExceptionType.badResponse) {
       if (err.response!.statusCode! < 400) {

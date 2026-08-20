@@ -121,7 +121,7 @@ class FollowRepository extends DatabaseAccessor<GeneratedDatabase>
   }) {
     page ??= 1;
     limit ??= 80;
-    int offset = (max(1, page) - 1) * limit;
+    final offset = (max(1, page) - 1) * limit;
     return _querySelect(
       limit: limit,
       offset: offset,
@@ -150,8 +150,8 @@ class FollowRepository extends DatabaseAccessor<GeneratedDatabase>
   ).watch().future;
 
   StreamFuture<int> length({int? identity}) {
-    final Expression<int> count = followsTable.id.count();
-    final Expression<bool> identified = _identityQuery(followsTable, identity);
+    final count = followsTable.id.count();
+    final identified = _identityQuery(followsTable, identity);
 
     return (selectOnly(followsTable)
           ..where(identified)
@@ -184,7 +184,7 @@ class FollowRepository extends DatabaseAccessor<GeneratedDatabase>
 
   Future<void> add(FollowRequest item, int identity) async {
     Follow follow;
-    Follow? existing = await _querySelect(
+    final existing = await _querySelect(
       identity: identity,
       tagRegex: r'^' + RegExp.escape(item.tags) + r'$',
     ).getSingleOrNull();

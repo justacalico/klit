@@ -3,12 +3,12 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class PostDetail extends StatefulWidget {
   const PostDetail({
@@ -153,7 +153,6 @@ class _PostDetailState extends State<PostDetail> {
           child: widget.useShell
               ? AppShell(
                   appBar: PostDetailAppBar(post: widget.post),
-                  floatingActionButton: null,
                   body: _buildContent(),
                 )
               : _buildContent(),
@@ -196,7 +195,7 @@ class _PostDetailBody extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 10),
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                minHeight: (constraints.maxHeight / 2),
+                minHeight: constraints.maxHeight / 2,
                 maxHeight: constraints.maxWidth > constraints.maxHeight
                     ? max(400, constraints.maxHeight * 0.8)
                     : double.infinity,

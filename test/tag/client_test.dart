@@ -60,7 +60,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/tags.json'),
-                data: [tagJson(id: 1), tagJson(id: 2, name: 'dog')],
+                data: [tagJson(), tagJson(id: 2, name: 'dog')],
               ));
 
       final tags = await client.page(page: 1, limit: 50);
@@ -187,7 +187,7 @@ void main() {
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/tags/autocomplete.json'),
                 data: [
-                  tagJson(id: 1, name: 'fox'),
+                  tagJson(),
                   tagJson(id: 2, name: 'foxes'),
                   tagJson(id: 3, name: 'foxy'),
                   tagJson(id: 4, name: 'extra'),
@@ -220,7 +220,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/tags.json'),
-                data: [tagJson(id: 1, name: 'fox')],
+                data: [tagJson()],
               ));
 
       await client.autocomplete(search: 'fox', category: 0, limit: 10);

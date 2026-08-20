@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/post/post.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/post/post.dart';
 
 class PostDetailFloatingActionButton extends StatelessWidget {
   const PostDetailFloatingActionButton({super.key, required this.post});

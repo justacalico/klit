@@ -2,8 +2,8 @@
 
 import 'dart:io';
 
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/shared/shared.dart';
 
 class GalleryButtons extends StatelessWidget {
   const GalleryButtons({
@@ -113,7 +113,7 @@ class _GalleryPageButtonState extends State<GalleryPageButton> {
     return AnimatedBuilder(
       animation: widget.controller,
       builder: (context, child) {
-        bool enabled = false;
+        var enabled = false;
 
         if (widget.controller.hasClients &&
             widget.controller.position.hasContentDimensions) {
@@ -151,7 +151,7 @@ class _GalleryPageButtonState extends State<GalleryPageButton> {
                   duration: const Duration(milliseconds: 100),
                   builder: (context, value, child) => IconButton(
                     onPressed: () {
-                      int page = widget.controller.page!.round();
+                      var page = widget.controller.page!.round();
                       switch (widget.direction) {
                         case GalleryButtonDirection.left:
                           page--;

@@ -46,7 +46,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/pools/1.json'),
-                data: poolJson(id: 1),
+                data: poolJson(),
               ));
 
       final pool = await client.get(id: 1);
@@ -98,7 +98,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/pools.json'),
-                data: [poolJson(id: 1), poolJson(id: 2)],
+                data: [poolJson(), poolJson(id: 2)],
               ));
 
       final pools = await client.page(page: 1, limit: 20);
@@ -128,7 +128,7 @@ void main() {
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/pools.json'),
                 data: {
-                  'pools': [poolJson(id: 1)],
+                  'pools': [poolJson()],
                 },
               ));
 

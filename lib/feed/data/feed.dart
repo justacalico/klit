@@ -10,12 +10,6 @@ class SubFeed {
     this.subfeeds = const [],
   });
 
-  final String id;
-  final String name;
-  final List<String> includeTags;
-  final List<String> excludeTags;
-  final List<SubFeed> subfeeds;
-
   factory SubFeed.fromJson(Map<String, dynamic> json) => SubFeed(
         id: json['id'] as String? ?? '',
         name: json['name'] as String? ?? '',
@@ -23,6 +17,12 @@ class SubFeed {
         excludeTags: Feed._parseStringList(json['excludeTags']),
         subfeeds: _parseSubfeeds(json['subfeeds']),
       );
+
+  final String id;
+  final String name;
+  final List<String> includeTags;
+  final List<String> excludeTags;
+  final List<SubFeed> subfeeds;
 
   static List<SubFeed> _parseSubfeeds(dynamic raw) {
     if (raw is! List) return [];
@@ -81,9 +81,6 @@ class SubFeed {
 /// Open a feed to browse posts matching include/or/exclude tags and type.
 /// Subfeeds add extra include/exclude when selected; only one subfeed is active at a time.
 class Feed {
-  static const String mediaTypeImage = 'image';
-  static const String mediaTypeVideo = 'video';
-  static const String mediaTypeAll = 'all';
 
   const Feed({
     required this.id,
@@ -98,22 +95,11 @@ class Feed {
     this.subfeeds = const [],
   });
 
-  final String id;
-  final String name;
-  final String mediaType;
-  final List<String> includeTags;
-  final List<String> orTags;
-  final List<String> excludeTags;
-  final String? rating;
-  final String order;
-  final bool excludeFavorites;
-  final List<SubFeed> subfeeds;
-
   factory Feed.fromJson(Map<String, dynamic> json) {
     final include = json['includeTags'];
     final or = json['orTags'];
     final exclude = json['excludeTags'];
-    String mt = json['mediaType'] as String? ?? '';
+    var mt = json['mediaType'] as String? ?? '';
     if (mt != mediaTypeImage && mt != mediaTypeVideo && mt != mediaTypeAll) {
       mt = json['isVideo'] == true ? mediaTypeVideo : mediaTypeImage;
     }
@@ -130,6 +116,20 @@ class Feed {
       subfeeds: _parseSubfeeds(json['subfeeds']),
     );
   }
+  static const String mediaTypeImage = 'image';
+  static const String mediaTypeVideo = 'video';
+  static const String mediaTypeAll = 'all';
+
+  final String id;
+  final String name;
+  final String mediaType;
+  final List<String> includeTags;
+  final List<String> orTags;
+  final List<String> excludeTags;
+  final String? rating;
+  final String order;
+  final bool excludeFavorites;
+  final List<SubFeed> subfeeds;
 
   static List<String> _parseStringList(dynamic raw) {
     if (raw is! List) return [];
@@ -230,7 +230,7 @@ class Feed {
       if (s.isNotEmpty) excludes.add(s);
     }
 
-    List<SubFeed> level = subfeeds;
+    var level = subfeeds;
     for (final index in path) {
       if (index < 0 || index >= level.length) break;
       final sub = level[index];

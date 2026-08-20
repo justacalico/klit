@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/post/post.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:kilt/post/post.dart';
 
 part 'editing.freezed.dart';
 
@@ -29,20 +29,20 @@ abstract class PostEdit with _$PostEdit {
   );
 
   Map<String, String?>? toForm() {
-    Map<String, String?> body = {};
+    final body = <String, String?>{};
 
-    List<String> oldTags = post.tags.values
+    final oldTags = post.tags.values
         .expand((category) => category)
         .toList();
-    List<String> newTags = tags;
-    List<String> removedTags = oldTags
+    final newTags = tags;
+    var removedTags = oldTags
         .where((element) => !newTags.contains(element))
         .toList();
     removedTags = removedTags.map((t) => '-$t').toList();
-    List<String> addedTags = newTags
+    final addedTags = newTags
         .where((element) => !oldTags.contains(element))
         .toList();
-    List<String> tagDiff = [];
+    final tagDiff = <String>[];
     tagDiff.addAll(removedTags);
     tagDiff.addAll(addedTags);
 
@@ -50,14 +50,14 @@ abstract class PostEdit with _$PostEdit {
       body.addEntries([MapEntry('post[tag_string_diff]', tagDiff.join(' '))]);
     }
 
-    List<String> removedSource = post.sources
+    var removedSource = post.sources
         .where((element) => !sources.contains(element))
         .toList();
     removedSource = removedSource.map((s) => '-$s').toList();
-    List<String> addedSource = sources
+    final addedSource = sources
         .where((element) => !post.sources.contains(element))
         .toList();
-    List<String> sourceDiff = [];
+    final sourceDiff = <String>[];
     sourceDiff.addAll(removedSource);
     sourceDiff.addAll(addedSource);
 

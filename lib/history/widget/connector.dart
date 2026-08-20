@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/client/client.dart';
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/shared/shared.dart';
 
 typedef HistoryConnector<T> =
     void Function(BuildContext context, Client client, T data);
@@ -72,7 +72,7 @@ class _ControllerHistoryConnectorState<T extends DataController?>
       initialize: true,
       listenable: Listenable.merge([widget.controller]),
       listener: () async {
-        T? controller = widget.controller;
+        final T? controller = widget.controller;
         if (controller == null) return;
         await controller.waitForNextPage();
         if (controller.error != null) return;

@@ -2,12 +2,12 @@
 
 import 'dart:async';
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class PostFullscreenFrame extends StatefulWidget {
   const PostFullscreenFrame({
@@ -167,7 +167,7 @@ class _PostFullscreenFrameState extends State<PostFullscreenFrame> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
+    final theme = Theme.of(context);
     return Theme(
       data: theme.copyWith(
         appBarTheme: theme.appBarTheme.copyWith(
@@ -182,7 +182,7 @@ class _PostFullscreenFrameState extends State<PostFullscreenFrame> {
         child: ScaffoldFrameSystemUI(
           child: Builder(
             builder: (context) {
-              VideoPlayer? player = widget.post.getVideo(context);
+              final player = widget.post.getVideo(context);
               return AdaptiveScaffold(
                 extendBodyBehindAppBar: true,
                 extendBody: true,
@@ -194,7 +194,7 @@ class _PostFullscreenFrameState extends State<PostFullscreenFrame> {
                 body: GestureDetector(
                   behavior: HitTestBehavior.translucent,
                   onTap: () {
-                    ScaffoldFrameController controller = ScaffoldFrame.of(
+                    final controller = ScaffoldFrame.of(
                       context,
                     );
                     controller.toggleFrame();
@@ -280,7 +280,7 @@ class _IndicatorEntry {
 
 class _FullscreenActionIndicatorState extends State<_FullscreenActionIndicator> {
   static const int _max = 3;
-  static const double _slotHeight = 48.0;
+  static const double _slotHeight = 48;
   static const Duration _slideDuration = Duration(milliseconds: 240);
 
   final List<_IndicatorEntry> _items = [];
@@ -307,7 +307,6 @@ class _FullscreenActionIndicatorState extends State<_FullscreenActionIndicator> 
       height: (_max + 1) * _slotHeight,
       child: ClipRect(
         child: Stack(
-          clipBehavior: Clip.hardEdge,
           children: [
             for (int i = 0; i < _items.length; i++)
               AnimatedPositioned(
@@ -403,8 +402,8 @@ class _IndicatorItemState extends State<_IndicatorItem>
   @override
   Widget build(BuildContext context) {
     final begin = _exiting
-        ? (_upwardExit ? Offset.zero : const Offset(-1.0, 0.0))
-        : const Offset(-1.0, 0.0);
+        ? (_upwardExit ? Offset.zero : const Offset(-1, 0))
+        : const Offset(-1, 0);
     final slide = Tween<Offset>(begin: begin, end: Offset.zero).animate(_curve);
     return FadeTransition(
       opacity: _fade,

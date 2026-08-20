@@ -2,11 +2,11 @@
 
 import 'dart:async';
 
-import 'package:kilt/settings/settings.dart';
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_sub/flutter_sub.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/shared/shared.dart';
 
 typedef SubmitString = FutureOr<void> Function(String result);
 
@@ -31,7 +31,7 @@ class ControlledTextWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PromptActionController actionController =
+    final actionController =
         this.actionController ?? PromptActions.of(context);
     return SubDefault<TextEditingController>(
       value: textController,

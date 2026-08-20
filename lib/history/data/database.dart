@@ -132,7 +132,7 @@ class HistoryRepository extends DatabaseAccessor<GeneratedDatabase>
   }) {
     page ??= 1;
     limit ??= 80;
-    int offset = (max(1, page) - 1) * limit;
+    final offset = (max(1, page) - 1) * limit;
     return _querySelect(
       limit: limit,
       offset: offset,
@@ -147,8 +147,8 @@ class HistoryRepository extends DatabaseAccessor<GeneratedDatabase>
   }
 
   StreamFuture<int> length({int? identity}) {
-    final Expression<int> count = historiesTable.id.count();
-    final Expression<bool> identified = _identityQuery(
+    final count = historiesTable.id.count();
+    final identified = _identityQuery(
       historiesTable,
       identity,
     );
@@ -163,8 +163,8 @@ class HistoryRepository extends DatabaseAccessor<GeneratedDatabase>
 
   StreamFuture<List<DateTime>> days({int? identity}) {
     final Expression<DateTime> time = historiesTable.visitedAt;
-    final Expression<String> date = historiesTable.visitedAt.date;
-    final Expression<bool> identified = _identityQuery(
+    final date = historiesTable.visitedAt.date;
+    final identified = _identityQuery(
       historiesTable,
       identity,
     );
@@ -175,7 +175,7 @@ class HistoryRepository extends DatabaseAccessor<GeneratedDatabase>
           ..groupBy([date])
           ..addColumns([time]))
         .map((row) {
-          DateTime source = row.read(time)!;
+          final source = row.read(time)!;
           return DateTime(source.year, source.month, source.day);
         })
         .watch()
@@ -198,7 +198,7 @@ class HistoryRepository extends DatabaseAccessor<GeneratedDatabase>
           .then((e) => e.isNotEmpty);
 
   Future<void> add(HistoryRequest item, int identity) async {
-    History history = await into(historiesTable).insertReturning(
+    final history = await into(historiesTable).insertReturning(
       HistoryCompanion(
         visitedAt: Value(item.visitedAt),
         link: Value(item.link),

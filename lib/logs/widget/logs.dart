@@ -4,12 +4,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:kilt/app/app.dart';
-import 'package:kilt/logs/logs.dart';
-import 'package:kilt/l10n/gen/app_localizations.dart';
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/logs/logs.dart';
+import 'package:kilt/shared/shared.dart';
 
 class LogsPage extends StatefulWidget {
   const LogsPage({super.key});
@@ -96,7 +96,7 @@ class _LogFileListState extends State<LogFileList> {
   );
 
   Stream<List<LogString>> loadFile(String path) {
-    File file = File(path);
+    final file = File(path);
     late StreamController<List<LogString>> controller;
     controller = StreamController(
       onListen: () async {
@@ -127,7 +127,7 @@ class _LogFileListState extends State<LogFileList> {
       child: FutureBuilder(
         future: files,
         builder: (context, snapshot) {
-          List<LogFileInfo>? files = snapshot.data
+          final files = snapshot.data
               ?.map((e) => LogFileInfo.parse(e.path))
               .sorted((a, b) => b.date.compareTo(a.date))
               .toList();
@@ -293,7 +293,7 @@ class _LogPageState extends State<LogPage> {
       ),
       keys: [widget.loader, levels],
       builder: (context, snapshot) {
-        List<LogString>? logs = snapshot.data;
+        final logs = snapshot.data;
         return SelectionLayout<LogString>(
           items: logs,
           child: Expandables(

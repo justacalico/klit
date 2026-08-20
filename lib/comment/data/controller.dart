@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0
 
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/comment/comment.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 class CommentController extends PageClientDataController<Comment> {
   CommentController({

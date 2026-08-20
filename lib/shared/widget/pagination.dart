@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/shared/shared.dart';
 
 class PagedChildBuilderRetryButton extends StatelessWidget {
   const PagedChildBuilderRetryButton(this.onRetry, {super.key});

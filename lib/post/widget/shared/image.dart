@@ -3,10 +3,10 @@
 import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:kilt/post/post.dart';
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/shared/shared.dart';
 
 class PostImageWidget extends StatelessWidget {
   /// Displays the image of a post.
@@ -50,7 +50,7 @@ class PostImageWidget extends StatelessWidget {
     return RepaintBoundary(
       child: Builder(
         builder: (context) {
-          double aspectRatio = post.width / post.height;
+          final aspectRatio = post.width / post.height;
 
           switch (size) {
             case PostImageSize.preview:
@@ -138,7 +138,7 @@ class RawPostImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Duration fades = stacked
+    final fades = stacked
         ? Duration.zero
         : const Duration(milliseconds: 250);
 
@@ -155,16 +155,16 @@ class RawPostImageWidget extends StatelessWidget {
       );
     }
 
-    String url =
+    final url =
         switch (size) {
           PostImageSize.preview => post.preview,
           PostImageSize.sample => post.sample,
           PostImageSize.file => post.file!,
         } ??
         post.file!;
-    Size dimensions = Size(post.width.toDouble(), post.height.toDouble());
+    final dimensions = Size(post.width.toDouble(), post.height.toDouble());
 
-    double aspectRatio = dimensions.width / dimensions.height;
+    final aspectRatio = dimensions.width / dimensions.height;
 
     int? memCacheWidth;
     int? memCacheHeight;

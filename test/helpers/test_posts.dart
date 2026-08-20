@@ -60,6 +60,6 @@ Post makePost({
     sources: sources,
     pools: pools,
     lockedTags: lockedTags,
-    relationships: relationships ?? const Relationships(parentId: null, hasChildren: false, hasActiveChildren: false, children: []),
+    relationships: relationships ?? const Relationships(parentId: null, hasActiveChildren: false, children: []),
   );
 }

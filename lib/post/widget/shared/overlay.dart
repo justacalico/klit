@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 class PostImageOverlay extends StatelessWidget {
   const PostImageOverlay({
@@ -17,7 +17,7 @@ class PostImageOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PostController? controller = context.read<PostController?>();
+    final controller = context.read<PostController?>();
 
     Widget centerText(String text) {
       return Center(child: Text(text, textAlign: TextAlign.center));

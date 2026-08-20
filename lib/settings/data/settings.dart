@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/foundation.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/settings/data/post_actions.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/foundation.dart';
 import 'package:notified_preferences/notified_preferences.dart';
 
 class Settings extends NotifiedSettings {

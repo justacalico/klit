@@ -2,10 +2,10 @@
 
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 class PostLoadingPage extends StatelessWidget {
   const PostLoadingPage(this.id, {super.key});
@@ -24,7 +24,6 @@ class PostLoadingPage extends StatelessWidget {
                 controller: value,
                 child: PostDetailGalleryWithShell(
                   controller: value,
-                  useShell: false,
                 ),
               ),
               title: Text('Post #$id'),
@@ -41,7 +40,7 @@ class SingleFuturePostsProvider
   SingleFuturePostsProvider({required int id, super.child, super.builder})
     : super(
         create: (context, client) => Future<PostController>(() async {
-          PostController controller = SinglePostController(
+          final PostController controller = SinglePostController(
             id: id,
             client: client,
           );

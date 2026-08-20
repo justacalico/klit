@@ -51,9 +51,9 @@ class PostClient {
     CancelToken? cancelToken,
   }) async {
     ordered ??= true;
-    String? tags = query?['tags'];
+    final tags = query?['tags'];
     if (ordered && tags != null) {
-      Map<RegExp, Future<List<Post>> Function(RegExpMatch match)> redirects = {
+      final redirects = <RegExp, Future<List<Post>> Function(RegExpMatch match)>{
         poolRegex(): (match) => byPool(
           id: int.parse(match.namedGroup('id')!),
           page: page,
@@ -67,7 +67,7 @@ class PostClient {
       };
 
       for (final entry in redirects.entries) {
-        RegExpMatch? match = entry.key.firstMatch(tags);
+        final match = entry.key.firstMatch(tags);
         if (match != null) {
           return entry.value(match);
         }
@@ -144,23 +144,23 @@ class PostClient {
   }) async {
     limit = max(0, min(limit ?? 75, 100));
 
-    List<List<int>> chunks = [];
-    for (int i = 0; i < ids.length; i += limit) {
+    final chunks = <List<int>>[];
+    for (var i = 0; i < ids.length; i += limit) {
       chunks.add(ids.sublist(i, min(i + limit, ids.length)));
     }
 
-    List<Post> result = [];
+    final result = <Post>[];
     for (final chunk in chunks) {
       if (chunk.isEmpty) continue;
-      String filter = 'id:${chunk.join(',')}';
-      List<Post> part = await page(
+      final filter = 'id:${chunk.join(',')}';
+      var part = await page(
         query: {'tags': filter},
         limit: limit,
         ordered: false,
         force: force,
         cancelToken: cancelToken,
       );
-      Map<int, Post> table = {for (Post e in part) e.id: e};
+      final table = <int, Post>{for (final Post e in part) e.id: e};
       part =
           (chunk.map((e) => table[e]).toList()..removeWhere((e) => e == null))
               .cast<Post>();
@@ -179,18 +179,18 @@ class PostClient {
     page ??= 1;
     tags.removeWhere((e) => e.contains(' ') || e.contains(':'));
     if (tags.isEmpty) return [];
-    int max = 40;
-    int pages = (tags.length / max).ceil();
-    int chunkSize = (tags.length / pages).ceil();
+    const max = 40;
+    final pages = (tags.length / max).ceil();
+    final chunkSize = (tags.length / pages).ceil();
 
-    int tagPage = page % pages != 0 ? page % pages : pages;
-    int sitePage = (page / pages).ceil();
+    final tagPage = page % pages != 0 ? page % pages : pages;
+    final sitePage = (page / pages).ceil();
 
-    List<String> chunk = tags
+    final chunk = tags
         .sublist((tagPage - 1) * chunkSize)
         .take(chunkSize)
         .toList();
-    String filter = chunk.map((e) => '~$e').join(' ');
+    final filter = chunk.map((e) => '~$e').join(' ');
     return this.page(
       page: sitePage,
       query: {'tags': filter},
@@ -240,15 +240,15 @@ class PostClient {
     CancelToken? cancelToken,
   }) async {
     page ??= 1;
-    int limit = 75;
-    Pool pool = await poolsService.get(
+    const limit = 75;
+    final pool = await poolsService.get(
       id: id,
       force: force,
       cancelToken: cancelToken,
     );
-    List<int> ids = pool.postIds;
+    var ids = pool.postIds;
     if (!orderByOldest) ids = ids.reversed.toList();
-    int lower = (page - 1) * limit;
+    final lower = (page - 1) * limit;
     if (lower > ids.length) return [];
     ids = ids.sublist(lower).take(limit).toList();
     return byIds(
@@ -288,9 +288,9 @@ class PostClient {
       throw NoUserLoginException();
     }
     orderByAdded ??= true;
-    String tags = query?['tags'] ?? '';
+    final tags = query?['tags'] ?? '';
     if (tags.isEmpty && orderByAdded) {
-      List<dynamic> body = await dio
+      final body = await dio
           .get(
             '/favorites.json',
             queryParameters: _withV2({'page': page, 'limit': limit, ...?query}),
@@ -298,7 +298,7 @@ class PostClient {
             cancelToken: cancelToken,
           )
           .then((response) => response.data);
-      List<Post> result = List.from(body.map(E621Post.fromJson));
+      final result = List<Post>.from(body.map(E621Post.fromJson));
       result.removeWhere((e) => e.isDeleted || e.file == null);
       return result;
     } else {

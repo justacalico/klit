@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/settings/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/settings/settings.dart';
 
 @immutable
 class LoadingShellState {
@@ -160,7 +160,7 @@ class _LoadingLayerState<T> extends State<LoadingLayer<T>> {
 
   void onSnapshotChanged(AsyncSnapshot<T> snapshot) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      LoadingShellController state = LoadingShell.of(context);
+      final state = LoadingShell.of(context);
 
       if (snapshot != lastSnapshot) {
         lastSnapshot = snapshot;
@@ -252,7 +252,7 @@ class _LoadingCoreState extends State<LoadingCore> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    LoadingShellController newState = LoadingShell.of(context);
+    final newState = LoadingShell.of(context);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (newState.value != state.value) {

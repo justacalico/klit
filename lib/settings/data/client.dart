@@ -85,8 +85,8 @@ class AppInfoClient {
     bool force = false,
     bool beta = false,
   }) async {
-    List<AppVersion> versions = await getVersions(force: force);
-    AppVersion current = AppVersion(
+    final versions = await getVersions(force: force);
+    final current = AppVersion(
       version: Version.parse('${info.version}+${info.buildNumber}'),
     );
 
@@ -109,9 +109,9 @@ class AppInfoClient {
     if (info.source.isFromStore) {
       versions.removeWhere(
         (e) =>
-            (e.date?.isBefore(
+            e.date?.isBefore(
               DateTime.now().subtract(const Duration(days: 7)),
-            )) ??
+            ) ??
             false,
       );
     }
@@ -126,7 +126,6 @@ class AppInfoClient {
         '$_openlystBase/apps/$_appSlug/latest',
         options: ClientCacheConfig(
           store: cache,
-          policy: CachePolicy.request,
         ).toOptions(),
       );
       final root = pick(response.data);

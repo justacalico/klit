@@ -2,21 +2,21 @@
 
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter/material.dart';
 
 extension PostTagging on Post {
   bool hasTag(String tag) {
     if (tag.trim().isEmpty) return false;
 
     if (tag.contains(':')) {
-      String identifier = tag.split(':')[0];
-      String value = tag.split(':')[1];
+      final identifier = tag.split(':')[0];
+      final value = tag.split(':')[1];
       switch (identifier) {
         case 'id':
           return id == int.tryParse(value);
@@ -26,23 +26,23 @@ extension PostTagging on Post {
         case 'type':
           return ext.toLowerCase() == value.toLowerCase();
         case 'width':
-          NumberRange? range = NumberRange.tryParse(value);
+          final range = NumberRange.tryParse(value);
           if (range == null) return false;
           return range.has(width);
         case 'height':
-          NumberRange? range = NumberRange.tryParse(value);
+          final range = NumberRange.tryParse(value);
           if (range == null) return false;
           return range.has(height);
         case 'filesize':
-          NumberRange? range = NumberRange.tryParse(value);
+          final range = NumberRange.tryParse(value);
           if (range == null) return false;
           return range.has(size);
         case 'score':
-          NumberRange? range = NumberRange.tryParse(value);
+          final range = NumberRange.tryParse(value);
           if (range == null) return false;
           return range.has(vote.score);
         case 'favcount':
-          NumberRange? range = NumberRange.tryParse(value);
+          final range = NumberRange.tryParse(value);
           if (range == null) return false;
           return range.has(favCount);
         case 'fav':
@@ -50,7 +50,7 @@ extension PostTagging on Post {
         case 'uploader':
         case 'user':
         case 'userid':
-          NumberRange? range = NumberRange.tryParse(value);
+          final range = NumberRange.tryParse(value);
           if (range == null) return false;
           return range.has(uploaderId);
         case 'username':
@@ -59,7 +59,7 @@ extension PostTagging on Post {
         case 'pool':
           return pools?.contains(int.tryParse(value)) ?? false;
         case 'tagcount':
-          NumberRange? range = NumberRange.tryParse(value);
+          final range = NumberRange.tryParse(value);
           if (range == null) return false;
           return range.has(
             tags.values.fold<int>(
@@ -79,25 +79,25 @@ extension PostDenying on Post {
       getDeniers(denylist).iterator.moveNext();
 
   Iterable<String> getDeniers(List<String> denylist) sync* {
-    for (String line in denylist) {
+    for (var line in denylist) {
       line = line.trim();
       if (line.isEmpty) continue;
 
-      int hash = line.indexOf('#');
+      final hash = line.indexOf('#');
       if (hash != -1) {
         line = line.substring(0, hash).trim();
         if (line.isEmpty) continue;
       }
 
-      bool pass = true;
-      bool isOptional = false;
-      bool hasOptional = false;
+      var pass = true;
+      var isOptional = false;
+      var hasOptional = false;
 
-      for (String tag in line.split(' ')) {
+      for (var tag in line.split(' ')) {
         if (tagToRaw(tag).isEmpty) continue;
 
-        bool optional = false;
-        bool inverted = false;
+        var optional = false;
+        var inverted = false;
 
         if (tag[0] == '~') {
           optional = true;
@@ -109,7 +109,7 @@ extension PostDenying on Post {
           tag = tag.substring(1);
         }
 
-        bool matches = hasTag(tag);
+        var matches = hasTag(tag);
 
         if (inverted) {
           matches = !matches;
@@ -174,8 +174,8 @@ extension PostVideoPlaying on Post {
       settings = context.read<Settings>();
     }
 
-    VideoResolution target = settings.videoResolution.value;
-    String closestUrl = file!;
+    final target = settings.videoResolution.value;
+    var closestUrl = file!;
     int? closestDifference;
 
     if (variants != null && variants!.isNotEmpty) {
@@ -205,7 +205,7 @@ extension PostLinking on Post {
 
 mixin PostActionController<KeyType> on ClientDataController<KeyType, Post> {
   Post? postById(int id) {
-    int index = rawItems?.indexWhere((e) => e.id == id) ?? -1;
+    final index = rawItems?.indexWhere((e) => e.id == id) ?? -1;
     if (index == -1) {
       return null;
     }

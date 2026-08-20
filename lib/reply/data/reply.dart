@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/comment/comment.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:kilt/comment/comment.dart';
 
 part 'reply.freezed.dart';
 part 'reply.g.dart';

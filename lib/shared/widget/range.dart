@@ -155,7 +155,7 @@ class NumberRangeInputFormatter extends FilteringTextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    NumberRange? newRange = NumberRange.tryParse(newValue.text);
+    final newRange = NumberRange.tryParse(newValue.text);
 
     if (newRange != null) {
       return newValue.copyWith(
@@ -272,12 +272,12 @@ class _RangeDialogState extends State<RangeDialog> {
   }
 
   double getSliderValue() {
-    NumberRange? range = NumberRange.tryParse(controller.text);
+    final range = NumberRange.tryParse(controller.text);
     return limitNumber(range?.value.toDouble()) ?? widget.min;
   }
 
   double getSliderEndValue() {
-    NumberRange? range = NumberRange.tryParse(controller.text);
+    final range = NumberRange.tryParse(controller.text);
     return min(
       widget.max,
       max(
@@ -291,7 +291,7 @@ class _RangeDialogState extends State<RangeDialog> {
     if (widget.canChangeMode == false) {
       return mode;
     }
-    String value = controller.text;
+    final value = controller.text;
     if (RegExp(r'^\d*$').hasMatch(value)) {
       return RangeDialogMode.exact;
     } else if (RegExp(r'^<\d*$').hasMatch(value)) {
@@ -310,7 +310,7 @@ class _RangeDialogState extends State<RangeDialog> {
   }
 
   String getTextValue() {
-    NumberRange currentRange =
+    final currentRange =
         NumberRange.tryParse(controller.text) ??
         NumberRange(widget.min.toInt());
 
@@ -328,7 +328,7 @@ class _RangeDialogState extends State<RangeDialog> {
           comparison: NumberComparison.greaterThanOrEqual,
         ).toString();
       case RangeDialogMode.fixedRange:
-        int endValue = currentRange.endValue ?? widget.max.toInt();
+        final endValue = currentRange.endValue ?? widget.max.toInt();
         return NumberRange(currentRange.value, endValue: endValue).toString();
     }
   }

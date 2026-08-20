@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SourceDisplay extends StatelessWidget {
   const SourceDisplay({super.key, required this.post});
@@ -78,7 +78,7 @@ class SourceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String url = this.url;
+    var url = this.url;
     if (RegExp(r'^-?https?://\S+').hasMatch(url)) {
       bool enabled;
       if (url.startsWith('-')) {

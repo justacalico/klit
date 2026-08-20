@@ -8,11 +8,11 @@ String encodeBasicAuth(String username, String password) =>
 
 (String username, String password)? parseBasicAuth(String? auth) {
   if (auth == null) return null;
-  RegExpMatch? fullBasicMatch = RegExp(
+  final fullBasicMatch = RegExp(
     r'Basic (?<encoded>[A-Za-z\d/=]+)',
   ).firstMatch(auth);
   if (fullBasicMatch == null) return null;
-  RegExpMatch? credentialMatch = RegExp(r'(?<username>.+):(?<password>.+)')
+  final credentialMatch = RegExp(r'(?<username>.+):(?<password>.+)')
       .firstMatch(
         utf8.decode(base64Decode(fullBasicMatch.namedGroup('encoded')!)),
       );
@@ -28,7 +28,7 @@ String encodeBasicAuth(String username, String password) =>
 /// - not have a trailing slash
 /// - not contain a query or fragment
 String normalizeHostUrl(String url) {
-  Uri uri = Uri.parse(url);
+  var uri = Uri.parse(url);
   if (uri.host.isEmpty && uri.path.isNotEmpty) {
     uri = Uri.https(uri.path);
   }
@@ -49,8 +49,8 @@ String normalizeHostUrl(String url) {
 }
 
 String assembleHostedUrl(String host, String path) {
-  Uri uri = Uri.parse(normalizeHostUrl(host));
-  Uri other = Uri.parse(path);
+  final uri = Uri.parse(normalizeHostUrl(host));
+  final other = Uri.parse(path);
 
   path = other.path;
   if (!path.startsWith('/')) path = '/$path';

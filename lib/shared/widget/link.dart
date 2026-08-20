@@ -30,7 +30,7 @@ class LinkPreviewProviderState extends State<LinkPreviewProvider> {
   @override
   void initState() {
     super.initState();
-    OverlayEntry overlayEntry = OverlayEntry(
+    final overlayEntry = OverlayEntry(
       builder: (context) => LinkOverlay(notifier: _linkNotifier),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {

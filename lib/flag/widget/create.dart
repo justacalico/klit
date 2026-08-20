@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/flag/flag.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
@@ -8,8 +10,6 @@ import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
 import 'package:kilt/ticket/ticket.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class PostFlagScreen extends StatefulWidget {
   const PostFlagScreen({super.key, required this.post});
@@ -45,7 +45,7 @@ class _PostFlagScreenState extends State<PostFlagScreen> {
         duration: defaultAnimationDuration,
         curve: Curves.easeInOut,
       );
-      ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+      final messenger = ScaffoldMessenger.of(context);
       try {
         await context.read<Client>().flags.create(
           widget.post.id,

@@ -2,10 +2,10 @@
 
 import 'dart:async';
 
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_sub/flutter_sub.dart';
+import 'package:kilt/shared/shared.dart';
 
 class ScaffoldFrameController extends ValueNotifier<bool> {
   ScaffoldFrameController({bool visible = false}) : super(visible);
@@ -21,7 +21,7 @@ class ScaffoldFrameController extends ValueNotifier<bool> {
       toggleFrame(shown: false, duration: duration);
 
   void toggleFrame({bool? shown, Duration? duration}) {
-    bool result = shown ?? !visible;
+    final result = shown ?? !visible;
 
     frameToggler?.cancel();
     void toggle() {
@@ -80,8 +80,8 @@ class ScaffoldFrameChild extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ScaffoldFrameController? controller = ScaffoldFrame.maybeOf(context);
-    bool shown = this.shown ?? controller?.visible ?? true;
+    final controller = ScaffoldFrame.maybeOf(context);
+    final shown = this.shown ?? controller?.visible ?? true;
 
     Widget body() {
       return AnimatedOpacity(
@@ -139,7 +139,7 @@ class _ScaffoldFrameSystemUIState extends State<ScaffoldFrameSystemUI>
   void initState() {
     super.initState();
     SystemChrome.setSystemUIChangeCallback((shown) async {
-      ScaffoldFrameController controller = ScaffoldFrame.of(context);
+      final controller = ScaffoldFrame.of(context);
       if (controller.visible != shown) {
         controller.toggleFrame(shown: shown);
       }

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
 import 'package:kilt/traits/traits.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 PreferredSizeWidget _emptyAppBar() => const PreferredSize(
     preferredSize: Size.zero,
@@ -68,7 +68,6 @@ class _PostsPageState extends State<PostsPage> {
             endDrawer: endDrawer(),
             body: widget.appBar == null
                 ? SafeArea(
-                    top: true,
                     child: LimitedWidthLayout(
                       child: TileLayout(
                         child: PullToRefresh(
@@ -78,7 +77,7 @@ class _PostsPageState extends State<PostsPage> {
                           ),
                           child: CustomScrollView(
                             primary: true,
-                            scrollCacheExtent: ScrollCacheExtent.pixels(400),
+                            scrollCacheExtent: const ScrollCacheExtent.pixels(400),
                             slivers: [
                               SliverPadding(
                                 padding: defaultActionListPadding,
@@ -109,7 +108,7 @@ class _PostsPageState extends State<PostsPage> {
                                   ),
                                   child: CustomScrollView(
                                     primary: true,
-                                    scrollCacheExtent: ScrollCacheExtent.pixels(400),
+                                    scrollCacheExtent: const ScrollCacheExtent.pixels(400),
                                     slivers: [
                                       SliverPadding(
                                         padding: defaultActionListPadding,
@@ -134,7 +133,7 @@ class _PostsPageState extends State<PostsPage> {
                                 widget.controller.refresh(force: true, background: true),
                             child: CustomScrollView(
                               primary: true,
-                              scrollCacheExtent: ScrollCacheExtent.pixels(400),
+                              scrollCacheExtent: const ScrollCacheExtent.pixels(400),
                               slivers: [
                                 SliverPadding(
                                   padding: defaultActionListPadding,

@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0
 
 import 'package:collection/collection.dart';
-import 'package:kilt/client/client.dart';
-import 'package:kilt/settings/settings.dart';
-import 'package:kilt/shared/shared.dart';
-import 'package:kilt/tag/tag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_sub/flutter_sub.dart';
 import 'package:intl/intl.dart';
+import 'package:kilt/client/client.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/shared/shared.dart';
+import 'package:kilt/tag/tag.dart';
 
 class TagInput extends StatelessWidget {
   const TagInput({
@@ -43,7 +43,7 @@ class TagInput extends StatelessWidget {
   final bool? cutoutForFab;
 
   int findTag(List<String> tags, int offset) {
-    List<String> before = [];
+    final before = <String>[];
     for (final tag in tags) {
       before.add(tag);
       if (before.join(' ').length >= offset) {
@@ -85,10 +85,10 @@ class TagInput extends StatelessWidget {
           maxLines: maxLines,
           cutoutForFab: cutoutForFab ?? true,
           onSelected: (suggestion) {
-            List<String> tags = controller.text.split(' ');
-            int selection = findTag(tags, controller.selection.extent.offset);
-            String tag = tags[selection];
-            String operator = tag[0];
+            final tags = controller.text.split(' ');
+            final selection = findTag(tags, controller.selection.extent.offset);
+            final tag = tags[selection];
+            var operator = tag[0];
             if (['-', '~'].contains(operator)) {
               tags[selection] = tag.substring(1);
             } else {
@@ -128,9 +128,9 @@ class TagInput extends StatelessWidget {
           ),
           suggestionsCallback: (pattern) async {
             final client = context.read<Client>();
-            List<String> tags = controller.text.split(' ');
-            int selection = findTag(tags, controller.selection.extent.offset);
-            String tag = tags[selection];
+            final tags = controller.text.split(' ');
+            final selection = findTag(tags, controller.selection.extent.offset);
+            final tag = tags[selection];
             if (tag.isEmpty) return [];
             return client.tags.autocomplete(
               search: tagToRaw(tags[selection]),

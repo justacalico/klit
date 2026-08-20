@@ -91,7 +91,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/posts/1.json'),
-                data: postJson(id: 1),
+                data: postJson(),
               ));
 
       final client = createClient();
@@ -142,7 +142,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/posts.json'),
-                data: [postJson(id: 1), postJson(id: 2)],
+                data: [postJson(), postJson(id: 2)],
               ));
 
       final client = createClient();
@@ -175,8 +175,8 @@ void main() {
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/posts.json'),
                 data: [
-                  postJson(id: 1),
-                  postJson(id: 2, fileUrl: null, deleted: false),
+                  postJson(),
+                  postJson(id: 2, fileUrl: null),
                   postJson(id: 3, fileUrl: null, deleted: true),
                 ],
               ));
@@ -197,7 +197,7 @@ void main() {
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/posts.json'),
                 data: [
-                  postJson(id: 1, ext: 'jpg'),
+                  postJson(),
                   postJson(id: 2, ext: 'swf'),
                 ],
               ));
@@ -234,7 +234,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/posts.json'),
-                data: [postJson(id: 1), postJson(id: 2)],
+                data: [postJson(), postJson(id: 2)],
               ));
 
       final client = createClient();
@@ -261,7 +261,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/popular.json'),
-                data: [postJson(id: 1)],
+                data: [postJson()],
               ));
 
       final client = createClient();
@@ -292,7 +292,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/popular.json'),
-                data: [postJson(id: 1)],
+                data: [postJson()],
               ));
 
       final client = createClient();
@@ -320,7 +320,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/posts.json'),
-                data: [postJson(id: 1)],
+                data: [postJson()],
               ));
 
       final client = createClient();
@@ -444,7 +444,7 @@ void main() {
   group('PostClient.favorites', () {
     test('throws NoUserLoginException when identity has no username',
         () async {
-      final noUserIdentity = const Identity(
+      const noUserIdentity = Identity(
         id: 1,
         host: 'e621.net',
         username: null,
@@ -471,7 +471,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/favorites.json'),
-                data: [postJson(id: 1), postJson(id: 2)],
+                data: [postJson(), postJson(id: 2)],
               ));
 
       final client = createClient();
@@ -497,7 +497,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/posts.json'),
-                data: [postJson(id: 3), postJson(id: 1), postJson(id: 2)],
+                data: [postJson(id: 3), postJson(), postJson(id: 2)],
               ));
 
       final client = createClient();
@@ -540,7 +540,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/posts.json'),
-                data: [postJson(id: 2), postJson(id: 1), postJson(id: 3)],
+                data: [postJson(id: 2), postJson(), postJson(id: 3)],
               ));
 
       final client = createClient();

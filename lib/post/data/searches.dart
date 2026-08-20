@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 enum PopularScale { day, week, month, hot }
 
@@ -14,7 +14,7 @@ class FavoritePostController extends PostController {
   @override
   @protected
   List<Post>? filter(List<Post>? items) {
-    List<Post>? result = super.filter(
+    final result = super.filter(
       items?.where((p) => !p.isFavorited).toList(),
     );
     return items
@@ -106,14 +106,14 @@ class HotPostController extends PostController {
   DateTime _prevReferenceDate() => switch (_scale) {
     PopularScale.day => _referenceDate.subtract(const Duration(days: 1)),
     PopularScale.week => _referenceDate.subtract(const Duration(days: 7)),
-    PopularScale.month => DateTime(_referenceDate.year, _referenceDate.month - 1, 1),
+    PopularScale.month => DateTime(_referenceDate.year, _referenceDate.month - 1),
     PopularScale.hot => _referenceDate,
   };
 
   DateTime _nextReferenceDate() => switch (_scale) {
     PopularScale.day => _referenceDate.add(const Duration(days: 1)),
     PopularScale.week => _referenceDate.add(const Duration(days: 7)),
-    PopularScale.month => DateTime(_referenceDate.year, _referenceDate.month + 1, 1),
+    PopularScale.month => DateTime(_referenceDate.year, _referenceDate.month + 1),
     PopularScale.hot => _referenceDate,
   };
 
@@ -144,7 +144,7 @@ class HotPostController extends PostController {
       start = d.subtract(Duration(days: d.weekday - DateTime.monday));
       end = start.add(const Duration(days: 6));
     } else {
-      start = DateTime(d.year, d.month, 1);
+      start = DateTime(d.year, d.month);
       end = DateTime(d.year, d.month + 1, 0);
     }
 

@@ -49,12 +49,12 @@ extension StringInfixRegexing on String {
 }
 
 String linkToDisplay(String link) {
-  Uri? url = Uri.tryParse(link.trim());
+  final url = Uri.tryParse(link.trim());
   if (url == null) return link;
-  List<String> allowed = ['v'];
-  Map<String, dynamic> parameters = Map.of(url.queryParameters);
+  final allowed = <String>['v'];
+  final parameters = Map<String, dynamic>.of(url.queryParameters);
   parameters.removeWhere((key, value) => !allowed.contains(key));
-  Uri newUrl = Uri(
+  final newUrl = Uri(
     host: url.host,
     port: switch (url.port) {
       0 || 80 || 443 => null,
@@ -63,9 +63,9 @@ String linkToDisplay(String link) {
     path: url.path,
     queryParameters: parameters.isNotEmpty ? parameters : null,
   );
-  String display = newUrl.toString();
-  List<String> removed = [r'^///?', r'^www.', r'/$'];
-  for (String pattern in removed) {
+  var display = newUrl.toString();
+  final removed = <String>[r'^///?', r'^www.', r'/$'];
+  for (final pattern in removed) {
     display = display.replaceFirst(RegExp(pattern), '');
   }
   return display;

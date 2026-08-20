@@ -5,13 +5,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/follow/follow.dart';
 import 'package:kilt/identity/identity.dart';
 import 'package:kilt/logs/logs.dart';
 import 'package:kilt/traits/traits.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 const String followsBackgroundTaskKey = 'gitlab.openlyst.klit.follows';
 
@@ -21,19 +21,19 @@ Future<void> runFollowUpdates({
   CancelToken? cancelToken,
 }) async {
   // this ensures continued scheduling on iOS.
-  FollowRepository allFollows = FollowRepository(database: storage.sqlite);
+  final allFollows = FollowRepository(database: storage.sqlite);
   registerFollowBackgroundTask(
     await allFollows.all(types: [FollowType.notify]),
   );
 
-  List<Identity> identities = await IdentityClient(
+  final identities = await IdentityClient(
     database: storage.sqlite,
   ).all();
 
   final clientFactory = ClientFactory();
 
   for (final identity in identities) {
-    TraitsClient traits = TraitsClient(database: storage.sqlite);
+    final traits = TraitsClient(database: storage.sqlite);
     await traits.activate(identity.id);
 
     final client = clientFactory.create(
@@ -61,7 +61,7 @@ Future<void> runClientFollowUpdate({
   required FlutterLocalNotificationsPlugin notifications,
   CancelToken? cancelToken,
 }) async {
-  List<Follow> previous = await client.follows.all(
+  final previous = await client.follows.all(
     query: FollowsQuery(types: [FollowType.notify]),
   );
 
@@ -71,7 +71,7 @@ Future<void> runClientFollowUpdate({
 
   await client.followServer.sync();
 
-  List<Follow> updated = await client.follows.all(
+  final updated = await client.follows.all(
     query: FollowsQuery(types: [FollowType.notify]),
   );
 
@@ -90,16 +90,16 @@ Future<void> updateFollowNotifications({
   required FlutterLocalNotificationsPlugin notifications,
 }) async {
   if (!PlatformCapabilities.hasNotifications) return;
-  final Logger logger = Logger('Notifications');
+  final logger = Logger('Notifications');
 
-  Map<Follow, int> updates = {};
-  List<Follow> seen = [];
+  final updates = <Follow, int>{};
+  final seen = <Follow>[];
 
   for (final update in updated) {
-    Follow? old = previous.firstWhereOrNull((e) => e.tags == update.tags);
+    final old = previous.firstWhereOrNull((e) => e.tags == update.tags);
     if (old == null) continue;
-    int previousUnseen = old.unseen ?? 0;
-    int nextUnseen = update.unseen ?? 0;
+    final previousUnseen = old.unseen ?? 0;
+    final nextUnseen = update.unseen ?? 0;
     if (previousUnseen < nextUnseen) {
       updates[update] = nextUnseen - previousUnseen;
     } else if (previousUnseen > 0 && nextUnseen <= 0) {
@@ -108,7 +108,7 @@ Future<void> updateFollowNotifications({
   }
 
   for (final MapEntry(key: follow, value: unseen) in updates.entries) {
-    String? thumbnail = follow.thumbnail;
+    final thumbnail = follow.thumbnail;
     String? picture;
     if (thumbnail != null) {
       picture = (await DefaultCacheManager().getSingleFile(thumbnail)).path;
@@ -116,12 +116,12 @@ Future<void> updateFollowNotifications({
 
     logger.fine('${follow.tags} has $unseen new posts!');
 
-    NotificationDetails notificationDetails = _createNotificationDetails(
+    final notificationDetails = _createNotificationDetails(
       thumbnailPath: picture,
     );
 
-    String title = follow.name;
-    String description = 'has $unseen new posts!';
+    final title = follow.name;
+    var description = 'has $unseen new posts!';
     if (unseen == 1) {
       description = 'has a new post!';
     }
@@ -142,15 +142,15 @@ Future<void> updateFollowNotifications({
     );
 
     if (Platform.isAndroid) {
-      List<ActiveNotification> active = await notifications
+      final active = await notifications
           .getActiveNotifications();
 
-      List<ActiveNotification> grouped = active
+      final grouped = active
           .where((e) => e.groupKey == followsBackgroundTaskKey)
           .toList();
 
       if (grouped.length > 3) {
-        NotificationDetails notificationDetails = _createNotificationDetails(
+        final notificationDetails = _createNotificationDetails(
           summary: true,
         );
         await notifications.show(

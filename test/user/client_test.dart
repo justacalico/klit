@@ -48,7 +48,7 @@ void main() {
             cancelToken: any(named: 'cancelToken'),
           )).thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(path: '/users/testuser.json'),
-                data: userJson(id: 1, name: 'testuser'),
+                data: userJson(),
               ));
 
       final user = await client.get(id: 'testuser');

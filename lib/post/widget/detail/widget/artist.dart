@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kilt/app/routing/app_routes.dart';
 import 'package:kilt/comment/widget/commenter_avatar.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
 
 class ArtistDisplay extends StatelessWidget {
   const ArtistDisplay({super.key, required this.post});
@@ -80,11 +80,11 @@ class ArtistName extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    List<String> artists = filterArtists(post.tags['artist'] ?? []);
+    final artists = filterArtists(post.tags['artist'] ?? []);
     if (artists.isNotEmpty) {
       return OverflowBar(
         children: [
-          for (String artist in artists)
+          for (final String artist in artists)
             TagGesture(
               tag: artist,
               child: Padding(

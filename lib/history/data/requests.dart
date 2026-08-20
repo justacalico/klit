@@ -14,7 +14,7 @@ List<String> getPostHistoryThumbnails(List<Post>? posts) =>
 
 String getHistorySubtitle(Map<String, String> items) => items.entries
     .take(5)
-    .map((e) => '* "${e.value.replaceAll(r'"', '\'')}":${e.key}')
+    .map((e) => '* "${e.value.replaceAll(r'"', "'")}":${e.key}')
     .join('\n');
 
 abstract final class PostHistoryRequest {

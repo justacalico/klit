@@ -67,7 +67,7 @@ Future<FlutterLocalNotificationsPlugin> initializeNotifications({
   DidReceiveBackgroundNotificationResponseCallback?
   onDidReceiveBackgroundNotificationResponse,
 }) async {
-  FlutterLocalNotificationsPlugin notifications =
+  final notifications =
       FlutterLocalNotificationsPlugin();
   await notifications.initialize(
     settings: const InitializationSettings(

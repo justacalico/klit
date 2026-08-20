@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/history/history.dart';
-import 'package:kilt/l10n/gen/app_localizations.dart';
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:grouped_list/grouped_list.dart';
+import 'package:kilt/history/history.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/shared/shared.dart';
 
 class HistoryList extends StatelessWidget {
   const HistoryList({super.key});
@@ -18,7 +18,7 @@ class HistoryList extends StatelessWidget {
           onRefresh: () => controller.refresh(force: true, background: true),
           child: CustomScrollView(
             primary: true,
-            scrollCacheExtent: ScrollCacheExtent.pixels(400),
+            scrollCacheExtent: const ScrollCacheExtent.pixels(400),
             slivers: [
               SliverPadding(
                 padding: defaultActionListPadding,

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter/material.dart';
 
 class DenylistTagDisplay extends StatelessWidget {
   const DenylistTagDisplay({super.key, required this.post});
@@ -16,7 +16,7 @@ class DenylistTagDisplay extends StatelessWidget {
     return PostsConnector(
       post: post,
       builder: (context, post) {
-        PostController controller = context.watch<PostController>();
+        final controller = context.watch<PostController>();
         final l10n = AppLocalizations.of(context);
         return CrossFade.builder(
           showChild: controller.isDenied(post),

@@ -2,8 +2,8 @@
 
 import 'dart:async';
 
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/foundation.dart';
+import 'package:kilt/shared/shared.dart';
 
 export 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
@@ -97,10 +97,10 @@ abstract class DataController<KeyType, ItemType> with ChangeNotifier {
       onPreRequest(force, reset, background);
       await Future.value();
       notifyListeners();
-      KeyType? key = nextPageKey;
+      var key = nextPageKey;
       if (reset) key = firstPageKey;
       if (key == null) return;
-      PageResponse response = await performRequest(key, force);
+      final PageResponse response = await performRequest(key, force);
       if (_disposed) return;
       if (response.error != null) {
         _error = response.error;
@@ -165,7 +165,7 @@ abstract class DataController<KeyType, ItemType> with ChangeNotifier {
 
   /// Waits for the current call to [getNextPage] to complete.
   Future<void> _waitForFetch() async {
-    Completer<void> completer = Completer<void>();
+    final completer = Completer<void>();
 
     void onUpdate() {
       if (!_fetching) {
@@ -194,7 +194,7 @@ abstract class DataController<KeyType, ItemType> with ChangeNotifier {
   /// If multiple refreshes are scheduled during the same [getNextPage] call,
   /// only the last one will be executed.
   Future<void> _scheduleReset(bool background) async {
-    Object id = _resetter = Object();
+    final id = _resetter = Object();
     await _waitForFetch();
     if (id != _resetter) return;
     return getNextPage(reset: true, background: background);
@@ -258,7 +258,7 @@ extension DataControllerItemManipulation<KeyType, ItemType>
   @protected
   void assertOwnsItem(ItemType item) {
     if (rawItems == null || !rawItems!.contains(item)) {
-      throw StateError('$runtimeType doesn\'t own this ${item.runtimeType}');
+      throw StateError("$runtimeType doesn't own this ${item.runtimeType}");
     }
   }
 }

@@ -3,10 +3,10 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:path_provider/path_provider.dart';
 
 Future<String?> getDefaultDownloadPath() async =>
@@ -28,13 +28,13 @@ extension PostDownloading on Post {
     required BaseCacheManager cache,
   }) async {
     try {
-      String? url = file;
+      final url = file;
 
       if (url == null) {
         throw FileDownloadException('Post does not have a file!');
       }
 
-      File downloadFile = await cache.getSingleFile(url);
+      final File downloadFile = await cache.getSingleFile(url);
 
       await FileDownloader.downloadImage(
         file: downloadFile,
@@ -51,8 +51,8 @@ extension PostDownloading on Post {
   }
 
   String _downloadName() {
-    String filename = '';
-    List<String> artists = filterArtists(tags['artist'] ?? []);
+    var filename = '';
+    final artists = filterArtists(tags['artist'] ?? []);
     if (artists.isNotEmpty) {
       filename = '${artists.join(', ')} - ';
     }

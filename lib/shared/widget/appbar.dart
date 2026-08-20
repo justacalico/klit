@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/shared/shared.dart';
 
 mixin AppBarBuilderWidget implements PreferredSizeWidget {
   abstract final PreferredSizeWidget child;
@@ -33,16 +33,16 @@ AppBarLeadingConfiguration getLeadingConfiguration({
   bool automaticallyImplyLeading = true,
 }) {
   const minimumTapTarget = Size(44, 44);
-  bool alwaysShowDrawer =
+  final alwaysShowDrawer =
       alwaysShowDrawerBreakpoint != null && width >= alwaysShowDrawerBreakpoint;
 
-  Widget? effectiveLeading = leading;
+  var effectiveLeading = leading;
   double? leadingWidth;
   if (leading == null && automaticallyImplyLeading) {
-    bool hasDrawer = Scaffold.maybeOf(context)?.hasDrawer ?? false;
-    ModalRoute? parentRoute = ModalRoute.of(context);
-    bool isFirst = parentRoute?.isFirst ?? false;
-    bool canPop = parentRoute?.canPop ?? false;
+    final hasDrawer = Scaffold.maybeOf(context)?.hasDrawer ?? false;
+    final ModalRoute? parentRoute = ModalRoute.of(context);
+    final isFirst = parentRoute?.isFirst ?? false;
+    final canPop = parentRoute?.canPop ?? false;
 
     Widget drawerButton() => CupertinoButton(
       padding: EdgeInsets.zero,
@@ -51,7 +51,7 @@ AppBarLeadingConfiguration getLeadingConfiguration({
       child: const Icon(CupertinoIcons.line_horizontal_3),
     );
 
-    Widget backButton =
+    final Widget backButton =
         parentRoute is PageRoute<dynamic> && parentRoute.fullscreenDialog
         ? CupertinoButton(
             padding: EdgeInsets.zero,
@@ -304,7 +304,7 @@ class ScrollToTop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget tapWrapper(Widget? child) {
-      ScrollController? controller =
+      final controller =
           this.controller ??
           (primary ? PrimaryScrollController.of(context) : null);
       return GestureDetector(
@@ -332,7 +332,7 @@ class ScrollToTop extends StatelessWidget {
       );
     }
 
-    Widget Function(BuildContext context, Widget child) builder =
+    final builder =
         this.builder ?? (context, child) => child;
 
     return builder(context, tapWrapper(child));
@@ -404,7 +404,7 @@ class DefaultSliverAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget>? effectiveActions = actions;
+    var effectiveActions = actions;
     if (actions != null) {
       effectiveActions = [...actions!, const SizedBox(width: 8)];
     }
@@ -413,7 +413,7 @@ class DefaultSliverAppBar extends StatelessWidget {
       padding: EdgeInsets.zero,
       sliver: SliverLayoutBuilder(
         builder: (context, constraints) {
-          AppBarLeadingConfiguration leadingConfig = getLeadingConfiguration(
+          final leadingConfig = getLeadingConfiguration(
             context: context,
             width: constraints.crossAxisExtent,
             automaticallyImplyLeading: automaticallyImplyLeading,

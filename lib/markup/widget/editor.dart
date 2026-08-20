@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 import 'package:overflow_view/overflow_view.dart';
 
 class DTextEditor extends StatelessWidget {
@@ -69,8 +69,8 @@ class _DTextEditorBarState extends State<DTextEditorBar> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     void enclose(String blockTag, {String? endTag}) {
-      int base = widget.controller.selection.baseOffset;
-      int extent = widget.controller.selection.extentOffset;
+      final base = widget.controller.selection.baseOffset;
+      final extent = widget.controller.selection.extentOffset;
 
       int start;
       int end;
@@ -82,13 +82,13 @@ class _DTextEditorBarState extends State<DTextEditorBar> {
         end = base;
       }
 
-      String before = widget.controller.text.substring(0, start);
-      String block = widget.controller.text.substring(start, end);
-      String after = widget.controller.text.substring(end);
+      final before = widget.controller.text.substring(0, start);
+      var block = widget.controller.text.substring(start, end);
+      final after = widget.controller.text.substring(end);
 
-      String blockStart = '[$blockTag]$block';
-      String blockEnd = '[/${endTag ?? blockTag}]';
-      int cursorOffset = before.length + blockStart.length;
+      final blockStart = '[$blockTag]$block';
+      final blockEnd = '[/${endTag ?? blockTag}]';
+      final cursorOffset = before.length + blockStart.length;
 
       block = blockStart + blockEnd;
       widget.controller.text = '$before$block$after';

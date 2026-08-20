@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
 import 'package:kilt/account/account.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 class HostUnvailablePage extends StatelessWidget {
   const HostUnvailablePage({super.key, this.offerResolve = false});
@@ -16,8 +16,8 @@ class HostUnvailablePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: TransparentAppBar(
-        child: const DefaultAppBar(leading: CloseButton()),
+      appBar: const TransparentAppBar(
+        child: DefaultAppBar(leading: CloseButton()),
       ),
       body: Center(
         child: Padding(

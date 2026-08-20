@@ -1,26 +1,26 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/widgets.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/history/history.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:flutter/widgets.dart';
 
 extension Identification on History {
   bool isItem(LinkType type) {
-    Link? parsed = const E621LinkParser().parse(link);
+    final parsed = const E621LinkParser().parse(link);
     return type == parsed?.type && parsed?.id != null;
   }
 
   bool isSearch(LinkType type) {
-    Link? parsed = const E621LinkParser().parse(link);
+    final parsed = const E621LinkParser().parse(link);
     return type == parsed?.type && (parsed?.query?.isNotEmpty ?? false);
   }
 
   String getName(BuildContext context) {
-    Link? parsed = const E621LinkParser().parse(link);
-    LinkType? type = parsed?.type;
+    final parsed = const E621LinkParser().parse(link);
+    final type = parsed?.type;
     if (parsed == null || type == null) {
       if (title != null) {
         return title!;
@@ -67,11 +67,11 @@ extension Identification on History {
       }
     }
 
-    QueryMap? search = parsed.query;
+    final search = parsed.query;
     if (search != null && search.isNotEmpty) {
       switch (type) {
         case LinkType.post:
-          String? username = context.read<Client>().identity.username;
+          final username = context.read<Client>().identity.username;
           if (username != null &&
               favRegex(username).hasMatch(search['tags'] ?? '')) {
             return 'Favorites';

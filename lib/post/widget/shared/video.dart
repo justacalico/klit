@@ -2,11 +2,11 @@
 
 import 'dart:async';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_sub/flutter_sub.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_sub/flutter_sub.dart';
 import 'package:rxdart/rxdart.dart';
 
 class VideoButton extends StatelessWidget {
@@ -17,7 +17,7 @@ class VideoButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ScaffoldFrameController? frameController = ScaffoldFrame.maybeOf(context);
+    final frameController = ScaffoldFrame.maybeOf(context);
     return SubStream<List<bool>>(
       create: () => CombineLatestStream.list([
         player.stream.playing.startWith(player.state.playing),
@@ -39,10 +39,10 @@ class VideoButton extends StatelessWidget {
                   player.isInitialized,
                 ];
 
-            bool loading = !initialized || buffering;
-            bool alwaysVisible = !playing || loading;
-            bool shown = alwaysVisible || (frameController?.visible ?? false);
-            bool showPlayButton = !playing || (playing && !loading);
+            final loading = !initialized || buffering;
+            final alwaysVisible = !playing || loading;
+            final shown = alwaysVisible || (frameController?.visible ?? false);
+            final showPlayButton = !playing || (playing && !loading);
 
             return ScaffoldFrameChild(
               shown: shown,
@@ -403,15 +403,15 @@ class _VideoGestureState extends State<VideoGesture>
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onDoubleTap: () async {
-        Duration current = widget.player.state.position;
-        bool boundOnZero = current == Duration.zero;
-        bool boundOnEnd = current == widget.player.state.duration;
+        final current = widget.player.state.position;
+        final boundOnZero = current == Duration.zero;
+        final boundOnEnd = current == widget.player.state.duration;
         if ((!widget.forward && boundOnZero) ||
             (widget.forward && boundOnEnd)) {
           return;
         }
 
-        Duration target = current;
+        var target = current;
         if (widget.forward) {
           target += const Duration(seconds: 10);
         } else {
@@ -446,7 +446,7 @@ class _VideoGestureState extends State<VideoGesture>
             ),
             LayoutBuilder(
               builder: (context, constraints) {
-                double size = constraints.maxHeight * 2;
+                final size = constraints.maxHeight * 2;
                 return AnimatedBuilder(
                   animation: fadeAnimation,
                   builder: (context, child) => Stack(
@@ -589,7 +589,7 @@ class PostVideoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    VideoPlayer player = post.getVideo(context)!;
+    final player = post.getVideo(context)!;
 
     Widget placeholder() {
       return PostImageWidget(
@@ -605,15 +605,15 @@ class PostVideoWidget extends StatelessWidget {
       create: () => player.initialized,
       keys: [player],
       builder: (context, snapshot) {
-        bool initialized = snapshot.data ?? player.isInitialized;
+        final initialized = snapshot.data ?? player.isInitialized;
         if (!initialized) return placeholder();
         final aspectRatio = post.width / post.height;
         return AspectRatio(
           aspectRatio: aspectRatio,
           child: LayoutBuilder(
             builder: (context, constraints) {
-              double w = constraints.maxWidth;
-              double h = constraints.maxHeight;
+              var w = constraints.maxWidth;
+              var h = constraints.maxHeight;
               if (!w.isFinite || !h.isFinite || w <= 0 || h <= 0) {
                 final size = MediaQuery.sizeOf(context);
                 final maxW = size.width.isFinite ? size.width : 1920.0;
@@ -631,8 +631,6 @@ class PostVideoWidget extends StatelessWidget {
                 controller: player.controller,
                 width: w,
                 height: h,
-                fill: Colors.black,
-                fit: BoxFit.contain,
                 controls: null,
               );
             },

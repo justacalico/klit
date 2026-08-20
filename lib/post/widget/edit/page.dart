@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 class PostEditPage extends StatefulWidget {
   const PostEditPage({super.key, required this.post});
@@ -183,8 +183,8 @@ class _PostEditPageState extends State<PostEditPage> {
       child: KeyboardDismisser(
         child: Scaffold(
           extendBodyBehindAppBar: true,
-          appBar: TransparentAppBar(
-            child: const DefaultAppBar(leading: CloseButton()),
+          appBar: const TransparentAppBar(
+            child: DefaultAppBar(leading: CloseButton()),
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: _isLoading ? null : _saveChanges,

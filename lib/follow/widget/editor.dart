@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0
 
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/follow/follow.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 class FollowEditor extends StatefulWidget {
   const FollowEditor({super.key});
@@ -19,7 +19,7 @@ class _FollowEditorState extends State<FollowEditor> {
   final String subscribe = FollowType.update.name;
   final String bookmark = FollowType.bookmark.name;
 
-  late final client = context.read<Client>();
+  late final Client client = context.read<Client>();
   late Future<List<Follow>> all = client.follows.all();
   late Future<Map<String, String>> follows = all.then(
     (all) => {
@@ -37,18 +37,18 @@ class _FollowEditorState extends State<FollowEditor> {
     List<String>? subscriptions,
     List<String>? bookmarks,
   }) async {
-    List<Follow> allRemoved = [];
-    List<FollowRequest> allAdded = [];
+    final allRemoved = <Follow>[];
+    final allAdded = <FollowRequest>[];
 
     Future<void> process(List<String> updateList, FollowType type) async {
-      List<Follow> follows = await all.then(
+      final follows = await all.then(
         (value) => value.where((e) => e.type == type).toList(),
       );
-      List<Follow> removed = follows
+      final removed = follows
           .whereNot((e) => updateList.contains(e.tags))
           .toList();
-      List<String> tags = follows.map((e) => e.tags).toList();
-      List<FollowRequest> added = updateList
+      final tags = follows.map((e) => e.tags).toList();
+      final added = updateList
           .whereNot((e) => tags.contains(e))
           .map((e) => FollowRequest(tags: e, type: type))
           .toList();
@@ -78,7 +78,7 @@ class _FollowEditorState extends State<FollowEditor> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    Widget title = Text(l10n.followEditFollows);
+    final Widget title = Text(l10n.followEditFollows);
     return FutureLoadingPage<Map<String, String>>(
       title: title,
       future: follows,
@@ -98,7 +98,7 @@ class _FollowEditorState extends State<FollowEditor> {
           ),
         ],
         onSubmitted: (value) async {
-          Map<String, List<String>> contents = Map.fromEntries(
+          final contents = Map<String, List<String>>.fromEntries(
             value
                 .whereNot((e) => e.value == null)
                 .map(

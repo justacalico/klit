@@ -7,7 +7,7 @@ import 'package:kilt/shared/shared.dart';
 void main() {
   group('Updating.name', () {
     test('returns title when set', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'some_tag',
         title: 'My Title',
@@ -22,7 +22,7 @@ void main() {
     });
 
     test('returns tagToName(tags) when title is null', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'fox canine',
         title: null,
@@ -37,7 +37,7 @@ void main() {
     });
 
     test('tagToName replaces underscores with spaces', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'red_fox',
         title: null,
@@ -80,7 +80,7 @@ void main() {
 
   group('Updating.withTitle', () {
     test('updates title when different', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'tag',
         title: 'Old',
@@ -96,7 +96,7 @@ void main() {
     });
 
     test('no change when title is the same', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'tag',
         title: 'Same',
@@ -115,7 +115,7 @@ void main() {
 
   group('Updating.withAlias', () {
     test('updates alias when different', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'tag',
         title: null,
@@ -131,7 +131,7 @@ void main() {
     });
 
     test('no change when alias is the same', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'tag',
         title: null,
@@ -152,8 +152,8 @@ void main() {
     Pool makePool({required String name, required bool active}) => Pool(
           id: 1,
           name: name,
-          createdAt: DateTime(2024, 1, 1),
-          updatedAt: DateTime(2024, 1, 1),
+          createdAt: DateTime(2024),
+          updatedAt: DateTime(2024),
           description: '',
           postIds: const [],
           postCount: 0,
@@ -161,7 +161,7 @@ void main() {
         );
 
     test('sets title from pool name', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'tag',
         title: null,
@@ -178,7 +178,7 @@ void main() {
     });
 
     test('sets bookmark type when pool is inactive', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'tag',
         title: null,
@@ -195,7 +195,7 @@ void main() {
     });
 
     test('does not change type when pool is active', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'tag',
         title: null,
@@ -214,7 +214,7 @@ void main() {
 
   group('Updating.withSeen', () {
     test('sets unseen to 0 when positive', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'tag',
         title: null,
@@ -230,7 +230,7 @@ void main() {
     });
 
     test('no change when unseen is already 0', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'tag',
         title: null,
@@ -247,7 +247,7 @@ void main() {
     });
 
     test('no change when unseen is null', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'tag',
         title: null,
@@ -291,7 +291,7 @@ void main() {
         variants: null,
         tags: const {},
         uploaderId: 1,
-        createdAt: DateTime(2024, 1, 1),
+        createdAt: DateTime(2024),
         updatedAt: null,
         vote: const VoteInfo(score: 0),
         isDeleted: false,
@@ -314,7 +314,7 @@ void main() {
     });
 
     test('uses preview when sample is null', () {
-      final follow = makeFollow(latest: 5, unseen: 0, thumbnail: null);
+      final follow = makeFollow(latest: 5, unseen: 0);
       final post = Post(
         id: 10,
         file: null,
@@ -327,7 +327,7 @@ void main() {
         variants: null,
         tags: const {},
         uploaderId: 1,
-        createdAt: DateTime(2024, 1, 1),
+        createdAt: DateTime(2024),
         updatedAt: null,
         vote: const VoteInfo(score: 0),
         isDeleted: false,
@@ -369,7 +369,7 @@ void main() {
         variants: null,
         tags: const {},
         uploaderId: 1,
-        createdAt: DateTime(2024, 1, 1),
+        createdAt: DateTime(2024),
         updatedAt: null,
         vote: const VoteInfo(score: 0),
         isDeleted: false,
@@ -404,7 +404,7 @@ void main() {
         variants: null,
         tags: const {},
         uploaderId: 1,
-        createdAt: DateTime(2024, 1, 1),
+        createdAt: DateTime(2024),
         updatedAt: null,
         vote: const VoteInfo(score: 0),
         isDeleted: false,
@@ -440,7 +440,7 @@ void main() {
           variants: null,
           tags: const {},
           uploaderId: 1,
-          createdAt: DateTime(2024, 1, 1),
+          createdAt: DateTime(2024),
           updatedAt: null,
           vote: const VoteInfo(score: 0),
           isDeleted: false,
@@ -459,7 +459,7 @@ void main() {
         );
 
     test('counts new posts and updates unseen', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'tag',
         title: null,
@@ -477,7 +477,7 @@ void main() {
     });
 
     test('sets unseen to 0 when latest is null', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'tag',
         title: null,
@@ -495,7 +495,7 @@ void main() {
     });
 
     test('no change when posts is empty', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'tag',
         title: null,
@@ -512,7 +512,7 @@ void main() {
     });
 
     test('only counts posts newer than latest', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'tag',
         title: null,

@@ -2,9 +2,9 @@
 
 import 'dart:math';
 
+import 'package:flutter/material.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 
 enum GridQuilt { square, vertical }
 
@@ -27,9 +27,9 @@ class TileLayoutData extends InheritedWidget {
 
   @override
   bool updateShouldNotify(covariant TileLayoutData oldWidget) =>
-      (oldWidget.tileHeightFactor != tileHeightFactor ||
+      oldWidget.tileHeightFactor != tileHeightFactor ||
       oldWidget.crossAxisCount != crossAxisCount ||
-      oldWidget.stagger != stagger);
+      oldWidget.stagger != stagger;
 }
 
 class TileLayout extends StatelessWidget {
@@ -62,11 +62,11 @@ class TileLayout extends StatelessWidget {
           builder: (context, constraints) {
             tileSize = this.tileSize ?? tileSize;
             stagger = this.stagger ?? stagger;
-            int crossAxisCount = max(
+            final crossAxisCount = max(
               1,
               constraints.maxWidth / tileSize,
             ).round();
-            int mainAxisCount = max(
+            final mainAxisCount = max(
               1,
               constraints.maxHeight / tileSize,
             ).round();

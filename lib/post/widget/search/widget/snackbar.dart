@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/logs/logs.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 Future<void> postDownloadingNotification(
   BuildContext context,
   Set<Post> items,
 ) async {
-  Settings settings = context.read<Settings>();
-  BaseCacheManager cache = context.read<BaseCacheManager>();
+  final settings = context.read<Settings>();
+  final cache = context.read<BaseCacheManager>();
   final l10n = AppLocalizations.of(context);
   final logger = Logger('Post Downloader');
   return loadingNotification<Post>(
@@ -54,8 +54,8 @@ Future<void> postFavoritingNotification(
   bool isLiked,
 ) {
   final l10n = AppLocalizations.of(context);
-  PostController controller = context.read<PostController>();
-  bool upvote = context.read<Settings>().upvoteFavs.value;
+  final controller = context.read<PostController>();
+  final upvote = context.read<Settings>().upvoteFavs.value;
   return loadingNotification<Post>(
     context: context,
     icon: const Icon(Icons.favorite),
@@ -71,7 +71,7 @@ Future<void> postFavoritingNotification(
       } else {
         if (!post.isFavorited) {
           return Future<bool>(() async {
-            bool result = await controller.fav(post);
+            var result = await controller.fav(post);
             if (result && upvote) {
               result = await controller.vote(
                 post: controller.postById(post.id)!,

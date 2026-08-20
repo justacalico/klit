@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/comment/comment.dart';
@@ -8,8 +10,6 @@ import 'package:kilt/post/post.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/ticket/ticket.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 typedef _PostMenuAction = ({IconData icon, String title, VoidCallback onTap});
 
@@ -182,9 +182,9 @@ Future<void> showPostMenuSheet(
 
   final anchor = anchorContext ?? context;
   final overlay =
-      Overlay.of(context, rootOverlay: true).context.findRenderObject()
+      Overlay.of(context, rootOverlay: true).context.findRenderObject()!
           as RenderBox;
-  final anchorBox = anchor.findRenderObject() as RenderBox;
+  final anchorBox = anchor.findRenderObject()! as RenderBox;
   final anchorRect = RelativeRect.fromRect(
     Rect.fromPoints(
       anchorBox.localToGlobal(Offset.zero, ancestor: overlay),

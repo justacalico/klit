@@ -3,10 +3,10 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:kilt/logs/logs.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -31,7 +31,7 @@ class VideoPlayer extends Player {
     // Re-opening the media fully resets the decoder state on each loop.
     _completedSubscription = stream.completed.listen((completed) async {
       if (completed && looping && !_disposed) {
-        await open(Media(key), play: true);
+        await open(Media(key));
       }
     });
   }
@@ -77,7 +77,7 @@ class VideoService extends ChangeNotifier {
 
   set muteVideos(bool value) {
     _muteVideos = value;
-    for (var e in _videos.values) {
+    for (final e in _videos.values) {
       e.setVolume(muteVideos ? 0 : 100);
     }
     notifyListeners();
@@ -86,14 +86,14 @@ class VideoService extends ChangeNotifier {
 
   VideoPlayer getVideo(String key) {
     while (true) {
-      Map<String, VideoPlayer> loaded = Map.of(_videos);
+      final loaded = Map<String, VideoPlayer>.of(_videos);
       loaded.remove(key);
       if (loaded.length < maxLoaded) break;
       _logger.fine('Too many (${loaded.length}) videos loaded!');
       disposeVideo(loaded.keys.first);
     }
     return _videos.putIfAbsent(key, () {
-      VideoPlayer player = VideoPlayer(key);
+      final player = VideoPlayer(key);
       player.open(Media(key), play: false);
       player.setVolume(_muteVideos ? 0 : 100);
       return player;
@@ -101,7 +101,7 @@ class VideoService extends ChangeNotifier {
   }
 
   Future<void> disposeVideo(String key) async {
-    VideoPlayer? controller = _videos[key];
+    final controller = _videos[key];
     if (controller != null) {
       _videos.remove(key);
       await controller.pause();
@@ -126,8 +126,8 @@ class VideoServiceVolumeControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    VideoService service = context.watch<VideoService>();
-    bool muted = service.muteVideos;
+    final service = context.watch<VideoService>();
+    final muted = service.muteVideos;
     return InkWell(
       onTap: () => service.muteVideos = !muted,
       child: Padding(

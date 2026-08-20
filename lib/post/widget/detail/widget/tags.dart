@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/post/post.dart';
-import 'package:kilt/tag/tag.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kilt/post/post.dart';
+import 'package:kilt/tag/tag.dart';
 
 class TagDisplay extends StatelessWidget {
   const TagDisplay({super.key, required this.post});

@@ -11,10 +11,6 @@ void main() {
         rating: Rating.q,
         description: 'hello world',
         sources: ['https://example.com/a', 'https://example.com/b'],
-        tags: const {
-          'general': ['fox', 'canine'],
-          'species': ['dog'],
-        },
         relationships: const Relationships(
           parentId: 3,
           hasChildren: true,
@@ -85,7 +81,7 @@ void main() {
     });
 
     test('includes rating when the rating changes', () {
-      final post = makePost(rating: Rating.s);
+      final post = makePost();
       final edit = PostEdit.fromPost(post).copyWith(rating: Rating.e);
 
       final form = edit.toForm()!;
@@ -104,7 +100,6 @@ void main() {
       final post = makePost(
         relationships: const Relationships(
           parentId: null,
-          hasChildren: false,
           hasActiveChildren: false,
           children: [],
         ),
@@ -119,7 +114,6 @@ void main() {
       final post = makePost(
         relationships: const Relationships(
           parentId: 5,
-          hasChildren: false,
           hasActiveChildren: false,
           children: [],
         ),
@@ -131,7 +125,7 @@ void main() {
     });
 
     test('includes edit_reason when there are other changes', () {
-      final post = makePost(rating: Rating.s);
+      final post = makePost();
       final edit = PostEdit.fromPost(post).copyWith(
         rating: Rating.q,
         editReason: 'fixing rating',
@@ -143,7 +137,7 @@ void main() {
     });
 
     test('trims the edit reason', () {
-      final post = makePost(rating: Rating.s);
+      final post = makePost();
       final edit = PostEdit.fromPost(post).copyWith(
         rating: Rating.q,
         editReason: '  fixing rating  ',
@@ -154,7 +148,7 @@ void main() {
     });
 
     test('does not include edit_reason when it is blank', () {
-      final post = makePost(rating: Rating.s);
+      final post = makePost();
       final edit = PostEdit.fromPost(post).copyWith(
         rating: Rating.q,
         editReason: '   ',
@@ -173,7 +167,6 @@ void main() {
 
     test('includes all changed fields for multiple changes', () {
       final post = makePost(
-        rating: Rating.s,
         description: 'old desc',
         sources: ['https://old.com'],
       );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kilt/markup/data/color.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kilt/markup/data/color.dart';
 
 void main() {
   group('parseColor', () {

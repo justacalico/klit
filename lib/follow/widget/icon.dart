@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/follow/follow.dart';
 import 'package:flutter/material.dart';
+import 'package:kilt/follow/follow.dart';
 
 extension FollowIcon on FollowType {
   Widget get icon {

@@ -22,7 +22,7 @@ class CheckboxFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    InputDecoration decoration =
+    final decoration =
         this.decoration ?? const InputDecoration(border: OutlineInputBorder());
     return InkWell(
       onTap: () {

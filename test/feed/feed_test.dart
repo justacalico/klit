@@ -105,7 +105,7 @@ void main() {
 
   group('Feed.toJson', () {
     test('roundtrip', () {
-      final feed = Feed(
+      const feed = Feed(
         id: 'rt1',
         name: 'Roundtrip',
         mediaType: Feed.mediaTypeAll,
@@ -116,7 +116,7 @@ void main() {
         order: 'id_asc',
         excludeFavorites: true,
         subfeeds: [
-          const SubFeed(id: 's1', name: 'S1', includeTags: ['x']),
+          SubFeed(id: 's1', name: 'S1', includeTags: ['x']),
         ],
       );
       final json = feed.toJson();
@@ -155,8 +155,6 @@ void main() {
         orTags: ['b'],
         excludeTags: ['c'],
         rating: 's',
-        order: 'id_desc',
-        excludeFavorites: false,
         subfeeds: [SubFeed(id: 's', name: 'S')],
       );
       final updated = feed.copyWith(

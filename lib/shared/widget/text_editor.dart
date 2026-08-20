@@ -2,10 +2,10 @@
 
 import 'dart:async';
 
-import 'package:kilt/settings/settings.dart';
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/settings/settings.dart';
+import 'package:kilt/shared/shared.dart';
 
 typedef TextEditorSubmit = FutureOr<String?> Function(String value);
 typedef TextEditorBuilder =
@@ -111,7 +111,7 @@ class _MultiTextEditorState extends State<MultiTextEditor> {
       LoadingDialogActionController();
 
   Future<void> submit() async {
-    String? error = await widget.onSubmitted([
+    final error = await widget.onSubmitted([
       for (final content in textControllers.keys)
         TextEditorContent(
           key: content.key,
@@ -194,7 +194,7 @@ class _MultiTextEditorState extends State<MultiTextEditor> {
           );
         }
 
-        Map<Widget, Widget>? tabs = {
+        final tabs = <Widget, Widget>{
           Tab(text: l10n.commonWrite): editor(),
           if (widget.preview case final preview?)
             Tab(text: l10n.commonPreview): scrollView(
@@ -206,7 +206,7 @@ class _MultiTextEditorState extends State<MultiTextEditor> {
           length: tabs.length,
           child: Builder(
             builder: (context) {
-              TabController tabController = DefaultTabController.of(context);
+              final tabController = DefaultTabController.of(context);
               return ListenableBuilder(
                 listenable: tabController,
                 builder: (context, child) => Scaffold(

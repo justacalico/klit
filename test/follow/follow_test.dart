@@ -57,7 +57,7 @@ void main() {
         latest: 200,
         unseen: 3,
         thumbnail: 'thumb.jpg',
-        updated: DateTime(2024, 6, 1, 12, 0),
+        updated: DateTime(2024, 6, 1, 12),
       );
       final json = follow.toJson();
       final restored = Follow.fromJson(json);
@@ -69,11 +69,11 @@ void main() {
       expect(restored.latest, 200);
       expect(restored.unseen, 3);
       expect(restored.thumbnail, 'thumb.jpg');
-      expect(restored.updated, DateTime(2024, 6, 1, 12, 0));
+      expect(restored.updated, DateTime(2024, 6, 1, 12));
     });
 
     test('null fields serialize correctly', () {
-      final follow = Follow(
+      const follow = Follow(
         id: 1,
         tags: 'tag',
         title: null,
@@ -105,7 +105,7 @@ void main() {
         latest: 10,
         unseen: 5,
         thumbnail: 'old.jpg',
-        updated: DateTime(2024, 1, 1),
+        updated: DateTime(2024),
       );
       final updated = follow.copyWith(
         title: 'New',
@@ -120,7 +120,7 @@ void main() {
       expect(updated.alias, 'old_alias');
       expect(updated.latest, 10);
       expect(updated.thumbnail, 'old.jpg');
-      expect(updated.updated, DateTime(2024, 1, 1));
+      expect(updated.updated, DateTime(2024));
     });
   });
 

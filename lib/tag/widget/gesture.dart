@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/tag/tag.dart';
-import 'package:kilt/traits/traits.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class TagGesture extends StatelessWidget {
   const TagGesture({
@@ -28,7 +27,7 @@ class TagGesture extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(4),
       onTap: () async {
-        Traits traits = context.read<Client>().traits.value;
+        final traits = context.read<Client>().traits.value;
         if (wiki || (safe && traits.denylist.contains(tag))) {
           sheet();
         } else {

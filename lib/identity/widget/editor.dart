@@ -4,13 +4,13 @@ import 'dart:io';
 
 import 'package:drift/isolate.dart';
 import 'package:drift/native.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kilt/app/app.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/identity/identity.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 Future<void> showIdentityEditorDialog({
   required BuildContext context,
@@ -289,7 +289,7 @@ class _LoginLoadingDialogState extends State<LoginLoadingDialog> {
     final identity = widget.identity;
     final host = widget.host;
     final username = widget.username;
-    String? apikey = widget.apikey;
+    var apikey = widget.apikey;
     final headers = Map<String, String>.of(identity?.headers ?? {});
 
     if (username != null && apikey != null) {
@@ -320,7 +320,7 @@ class _LoginLoadingDialogState extends State<LoginLoadingDialog> {
         );
       }
     } on DriftRemoteException catch (e) {
-      Object remoteError = e.remoteCause;
+      final remoteError = e.remoteCause;
       String? reason;
       if (remoteError is SqliteException &&
           remoteError.extendedResultCode == 2067) {

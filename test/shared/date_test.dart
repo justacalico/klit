@@ -47,29 +47,29 @@ void main() {
   group('DateFormatting.named', () {
     test('returns "Today" for current date with null context', () {
       final now = DateTime.now();
-      expect(DateFormatting.named(now, null), 'Today');
+      expect(DateFormatting.named(now), 'Today');
     });
 
     test('returns "Yesterday" for previous date with null context', () {
       final yesterday = DateTime.now().subtract(const Duration(days: 1));
-      expect(DateFormatting.named(yesterday, null), 'Yesterday');
+      expect(DateFormatting.named(yesterday), 'Yesterday');
     });
 
     test('returns weekday name for date within 7 days', () {
       final date = DateTime.now().subtract(const Duration(days: 3));
       final expected = DateFormat.EEEE().format(date);
-      expect(DateFormatting.named(date, null), expected);
+      expect(DateFormatting.named(date), expected);
     });
 
     test('returns date format for date older than 7 days', () {
       final date = DateTime.now().subtract(const Duration(days: 10));
       final expected = DateFormatting.date(date);
-      expect(DateFormatting.named(date, null), expected);
+      expect(DateFormatting.named(date), expected);
     });
 
     test('returns date format for date far in the past', () {
       final date = DateTime(2020, 6, 15);
-      expect(DateFormatting.named(date, null), '2020/6/15');
+      expect(DateFormatting.named(date), '2020/6/15');
     });
   });
 }

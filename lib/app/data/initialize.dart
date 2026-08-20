@@ -3,11 +3,11 @@
 import 'dart:io';
 
 import 'package:drift_flutter/drift_flutter.dart';
-import 'package:kilt/app/app.dart';
-import 'package:kilt/logs/logs.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:http_cache_drift_store/http_cache_drift_store.dart';
+import 'package:kilt/app/app.dart';
+import 'package:kilt/logs/logs.dart';
 import 'package:notified_preferences/notified_preferences.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -58,25 +58,25 @@ Future<Logs> initializeLogger({
 }
 
 File createLogFile(String directoryPath, String? postfix) {
-  File logFile = File(
+  final logFile = File(
     join(
       directoryPath,
       '${logFileDateFormat.format(DateTime.now())}${postfix != null ? '.$postfix' : ''}.log',
     ),
   );
 
-  Directory dir = Directory(directoryPath);
+  final dir = Directory(directoryPath);
   if (!dir.existsSync()) {
     dir.createSync(recursive: true);
   }
-  List<File> logFiles = dir
+  final logFiles = dir
       .listSync()
       .whereType<File>()
       .where((entity) => entity.path.endsWith('.log'))
       .toList();
 
   DateTime getFileDate(String fileName) {
-    var name = basenameWithoutExtension(fileName);
+    final name = basenameWithoutExtension(fileName);
     return logFileDateFormat.parse(name);
   }
 
@@ -105,7 +105,7 @@ void registerFlutterErrorHandler(
 
 /// Initializes the storages used by the app with default production values.
 Future<AppStorage> initializeAppStorage({bool cache = true}) async {
-  final String temporaryFiles = await getTemporaryAppDirectory();
+  final temporaryFiles = await getTemporaryAppDirectory();
   cleanupImageCache();
   await completeDbImport();
   return AppStorage(
@@ -176,7 +176,7 @@ const double _kDesktopWindowMinHeight = 400;
 /// Returns an initialized WindowManager or null the current Platform is unsupported.
 Future<WindowManager?> initializeWindowManager() async {
   if ([Platform.isWindows, Platform.isLinux, Platform.isMacOS].any((e) => e)) {
-    WindowManager manager = WindowManager.instance;
+    final manager = WindowManager.instance;
     await manager.ensureInitialized();
     await manager.setMinimumSize(const Size(_kDesktopWindowMinWidth, _kDesktopWindowMinHeight));
     await manager.setSize(const Size(_kDesktopWindowWidth, _kDesktopWindowHeight));

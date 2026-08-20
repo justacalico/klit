@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:flutter/material.dart';
+import 'package:flutter_sub/flutter_sub.dart';
+import 'package:intl/intl.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/history/history.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_sub/flutter_sub.dart';
-import 'package:intl/intl.dart';
 
 class HistoryEnableTile extends StatelessWidget {
   const HistoryEnableTile({super.key});
@@ -156,7 +156,7 @@ class HistoryCategoryFilterTile extends StatelessWidget {
             AnimatedBuilder(
               animation: controller,
               builder: (context, child) {
-                HistoryQuery query = HistoryQuery.from(controller.search);
+                final query = HistoryQuery.from(controller.search);
                 return Padding(
                   padding: const EdgeInsets.only(left: 16),
                   child: CheckboxListTile(
@@ -165,7 +165,7 @@ class HistoryCategoryFilterTile extends StatelessWidget {
                     value: query.categories?.contains(filter) ?? true,
                     onChanged: (value) {
                       if (value == null) return;
-                      Set<HistoryCategory> filters =
+                      final filters =
                           query.categories ?? HistoryCategory.values.toSet();
                       if (value) {
                         filters.add(filter);
@@ -202,7 +202,7 @@ class HistoryTypeFilterTile extends StatelessWidget {
             AnimatedBuilder(
               animation: controller,
               builder: (context, child) {
-                HistoryQuery query = HistoryQuery.from(controller.search);
+                final query = HistoryQuery.from(controller.search);
                 return Padding(
                   padding: const EdgeInsets.only(left: 16),
                   child: CheckboxListTile(
@@ -211,7 +211,7 @@ class HistoryTypeFilterTile extends StatelessWidget {
                     value: query.types?.contains(filter) ?? true,
                     onChanged: (value) {
                       if (value == null) return;
-                      Set<HistoryType> filters =
+                      final filters =
                           query.types ?? HistoryType.values.toSet();
                       if (value) {
                         filters.add(filter);

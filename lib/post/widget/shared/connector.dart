@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0
 
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_sub/flutter_sub.dart';
 import 'package:kilt/history/history.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_sub/flutter_sub.dart';
 
 class PostsRouteConnector extends StatefulWidget {
   const PostsRouteConnector({
@@ -39,15 +39,15 @@ class _PostsRouteConnectorState extends State<PostsRouteConnector> {
   }
 
   void updatePages() {
-    List<Post>? previous = pageItems;
-    List<Post>? current = widget.controller.items;
+    final previous = pageItems;
+    final current = widget.controller.items;
     if (previous == null || current == null) {
       return popOrRemove();
     }
     if (previous.length > current.length) {
       return popOrRemove();
     }
-    for (int i = 0; i < previous.length; i++) {
+    for (var i = 0; i < previous.length; i++) {
       if (previous[i].id != current[i].id) {
         return popOrRemove();
       }
@@ -74,7 +74,7 @@ class PostsIdConnector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PostController? controller = context.watch<PostController?>();
+    final controller = context.watch<PostController?>();
     return SubValue(
       create: () => controller?.items?.firstWhereOrNull((e) => e.id == id),
       keys: [controller?.items.hashCode],

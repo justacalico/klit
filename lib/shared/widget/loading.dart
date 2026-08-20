@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/shared/shared.dart';
 import 'package:flutter/material.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
+import 'package:kilt/shared/shared.dart';
 
 class SizedCircularProgressIndicator extends StatelessWidget {
   const SizedCircularProgressIndicator({
@@ -110,7 +110,7 @@ class LoadingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    LoadingPageState state = isBuilt ?? true
+    var state = isBuilt ?? true
         ? LoadingPageState.done
         : LoadingPageState.loading;
     if (isEmpty) {

@@ -88,7 +88,7 @@ class ClientCacheConfig extends CacheOptions {
   final String? pageParam;
 
   static ClientCacheConfig? fromExtra(RequestOptions request) {
-    final CacheOptions? config = request.getCacheOptions();
+    final config = request.getCacheOptions();
     if (config != null && config is ClientCacheConfig) {
       return config;
     }
@@ -137,20 +137,20 @@ class ClientCacheInterceptor extends DioCacheInterceptor {
       ClientCacheConfig.fromExtra(options) ?? _options;
 
   @override
-  void onRequest(
+  Future<void> onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    final ClientCacheConfig config = _getCacheConfig(options);
+    final config = _getCacheConfig(options);
 
-    bool isForceRefreshing = [
+    final isForceRefreshing = [
       CachePolicy.refresh,
       CachePolicy.refreshForceCache,
     ].contains(config.policy);
 
-    String? pageParam = config.pageParam ?? _options.pageParam;
+    final pageParam = config.pageParam ?? _options.pageParam;
     if (isForceRefreshing && pageParam != null) {
-      Map<String, String?> params = Map.of(options.uri.queryParameters);
+      final params = Map<String, String?>.of(options.uri.queryParameters);
       params.remove(pageParam);
       await _getCacheStore(config).deleteFromPath(
         RegExp(RegExp.escape(options.uri.path)),
@@ -162,19 +162,19 @@ class ClientCacheInterceptor extends DioCacheInterceptor {
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) async {
-    final ClientCacheConfig config = _getCacheConfig(response.requestOptions);
+  Future<void> onResponse(Response response, ResponseInterceptorHandler handler) async {
+    final config = _getCacheConfig(response.requestOptions);
 
-    final CacheControl cacheControl = CacheControl.fromHeader(
+    final cacheControl = CacheControl.fromHeader(
       response.headers[HttpHeaders.cacheControlHeader],
     );
 
-    int updatedMaxAge = config.maxAge?.inSeconds ?? cacheControl.maxAge;
+    var updatedMaxAge = config.maxAge?.inSeconds ?? cacheControl.maxAge;
     if (updatedMaxAge == 0 && _options.maxAge?.inSeconds != null) {
       updatedMaxAge = _options.maxAge!.inSeconds;
     }
 
-    final CacheControl updatedCacheControl = CacheControl(
+    final updatedCacheControl = CacheControl(
       maxAge: updatedMaxAge,
       privacy: cacheControl.privacy,
       maxStale: cacheControl.maxStale,

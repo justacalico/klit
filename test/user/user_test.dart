@@ -110,7 +110,7 @@ void main() {
     });
 
     test('roundtrip preserves data with null about and stats', () {
-      final userNull = User(
+      const userNull = User(
         id: 2,
         name: 'minimal',
         avatarId: null,
@@ -142,7 +142,7 @@ void main() {
 
   group('User.copyWith', () {
     test('changes name and avatarId', () {
-      final user = User(
+      const user = User(
         id: 1,
         name: 'original',
         avatarId: null,
@@ -156,7 +156,7 @@ void main() {
     });
 
     test('changes about and stats', () {
-      final user = User(
+      const user = User(
         id: 1,
         name: 'original',
         avatarId: null,
