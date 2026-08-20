@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 /// This should be replaced by a FilterList.
 /// To do that, we need to upgrade FilterList to support required fields.
 library;

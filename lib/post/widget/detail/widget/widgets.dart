@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 export 'artist.dart';
 export 'blacklist.dart';
 export 'comments.dart';

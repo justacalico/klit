@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:kilt/post/post.dart';
 
 class UserFavoritesController extends PostController {

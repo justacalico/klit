@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:io';
 
 /// Provides information about what features are available on this Platform.

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';

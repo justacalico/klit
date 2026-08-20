@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'dart:convert';
 
 import 'package:freezed_annotation/freezed_annotation.dart';

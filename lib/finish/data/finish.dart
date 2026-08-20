@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 class Finish {
   const Finish({
     required this.id,

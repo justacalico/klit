@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 /// This file contains global, app-wide default providers.
 ///
 /// They are not meant for usage further down the tree.

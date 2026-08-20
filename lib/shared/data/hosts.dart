@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 final Map<FaIconData, List<String>> hostIcons = {

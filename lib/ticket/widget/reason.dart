@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/ticket/ticket.dart';
 import 'package:flutter/material.dart';

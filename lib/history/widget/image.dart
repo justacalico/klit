@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';

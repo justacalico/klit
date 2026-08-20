@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:dio/dio.dart';
 import 'package:kilt/account/account.dart';
 import 'package:kilt/app/app.dart';

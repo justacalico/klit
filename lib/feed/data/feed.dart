@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 /// Optional subfeed: adds extra include/exclude tags when active. Can have nested subfeeds.
 class SubFeed {
   const SubFeed({

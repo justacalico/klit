@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:collection/collection.dart';
 
 typedef QueryMap = Map<String, String>;

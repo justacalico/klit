@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:dio/dio.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:kilt/user/user.dart';

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:kilt/app/routing/app_routes.dart';
 import 'package:kilt/identity/identity.dart';
 import 'package:kilt/settings/settings.dart';

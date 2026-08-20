@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:dio/dio.dart';
 
 /// [NewlineReplaceInterceptor] replaces all `\r\n` with `\n` in the request.

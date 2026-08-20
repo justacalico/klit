@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:go_router/go_router.dart';
 import 'package:kilt/account/account.dart';
 import 'package:kilt/app/app.dart';

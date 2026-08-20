@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:kilt/shared/widget/appbar.dart' as shared_appbar;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

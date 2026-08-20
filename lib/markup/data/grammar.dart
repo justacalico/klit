@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 import 'package:kilt/markup/markup.dart';
 import 'package:petitparser/petitparser.dart';
 

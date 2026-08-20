@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0
+
 export 'actions.dart';
 export 'card.dart';
 export 'drawer.dart';
