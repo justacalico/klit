@@ -140,11 +140,9 @@ class PoolNameFilter extends StatelessWidget {
                     page: 1,
                     query: HistoryQuery(
                       date: DateTime.now(),
-                      link: r'/pools/.*',
+                      link: '/pools/.*',
                       title:
-                          r'.*' +
-                          RegExp.escape(value.replaceAll(' ', '_')) +
-                          r'.*',
+                          '.*${RegExp.escape(value.replaceAll(' ', '_'))}.*',
                     ),
                     limit: 4,
                   ))

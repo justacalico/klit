@@ -190,7 +190,7 @@ class FollowRepository extends DatabaseAccessor<GeneratedDatabase>
     Follow follow;
     final existing = await _querySelect(
       identity: identity,
-      tagRegex: r'^' + RegExp.escape(item.tags) + r'$',
+      tagRegex: '^${RegExp.escape(item.tags)}\$',
     ).getSingleOrNull();
     if (existing != null) {
       follow = existing.copyWith(

@@ -2,4 +2,4 @@
 
 RegExp poolRegex() => RegExp(r'^pool:(?<id>\d+)$');
 
-RegExp favRegex(String username) => RegExp(r'^fav:' + username + r'$');
+RegExp favRegex(String username) => RegExp('^fav:$username\$');

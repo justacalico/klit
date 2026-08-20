@@ -64,7 +64,7 @@ String linkToDisplay(String link) {
     queryParameters: parameters.isNotEmpty ? parameters : null,
   );
   var display = newUrl.toString();
-  final removed = <String>[r'^///?', r'^www.', r'/$'];
+  final removed = <String>['^///?', '^www.', r'/$'];
   for (final pattern in removed) {
     display = display.replaceFirst(RegExp(pattern), '');
   }
