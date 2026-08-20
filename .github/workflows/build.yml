@@ -210,6 +210,14 @@ jobs:
             const regKey = 'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock';
             await exec.exec('reg', ['add', regKey, '/v', 'AllowDevelopmentWithoutDevLicense', '/t', 'REG_DWORD', '/d', '1', '/f']);
 
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate Dart code
+        run: |
+          dart run build_runner build --delete-conflicting-outputs
+          flutter gen-l10n
+
       - name: Build
         shell: bash
         env:
