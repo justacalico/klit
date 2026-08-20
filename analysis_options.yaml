@@ -13,7 +13,7 @@ linter:
     unnecessary_lambdas: false
     unnecessary_breaks: true
     unnecessary_raw_strings: true
-    no_runtimetype_tostring: false
+    no_runtimetype_tostring: true
     unnecessary_ignore: false
     document_ignores: false
     # rules that are too noisy to fix in a single pass; re-enable incrementally

@@ -27,7 +27,7 @@ class FollowSync {
     this.force,
   });
 
-  late final Logger logger = Logger('$runtimeType#$hashCode');
+  late final Logger logger = Logger('FollowSync#$hashCode');
 
   final int refreshAmount = 5;
   final Duration refreshRate = const Duration(hours: 1);
