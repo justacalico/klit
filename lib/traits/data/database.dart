@@ -41,7 +41,7 @@ class TraitsRepository extends DatabaseAccessor<GeneratedDatabase>
 
   Future<Traits> add(TraitsRequest value) {
     return into(traitsTable).insertReturning(
-      TraitsCompanion(
+      TraitsTableCompanion(
         id: Value(value.identity),
         denylist: Value(value.denylist),
         homeTags: Value(value.homeTags),

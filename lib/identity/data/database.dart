@@ -128,7 +128,7 @@ class IdentityRepository extends DatabaseAccessor<GeneratedDatabase>
 }
 
 extension IdentityRequestCompanion on IdentityRequest {
-  IdentityCompanion toCompanion() => IdentityCompanion(
+  IdentitiesTableCompanion toCompanion() => IdentitiesTableCompanion(
     host: Value(normalizeHostUrl(host)),
     username: Value(username),
     headers: Value(headers),

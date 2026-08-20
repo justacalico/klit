@@ -78,7 +78,7 @@ class FollowClient {
     await ((repository.update(
       repository.followsTable,
     ))..where((tbl) => tbl.id.equals(id))).write(
-      FollowCompanion(
+      FollowsTableCompanion(
         title: title != null
             ? Value(title.nullWhenEmpty)
             : const Value.absent(),
@@ -89,7 +89,7 @@ class FollowClient {
       await ((repository.update(
         repository.followsTable,
       ))..where((tbl) => tbl.id.equals(id))).write(
-        FollowCompanion(
+        FollowsTableCompanion(
           tags: Value(tags!),
           updated: const Value(null),
           unseen: const Value(null),
