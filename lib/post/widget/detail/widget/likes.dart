@@ -290,7 +290,6 @@ List<Widget> _buildActionButtons({
             },
           ),
         );
-        break;
       case PostActionId.downvote:
         buttons.add(
           buildControlButton(
@@ -306,7 +305,6 @@ List<Widget> _buildActionButtons({
             },
           ),
         );
-        break;
       case PostActionId.favorite:
         buttons.add(
           buildControlButton(
@@ -320,7 +318,6 @@ List<Widget> _buildActionButtons({
             },
           ),
         );
-        break;
       case PostActionId.share:
         buttons.add(
           buildControlButton(
@@ -334,7 +331,6 @@ List<Widget> _buildActionButtons({
             },
           ),
         );
-        break;
       case PostActionId.download:
         if (post.file != null) {
           buttons.add(
@@ -350,7 +346,6 @@ List<Widget> _buildActionButtons({
             ),
           );
         }
-        break;
       case PostActionId.browse:
         buttons.add(
           buildControlButton(
@@ -364,7 +359,6 @@ List<Widget> _buildActionButtons({
             },
           ),
         );
-        break;
       case PostActionId.iFinished:
         final enabled = settings.iFinishedEnabled.value;
         buttons.add(
@@ -378,7 +372,6 @@ List<Widget> _buildActionButtons({
             buildControlButton: buildControlButton,
           ),
         );
-        break;
     }
   }
   return buttons;

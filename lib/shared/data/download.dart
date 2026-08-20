@@ -174,14 +174,14 @@ class FileDownloadException implements Exception {
   @override
   String toString() {
     if (message != null) {
-      return '$runtimeType: $message';
+      return 'FileDownloadException: $message';
     }
     if (inner != null) {
       if (inner is FileDownloadException) {
         return inner.toString();
       }
-      return '$runtimeType: $inner';
+      return 'FileDownloadException: $inner';
     }
-    return '$runtimeType: unknown cause!';
+    return 'FileDownloadException: unknown cause!';
   }
 }

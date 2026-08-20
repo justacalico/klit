@@ -12,7 +12,7 @@ String encodeBasicAuth(String username, String password) =>
     r'Basic (?<encoded>[A-Za-z\d/=]+)',
   ).firstMatch(auth);
   if (fullBasicMatch == null) return null;
-  final credentialMatch = RegExp(r'(?<username>.+):(?<password>.+)')
+  final credentialMatch = RegExp('(?<username>.+):(?<password>.+)')
       .firstMatch(
         utf8.decode(base64Decode(fullBasicMatch.namedGroup('encoded')!)),
       );

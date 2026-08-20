@@ -11,10 +11,10 @@ linter:
     avoid_positional_boolean_parameters: false
     avoid_types_on_closure_parameters: false
     unnecessary_lambdas: false
-    unnecessary_breaks: false
-    unnecessary_raw_strings: false
-    no_runtimetype_tostring: false
-    unnecessary_ignore: false
+    unnecessary_breaks: true
+    unnecessary_raw_strings: true
+    no_runtimetype_tostring: true
+    unnecessary_ignore: true
     document_ignores: false
     # rules that are too noisy to fix in a single pass; re-enable incrementally
     discarded_futures: false

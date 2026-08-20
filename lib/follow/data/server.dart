@@ -65,7 +65,7 @@ class FollowServer with Disposable {
       ((repository.update(
         repository.followsTable,
       ))..where((tbl) => tbl.id.equals(id))).write(
-        FollowCompanion(
+        FollowsTableCompanion(
           latest: posts?.isNotEmpty ?? false
               ? Value(posts!.first.id)
               : const Value.absent(),

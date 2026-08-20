@@ -19,7 +19,6 @@ extension ConditionalListenables on Listenable {
   }
 }
 
-// ignore: one_member_abstracts
 abstract mixin class Disposable {
   @mustCallSuper
   void dispose() {}

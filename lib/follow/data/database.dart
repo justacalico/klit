@@ -29,8 +29,8 @@ class FollowsIdentitiesTable extends Table {
   IntColumn get identity => integer().references(
     IdentitiesTable,
     #id,
-    onDelete: KeyAction.noAction,
-    onUpdate: KeyAction.noAction,
+    onDelete: KeyAction.cascade,
+    onUpdate: KeyAction.cascade,
   )();
   IntColumn get follow => integer().references(
     FollowsTable,
@@ -190,7 +190,7 @@ class FollowRepository extends DatabaseAccessor<GeneratedDatabase>
     Follow follow;
     final existing = await _querySelect(
       identity: identity,
-      tagRegex: r'^' + RegExp.escape(item.tags) + r'$',
+      tagRegex: '^${RegExp.escape(item.tags)}\$',
     ).getSingleOrNull();
     if (existing != null) {
       follow = existing.copyWith(
@@ -201,7 +201,7 @@ class FollowRepository extends DatabaseAccessor<GeneratedDatabase>
       await replace(follow);
     } else {
       follow = await into(followsTable).insertReturning(
-        FollowCompanion(
+        FollowsTableCompanion(
           tags: Value(item.tags),
           title: Value(item.title),
           alias: Value(item.alias),
@@ -210,7 +210,7 @@ class FollowRepository extends DatabaseAccessor<GeneratedDatabase>
         mode: InsertMode.insertOrIgnore,
       );
       await into(followsIdentitiesTable).insert(
-        FollowIdentityCompanion(
+        FollowsIdentitiesTableCompanion(
           identity: Value(identity),
           follow: Value(follow.id),
         ),
@@ -223,7 +223,7 @@ class FollowRepository extends DatabaseAccessor<GeneratedDatabase>
             ..where((tbl) => _identityQuery(tbl, identity))
             ..where((tbl) => Variable(ids).isNull() | tbl.id.isIn(ids ?? []))
             ..where((tbl) => (tbl.unseen.isBiggerThanValue(0))))
-          .write(const FollowCompanion(unseen: Value(0)));
+          .write(const FollowsTableCompanion(unseen: Value(0)));
 
   Future<void> replace(Follow item) => ((update(
     followsTable,

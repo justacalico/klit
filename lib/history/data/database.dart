@@ -27,8 +27,8 @@ class HistoriesIdentitiesTable extends Table {
   IntColumn get identity => integer().references(
     IdentitiesTable,
     #id,
-    onDelete: KeyAction.noAction,
-    onUpdate: KeyAction.noAction,
+    onDelete: KeyAction.cascade,
+    onUpdate: KeyAction.cascade,
   )();
   IntColumn get history => integer().references(
     HistoriesTable,
@@ -202,7 +202,7 @@ class HistoryRepository extends DatabaseAccessor<GeneratedDatabase>
 
   Future<void> add(HistoryRequest item, int identity) async {
     final history = await into(historiesTable).insertReturning(
-      HistoryCompanion(
+      HistoriesTableCompanion(
         visitedAt: Value(item.visitedAt),
         link: Value(item.link),
         category: Value(item.category),
@@ -213,7 +213,7 @@ class HistoryRepository extends DatabaseAccessor<GeneratedDatabase>
       ),
     );
     await into(historiesIdentitiesTable).insert(
-      HistoryIdentityCompanion(
+      HistoriesIdentitiesTableCompanion(
         identity: Value(identity),
         history: Value(history.id),
       ),

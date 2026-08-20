@@ -37,7 +37,7 @@ Future<void> guardWithLogin({
 
 String? findFavicon(String html) {
   final headRegExp = RegExp(
-    r'<head>.*?</head>',
+    '<head>.*?</head>',
     dotAll: true,
     caseSensitive: false,
   );

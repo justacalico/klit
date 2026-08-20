@@ -48,13 +48,11 @@ class _AvailabilityCheckState extends State<AvailabilityCheck> {
         case HttpStatus.serviceUnavailable:
           logger.warning('Client is unavailable, attempting resolve!');
           offerResolve = true;
-          break;
         case HttpStatus.forbidden:
           logger.warning('Client has denied access! Failing silently...');
           // This could potentially logout the user.
           // However, it might be returned during Cloudflare API blockages.
           // Logout the user, and if theyre already logged out, trigger Resolver?
-          break;
         case >= 500 && < 600:
           logger.warning('Client is unavailable, resolve not possible!');
           offerResolve = false;

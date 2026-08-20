@@ -130,7 +130,7 @@ class App extends StatelessWidget {
 
 Locale? _localeFromTag(String? tag) {
   if (tag == null || tag.isEmpty) return null;
-  final parts = tag.split(RegExp(r'[-_]'));
+  final parts = tag.split(RegExp('[-_]'));
   if (parts.isEmpty) return null;
   final languageCode = parts[0];
   final countryCode = parts.length >= 2 ? parts[1] : null;

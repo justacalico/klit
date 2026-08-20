@@ -202,7 +202,7 @@ void main() {
     Future<void> setUnseen(int id, int value) async {
       await (database.update(database.followsTable)
             ..where((tbl) => tbl.id.equals(id)))
-          .write(FollowCompanion(unseen: Value(value)));
+          .write(FollowsTableCompanion(unseen: Value(value)));
     }
 
     test('markSeen sets unseen to 0 for a single follow', () async {

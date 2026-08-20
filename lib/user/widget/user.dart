@@ -356,8 +356,7 @@ class _UserPageControllers {
 }
 
 class _UserPageProvider extends SubProvider<Client, _UserPageControllers> {
-  // ignore: unused_element, unused_element_parameter
-  _UserPageProvider({required User user, super.child, super.builder})
+  _UserPageProvider({required User user, super.child})
     : super(
         create: (context, client) => _UserPageControllers(
           favoritePosts: UserFavoritesController(

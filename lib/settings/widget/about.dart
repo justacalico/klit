@@ -56,7 +56,6 @@ class _DevOptionEnablerState extends State<DevOptionEnabler> {
 }
 
 class AboutVersion extends StatelessWidget {
-  // ignore: unused_element
   const AboutVersion({super.key, required this.newVersions});
 
   final Future<List<AppVersion>>? newVersions;

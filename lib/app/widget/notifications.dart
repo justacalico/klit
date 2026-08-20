@@ -116,7 +116,6 @@ class _NotificationHandlerState extends State<NotificationHandler> {
         if (notification.id != null) {
           widget.goRouter.push('/post/${notification.id}');
         }
-        break;
       default:
         logger.warning('Unknown notification type: ${notification.type}');
         return;
