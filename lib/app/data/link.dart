@@ -210,13 +210,11 @@ extension LinkOnTapExtension on LinkParser {
             context.go('${AppRoutes.profile}?$q');
           };
         }
-        break;
       case LinkType.wiki:
         final id = result.id;
         if (id != null) {
           return navWrapper((context) => WikiLoadingPage(id.toString()));
         }
-        break;
       case LinkType.topic:
         final id = result.id as int?;
         if (id != null) {

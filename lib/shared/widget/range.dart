@@ -339,22 +339,18 @@ class _RangeDialogState extends State<RangeDialog> {
     switch (mode) {
       case RangeDialogMode.exact:
         updatedRange = NumberRange(value.toInt());
-        break;
       case RangeDialogMode.smallerOrEqual:
         updatedRange = NumberRange(
           value.toInt(),
           comparison: NumberComparison.lessThanOrEqual,
         );
-        break;
       case RangeDialogMode.greaterOrEqual:
         updatedRange = NumberRange(
           value.toInt(),
           comparison: NumberComparison.greaterThanOrEqual,
         );
-        break;
       case RangeDialogMode.fixedRange:
         updatedRange = NumberRange(value.toInt(), endValue: endValue?.toInt());
-        break;
     }
 
     controller.text = updatedRange.toString();

@@ -11,7 +11,7 @@ linter:
     avoid_positional_boolean_parameters: false
     avoid_types_on_closure_parameters: false
     unnecessary_lambdas: false
-    unnecessary_breaks: false
+    unnecessary_breaks: true
     unnecessary_raw_strings: false
     no_runtimetype_tostring: false
     unnecessary_ignore: false

@@ -122,12 +122,10 @@ class _GalleryPageButtonState extends State<GalleryPageButton> {
               enabled =
                   widget.controller.position.minScrollExtent <
                   widget.controller.position.pixels;
-              break;
             case GalleryButtonDirection.right:
               enabled =
                   widget.controller.position.maxScrollExtent >
                   widget.controller.position.pixels;
-              break;
           }
         }
 
@@ -155,10 +153,8 @@ class _GalleryPageButtonState extends State<GalleryPageButton> {
                       switch (widget.direction) {
                         case GalleryButtonDirection.left:
                           page--;
-                          break;
                         case GalleryButtonDirection.right:
                           page++;
-                          break;
                       }
                       widget.controller.animateToPage(
                         page,
