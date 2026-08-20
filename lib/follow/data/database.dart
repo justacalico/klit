@@ -29,8 +29,8 @@ class FollowsIdentitiesTable extends Table {
   IntColumn get identity => integer().references(
     IdentitiesTable,
     #id,
-    onDelete: KeyAction.noAction,
-    onUpdate: KeyAction.noAction,
+    onDelete: KeyAction.cascade,
+    onUpdate: KeyAction.cascade,
   )();
   IntColumn get follow => integer().references(
     FollowsTable,
