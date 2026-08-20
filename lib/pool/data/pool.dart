@@ -18,5 +18,5 @@ abstract class Pool with _$Pool {
     required bool active,
   }) = _Pool;
 
-  factory Pool.fromJson(dynamic json) => _$PoolFromJson(json);
+  factory Pool.fromJson(Map<String, dynamic> json) => _$PoolFromJson(json);
 }

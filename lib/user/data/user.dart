@@ -15,7 +15,7 @@ abstract class User with _$User {
     required UserStats? stats,
   }) = _User;
 
-  factory User.fromJson(dynamic json) => _$UserFromJson(json);
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }
 
 @freezed
@@ -23,7 +23,7 @@ abstract class UserAbout with _$UserAbout {
   const factory UserAbout({required String? bio, required String? comission}) =
       _UserAbout;
 
-  factory UserAbout.fromJson(dynamic json) => _$UserAboutFromJson(json);
+  factory UserAbout.fromJson(Map<String, dynamic> json) => _$UserAboutFromJson(json);
 }
 
 @freezed
@@ -38,5 +38,5 @@ abstract class UserStats with _$UserStats {
     required int? commentCount,
   }) = _UserStats;
 
-  factory UserStats.fromJson(dynamic json) => _$UserStatsFromJson(json);
+  factory UserStats.fromJson(Map<String, dynamic> json) => _$UserStatsFromJson(json);
 }

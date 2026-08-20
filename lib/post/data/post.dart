@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0
 
-import 'package:kilt/shared/shared.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:kilt/shared/shared.dart';
 
 part 'post.freezed.dart';
 part 'post.g.dart';
@@ -38,7 +38,7 @@ abstract class Post with _$Post {
     required Relationships relationships,
   }) = _Post;
 
-  factory Post.fromJson(dynamic json) => _$PostFromJson(json);
+  factory Post.fromJson(Map<String, dynamic> json) => _$PostFromJson(json);
 }
 
 enum Rating { s, q, e }
@@ -52,5 +52,5 @@ abstract class Relationships with _$Relationships {
     required List<int> children,
   }) = _Relationships;
 
-  factory Relationships.fromJson(dynamic json) => _$RelationshipsFromJson(json);
+  factory Relationships.fromJson(Map<String, dynamic> json) => _$RelationshipsFromJson(json);
 }

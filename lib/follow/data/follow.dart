@@ -19,7 +19,7 @@ abstract class Follow with _$Follow {
     required DateTime? updated,
   }) = _Follow;
 
-  factory Follow.fromJson(dynamic json) => _$FollowFromJson(json);
+  factory Follow.fromJson(Map<String, dynamic> json) => _$FollowFromJson(json);
 }
 
 @freezed

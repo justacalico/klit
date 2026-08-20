@@ -14,5 +14,5 @@ abstract class Tag with _$Tag {
     required int category,
   }) = _Tag;
 
-  factory Tag.fromJson(dynamic json) => _$TagFromJson(json);
+  factory Tag.fromJson(Map<String, dynamic> json) => _$TagFromJson(json);
 }

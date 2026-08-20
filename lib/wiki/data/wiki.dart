@@ -17,5 +17,5 @@ abstract class Wiki with _$Wiki {
     bool? isLocked,
   }) = _Wiki;
 
-  factory Wiki.fromJson(dynamic json) => _$WikiFromJson(json);
+  factory Wiki.fromJson(Map<String, dynamic> json) => _$WikiFromJson(json);
 }
