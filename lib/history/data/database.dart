@@ -7,6 +7,9 @@ import 'package:kilt/history/history.dart';
 import 'package:kilt/identity/data/database.dart';
 import 'package:kilt/shared/shared.dart';
 
+@TableIndex(name: 'histories_visited_at', columns: {#visitedAt})
+@TableIndex(name: 'histories_category_visited_at', columns: {#category, #visitedAt})
+@TableIndex(name: 'histories_type_visited_at', columns: {#type, #visitedAt})
 @UseRowClass(History, generateInsertable: true)
 class HistoriesTable extends Table {
   IntColumn get id => integer().autoIncrement()();

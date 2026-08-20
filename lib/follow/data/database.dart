@@ -7,6 +7,10 @@ import 'package:kilt/follow/follow.dart';
 import 'package:kilt/identity/data/database.dart';
 import 'package:kilt/shared/shared.dart';
 
+@TableIndex(name: 'follows_tags', columns: {#tags})
+@TableIndex(name: 'follows_updated', columns: {#updated})
+@TableIndex(name: 'follows_latest', columns: {#latest})
+@TableIndex(name: 'follows_unseen', columns: {#unseen})
 @UseRowClass(Follow, generateInsertable: true)
 class FollowsTable extends Table {
   IntColumn get id => integer().autoIncrement()();
