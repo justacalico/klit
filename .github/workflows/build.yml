@@ -10,10 +10,14 @@ on:
     - cron: '0 2 * * *'
   workflow_dispatch:
     inputs:
-      create_release:
-        description: 'Publish a nightly release from this build (leave unchecked for plain branch builds)'
+      build_all:
+        description: 'Build all platforms (linux arm, windows, macos, ios). If unchecked only android and linux x64 are built.'
         type: boolean
         default: true
+      create_release:
+        description: 'Publish a release from this build'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -22,8 +26,50 @@ env:
   FLUTTER_CHANNEL: stable
 
 jobs:
+  setup:
+    name: Setup build matrix
+    runs-on: ubuntu-latest
+    outputs:
+      build_all: ${{ steps.matrix.outputs.build_all }}
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: Determine build matrix
+        id: matrix
+        shell: bash
+        run: |
+          if [ -n "${{ inputs.build_all }}" ]; then
+            BUILD_ALL="${{ inputs.build_all }}"
+          elif [ "${{ github.ref_type }}" = "tag" ] || \
+               [ "${{ github.event_name }}" = "push" ] || \
+               [ "${{ github.event_name }}" = "pull_request" ] || \
+               [ "${{ github.event_name }}" = "schedule" ]; then
+            BUILD_ALL="true"
+          else
+            BUILD_ALL="false"
+          fi
+          echo "build_all=$BUILD_ALL" >> "$GITHUB_OUTPUT"
+
+          always='[
+            {"target":"android","os":"ubuntu-latest","artifact":"kilt-android"},
+            {"target":"linux-x64","os":"ubuntu-latest","artifact":"kilt-linux-x64"}
+          ]'
+
+          if [ "$BUILD_ALL" = "true" ]; then
+            extra='[
+              {"target":"linux-arm64","os":"ubuntu-24.04-arm","artifact":"kilt-linux-arm64"},
+              {"target":"windows","os":"windows-latest","artifact":"kilt-windows"},
+              {"target":"macos","os":"macos-latest","artifact":"kilt-macos"},
+              {"target":"ios","os":"macos-latest","artifact":"kilt-ios"}
+            ]'
+            matrix=$(echo "$always $extra" | jq -s -c '{include: add}')
+          else
+            matrix=$(echo "$always" | jq -c '{include: .}')
+          fi
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
   build:
     name: Build ${{ matrix.target }}
+    needs: setup
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     continue-on-error: false
@@ -31,26 +77,7 @@ jobs:
       APPIMAGE_EXTRACT_AND_RUN: "1"
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - target: android
-            os: ubuntu-latest
-            artifact: kilt-android
-          - target: linux-x64
-            os: ubuntu-latest
-            artifact: kilt-linux-x64
-          - target: linux-arm64
-            os: ubuntu-24.04-arm
-            artifact: kilt-linux-arm64
-          - target: windows
-            os: windows-latest
-            artifact: kilt-windows
-          - target: macos
-            os: macos-latest
-            artifact: kilt-macos
-          - target: ios
-            os: macos-latest
-            artifact: kilt-ios
+      matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
 
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -72,17 +99,11 @@ jobs:
           echo "build_date=$BUILD_DATE" >> "$GITHUB_OUTPUT"
 
       - name: Set up Java 17
-        if: matrix.target == 'android'
+        if: startsWith(matrix.target, 'android')
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-
-      - name: Set up Android SDK
-        if: matrix.target == 'android'
-        uses: android-actions/setup-android@v3
-        with:
-          packages: 'platforms;android-36 build-tools;36.0.0'
 
       - uses: subosito/flutter-action@v2
         if: matrix.target != 'linux-arm64'
@@ -106,10 +127,10 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y \
             clang cmake ninja-build pkg-config \
-            libgtk-3-dev liblzma-dev libstdc++-12-dev libsecret-1-dev \
-            libmpv-dev libasound2-dev \
-            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
-            dpkg-dev rpm wget file squashfs-tools patchelf libfuse2
+            libgtk-3-dev liblzma-dev libstdc++-13-dev libsecret-1-dev libmpv-dev \
+            libayatana-appindicator3-dev \
+            dpkg-dev rpm wget file squashfs-tools patchelf libfuse2 \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
           flutter config --enable-linux-desktop
 
       - name: Install appimagetool (x64)
@@ -132,9 +153,34 @@ jobs:
           sudo ln -sf /opt/appimagetool/AppRun /usr/local/bin/appimagetool
           appimagetool --version || echo "appimagetool installed"
 
+      - name: Install Rust
+        if: matrix.target == 'ios'
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: Install iOS Rust targets
+        if: matrix.target == 'ios'
+        run: |
+          rustup target add aarch64-apple-ios
+          rustup target add x86_64-apple-ios
+          rustup target add aarch64-apple-ios-sim
+
+      - name: Fix RepeatMode conflict with Flutter
+        if: startsWith(matrix.target, 'android') || matrix.target == 'ios' || matrix.target == 'macos'
+        shell: bash
+        run: |
+          AUDIO_HANDLER="lib/services/audio/unified_audio_handler.dart"
+          if [ -f "$AUDIO_HANDLER" ]; then
+            perl -i -pe 's/\bRepeatMode\b/AudioRepeatMode/g' "$AUDIO_HANDLER"
+            find lib -name "*.dart" -exec grep -l "unified_audio_handler" {} \; | while read f; do
+              [ "$f" = "$AUDIO_HANDLER" ] || ! grep -q '\bRepeatMode\b' "$f" || perl -i -pe 's/\bRepeatMode\b/AudioRepeatMode/g' "$f"
+            done
+          fi
+
       - name: Setup Android signing
         id: signing
-        if: matrix.target == 'android'
+        if: startsWith(matrix.target, 'android')
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.KLIT_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.KLIT_KEYSTORE_PASSWORD }}
@@ -142,6 +188,13 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.KLIT_KEY_ALIAS }}
         run: |
           set -euo pipefail
+
+          # Non-main branches and non-tag refs only get debug/unsigned builds.
+          if [ "${{ github.ref }}" != "refs/heads/main" ] && [[ ! "${{ github.ref }}" =~ ^refs/tags/ ]]; then
+            echo "signing=debug" >> "$GITHUB_OUTPUT"
+            echo "Non-main branch, using debug signing only"
+            exit 0
+          fi
 
           if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then
             echo "signing=debug" >> "$GITHUB_OUTPUT"
@@ -173,7 +226,7 @@ jobs:
           echo "Release signing is configured"
 
       - name: Validate Android keystore
-        if: matrix.target == 'android' && steps.signing.outputs.signing == 'release'
+        if: startsWith(matrix.target, 'android') && steps.signing.outputs.signing == 'release'
         run: |
           set -euo pipefail
           STORE_PASSWORD=$(grep '^storePassword=' android/key.properties | cut -d'=' -f2-)
@@ -195,28 +248,81 @@ jobs:
           keytool -list -keystore "$STORE_FILE" -storepass "$STORE_PASSWORD" -alias "$KEY_ALIAS" -keypass "$KEY_PASSWORD" >/dev/null
           echo "Android keystore validation passed"
 
+      - name: Enable Windows Developer Mode
+        if: matrix.target == 'windows'
+        shell: powershell
+        run: |
+          New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1 -PropertyType DWORD -Force
+
+      - name: Patch clipboard plugin (Windows C4189)
+        if: matrix.target == 'windows'
+        shell: bash
+        run: |
+          cache="${PUB_CACHE:-$HOME/.pub-cache}"
+          [ -d "$cache" ] || cache="/c/Users/$USER/AppData/Local/Pub/Cache"
+          f=$(find "$cache" -name "clipboard_plugin.cpp" -path "*/clipboard/*" 2>/dev/null | head -1)
+          if [ -n "$f" ] && grep -q "headerSize" "$f"; then
+            sed -i.bak '/headerSize.*=/a\  (void)headerSize;' "$f" && rm -f "${f}.bak" || true
+          fi
+
+      - name: Patch plugin CMake for Windows symlink extraction
+        if: matrix.target == 'windows'
+        shell: powershell
+        run: |
+          $smtc = Get-ChildItem -Path "$env:PUB_CACHE\hosted\pub.dev" -Recurse -Filter "CMakeLists.txt" -ErrorAction SilentlyContinue |
+                    Where-Object { $_.FullName -match "smtc_windows-[\d.]+\\windows\\CMakeLists\.txt" } |
+                    Select-Object -First 1
+          if ($smtc) {
+            $txt = Get-Content $smtc.FullName -Raw
+            if ($txt -notmatch 'file\(REAL_PATH "\$\{CMAKE_CURRENT_SOURCE_DIR\}" REAL_SOURCE_DIR\)') {
+              $txt = $txt -replace 'set\(LibRoot "\$\{CMAKE_CURRENT_SOURCE_DIR\}/\$\{LibraryVersion\}"\)',
+                                 "file(REAL_PATH `"`${CMAKE_CURRENT_SOURCE_DIR}`" REAL_SOURCE_DIR)`r`nset(LibRoot `"`${REAL_SOURCE_DIR}/`${LibraryVersion}`")"
+              Set-Content $smtc.FullName -Value $txt -NoNewline
+            }
+          }
+          $audio = Get-ChildItem -Path "$env:PUB_CACHE\hosted\pub.dev" -Recurse -Filter "CMakeLists.txt" -ErrorAction SilentlyContinue |
+                     Where-Object { $_.FullName -match "audiotags-[\d.]+\\windows\\CMakeLists\.txt" } |
+                     Select-Object -First 1
+          if ($audio) {
+            $txt = Get-Content $audio.FullName -Raw
+            if ($txt -notmatch 'file\(REAL_PATH "\$\{CMAKE_CURRENT_SOURCE_DIR\}" REAL_SOURCE_DIR\)') {
+              $txt = $txt -replace 'set\(LibPath "\$\{CMAKE_CURRENT_SOURCE_DIR\}/windows\.tar\.gz"\)',
+                                 "file(REAL_PATH `"`${CMAKE_CURRENT_SOURCE_DIR}`" REAL_SOURCE_DIR)`r`nset(LibPath `"`${REAL_SOURCE_DIR}/windows.tar.gz`")"
+              $txt = $txt -replace '\$\{CMAKE_CURRENT_SOURCE_DIR\}/audiotags\.dll', '${REAL_SOURCE_DIR}/audiotags.dll'
+              $txt = $txt -replace 'WORKING_DIRECTORY \$\{CMAKE_CURRENT_SOURCE_DIR\}', 'WORKING_DIRECTORY ${REAL_SOURCE_DIR}'
+              Set-Content $audio.FullName -Value $txt -NoNewline
+            }
+          }
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run iOS prebuild patches
+        if: matrix.target == 'ios'
+        run: bash scripts/build-ios.sh
+
+      - name: Set iOS deployment target
+        if: matrix.target == 'ios'
+        run: |
+          if [ -f ios/Podfile ]; then
+            sed -E -i '' "s/^[[:space:]]*# platform :ios, ['\"][^'\"]+['\"]/platform :ios, '14.0'/" ios/Podfile
+            if ! grep -Eq "^[[:space:]]*platform :ios" ios/Podfile; then
+              printf "platform :ios, '14.0'\n%s" "$(cat ios/Podfile)" > ios/Podfile
+            fi
+          fi
+          if [ -f ios/Flutter/AppFrameworkInfo.plist ]; then
+            /usr/libexec/PlistBuddy -c "Set :MinimumOSVersion 14.0" ios/Flutter/AppFrameworkInfo.plist >/dev/null 2>&1 || true
+          fi
+          if [ -f ios/Runner.xcodeproj/project.pbxproj ]; then
+            sed -E -i '' "s/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]+;/IPHONEOS_DEPLOYMENT_TARGET = 14.0;/g" ios/Runner.xcodeproj/project.pbxproj
+          fi
+
       - name: Set macOS deployment target
         if: matrix.target == 'macos'
         run: |
           if [ -f macos/Podfile ]; then
             sed -i '' "s/platform :osx, '[^']*'/platform :osx, '11.0'/" macos/Podfile
           fi
-
-      - name: Enable Windows Developer Mode
-        if: matrix.target == 'windows'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const regKey = 'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\AppModelUnlock';
-            await exec.exec('reg', ['add', regKey, '/v', 'AllowDevelopmentWithoutDevLicense', '/t', 'REG_DWORD', '/d', '1', '/f']);
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Generate Dart code
-        run: |
-          dart run build_runner build --delete-conflicting-outputs
-          flutter gen-l10n
 
       - name: Build
         shell: bash
@@ -225,27 +331,44 @@ jobs:
           BUILD_NUMBER: ${{ steps.version.outputs.build_number }}
           BUILD_DATE: ${{ steps.version.outputs.build_date }}
           _SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS: 1
+          SIGNING: ${{ steps.signing.outputs.signing }}
         run: |
           set -euo pipefail
           mkdir -p artifacts
 
+          build_apk() {
+            local build_mode="release"
+            if [ "${SIGNING:-}" = "debug" ]; then
+              build_mode="debug"
+            fi
+            flutter build apk --"$build_mode" -t lib/main.dart --build-name="$VERSION" --build-number="$BUILD_NUMBER"
+            cp "build/app/outputs/flutter-apk/app-${build_mode}.apk" \
+               "artifacts/kilt-${VERSION}-${BUILD_DATE}.apk"
+          }
+
+          build_aab() {
+            local build_mode="release"
+            if [ "${SIGNING:-}" = "debug" ]; then
+              build_mode="debug"
+            fi
+            flutter build appbundle --"$build_mode" -t lib/main.dart --build-name="$VERSION" --build-number="$BUILD_NUMBER"
+            cp "build/app/outputs/bundle/${build_mode}/app-${build_mode}.aab" \
+               "artifacts/kilt-${VERSION}-${BUILD_DATE}.aab"
+          }
+
           case "${{ matrix.target }}" in
             android)
-              flutter build apk --release --build-name="$VERSION" --build-number="$BUILD_NUMBER"
-              cp build/app/outputs/flutter-apk/app-release.apk \
-                 "artifacts/kilt-${VERSION}-${BUILD_DATE}.apk"
-              flutter build appbundle --release --build-name="$VERSION" --build-number="$BUILD_NUMBER"
-              cp build/app/outputs/bundle/release/app-release.aab \
-                 "artifacts/kilt-${VERSION}-${BUILD_DATE}.aab"
+              build_apk
+              build_aab
               ;;
             linux-x64)
               flutter build linux --release --build-name="$VERSION"
               cd build/linux/x64/release && zip -r "$GITHUB_WORKSPACE/artifacts/kilt-linux-x64-${VERSION}-${BUILD_DATE}.zip" bundle/ && cd "$GITHUB_WORKSPACE"
               export PATH="$PATH:$HOME/.pub-cache/bin"
               dart pub global activate fastforge
-              timeout 300 fastforge package --platform linux --targets deb --skip-clean || echo "DEB build had warnings"
-              timeout 300 fastforge package --platform linux --targets rpm --skip-clean || echo "RPM build had warnings"
-              timeout 300 fastforge package --platform linux --targets appimage --skip-clean || echo "AppImage build had warnings"
+              fastforge package --platform linux --targets deb --skip-clean || echo "DEB build had warnings"
+              fastforge package --platform linux --targets rpm --skip-clean || echo "RPM build had warnings"
+              fastforge package --platform linux --targets appimage --skip-clean || echo "AppImage build had warnings"
               find dist -name "*.deb" -exec cp {} "artifacts/kilt-linux-amd64-${VERSION}-${BUILD_DATE}.deb" \; 2>/dev/null || true
               find dist -name "*.rpm" -exec cp {} "artifacts/kilt-linux-amd64-${VERSION}-${BUILD_DATE}.rpm" \; 2>/dev/null || true
               find dist -name "*.AppImage" -exec cp {} "artifacts/kilt-linux-x86_64-${VERSION}-${BUILD_DATE}.AppImage" \; 2>/dev/null || true
@@ -256,34 +379,22 @@ jobs:
               export PATH="$PATH:$HOME/.pub-cache/bin"
               export PUB_CACHE="$HOME/.pub-cache"
               dart pub global activate fastforge
-              timeout 300 fastforge package --platform linux --targets deb --skip-clean || echo "DEB build had warnings"
-              timeout 300 fastforge package --platform linux --targets rpm --skip-clean || echo "RPM build had warnings"
-              timeout 300 fastforge package --platform linux --targets appimage --skip-clean || echo "AppImage build had warnings"
+              fastforge package --platform linux --targets deb --skip-clean || echo "DEB build had warnings"
+              fastforge package --platform linux --targets rpm --skip-clean || echo "RPM build had warnings"
+              fastforge package --platform linux --targets appimage --skip-clean || echo "AppImage build had warnings"
               find dist -name "*.deb" -exec cp {} "artifacts/kilt-linux-arm64-${VERSION}-${BUILD_DATE}.deb" \; 2>/dev/null || true
               find dist -name "*.rpm" -exec cp {} "artifacts/kilt-linux-arm64-${VERSION}-${BUILD_DATE}.rpm" \; 2>/dev/null || true
               find dist -name "*.AppImage" -exec cp {} "artifacts/kilt-linux-aarch64-${VERSION}-${BUILD_DATE}.AppImage" \; 2>/dev/null || true
               ;;
             windows)
               flutter build windows --release
-              7z a "artifacts/kilt-windows-${VERSION}-${BUILD_DATE}.zip" "build/windows/x64/runner/Release"
+              7z a "artifacts/kilt-windows-x64-${VERSION}-${BUILD_DATE}.zip" "build/windows/x64/runner/Release"
               ;;
             macos)
               flutter config --enable-macos-desktop
               flutter build macos --release --build-name="$VERSION"
               ;;
             ios)
-              if [ -f ios/Podfile ]; then
-                sed -E -i '' "s/^[[:space:]]*# platform :ios, ['\"][^'\"]+['\"]/platform :ios, '14.0'/" ios/Podfile
-                if ! grep -Eq "^[[:space:]]*platform :ios" ios/Podfile; then
-                  printf "platform :ios, '14.0'\n%s" "$(cat ios/Podfile)" > ios/Podfile
-                fi
-              fi
-              if [ -f ios/Flutter/AppFrameworkInfo.plist ]; then
-                /usr/libexec/PlistBuddy -c "Set :MinimumOSVersion 14.0" ios/Flutter/AppFrameworkInfo.plist >/dev/null 2>&1 || true
-              fi
-              if [ -f ios/Runner.xcodeproj/project.pbxproj ]; then
-                sed -E -i '' "s/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]+;/IPHONEOS_DEPLOYMENT_TARGET = 14.0;/g" ios/Runner.xcodeproj/project.pbxproj
-              fi
               flutter build ios --release --no-codesign
               ;;
             *)
@@ -305,14 +416,14 @@ jobs:
         if: matrix.target == 'macos'
         run: |
           cd build/macos/Build/Products/Release
-          zip -r "$GITHUB_WORKSPACE/artifacts/kilt-macos-${{ steps.version.outputs.version }}-${{ steps.version.outputs.build_date }}-unsigned.zip" *.app
+          zip -r "$GITHUB_WORKSPACE/artifacts/kilt-macos-${{ steps.version.outputs.version }}-${{ steps.version.outputs.build_date }}.zip" *.app
 
       - name: Create iOS IPA
         if: matrix.target == 'ios'
         run: |
           mkdir -p Payload
           cp -r build/ios/iphoneos/Runner.app Payload/
-          zip -r "artifacts/kilt-ios-${{ steps.version.outputs.version }}-${{ steps.version.outputs.build_date }}-unsigned.ipa" Payload/
+          zip -r "artifacts/kilt-ios-${{ steps.version.outputs.version }}-${{ steps.version.outputs.build_date }}.ipa" Payload/
           rm -rf Payload
 
       - name: Create Windows installer
@@ -327,7 +438,7 @@ jobs:
           DefaultDirName={autopf}\Kilt
           DefaultGroupName=Kilt
           OutputDir=artifacts
-          OutputBaseFilename=kilt-${{ steps.version.outputs.version }}-${{ steps.version.outputs.build_date }}-windows-x64-setup
+          OutputBaseFilename=kilt-windows-x64-${{ steps.version.outputs.version }}-${{ steps.version.outputs.build_date }}-setup
           Compression=lzma2
           SolidCompression=yes
           ArchitecturesInstallIn64BitMode=x64compatible
@@ -355,7 +466,7 @@ jobs:
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" installer.iss
 
       - name: Verify Android signature
-        if: matrix.target == 'android' && steps.signing.outputs.signing == 'release'
+        if: startsWith(matrix.target, 'android') && steps.signing.outputs.signing == 'release'
         shell: bash
         run: |
           for pkg in artifacts/*.apk artifacts/*.aab; do
@@ -380,12 +491,29 @@ jobs:
     name: Nightly Release
     runs-on: ubuntu-latest
     needs: build
-    if: ${{ always() && !startsWith(github.ref, 'refs/tags/v') && !startsWith(github.ref, 'refs/pull/') && (github.event_name == 'push' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.create_release == true)) }}
+    # Skip on tag pushes (handled by the release job), PR builds, and manual
+    # dispatches with create_release checked (those go to the release job).
+    # On manual dispatch without create_release, publish a nightly build.
+    if: ${{ !cancelled() && contains(needs.build.result, 'success') && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.create_release == false)) }}
     permissions:
       contents: write
+    outputs:
+      release_tag: ${{ steps.meta.outputs.release_tag }}
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Determine release tag
+        id: meta
+        run: echo "release_tag=nightly" >> "$GITHUB_OUTPUT"
+
+      - name: Move nightly tag to current commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch --tags --force
+          git tag -f nightly "$GITHUB_SHA"
+          git push -f origin nightly
 
       - name: Read version from pubspec
         id: version
@@ -405,7 +533,7 @@ jobs:
       - name: Prepare release assets
         run: |
           mkdir -p release-assets
-          find artifacts -type f \( -name "*.apk" -o -name "*.aab" -o -name "*.zip" -o -name "*.ipa" -o -name "*.exe" -o -name "*.deb" -o -name "*.rpm" -o -name "*.AppImage" \) -exec cp {} release-assets/ \;
+          find artifacts -type f \( -name "*.apk" -o -name "*.aab" -o -name "*.tar.gz" -o -name "*.zip" -o -name "*.ipa" -o -name "*.exe" -o -name "*.deb" -o -name "*.rpm" -o -name "*.AppImage" \) -exec cp {} release-assets/ \;
           ls -la release-assets/
 
       - name: Generate SHA256 checksums
@@ -430,14 +558,15 @@ jobs:
           tag_name: nightly
           name: Nightly Build
           body: |
-            Automated nightly build from the latest commit on main.
+            Automated nightly build from commit ${{ github.sha }}
 
+            **Branch:** ${{ github.ref_name }}
             **Version:** ${{ steps.version.outputs.version }}
             **Build:** #${{ github.run_number }}
             **Date:** ${{ steps.version.outputs.build_date }}
-            **Commit:** ${{ steps.version.outputs.short_sha }}
+            **Commit:** ${{ github.sha }}
 
-            > This release is automatically updated on every push to main. Artifacts are untested nightly builds.
+            > This release is automatically updated on every push. Artifacts are untested nightly builds.
           files: |
             release-assets/*
             SHA256SUMS.txt
@@ -450,9 +579,11 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     needs: build
-    if: ${{ always() && startsWith(github.ref, 'refs/tags/v') }}
+    if: ${{ !cancelled() && contains(needs.build.result, 'success') && (startsWith(github.ref, 'refs/tags/v') || (github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.create_release == true)) }}
     permissions:
       contents: write
+    outputs:
+      release_tag: ${{ steps.meta.outputs.release_tag }}
 
     steps:
       - uses: actions/checkout@v4
@@ -467,6 +598,33 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "build_date=$BUILD_DATE" >> "$GITHUB_OUTPUT"
 
+      - name: Determine release tag
+        id: meta
+        run: |
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            echo "release_tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "release_tag=v${{ steps.version.outputs.version }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create version tag
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.create_release == true }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch --tags --force
+          TAG="${{ steps.meta.outputs.release_tag }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists at $(git rev-parse "$TAG")"
+            if [ "$(git rev-parse "$TAG")" != "$GITHUB_SHA" ]; then
+              echo "Tag $TAG exists on a different commit, not overwriting" >&2
+              exit 1
+            fi
+          else
+            git tag "$TAG" "$GITHUB_SHA"
+            git push origin "$TAG"
+          fi
+
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
@@ -475,7 +633,7 @@ jobs:
       - name: Prepare release assets
         run: |
           mkdir -p release-assets
-          find artifacts -type f \( -name "*.apk" -o -name "*.aab" -o -name "*.zip" -o -name "*.ipa" -o -name "*.exe" -o -name "*.deb" -o -name "*.rpm" -o -name "*.AppImage" \) -exec cp {} release-assets/ \;
+          find artifacts -type f \( -name "*.apk" -o -name "*.aab" -o -name "*.tar.gz" -o -name "*.zip" -o -name "*.ipa" -o -name "*.exe" -o -name "*.deb" -o -name "*.rpm" -o -name "*.AppImage" \) -exec cp {} release-assets/ \;
           ls -la release-assets/
 
       - name: Generate SHA256 checksums
@@ -487,8 +645,8 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.version.outputs.version }}
-          name: Kilt v${{ steps.version.outputs.version }}
+          tag_name: ${{ steps.meta.outputs.release_tag }}
+          name: Kilt ${{ steps.meta.outputs.release_tag }}
           generate_release_notes: true
           body: |
             ## Kilt v${{ steps.version.outputs.version }}
@@ -516,3 +674,27 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  gitlab-sync:
+    name: Trigger GitLab sync
+    runs-on: ubuntu-latest
+    needs: [nightly, release]
+    if: always() && (needs.nightly.result == 'success' || needs.release.result == 'success')
+    steps:
+      - name: Determine release tag
+        id: meta
+        run: |
+          if [ "${{ needs.release.result }}" = "success" ]; then
+            echo "release_tag=${{ needs.release.outputs.release_tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "release_tag=${{ needs.nightly.outputs.release_tag }}" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Trigger GitLab sync pipeline
+        run: |
+          curl -fsSL --max-time 30 --retry 2 -X POST \
+            -F token="${{ secrets.GITLAB_TRIGGER_TOKEN }}" \
+            -F ref=main \
+            -F "variables[GITHUB_RUN_ID]=${{ github.run_id }}" \
+            -F "variables[RELEASE_TAG]=${{ steps.meta.outputs.release_tag }}" \
+            "https://gitlab.com/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/trigger/pipeline"
+
