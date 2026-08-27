@@ -9,10 +9,6 @@ PROJECT_DIR="${CI_PROJECT_DIR:-$PWD}"
 
 cd "$PROJECT_DIR"
 
-echo "DEBUG: GH_TOKEN length: ${#GH_TOKEN}"
-echo "DEBUG: RELEASE_TAG: ${RELEASE_TAG:-}"
-gh auth status 2>&1 || true
-
 # Determine which GitHub release to sync.
 if [ -z "$RELEASE_TAG" ]; then
   RELEASE_TAG=$(gh release view -R justacalico/klit --json tagName -q .tagName)
