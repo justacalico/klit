@@ -12,7 +12,7 @@
 
 </div>
 
-Kilt is a client for E926 and Self21-compatible image boards. It works on desktop and mobile.
+Kilt is a client for E926 and Self21-compatible image boards. It works on desktop and mobile. 
 
 ## Prerequisites
 
