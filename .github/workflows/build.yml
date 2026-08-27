@@ -694,6 +694,24 @@ jobs:
           else
             echo "release_tag=${{ needs.nightly.outputs.release_tag }}" >> "$GITHUB_OUTPUT"
           fi
+      - name: Wait for release assets to be available
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.meta.outputs.release_tag }}"
+          echo "Waiting for release $TAG assets..."
+          for i in $(seq 1 30); do
+            COUNT=$(gh api "repos/${{ github.repository }}/releases/tags/$TAG" --jq '.assets | length' 2>/dev/null || echo 0)
+            if [ "$COUNT" -ge 14 ]; then
+              echo "Release $TAG has $COUNT assets"
+              exit 0
+            fi
+            echo "  ...$COUNT/14 assets, sleeping 10s"
+            sleep 10
+          done
+          echo "Timeout waiting for release assets"
+          exit 1
+
       - name: Trigger GitLab sync pipeline
         run: |
           curl -fsSL --max-time 30 --retry 2 -X POST \
