@@ -11,7 +11,7 @@ cd "$PROJECT_DIR"
 
 # Determine which GitHub release to sync.
 if [ -z "$RELEASE_TAG" ]; then
-  RELEASE_TAG=$(gh release list -R justacalico/klit --limit 1 --json tagName -q '.[0].tagName')
+  RELEASE_TAG=$(gh release view -R justacalico/klit --json tagName -q .tagName)
 fi
 
 echo "Syncing GitHub release: $RELEASE_TAG"
