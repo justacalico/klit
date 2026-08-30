@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:kilt/markup/markup.dart';
 import 'package:kilt/post/post.dart';
-import 'package:kilt/shared/shared.dart';
 
 class DescriptionDisplay extends StatelessWidget {
   const DescriptionDisplay({super.key, required this.post});
@@ -22,8 +21,17 @@ class DescriptionDisplay extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: GlassCard(
-              child: DText(desc),
+            child: Card(
+              margin: EdgeInsets.zero,
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: DText(desc),
+              ),
             ),
           ),
         ],
