@@ -19,10 +19,14 @@ class CommentDisplay extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return Column(
       children: [
-        GlassCard(
+        Card(
           margin: const EdgeInsets.only(top: 10),
-          padding: EdgeInsets.zero,
-          borderRadius: 12,
+          color: Theme.of(context).colorScheme.surfaceContainerHigh,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          clipBehavior: Clip.antiAlias,
           child: SizedBox(
             width: double.infinity,
             child: CupertinoButton(

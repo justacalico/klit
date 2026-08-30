@@ -67,33 +67,42 @@ class LikeDisplay extends StatelessWidget {
         return Column(
           children: [
             if (showInlineActions) PostDetailPinnedActions(post: post),
-            GlassCard(
+            Card(
               margin: EdgeInsets.only(top: showInlineActions ? 10 : 12),
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-              borderRadius: 18,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  buildStat(
-                    icon: Icons.thumb_up,
-                    label: l10n.commonScore,
-                    value: formatCompactNumber(post.vote.score),
-                    color: voteStatus == VoteStatus.upvoted
-                        ? primary
-                        : iconColor,
-                  ),
-                  buildStat(
-                    icon: Icons.favorite,
-                    label: l10n.postFavorites,
-                    value: formatCompactNumber(post.favCount),
-                    color: post.isFavorited ? Colors.pinkAccent : iconColor,
-                  ),
-                  buildStat(
-                    icon: Icons.comment,
-                    label: l10n.postComments,
-                    value: formatCompactNumber(post.commentCount),
-                  ),
-                ],
+              color: theme.colorScheme.surfaceContainerHigh,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 16,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    buildStat(
+                      icon: Icons.thumb_up,
+                      label: l10n.commonScore,
+                      value: formatCompactNumber(post.vote.score),
+                      color: voteStatus == VoteStatus.upvoted
+                          ? primary
+                          : iconColor,
+                    ),
+                    buildStat(
+                      icon: Icons.favorite,
+                      label: l10n.postFavorites,
+                      value: formatCompactNumber(post.favCount),
+                      color: post.isFavorited ? Colors.pinkAccent : iconColor,
+                    ),
+                    buildStat(
+                      icon: Icons.comment,
+                      label: l10n.postComments,
+                      value: formatCompactNumber(post.commentCount),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -136,24 +145,30 @@ class PostDetailPinnedActions extends StatelessWidget {
 
         final strip = _PostDetailActionButtonStrip(buttons: buttons);
         if (!floating) {
-          return GlassCard(
+          return Card(
             margin: const EdgeInsets.only(top: 12),
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-            borderRadius: 18,
-            child: strip,
+            color: Theme.of(context).colorScheme.surfaceContainerHigh,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+              child: strip,
+            ),
           );
         }
 
-        final theme = Theme.of(context);
-        final colorScheme = theme.colorScheme;
-        final isDark = theme.brightness == Brightness.dark;
+        final colorScheme = Theme.of(context).colorScheme;
+        final isDark = Theme.of(context).brightness == Brightness.dark;
         final barBg = isDark
-            ? theme.canvasColor
+            ? Theme.of(context).canvasColor
             : colorScheme.surfaceContainerHigh;
-        return GlassSurface(
-          margin: EdgeInsets.zero,
-          borderRadius: 18,
-          color: barBg.withValues(alpha: 0.55),
+        return Container(
+          decoration: BoxDecoration(
+            color: barBg,
+            borderRadius: BorderRadius.circular(18),
+          ),
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
           child: strip,
         );
