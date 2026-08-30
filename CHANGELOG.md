@@ -1,6 +1,8 @@
 # Changelog
 
-# 12.0.0 (Unreleased)
+# 12.0.0
+
+# 11.0.0
 - Fixed the sidebar auto-expanding when the window grew past the collapse breakpoint even after the user manually collapsed it: manual collapse state is now preserved across window resizes ([!55](https://gitlab.com/Openlyst/klit/-/merge_requests/55))
 - Fixed the nightly release job being skipped when manually dispatching the Build and Release workflow: `create_release` input now defaults to true ([!52](https://gitlab.com/Openlyst/klit/-/merge_requests/52))
 - Pressing ESC now closes the post detail page on desktop ([!51](https://gitlab.com/Openlyst/klit/-/merge_requests/51))
