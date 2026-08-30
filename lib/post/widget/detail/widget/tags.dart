@@ -50,12 +50,18 @@ class TagDisplay extends StatelessWidget {
       );
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: post.tags.keys
-          .where((category) => post.tags[category]?.isNotEmpty ?? false)
-          .map((category) => categoryTile(category))
-          .toList(),
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 400),
+      child: SingleChildScrollView(
+        primary: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: post.tags.keys
+              .where((category) => post.tags[category]?.isNotEmpty ?? false)
+              .map((category) => categoryTile(category))
+              .toList(),
+        ),
+      ),
     );
   }
 }
