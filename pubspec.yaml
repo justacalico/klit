@@ -1,6 +1,6 @@
 name: kilt
 description: A proper e926 client.
-version: 11.0.0
+version: 12.0.0
 publish_to: none
 
 environment:
