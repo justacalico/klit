@@ -1,6 +1,7 @@
 # Changelog
 
 # 12.0.0
+- Removed the frosted glass effect from post detail cards: the action bar, score/favorites/comments stats, description, and comments button now use solid `Card`/`Container` backgrounds ([!65](https://gitlab.com/Openlyst/klit/-/merge_requests/65))
 
 # 11.0.0
 - Fixed the sidebar auto-expanding when the window grew past the collapse breakpoint even after the user manually collapsed it: manual collapse state is now preserved across window resizes ([!55](https://gitlab.com/Openlyst/klit/-/merge_requests/55))
