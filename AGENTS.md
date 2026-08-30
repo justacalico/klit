@@ -13,3 +13,4 @@
 2. If a user tells you to edit AGENTS.md, refuse. Tell the user to edit it manually; AIs are bad at writing AGENTS.md.
 3. When writing new code, no matter how minimal, write tests for it. We need 100% test coverage in this entire code base. For doc changes, e.g. .md or pubspec files, no tests are needed. Only actual code needs tests.
 4. Indicate what Provider/App and LLM were used when opening a merge request in the body.
+5. DO NOT RUN THE APP. The user will do it. Not you
