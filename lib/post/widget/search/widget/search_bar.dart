@@ -26,7 +26,8 @@ class SearchPageAppBar extends StatefulWidget implements PreferredSizeWidget {
   State<SearchPageAppBar> createState() => _SearchPageAppBarState();
 }
 
-class _SearchPageAppBarState extends State<SearchPageAppBar> {
+class _SearchPageAppBarState extends State<SearchPageAppBar>
+    with DefaultRouteAware<SearchPageAppBar> {
   late final FocusNode _focusNode = FocusNode();
   late final TextEditingController _textController = TextEditingController(
     text: widget.controller.query['tags'] ?? '',
@@ -40,6 +41,13 @@ class _SearchPageAppBarState extends State<SearchPageAppBar> {
         if (mounted) _focusNode.requestFocus();
       });
     }
+  }
+
+  @override
+  void didPushNext() {
+    super.didPushNext();
+    // Drop focus so the keyboard doesn't reappear when returning here.
+    _focusNode.unfocus();
   }
 
   @override
