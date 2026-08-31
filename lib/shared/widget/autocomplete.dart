@@ -54,6 +54,7 @@ class AutocompleteTextField<T> extends StatelessWidget {
     final hasFab = Scaffold.maybeOf(context)?.hasFloatingActionButton ?? false;
     return TypeAheadField<T>(
       controller: controller,
+      focusNode: focusNode,
       direction: direction,
       hideOnEmpty: true,
       hideOnSelect: false,
