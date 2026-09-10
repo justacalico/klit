@@ -141,7 +141,31 @@ class _HistoryTileDropdown extends StatelessWidget {
         PopupMenuTile(
           title: l10n.commonDelete,
           icon: Icons.delete,
-          value: () => context.read<Client>().histories.remove(entry.id),
+          value: () async {
+            final confirmed = await showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text(l10n.historyDeleteSelectedTitle),
+                content: Text(l10n.historyDeleteSelectedBody(1)),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: Text(l10n.commonCancel),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.error,
+                    ),
+                    child: Text(l10n.commonDelete),
+                  ),
+                ],
+              ),
+            );
+            if (confirmed == true && context.mounted) {
+              await context.read<Client>().histories.remove(entry.id);
+            }
+          },
         ),
       ],
     );

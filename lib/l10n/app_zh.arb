@@ -897,6 +897,22 @@
       "count": {}
     }
   },
+  "historyDeleteSelectedTitle": "删除所选记录？",
+  "historyDeleteSelectedBody": "这将永久删除 {count} 条历史记录。",
+  "@historyDeleteSelectedBody": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "finishDeleteTitle": "删除完成记录？",
+  "finishDeleteBody": "删除帖子 #{id} 的完成记录？",
+  "@finishDeleteBody": {
+    "placeholders": {
+      "id": {}
+    }
+  },
   "historyEnabled": "已启用",
   "historyPagesVisited": "已访问 {count} 个页面",
   "@historyPagesVisited": {

@@ -61,8 +61,31 @@ class HistorySelectionAppBar extends StatelessWidget with AppBarBuilderWidget {
         IconButton(
           icon: const Icon(Icons.delete_outline),
           onPressed: () async {
+            final count = data.selections.length;
+            final client = context.read<Client>();
+            final confirmed = await showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text(l10n.historyDeleteSelectedTitle),
+                content: Text(l10n.historyDeleteSelectedBody(count)),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: Text(l10n.commonCancel),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.error,
+                    ),
+                    child: Text(l10n.commonDelete),
+                  ),
+                ],
+              ),
+            );
+            if (confirmed != true) return;
             data.onChanged({});
-            await context.read<Client>().histories.removeAll(
+            await client.histories.removeAll(
               data.selections.map((e) => e.id).toList(),
             );
           },

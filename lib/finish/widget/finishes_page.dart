@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kilt/app/routing/app_routes.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/finish/finish.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
@@ -48,12 +49,42 @@ class FinishesPage extends StatelessWidget {
                 }
                 return _FinishesList(
                   finishes: list,
-                  onDelete: (id) =>
-                      client.finishes.deleteById(id),
+                  onDelete: (id) => _confirmDeleteFinish(context, id, client),
                 );
               },
             ),
     );
+  }
+}
+
+Future<void> _confirmDeleteFinish(
+  BuildContext context,
+  int id,
+  Client client,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(l10n.finishDeleteTitle),
+      content: Text(l10n.finishDeleteBody(id)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(l10n.commonCancel),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          style: TextButton.styleFrom(
+            foregroundColor: Theme.of(context).colorScheme.error,
+          ),
+          child: Text(l10n.commonDelete),
+        ),
+      ],
+    ),
+  );
+  if (confirmed == true) {
+    await client.finishes.deleteById(id);
   }
 }
 

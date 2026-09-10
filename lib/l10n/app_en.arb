@@ -897,6 +897,22 @@
       "count": {}
     }
   },
+  "historyDeleteSelectedTitle": "Delete selected entries?",
+  "historyDeleteSelectedBody": "This will permanently delete {count} history {count, plural, =1{entry} other{entries}}.",
+  "@historyDeleteSelectedBody": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "finishDeleteTitle": "Delete finish?",
+  "finishDeleteBody": "Delete the finish for post #{id}?",
+  "@finishDeleteBody": {
+    "placeholders": {
+      "id": {}
+    }
+  },
   "historyEnabled": "Enabled",
   "historyPagesVisited": "{count} pages visited",
   "@historyPagesVisited": {
