@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kilt/app/routing/app_routes.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/finish/finish.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
@@ -20,30 +21,35 @@ class FinishesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final client = context.watch<Client>();
     final settings = context.watch<Settings>();
     final enabled = settings.iFinishedEnabled.value;
     return AdaptiveScaffold(
       appBar: AppBar(
-        title: const Text('Finishes'),
+        title: Text(l10n.finishTitle),
       ),
       body: !enabled
           ? _EmptyState(
-              message: 'Turn on I Finished in Settings',
+              message: l10n.finishEnablePrompt,
+              actionLabel: l10n.finishOpenSettings,
               onTap: () => context.go(AppRoutes.settings),
             )
           : StreamBuilder<List<Finish>>(
               stream: client.finishes.watchForIdentity(),
               builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
                 if (snapshot.hasError) {
                   return Center(
-                    child: Text('Error: ${snapshot.error}'),
+                    child: Text(l10n.finishError(snapshot.error.toString())),
                   );
                 }
                 final list = snapshot.data ?? [];
                 if (list.isEmpty) {
-                  return const _EmptyState(
-                    message: 'No finished posts yet',
+                  return _EmptyState(
+                    message: l10n.finishEmpty,
                   );
                 }
                 return _FinishesList(
@@ -58,9 +64,10 @@ class FinishesPage extends StatelessWidget {
 }
 
 class _EmptyState extends StatelessWidget {
-  const _EmptyState({required this.message, this.onTap});
+  const _EmptyState({required this.message, this.actionLabel, this.onTap});
 
   final String message;
+  final String? actionLabel;
   final VoidCallback? onTap;
 
   @override
@@ -82,11 +89,11 @@ class _EmptyState extends StatelessWidget {
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
-            if (onTap != null) ...[
+            if (onTap != null && actionLabel != null) ...[
               const SizedBox(height: 16),
               CupertinoButton.filled(
                 onPressed: onTap,
-                child: const Text('Open Settings'),
+                child: Text(actionLabel!),
               ),
             ],
           ],
@@ -146,6 +153,7 @@ class _FinishTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return FutureBuilder<Post?>(
       future: context.read<Client>().posts.get(id: finish.postId),
       builder: (context, postSnapshot) {
@@ -191,13 +199,13 @@ class _FinishTile extends StatelessWidget {
                             children: [
                               Text(
                                 post != null
-                                    ? 'Post #${post.id}'
-                                    : 'Post #${finish.postId}',
+                                    ? l10n.postDetailTitle(post.id)
+                                    : l10n.postDetailTitle(finish.postId),
                                 overflow: TextOverflow.ellipsis,
                                 style: Theme.of(context).textTheme.labelLarge,
                               ),
                               Text(
-                                _formatDate(finish.finishedAt),
+                                _formatDate(l10n, finish.finishedAt),
                                 overflow: TextOverflow.ellipsis,
                                 style: Theme.of(context)
                                     .textTheme
@@ -298,15 +306,16 @@ class _FinishTile extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime d) {
+  String _formatDate(AppLocalizations l10n, DateTime d) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final day = DateTime(d.year, d.month, d.day);
+    final time = '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
     if (day == today) {
-      return 'Today ${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+      return l10n.finishToday(time);
     }
     return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')} '
-        '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+        '$time';
   }
 }
 

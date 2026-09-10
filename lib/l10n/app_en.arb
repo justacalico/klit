@@ -441,6 +441,12 @@
   "postHome": "Home",
   "postPopular": "Popular",
   "postPosts": "Posts",
+  "postDetailTitle": "Post #{id}",
+  "@postDetailTitle": {
+    "placeholders": {
+      "id": {}
+    }
+  },
   "postFavsUnavailable": "Favorites are unavailable for anonymous users",
   "postFavOrder": "Favorite order",
   "postFavOrderAdded": "added order",
@@ -992,6 +998,22 @@
   "@tagPreviewLoadFailed": {
     "placeholders": {
       "error": {}
+    }
+  },
+  "finishTitle": "Finishes",
+  "finishEnablePrompt": "Turn on I Finished in Settings",
+  "finishOpenSettings": "Open Settings",
+  "finishEmpty": "No finished posts yet",
+  "finishError": "Error: {error}",
+  "@finishError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "finishToday": "Today {time}",
+  "@finishToday": {
+    "placeholders": {
+      "time": {}
     }
   }
 }
