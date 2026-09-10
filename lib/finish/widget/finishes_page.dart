@@ -273,6 +273,9 @@ class _FinishTile extends StatelessWidget {
         child: CachedNetworkImage(
           imageUrl: imageUrl,
           fit: BoxFit.cover,
+          placeholder: (context, url) => const Center(
+            child: SizedCircularProgressIndicator(size: 24),
+          ),
           cacheManager: context.read<BaseCacheManager>(),
           errorWidget: (context, url, error) => ColoredBox(
             color: Theme.of(context).colorScheme.surfaceContainerHighest,

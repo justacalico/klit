@@ -1,6 +1,7 @@
 # Changelog
 
 # 12.0.0
+- Fixed blank image tiles by enabling loading progress indicators and low-res placeholders in `PostImageTile`, and showing a warning icon error widget instead of an empty `SizedBox` when image loading fails ([!74](https://gitlab.com/Openlyst/klit/-/merge_requests/74))
 - Fixed the search box keeping focus after navigating to a post and returning, which reopened the keyboard: focus is now dropped when a route is pushed on top of the search page, and the search field's focus node is correctly wired through to the autocomplete text field ([!69](https://gitlab.com/Openlyst/klit/-/merge_requests/69))
 - Removed the frosted glass effect from post detail cards: the action bar, score/favorites/comments stats, description, and comments button now use solid `Card`/`Container` backgrounds ([!65](https://gitlab.com/Openlyst/klit/-/merge_requests/65))
 

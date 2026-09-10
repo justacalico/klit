@@ -180,9 +180,7 @@ class RawPostImageWidget extends StatelessWidget {
       fadeInDuration: fades,
       fadeOutDuration: fades,
       imageUrl: url,
-      errorWidget: stacked
-          ? defaultErrorBuilder
-          : (context, url, error) => const SizedBox.shrink(),
+      errorWidget: defaultErrorBuilder,
       progressIndicatorBuilder: showProgress || stacked
           ? progressIndicatorBuilder ?? progressIndicator
           : null,

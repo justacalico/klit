@@ -80,6 +80,9 @@ class HistoryImageGrid extends StatelessWidget {
                         ),
                         child: CachedNetworkImage(
                           imageUrl: urls[row * perRow + col],
+                          placeholder: (context, url) => const Center(
+                            child: SizedCircularProgressIndicator(size: 24),
+                          ),
                           errorWidget: defaultErrorBuilder,
                           fit: BoxFit.cover,
                           cacheManager: context.read<BaseCacheManager>(),
