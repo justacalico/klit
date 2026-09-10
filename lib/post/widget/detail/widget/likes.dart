@@ -499,7 +499,7 @@ class _IFinishedButtonState extends State<_IFinishedButton> {
       stream: client.finishes.watchCountForPost(widget.post.id),
       initialData: 0,
       builder: (context, snapshot) {
-        final count = snapshot.data ?? 0;
+        final count = snapshot.hasError ? 0 : (snapshot.data ?? 0);
         final fgColor = widget.iconColor;
         final child = ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 64),

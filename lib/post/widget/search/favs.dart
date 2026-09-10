@@ -25,7 +25,8 @@ class FavPage extends StatelessWidget {
               ),
             ),
             child: LoadingPage(
-              isEmpty: controller.error is NoUserLoginException,
+              isLoading: controller.items == null && controller.error == null,
+              isEmpty: controller.items != null && controller.items!.isEmpty,
               isError: controller.error is NoUserLoginException,
               onError: IconMessage(
                 icon: const Icon(Icons.person_search),
