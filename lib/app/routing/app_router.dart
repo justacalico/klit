@@ -16,11 +16,16 @@ import 'package:kilt/app/pages/settings_page.dart';
 import 'package:kilt/app/pages/topics_page.dart';
 import 'package:kilt/app/routing/app_routes.dart';
 import 'package:kilt/app/widget/main_shell.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 
 GoRouter createAppRouter(GlobalKey<NavigatorState> navigatorKey) {
   return GoRouter(
     navigatorKey: navigatorKey,
     initialLocation: AppRoutes.home,
+    errorBuilder: (context, state) => _RouteErrorPage(
+      title: AppLocalizations.of(context).routeNotFoundTitle,
+      body: AppLocalizations.of(context).routeNotFoundBody,
+    ),
     routes: [
       ShellRoute(
         builder: (context, state, child) => MainShell(
@@ -93,13 +98,61 @@ GoRouter createAppRouter(GlobalKey<NavigatorState> navigatorKey) {
             path: '/post/:id',
             builder: (context, state) {
               final id = state.pathParameters['id']!;
-              return PostLoadingPage(int.parse(id));
+              final parsed = int.tryParse(id);
+              if (parsed == null) {
+                return _RouteErrorPage(
+                  title: AppLocalizations.of(context).routeNotFoundTitle,
+                  body: AppLocalizations.of(context).routeInvalidPostId(id),
+                );
+              }
+              return PostLoadingPage(parsed);
             },
           ),
         ],
       ),
     ],
   );
+}
+
+class _RouteErrorPage extends StatelessWidget {
+  const _RouteErrorPage({required this.title, required this.body});
+
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Theme.of(context).colorScheme.outline,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                body,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: () => context.go(AppRoutes.home),
+                child: Text(l10n.navHome),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 int? _intParam(GoRouterState state, String key) {

@@ -46,6 +46,14 @@
   "commonBrowse": "Browse",
   "commonReport": "Report",
   "commonClear": "Clear",
+  "routeNotFoundTitle": "Page Not Found",
+  "routeNotFoundBody": "The page you requested could not be found.",
+  "routeInvalidPostId": "Invalid post ID: {id}",
+  "@routeInvalidPostId": {
+    "placeholders": {
+      "id": {}
+    }
+  },
   "commonCopy": "Copy",
   "commonLoading": "Loading...",
   "commonDone": "Done",
