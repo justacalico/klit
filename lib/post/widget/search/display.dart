@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0
 
 import 'package:flutter/material.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 
@@ -38,12 +39,13 @@ class PostSliverGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     PagedChildBuilderDelegate<Post> buildBuilderDelegate(
       ItemWidgetBuilder<Post> itemBuilder,
     ) => defaultPagedChildBuilderDelegate<Post>(
       onRetry: controller.getNextPage,
-      onEmpty: const Text('No posts'),
-      onError: const Text('Failed to load posts'),
+      onEmpty: Text(l10n.postNoPosts),
+      onError: Text(l10n.postFailedLoadPosts),
       itemBuilder: itemBuilder,
     );
 
@@ -99,6 +101,7 @@ class PostSliverComic extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) => PagedSliverList(
@@ -106,8 +109,8 @@ class PostSliverComic extends StatelessWidget {
         fetchNextPage: controller.getNextPage,
         builderDelegate: defaultPagedChildBuilderDelegate<Post>(
           onRetry: controller.getNextPage,
-          onEmpty: const Text('No posts'),
-          onError: const Text('Failed to load posts'),
+          onEmpty: Text(l10n.postNoPosts),
+          onError: Text(l10n.postFailedLoadPosts),
           itemBuilder: (context, item, index) => RepaintBoundary(
             key: ValueKey(item.id),
             child: Padding(
@@ -132,6 +135,7 @@ class PostSliverTimeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) => PagedSliverList(
@@ -139,8 +143,8 @@ class PostSliverTimeline extends StatelessWidget {
         fetchNextPage: controller.getNextPage,
         builderDelegate: defaultPagedChildBuilderDelegate<Post>(
           onRetry: controller.getNextPage,
-          onEmpty: const Text('No posts'),
-          onError: const Text('Failed to load posts'),
+          onEmpty: Text(l10n.postNoPosts),
+          onError: Text(l10n.postFailedLoadPosts),
           itemBuilder: (context, item, index) => RepaintBoundary(
             key: ValueKey(item.id),
             child: Padding(

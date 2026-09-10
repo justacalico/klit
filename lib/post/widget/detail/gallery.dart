@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_sub/flutter_sub.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 
@@ -114,58 +115,61 @@ class PostDetailGallery extends StatelessWidget {
         child: Consumer<PostController>(
           builder: (context, controller, child) => ListenableBuilder(
               listenable: controller,
-              builder: (context, _) => _PageChangeNotifier(
-                pageController: pageController,
-                onPageChanged: (oldIndex, newIndex) {
-                  if (controller.items != null &&
-                      oldIndex >= 0 &&
-                      oldIndex < controller.items!.length) {
-                    controller.items![oldIndex]
-                        .getVideo(context, listen: false)
-                        ?.pause();
-                  }
-                  onPageChanged?.call(newIndex);
-                  if (controller.items != null) {
-                    preloadPostImages(
-                      context: context,
-                      index: newIndex,
-                      posts: controller.items!,
-                      size: PostImageSize.sample,
-                    );
-                  }
-                },
-                child: PagedPageView(
+              builder: (context, _) {
+                final l10n = AppLocalizations.of(context);
+                return _PageChangeNotifier(
                   pageController: pageController,
-                  state: controller.state,
-                  fetchNextPage: controller.getNextPage,
-                  builderDelegate: defaultPagedChildBuilderDelegate<Post>(
-                    onRetry: controller.getNextPage,
-                    pageBuilder: contentOnly
-                        ? (context, child) => child
-                        : (context, child) => Scaffold(
-                            appBar: const TransparentAppBar(
-                                child: DefaultAppBar()),
-                            body: child,
-                          ),
-                    onEmpty: const Text('No posts'),
-                    onError: const Text('Failed to load posts'),
-                    itemBuilder: (context, item, index) => SubScrollController(
-                      builder: (context, scrollController) =>
-                          PrimaryScrollController(
-                        controller: scrollController,
-                        child: PostDetailPageControllerProvider(
-                          controller: pageController,
-                          child: PostDetail(
-                            post: item,
-                            useShell: !contentOnly,
-                            onTapImage: () => Navigator.of(context, rootNavigator: true).push(
-                              MaterialPageRoute(
-                                builder: (context) => PostsRouteConnector(
-                                  controller: controller,
-                                  child: PostFullscreenGallery(
+                  onPageChanged: (oldIndex, newIndex) {
+                    if (controller.items != null &&
+                        oldIndex >= 0 &&
+                        oldIndex < controller.items!.length) {
+                      controller.items![oldIndex]
+                          .getVideo(context, listen: false)
+                          ?.pause();
+                    }
+                    onPageChanged?.call(newIndex);
+                    if (controller.items != null) {
+                      preloadPostImages(
+                        context: context,
+                        index: newIndex,
+                        posts: controller.items!,
+                        size: PostImageSize.sample,
+                      );
+                    }
+                  },
+                  child: PagedPageView(
+                    pageController: pageController,
+                    state: controller.state,
+                    fetchNextPage: controller.getNextPage,
+                    builderDelegate: defaultPagedChildBuilderDelegate<Post>(
+                      onRetry: controller.getNextPage,
+                      pageBuilder: contentOnly
+                          ? (context, child) => child
+                          : (context, child) => Scaffold(
+                              appBar: const TransparentAppBar(
+                                  child: DefaultAppBar()),
+                              body: child,
+                            ),
+                      onEmpty: Text(l10n.postNoPosts),
+                      onError: Text(l10n.postFailedLoadPosts),
+                      itemBuilder: (context, item, index) => SubScrollController(
+                        builder: (context, scrollController) =>
+                            PrimaryScrollController(
+                          controller: scrollController,
+                          child: PostDetailPageControllerProvider(
+                            controller: pageController,
+                            child: PostDetail(
+                              post: item,
+                              useShell: !contentOnly,
+                              onTapImage: () => Navigator.of(context, rootNavigator: true).push(
+                                MaterialPageRoute(
+                                  builder: (context) => PostsRouteConnector(
                                     controller: controller,
-                                    initialPage: index,
-                                    onPageChanged: pageController.jumpToPage,
+                                    child: PostFullscreenGallery(
+                                      controller: controller,
+                                      initialPage: index,
+                                      onPageChanged: pageController.jumpToPage,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -175,8 +179,8 @@ class PostDetailGallery extends StatelessWidget {
                       ),
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
         ),
       ),

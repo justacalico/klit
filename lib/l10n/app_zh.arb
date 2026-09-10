@@ -441,6 +441,8 @@
   "postHome": "首页",
   "postPopular": "热门",
   "postPosts": "帖子",
+  "postNoPosts": "没有帖子",
+  "postFailedLoadPosts": "加载帖子失败",
   "postFavsUnavailable": "匿名用户无法使用收藏功能",
   "postFavOrder": "收藏排序",
   "postFavOrderAdded": "按添加时间",
