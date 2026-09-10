@@ -55,13 +55,17 @@ class _PostDetailState extends State<PostDetail> {
       return KeyEventResult.handled;
     }
 
+    final primaryFocus = FocusManager.instance.primaryFocus;
+    final isEditingText =
+        primaryFocus != null && primaryFocus.context?.widget is EditableText;
+
     if (physicalKey == PhysicalKeyboardKey.arrowLeft ||
-        logicalKey == LogicalKeyboardKey.keyA) {
+        (!isEditingText && logicalKey == LogicalKeyboardKey.keyA)) {
       _goToAdjacentPost(-1);
       return KeyEventResult.handled;
     }
     if (physicalKey == PhysicalKeyboardKey.arrowRight ||
-        logicalKey == LogicalKeyboardKey.keyD) {
+        (!isEditingText && logicalKey == LogicalKeyboardKey.keyD)) {
       _goToAdjacentPost(1);
       return KeyEventResult.handled;
     }
@@ -70,16 +74,16 @@ class _PostDetailState extends State<PostDetail> {
     if (!hasLogin) return KeyEventResult.ignored;
 
     if (physicalKey == PhysicalKeyboardKey.arrowUp ||
-        logicalKey == LogicalKeyboardKey.keyW) {
+        (!isEditingText && logicalKey == LogicalKeyboardKey.keyW)) {
       _vote(upvote: true);
       return KeyEventResult.handled;
     }
     if (physicalKey == PhysicalKeyboardKey.arrowDown ||
-        logicalKey == LogicalKeyboardKey.keyS) {
+        (!isEditingText && logicalKey == LogicalKeyboardKey.keyS)) {
       _vote(upvote: false);
       return KeyEventResult.handled;
     }
-    if (logicalKey == LogicalKeyboardKey.keyF) {
+    if (!isEditingText && logicalKey == LogicalKeyboardKey.keyF) {
       _toggleFavorite();
       return KeyEventResult.handled;
     }
