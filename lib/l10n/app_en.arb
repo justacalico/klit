@@ -441,6 +441,22 @@
   "postHome": "Home",
   "postPopular": "Popular",
   "postPosts": "Posts",
+  "postDetailTitle": "Post #{id}",
+  "@postDetailTitle": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postFailedLoadPost": "Failed to load post",
+  "postNotFound": "Post not found",
+  "postHide": "Hide",
+  "postShow": "Show",
+  "postFavorited": "Favorited",
+  "postUnfavorited": "Unfavorited",
+  "postUpvoted": "Upvoted",
+  "postUpvoteRemoved": "Upvote removed",
+  "postDownvoted": "Downvoted",
+  "postDownvoteRemoved": "Downvote removed",
   "postFavsUnavailable": "Favorites are unavailable for anonymous users",
   "postFavOrder": "Favorite order",
   "postFavOrderAdded": "added order",

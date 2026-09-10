@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:kilt/app/app.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 
@@ -107,6 +108,7 @@ class PostDetailImageToggle extends StatelessWidget {
         if (post.isDeleted) return const SizedBox.shrink();
         if (post.file == null) return const SizedBox.shrink();
         final controller = context.watch<PostController>();
+        final l10n = AppLocalizations.of(context);
         return CrossFade.builder(
           showChild:
               (!post.isFavorited && controller.isDenied(post)) ||
@@ -136,7 +138,7 @@ class PostDetailImageToggle extends StatelessWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 5),
-                      child: Text(controller.isAllowed(post) ? 'hide' : 'show'),
+                      child: Text(controller.isAllowed(post) ? l10n.postHide : l10n.postShow),
                     ),
                   ],
                 ),

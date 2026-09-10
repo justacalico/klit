@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:kilt/client/client.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/shared/shared.dart';
 
@@ -14,6 +15,7 @@ class PostLoadingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SingleFuturePostsProvider(
       id: id,
       child: Consumer<Future<PostController>>(
@@ -26,9 +28,9 @@ class PostLoadingPage extends StatelessWidget {
                   controller: value,
                 ),
               ),
-              title: Text('Post #$id'),
-              onError: const Text('Failed to load post'),
-              onEmpty: const Text('Post not found'),
+              title: Text(l10n.postDetailTitle(id)),
+              onError: Text(l10n.postFailedLoadPost),
+              onEmpty: Text(l10n.postNotFound),
             ),
       ),
     );

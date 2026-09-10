@@ -441,6 +441,22 @@
   "postHome": "首页",
   "postPopular": "热门",
   "postPosts": "帖子",
+  "postDetailTitle": "帖子 #{id}",
+  "@postDetailTitle": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "postFailedLoadPost": "加载帖子失败",
+  "postNotFound": "未找到帖子",
+  "postHide": "隐藏",
+  "postShow": "显示",
+  "postFavorited": "已收藏",
+  "postUnfavorited": "已取消收藏",
+  "postUpvoted": "已点赞",
+  "postUpvoteRemoved": "已取消点赞",
+  "postDownvoted": "已踩",
+  "postDownvoteRemoved": "已取消踩",
   "postFavsUnavailable": "匿名用户无法使用收藏功能",
   "postFavOrder": "收藏排序",
   "postFavOrderAdded": "按添加时间",

@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kilt/client/client.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
@@ -423,26 +424,27 @@ class _FullscreenActionPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final (icon, label, color) = switch (action.kind) {
       _FullscreenActionKind.favorite => (
         Icons.favorite,
-        'Favorited',
+        l10n.postFavorited,
         Colors.pinkAccent,
       ),
       _FullscreenActionKind.unfavorite => (
         Icons.favorite_border,
-        'Unfavorited',
+        l10n.postUnfavorited,
         Colors.white,
       ),
       _FullscreenActionKind.upvote => (
         Icons.arrow_upward,
-        action.active ? 'Upvoted' : 'Upvote removed',
+        action.active ? l10n.postUpvoted : l10n.postUpvoteRemoved,
         action.active ? Colors.deepOrange : Colors.white,
       ),
       _FullscreenActionKind.downvote => (
         Icons.arrow_downward,
-        action.active ? 'Downvoted' : 'Downvote removed',
+        action.active ? l10n.postDownvoted : l10n.postDownvoteRemoved,
         action.active ? Colors.blue : Colors.white,
       ),
     };
