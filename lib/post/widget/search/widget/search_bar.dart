@@ -36,6 +36,7 @@ class _SearchPageAppBarState extends State<SearchPageAppBar>
   @override
   void initState() {
     super.initState();
+    widget.controller.addListener(_syncFromController);
     if (widget.requestFocus) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _focusNode.requestFocus();
@@ -44,14 +45,34 @@ class _SearchPageAppBarState extends State<SearchPageAppBar>
   }
 
   @override
+  void didUpdateWidget(SearchPageAppBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_syncFromController);
+      widget.controller.addListener(_syncFromController);
+      _syncFromController();
+    }
+  }
+
+  void _syncFromController() {
+    final queryTags = widget.controller.query['tags'] ?? '';
+    if (_textController.text != queryTags) {
+      _textController.value = TextEditingValue(
+        text: queryTags,
+        selection: TextSelection.collapsed(offset: queryTags.length),
+      );
+    }
+  }
+
+  @override
   void didPushNext() {
     super.didPushNext();
-    // Drop focus so the keyboard doesn't reappear when returning here.
     _focusNode.unfocus();
   }
 
   @override
   void dispose() {
+    widget.controller.removeListener(_syncFromController);
     _focusNode.dispose();
     _textController.dispose();
     super.dispose();
@@ -77,6 +98,21 @@ class _SearchPageAppBarState extends State<SearchPageAppBar>
           hintText: l10n.postSearchTags,
           hintStyle: theme.textTheme.bodyLarge?.copyWith(color: hintColor),
           prefixIcon: Icon(Icons.search, color: iconColor),
+          suffixIcon: ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _textController,
+            builder: (context, value, _) {
+              if (value.text.isEmpty) return const SizedBox.shrink();
+              return IconButton(
+                icon: const Icon(Icons.clear, size: 20),
+                tooltip: l10n.commonClear,
+                onPressed: () {
+                  _textController.clear();
+                  widget.controller.query = Map.from(widget.controller.query)
+                    ..remove('tags');
+                },
+              );
+            },
+          ),
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
