@@ -298,50 +298,54 @@ class _SidebarTile extends StatelessWidget {
     final surfaceElevated = theme.brightness == Brightness.dark
         ? Color.lerp(theme.canvasColor, Colors.white, 0.06)!
         : colorScheme.surfaceContainerHighest;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Material(
-        color: Colors.transparent,
-        child: AnimatedContainer(
-          duration: _sidebarAnimationDuration,
-          curve: Curves.easeInOut,
-          decoration: BoxDecoration(
-            color: selected ? surfaceElevated : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: CupertinoButton(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            minimumSize: Size.zero,
-            onPressed: () {
-              HapticFeedback.selectionClick();
-              onTap();
-            },
-            child: Row(
-              children: [
-                Icon(
-                  item.icon,
-                  size: 22,
-                  color: selected
-                      ? colorScheme.onSurface
-                      : colorScheme.onSurfaceVariant,
-                ),
-                if (!collapsed) ...[
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Text(
-                      item.label(l10n),
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontWeight: selected
-                            ? FontWeight.w600
-                            : FontWeight.w500,
-                        color: selected
-                            ? colorScheme.onSurface
-                            : colorScheme.onSurfaceVariant,
+    return Tooltip(
+      message: item.label(l10n),
+      preferBelow: false,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Material(
+          color: Colors.transparent,
+          child: AnimatedContainer(
+            duration: _sidebarAnimationDuration,
+            curve: Curves.easeInOut,
+            decoration: BoxDecoration(
+              color: selected ? surfaceElevated : Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: CupertinoButton(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              minimumSize: Size.zero,
+              onPressed: () {
+                HapticFeedback.selectionClick();
+                onTap();
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    item.icon,
+                    size: 22,
+                    color: selected
+                        ? colorScheme.onSurface
+                        : colorScheme.onSurfaceVariant,
+                  ),
+                  if (!collapsed) ...[
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Text(
+                        item.label(l10n),
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontWeight: selected
+                              ? FontWeight.w600
+                              : FontWeight.w500,
+                          color: selected
+                              ? colorScheme.onSurface
+                              : colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         ),

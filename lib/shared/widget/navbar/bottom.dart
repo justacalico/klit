@@ -249,6 +249,8 @@ Future<void> _showMoreMenu(
   _NavAdapter nav,
 ) async {
   final l10n = AppLocalizations.of(context);
+  final theme = Theme.of(context);
+  final colorScheme = theme.colorScheme;
   final box = context.findRenderObject()! as RenderBox;
   final overlay = Overlay.of(context).context.findRenderObject()! as RenderBox;
   final rect = RelativeRect.fromRect(
@@ -268,6 +270,12 @@ Future<void> _showMoreMenu(
             title: e.item.label(l10n),
             icon: e.item.icon,
             value: e.index,
+            textColor: nav.currentIndex == e.index
+                ? colorScheme.primary
+                : null,
+            iconColor: nav.currentIndex == e.index
+                ? colorScheme.primary
+                : null,
           ),
         )
         .toList(),

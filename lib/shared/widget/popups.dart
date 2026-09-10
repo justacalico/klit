@@ -8,13 +8,20 @@ class PopupMenuTile<T> extends PopupMenuItem<T> {
     required T value,
     required this.icon,
     required this.title,
+    this.textColor,
+    this.iconColor,
   }) : super(
-         child: ListMenuTile(leading: Icon(icon), title: Text(title)),
+         child: ListMenuTile(
+           leading: Icon(icon, color: iconColor),
+           title: Text(title, style: textColor != null ? TextStyle(color: textColor) : null),
+         ),
          value: value,
        );
 
   final IconData icon;
   final String title;
+  final Color? textColor;
+  final Color? iconColor;
 }
 
 class PopupMenuPickerTile<T> extends PopupMenuItem<T> {

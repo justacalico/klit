@@ -106,24 +106,37 @@ class _NavBarTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final color = selected ? colorScheme.primary : colorScheme.onSurfaceVariant;
     final child = showLabel
         ? Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(item.icon, size: 20),
+              Icon(item.icon, size: 20, color: color),
               const SizedBox(width: 8),
-              Text(item.label(l10n)),
+              Text(
+                item.label(l10n),
+                style: TextStyle(
+                  color: color,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
             ],
           )
-        : Icon(item.icon);
-    return CupertinoButton(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      minimumSize: Size.zero,
-      onPressed: () {
-        HapticFeedback.selectionClick();
-        onTap();
-      },
-      child: child,
+        : Icon(item.icon, color: color);
+    return Tooltip(
+      message: item.label(l10n),
+      preferBelow: false,
+      child: CupertinoButton(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        minimumSize: Size.zero,
+        onPressed: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
+        child: child,
+      ),
     );
   }
 }
