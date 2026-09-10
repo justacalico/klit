@@ -32,14 +32,17 @@ GoRouter createAppRouter(GlobalKey<NavigatorState> navigatorKey) {
         routes: [
           GoRoute(
             path: AppRoutes.home,
+            pageBuilder: _instantPage,
             builder: (context, state) => const HomePage(),
           ),
           GoRoute(
             path: AppRoutes.hot,
+            pageBuilder: _instantPage,
             builder: (context, state) => const HotPage(),
           ),
           GoRoute(
             path: AppRoutes.search,
+            pageBuilder: _instantPage,
             builder: (context, state) {
               final tags = state.uri.queryParameters['tags'];
               if (tags == null || tags.isEmpty) return const PostsSearchPage();
@@ -51,6 +54,7 @@ GoRouter createAppRouter(GlobalKey<NavigatorState> navigatorKey) {
           ),
           GoRoute(
             path: AppRoutes.feeds,
+            pageBuilder: _instantPage,
             builder: (context, state) => const FeedsPage(),
           ),
           GoRoute(
@@ -63,30 +67,37 @@ GoRouter createAppRouter(GlobalKey<NavigatorState> navigatorKey) {
           ),
           GoRoute(
             path: AppRoutes.profile,
+            pageBuilder: _instantPage,
             builder: (context, state) => const ProfilePage(),
           ),
           GoRoute(
             path: AppRoutes.pools,
+            pageBuilder: _instantPage,
             builder: (context, state) => const PoolsPage(),
           ),
           GoRoute(
             path: AppRoutes.forum,
+            pageBuilder: _instantPage,
             builder: (context, state) => const TopicsPage(),
           ),
           GoRoute(
             path: AppRoutes.history,
+            pageBuilder: _instantPage,
             builder: (context, state) => const HistoriesPage(),
           ),
           GoRoute(
             path: AppRoutes.finishes,
+            pageBuilder: _instantPage,
             builder: (context, state) => const FinishesPage(),
           ),
           GoRoute(
             path: AppRoutes.blacklist,
+            pageBuilder: _instantPage,
             builder: (context, state) => const DenyListPage(),
           ),
           GoRoute(
             path: AppRoutes.settings,
+            pageBuilder: _instantPage,
             builder: (context, state) => const SettingsPage(),
           ),
           GoRoute(
@@ -100,6 +111,44 @@ GoRouter createAppRouter(GlobalKey<NavigatorState> navigatorKey) {
       ),
     ],
   );
+}
+
+CustomTransitionPage<void> _instantPage(
+  BuildContext context,
+  GoRouterState state,
+) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: _pageForPath(state),
+    transitionDuration: Duration.zero,
+    reverseTransitionDuration: Duration.zero,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) => child,
+  );
+}
+
+Widget _pageForPath(GoRouterState state) {
+  final path = state.uri.path;
+  return switch (path) {
+    AppRoutes.home => const HomePage(),
+    AppRoutes.hot => const HotPage(),
+    AppRoutes.search => () {
+      final tags = state.uri.queryParameters['tags'];
+      if (tags == null || tags.isEmpty) return const PostsSearchPage();
+      return PostsSearchPage(
+        key: ValueKey(tags),
+        query: {'tags': tags},
+      );
+    }(),
+    AppRoutes.feeds => const FeedsPage(),
+    AppRoutes.profile => const ProfilePage(),
+    AppRoutes.pools => const PoolsPage(),
+    AppRoutes.forum => const TopicsPage(),
+    AppRoutes.history => const HistoriesPage(),
+    AppRoutes.finishes => const FinishesPage(),
+    AppRoutes.blacklist => const DenyListPage(),
+    AppRoutes.settings => const SettingsPage(),
+    _ => const SizedBox(),
+  };
 }
 
 int? _intParam(GoRouterState state, String key) {
