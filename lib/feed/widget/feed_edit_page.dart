@@ -33,6 +33,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
   late String _order;
   late bool _excludeFavorites;
   late List<SubFeed> _subfeeds;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool get _isNew => widget.feed == null;
   bool get _embedded => widget.onComplete != null;
@@ -66,6 +67,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
 
   Future<void> _save() async {
     final l10n = AppLocalizations.of(context);
+    if (!(_formKey.currentState?.validate() ?? false)) return;
     final name = _nameController.text.trim();
     final feed = Feed(
       id: widget.feed?.id ?? '',
@@ -98,7 +100,9 @@ class _FeedEditPageState extends State<FeedEditPage> {
     final padding = _embedded
         ? defaultActionListPadding.add(LimitedWidthLayout.of(context).padding)
         : defaultListPadding;
-    return ListView(
+    return Form(
+      key: _formKey,
+      child: ListView(
       primary: true,
       padding: padding,
       children: [
@@ -106,13 +110,19 @@ class _FeedEditPageState extends State<FeedEditPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextField(
+              TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
                   labelText: l10n.commonName,
                   hintText: l10n.feedsNameHint,
                   border: _roundedInputBorder,
                 ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return l10n.feedsNameRequired;
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
               ListTileHeader(title: l10n.commonType),
@@ -285,6 +295,7 @@ class _FeedEditPageState extends State<FeedEditPage> {
           ),
         ],
       ],
+    ),
     );
   }
 

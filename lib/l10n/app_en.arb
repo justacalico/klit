@@ -189,6 +189,7 @@
   "feedsCreateFeed": "Create feed",
   "feedsUnnamed": "Unnamed feed",
   "feedsNameHint": "e.g. My art feed",
+  "feedsNameRequired": "Please enter a feed name",
   "feedsIncludeTags": "Include tags",
   "feedsIncludeTagsHint": "space separated, all required",
   "feedsOrTags": "Or tags",

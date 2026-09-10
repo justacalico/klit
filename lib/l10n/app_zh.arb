@@ -189,6 +189,7 @@
   "feedsCreateFeed": "创建订阅源",
   "feedsUnnamed": "未命名订阅源",
   "feedsNameHint": "例如：我的艺术订阅",
+  "feedsNameRequired": "请输入订阅名称",
   "feedsIncludeTags": "包含标签",
   "feedsIncludeTagsHint": "空格分隔，全部匹配",
   "feedsOrTags": "或标签",
