@@ -62,6 +62,17 @@ class PoolTile extends StatelessWidget {
             ),
           ),
         );
+      } else if (controller.thumbnails.items == null) {
+        image = const Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+        );
       }
     }
 
