@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kilt/app/routing/app_routes.dart';
 import 'package:kilt/client/client.dart';
 import 'package:kilt/finish/finish.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/post/post.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
@@ -214,6 +215,7 @@ class _FinishTile extends StatelessWidget {
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete_outline),
+                        tooltip: AppLocalizations.of(context).tooltipDelete,
                         onPressed: onDelete,
                         iconSize: 20,
                         padding: EdgeInsets.zero,

@@ -371,6 +371,7 @@ class PostFeedTile extends StatelessWidget {
               children: [
                 IconButton(
                   icon: const Icon(Icons.comment),
+                  tooltip: l10n.commonComments,
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => PostCommentsPage(postId: post.id),
@@ -444,6 +445,7 @@ class PostFeedTile extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(Icons.share),
+              tooltip: l10n.commonShare,
               onPressed: () => Share.text(
                 context,
                 context.read<Client>().withHost(post.link),
