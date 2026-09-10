@@ -62,7 +62,7 @@ class _FeedsPageState extends State<FeedsPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l10n.feedsDeleteDialogTitle),
-        content: Text('Delete "${feed.name}"?'),
+        content: Text(l10n.feedsDeleteDialogBody(feed.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),

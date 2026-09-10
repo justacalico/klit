@@ -108,7 +108,7 @@ class HistoryLimitTile extends StatelessWidget {
                       );
                       Navigator.of(context).maybePop();
                     },
-                    child: const Text('OK'),
+                    child: Text(l10n.commonOkUpper),
                   ),
                 ],
               ),

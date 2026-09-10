@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0
 
 import 'package:flutter/material.dart';
+import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
 
 class ContextDrawer extends StatelessWidget {
@@ -40,7 +41,7 @@ class ContextDrawer extends StatelessWidget {
 }
 
 class ContextDrawerButton extends StatelessWidget {
-  const ContextDrawerButton({super.key, this.icon, this.tooltip = 'Filter'});
+  const ContextDrawerButton({super.key, this.icon, this.tooltip});
 
   final IconData? icon;
   final String? tooltip;
@@ -51,8 +52,9 @@ class ContextDrawerButton extends StatelessWidget {
     if (scaffold == null || !scaffold.hasEndDrawer) {
       return const SizedBox();
     }
+    final effectiveTooltip = tooltip ?? AppLocalizations.of(context).commonFilter;
     return IconButton(
-      tooltip: tooltip,
+      tooltip: effectiveTooltip,
       icon: Icon(icon ?? Icons.tune),
       onPressed: scaffold.openEndDrawer,
     );
