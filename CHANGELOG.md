@@ -1,6 +1,7 @@
 # Changelog
 
 # 12.0.0
+- Fixed fullscreen video controls being visible but unresponsive: the centered play button expanded to fill the screen and swallowed all taps, and the gesture layer covered the control bar ([!86](https://gitlab.com/Openlyst/klit/-/merge_requests/86))
 - Fixed the search input box being taller than intended: the app bar secondary slot now subtracts its vertical padding from the reserved band height instead of giving the pill the full band plus padding ([!85](https://gitlab.com/Openlyst/klit/-/merge_requests/85))
 - Synced the search bar text with `PostController` query changes and added a clear button that clears both the text field and the active search query ([!76](https://gitlab.com/Openlyst/klit/-/merge_requests/76))
 - Fixed the search box keeping focus after navigating to a post and returning, which reopened the keyboard: focus is now dropped when a route is pushed on top of the search page, and the search field's focus node is correctly wired through to the autocomplete text field ([!69](https://gitlab.com/Openlyst/klit/-/merge_requests/69))

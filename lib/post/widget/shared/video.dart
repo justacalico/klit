@@ -46,57 +46,62 @@ class VideoButton extends StatelessWidget {
 
             return ScaffoldFrameChild(
               shown: shown,
-              child: Material(
-                clipBehavior: Clip.antiAlias,
-                shape: const CircleBorder(),
-                color: Colors.black26,
-                child: IconButton(
-                  iconSize: size,
-                  onPressed: () {
-                    if (player.state.playing) {
-                      frameController?.cancel();
-                      player.pause();
-                    } else {
-                      player.play();
-                      frameController?.hideFrame(
-                        duration: const Duration(milliseconds: 500),
-                      );
-                    }
-                  },
-                  icon: Center(
-                    child: CrossFade(
-                      showChild: showPlayButton,
-                      duration: const Duration(milliseconds: 100),
-                      secondChild: const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(8),
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                      child: SubValue<StreamSubscription<bool>>(
-                        create: () {
-                          if (player.state.playing) {
-                            animationController.forward();
-                          } else {
-                            animationController.reverse();
-                          }
-                          return player.stream.playing.listen((event) {
-                            if (event) {
-                              animationController.forward();
-                            } else {
-                              animationController.reverse();
-                            }
-                          });
-                        },
-                        keys: [player, animationController],
-                        dispose: (value) => value.cancel(),
-                        builder: (context, _) => AnimatedBuilder(
-                          animation: animationController,
-                          builder: (context, child) => AnimatedIcon(
-                            icon: AnimatedIcons.play_pause,
-                            progress: animationController,
-                            size: size,
-                            color: Colors.white,
+              child: Center(
+                child: Material(
+                  clipBehavior: Clip.antiAlias,
+                  shape: const CircleBorder(),
+                  color: Colors.black26,
+                  child: IconButton(
+                    iconSize: size,
+                    onPressed: () {
+                      if (player.state.playing) {
+                        frameController?.cancel();
+                        player.pause();
+                      } else {
+                        player.play();
+                        frameController?.hideFrame(
+                          duration: const Duration(milliseconds: 500),
+                        );
+                      }
+                    },
+                    icon: SizedBox.square(
+                      dimension: size,
+                      child: Center(
+                        child: CrossFade(
+                          showChild: showPlayButton,
+                          duration: const Duration(milliseconds: 100),
+                          secondChild: const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(8),
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                          child: SubValue<StreamSubscription<bool>>(
+                            create: () {
+                              if (player.state.playing) {
+                                animationController.forward();
+                              } else {
+                                animationController.reverse();
+                              }
+                              return player.stream.playing.listen((event) {
+                                if (event) {
+                                  animationController.forward();
+                                } else {
+                                  animationController.reverse();
+                                }
+                              });
+                            },
+                            keys: [player, animationController],
+                            dispose: (value) => value.cancel(),
+                            builder: (context, _) => AnimatedBuilder(
+                              animation: animationController,
+                              builder: (context, child) => AnimatedIcon(
+                                icon: AnimatedIcons.play_pause,
+                                progress: animationController,
+                                size: size,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -397,6 +402,13 @@ class _VideoGestureState extends State<VideoGesture>
   );
   int combo = 0;
   Timer? comboReset;
+
+  @override
+  void dispose() {
+    comboReset?.cancel();
+    animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

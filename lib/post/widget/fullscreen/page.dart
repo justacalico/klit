@@ -72,20 +72,20 @@ class PostFullscreen extends StatelessWidget {
                   return Center(
                     child: Hero(
                       tag: post.link,
-                      child: VideoGestures(
-                        player: player,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            PostVideoWidget(post: post),
-                            Positioned(
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              child: VideoBar(player: player),
-                            ),
-                          ],
-                        ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          VideoGestures(
+                            player: player,
+                            child: PostVideoWidget(post: post),
+                          ),
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            child: VideoBar(player: player),
+                          ),
+                        ],
                       ),
                     ),
                   );
