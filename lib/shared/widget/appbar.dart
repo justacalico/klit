@@ -130,6 +130,8 @@ class AppHeaderBar extends StatelessWidget implements PreferredSizeWidget {
   final AppHeaderDensity density;
   final AppHeaderSurface surface;
 
+  static const _secondaryPadding = EdgeInsets.fromLTRB(12, 4, 12, 10);
+
   double get _secondaryHeight {
     return switch (density) {
       AppHeaderDensity.compact => 52,
@@ -190,11 +192,14 @@ class AppHeaderBar extends StatelessWidget implements PreferredSizeWidget {
             children: [
               bar,
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
+                padding: _secondaryPadding,
                 child: Material(
                   color: secondaryFill,
                   borderRadius: BorderRadius.circular(14),
-                  child: SizedBox(height: _secondaryHeight, child: secondary),
+                  child: SizedBox(
+                    height: _secondaryHeight - _secondaryPadding.vertical,
+                    child: secondary,
+                  ),
                 ),
               ),
             ],
