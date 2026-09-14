@@ -1,6 +1,7 @@
 # Changelog
 
 # 12.0.0
+- CI builds now stamp the GitHub Actions run number into the pubspec version so built apps report e.g. `12.0.0+42` for easier version tracking ([!87](https://gitlab.com/Openlyst/klit/-/merge_requests/87))
 - Fixed fullscreen video controls being visible but unresponsive: the centered play button expanded to fill the screen and swallowed all taps, and the gesture layer covered the control bar ([!86](https://gitlab.com/Openlyst/klit/-/merge_requests/86))
 - Fixed the search input box being taller than intended: the app bar secondary slot now subtracts its vertical padding from the reserved band height instead of giving the pill the full band plus padding ([!85](https://gitlab.com/Openlyst/klit/-/merge_requests/85))
 - Synced the search bar text with `PostController` query changes and added a clear button that clears both the text field and the active search query ([!76](https://gitlab.com/Openlyst/klit/-/merge_requests/76))
