@@ -92,8 +92,9 @@ jobs:
         shell: bash
         run: |
           VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //g' | cut -d'+' -f1)
-          BUILD_NUMBER=$(date +%s | cut -c4-10)
+          BUILD_NUMBER="${{ github.run_number }}"
           BUILD_DATE=$(date +%Y-%m-%d)
+          sed -i.bak "s/^version: .*/version: ${VERSION}+${BUILD_NUMBER}/" pubspec.yaml && rm -f pubspec.yaml.bak
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
           echo "build_date=$BUILD_DATE" >> "$GITHUB_OUTPUT"
