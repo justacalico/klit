@@ -9,9 +9,9 @@ void main() {
       final textController = TextEditingController(text: 'fox');
       expect(textController.text, 'fox');
 
-      final queryTags = 'cat';
+      const queryTags = 'cat';
       if (textController.text != queryTags) {
-        textController.value = TextEditingValue(
+        textController.value = const TextEditingValue(
           text: queryTags,
           selection: TextSelection.collapsed(offset: queryTags.length),
         );
@@ -27,7 +27,7 @@ void main() {
 
     test('sync does not update when text already matches', () {
       final textController = TextEditingController(text: 'fox');
-      final queryTags = 'fox';
+      const queryTags = 'fox';
       expect(textController.text, queryTags);
     });
 
