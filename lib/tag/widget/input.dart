@@ -26,6 +26,7 @@ class TagInput extends StatelessWidget {
     this.focusNode,
     this.maxLines = 1,
     this.cutoutForFab,
+    this.textAlignVertical,
   });
 
   final SubmitString? submit;
@@ -41,6 +42,7 @@ class TagInput extends StatelessWidget {
   final FocusNode? focusNode;
   final int? maxLines;
   final bool? cutoutForFab;
+  final TextAlignVertical? textAlignVertical;
 
   int findTag(List<String> tags, int offset) {
     final before = <String>[];
@@ -84,6 +86,7 @@ class TagInput extends StatelessWidget {
           focusNode: focusNode,
           maxLines: maxLines,
           cutoutForFab: cutoutForFab ?? true,
+          textAlignVertical: textAlignVertical,
           onSelected: (suggestion) {
             final tags = controller.text.split(' ');
             final selection = findTag(tags, controller.selection.extent.offset);
