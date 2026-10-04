@@ -30,6 +30,7 @@ class AutocompleteTextField<T> extends StatelessWidget {
     this.inputFormatters,
     this.maxLines = 1,
     this.cutoutForFab = true,
+    this.textAlignVertical,
   });
 
   final SubmitString? submit;
@@ -48,6 +49,7 @@ class AutocompleteTextField<T> extends StatelessWidget {
   final bool autofocus;
   final bool private;
   final bool cutoutForFab;
+  final TextAlignVertical? textAlignVertical;
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +73,7 @@ class AutocompleteTextField<T> extends StatelessWidget {
         readOnly: readOnly,
         enableIMEPersonalizedLearning: !private,
         maxLines: maxLines,
+        textAlignVertical: textAlignVertical,
       ),
       decorationBuilder: (context, child) {
         final Widget result = Card(

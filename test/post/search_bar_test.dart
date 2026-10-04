@@ -104,6 +104,21 @@ void main() {
       final textField = tester.widget<TextField>(find.byType(TextField));
       expect(textField.focusNode!.hasFocus, isFalse);
     });
+
+    testWidgets('centers the input vertically inside the search box',
+        (tester) async {
+      await tester.pumpWidget(buildApp(requestFocus: false));
+      await tester.pumpAndSettle();
+
+      final box = find.ancestor(
+        of: find.byType(EditableText),
+        matching: find.byType(Material),
+      );
+      expect(
+        tester.getCenter(find.byType(EditableText)).dy,
+        moreOrLessEquals(tester.getCenter(box.first).dy, epsilon: 4),
+      );
+    });
   });
 }
 

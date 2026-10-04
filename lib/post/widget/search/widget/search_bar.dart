@@ -119,8 +119,9 @@ class _SearchPageAppBarState extends State<SearchPageAppBar>
           disabledBorder: InputBorder.none,
           isDense: true,
           prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-          contentPadding: const EdgeInsetsDirectional.fromSTEB(0, 14, 14, 14),
+          contentPadding: const EdgeInsetsDirectional.only(end: 14),
         ),
+        textAlignVertical: TextAlignVertical.center,
         submit: (value) {
           widget.controller.query = Map.from(widget.controller.query)
             ..['tags'] = value;
