@@ -1,6 +1,7 @@
 # Changelog
 
 # 12.0.0
+- Added browser-style UI zoom on desktop: Ctrl (Cmd on macOS) + `+`/`-` steps through zoom levels from 25% to 500%, Ctrl+0 resets to 100%, a badge shows the current percentage, and the factor persists across launches ([!88](https://gitlab.com/Openlyst/klit/-/merge_requests/88))
 - CI builds now stamp the GitHub Actions run number into the pubspec version so built apps report e.g. `12.0.0+42` for easier version tracking ([!87](https://gitlab.com/Openlyst/klit/-/merge_requests/87))
 - Fixed fullscreen video controls being visible but unresponsive: the centered play button expanded to fill the screen and swallowed all taps, and the gesture layer covered the control bar ([!86](https://gitlab.com/Openlyst/klit/-/merge_requests/86))
 - Fixed the search input box being taller than intended: the app bar secondary slot now subtracts its vertical padding from the reserved band height instead of giving the pill the full band plus padding ([!85](https://gitlab.com/Openlyst/klit/-/merge_requests/85))
