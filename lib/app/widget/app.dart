@@ -72,7 +72,8 @@ class App extends StatelessWidget {
                                 RelativeTimeLocalizations.delegate,
                               ],
                               routerConfig: goRouter,
-                              builder: (context, child) => Theme(
+                              builder: (context, child) => DesktopZoom(
+                                child: Theme(
                                 data: materialTheme,
                                 child: ScaffoldMessenger(
                                   child: WindowFrame(
@@ -112,6 +113,7 @@ class App extends StatelessWidget {
                                       ),
                                     ),
                                   ),
+                                ),
                                 ),
                               ),
                             );
