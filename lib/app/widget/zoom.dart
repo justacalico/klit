@@ -80,7 +80,6 @@ class _DesktopZoomState extends State<DesktopZoom> {
     } else {
       return false;
     }
-    if (next == factor) return false;
     zoomFactor.value = next;
     _flashBadge();
     return true;

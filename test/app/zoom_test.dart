@@ -226,16 +226,21 @@ void main() {
       );
     });
 
-    testWidgets('does not flash the badge at the zoom limits', (tester) async {
+    testWidgets('stays clamped but still flashes the badge at the limits', (
+      tester,
+    ) async {
       settings.zoomFactor.value = 5;
       await pumpZoom(tester, enabled: true);
 
       await pressCtrlKey(tester, LogicalKeyboardKey.equal);
       expect(settings.zoomFactor.value, 5);
+      expect(find.text('500%'), findsOneWidget);
       expect(
         tester.widget<AnimatedOpacity>(find.byType(AnimatedOpacity)).opacity,
-        0,
+        1,
       );
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump();
     });
   });
 }
