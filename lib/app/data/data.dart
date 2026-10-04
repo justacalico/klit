@@ -9,3 +9,4 @@ export 'storage.dart';
 export 'storage.drift.dart';
 export 'task.dart';
 export 'theme.dart';
+export 'zoom.dart';

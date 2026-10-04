@@ -59,6 +59,10 @@ class Settings extends NotifiedSettings {
     key: 'tileSize',
     initialValue: 200,
   );
+  late final ValueNotifier<double> zoomFactor = createSetting<double>(
+    key: 'zoomFactor',
+    initialValue: 1,
+  );
   late final ValueNotifier<GridQuilt> quilt = createEnumSetting(
     key: 'quilt',
     initialValue: GridQuilt.square,

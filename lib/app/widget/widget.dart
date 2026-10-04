@@ -9,3 +9,4 @@ export 'lock.dart';
 export 'notifications.dart';
 export 'provider.dart';
 export 'window.dart';
+export 'zoom.dart';
