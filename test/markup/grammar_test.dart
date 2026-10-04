@@ -197,5 +197,108 @@ void main() {
       expect(list.items[0].indent, 0);
       expect(list.items[1].indent, 1);
     });
+
+    test('parses markdown bold', () {
+      final ast = parse('**bold text**');
+      expect(ast, isA<DTextBold>());
+      final bold = ast as DTextBold;
+      expect((bold.children as DTextContent).content, 'bold text');
+    });
+
+    test('parses markdown bold with underscores', () {
+      final ast = parse('__bold text__');
+      expect(ast, isA<DTextBold>());
+    });
+
+    test('parses markdown italic', () {
+      final ast = parse('*italic text*');
+      expect(ast, isA<DTextItalic>());
+      final italic = ast as DTextItalic;
+      expect((italic.children as DTextContent).content, 'italic text');
+    });
+
+    test('parses markdown italic with underscores', () {
+      final ast = parse('_italic text_');
+      expect(ast, isA<DTextItalic>());
+    });
+
+    test('parses markdown strikethrough', () {
+      final ast = parse('~~struck~~');
+      expect(ast, isA<DTextStrikethrough>());
+      final struck = ast as DTextStrikethrough;
+      expect((struck.children as DTextContent).content, 'struck');
+    });
+
+    test('parses markdown bold and italic combined', () {
+      final ast = parse('***bold italic***');
+      expect(ast, isA<DTextBold>());
+      final bold = ast as DTextBold;
+      expect(bold.children, isA<DTextItalic>());
+    });
+
+    test('parses markdown styles inline', () {
+      final ast = parse('a **b** c ~~d~~');
+      expect(ast, isA<DTextElements>());
+      final elements = (ast as DTextElements).elements;
+      expect(elements.any((e) => e is DTextBold), isTrue);
+      expect(elements.any((e) => e is DTextStrikethrough), isTrue);
+    });
+
+    test('does not parse empty markdown bold', () {
+      final ast = parse('a ** b');
+      expect(ast, isA<DTextContent>());
+      expect((ast as DTextContent).content, 'a ** b');
+    });
+
+    test('does not parse underscores inside words', () {
+      final ast = parse('snake_case_name');
+      expect(ast, isA<DTextContent>());
+      expect((ast as DTextContent).content, 'snake_case_name');
+    });
+
+    test('parses markdown header', () {
+      final ast = parse('## Header text');
+      expect(ast, isA<DTextHeader>());
+      expect((ast as DTextHeader).level, 2);
+    });
+
+    test('does not parse markdown header without space', () {
+      final ast = parse('#notaheader');
+      expect(ast, isA<DTextContent>());
+    });
+
+    test('parses markdown quote', () {
+      final ast = parse('> quoted text');
+      expect(ast, isA<DTextQuote>());
+      final quote = ast as DTextQuote;
+      expect((quote.children as DTextContent).content, 'quoted text');
+    });
+
+    test('parses markdown link', () {
+      final ast = parse('[display](https://example.com)');
+      expect(ast, isA<DTextLink>());
+      final link = ast as DTextLink;
+      expect(link.link, 'https://example.com');
+      expect((link.name! as DTextContent).content, 'display');
+    });
+
+    test('parses markdown local link', () {
+      final ast = parse('[post](/posts/123)');
+      expect(ast, isA<DTextLocalLink>());
+      final link = ast as DTextLocalLink;
+      expect(link.link, '/posts/123');
+    });
+
+    test('keeps bullet list precedence over markdown italic', () {
+      final ast = parse('* item one');
+      expect(ast, isA<DTextList>());
+    });
+
+    test('keeps nested bullet precedence over markdown bold', () {
+      final ast = parse('* top\n** nested');
+      expect(ast, isA<DTextList>());
+      final list = ast as DTextList;
+      expect(list.items[1].indent, 1);
+    });
   });
 }
