@@ -127,8 +127,12 @@ class DTextGrammar extends GrammarDefinition<DTextElement> {
     ref1(blockMarker, 'section'),
   ].toChoiceParser();
 
-  Parser<DTextElement> structures() =>
-      [ref0(header), ref0(list)].toChoiceParser();
+  Parser<DTextElement> structures() => [
+    ref0(header),
+    ref0(markdownHeader),
+    ref0(markdownQuote),
+    ref0(list),
+  ].toChoiceParser();
 
   Parser<DTextElement> newlineStructures() => (
     newline().map(DTextContent.new),
@@ -150,6 +154,9 @@ class DTextGrammar extends GrammarDefinition<DTextElement> {
     ref0(superscript),
     ref0(subscript),
     ref0(color),
+    ref0(markdownBold),
+    ref0(markdownItalic),
+    ref0(markdownStrikethrough),
   ].toChoiceParser();
 
   Parser<DTextElement> links() => [
@@ -158,6 +165,7 @@ class DTextGrammar extends GrammarDefinition<DTextElement> {
     ref0(localLink),
     ref0(tagLink),
     ref0(tagSearchLink),
+    ref0(markdownLink),
   ].toChoiceParser();
 
   Parser<DTextElement> character() => any().map((value) => DTextContent(value));
@@ -266,6 +274,85 @@ class DTextGrammar extends GrammarDefinition<DTextElement> {
     any().starLazy(char('`')).flatten().map((e) => DTextInlineCode(e)),
     char('`'),
   ).toSequenceParser().map((e) => e.$2);
+
+  Parser<DTextElement> markdownDelimited(
+    String delimiter,
+    DTextElement Function(DTextElement children) wrap, {
+    Parser<void>? trailing,
+  }) {
+    final inner = ref1(
+      condense,
+      ref0(textElement).plusLazy(string(delimiter)).map(DTextElements.new),
+    );
+    if (trailing == null) {
+      return (
+        string(delimiter),
+        whitespace().not(),
+        inner,
+        string(delimiter),
+      ).toSequenceParser().map((e) => wrap(e.$3));
+    }
+    return (
+      string(delimiter),
+      whitespace().not(),
+      inner,
+      string(delimiter),
+      trailing,
+    ).toSequenceParser().map((e) => wrap(e.$3));
+  }
+
+  Parser<DTextElement> markdownBold() => [
+    markdownDelimited('**', DTextBold.new),
+    markdownDelimited('__', DTextBold.new, trailing: word().not()),
+  ].toChoiceParser();
+
+  Parser<DTextElement> markdownItalic() => [
+    markdownDelimited('*', DTextItalic.new),
+    markdownDelimited('_', DTextItalic.new, trailing: word().not()),
+  ].toChoiceParser();
+
+  Parser<DTextElement> markdownStrikethrough() =>
+      markdownDelimited('~~', DTextStrikethrough.new);
+
+  Parser<DTextElement> markdownHeader() => (
+    (
+      char('#').repeat(1, 6).flatten().map((e) => e.length),
+      char('#').not(),
+      char(' ').plus(),
+    ).toSequenceParser().map((e) => e.$1),
+    condense(
+      ref0(textElement)
+          .starLazy(
+            [blockMarkers(), newline(), endOfInput()].toChoiceParser(),
+          )
+          .map(DTextElements.new),
+    ),
+  ).toSequenceParser().map((e) => DTextHeader(e.$1, e.$2));
+
+  Parser<DTextElement> markdownQuote() => (
+    char('>'),
+    char(' ').optional(),
+    condense(
+      ref0(textElement)
+          .starLazy(
+            [blockMarkers(), newline(), endOfInput()].toChoiceParser(),
+          )
+          .map(DTextElements.new),
+    ),
+  ).toSequenceParser().map((e) => DTextQuote(e.$3));
+
+  Parser<DTextElement> markdownLink() => (
+    char('['),
+    ref2(withText, ref0(inlineStyles), char(']')),
+    char(']'),
+    char('('),
+    any().starLazy(char(')')).flatten(),
+    char(')'),
+  ).toSequenceParser().map(
+    (e) => e.$5.startsWith('/')
+        ? DTextLocalLink(e.$2, e.$5)
+        : DTextLink(e.$2, e.$5),
+  );
 
   Parser<DTextElement> header() => (
     (
