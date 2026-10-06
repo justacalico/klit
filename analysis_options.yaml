@@ -39,3 +39,9 @@ analyzer:
     - lib/**.g.dart
     - lib/**.drift.dart
     - lib/l10n/gen/**
+    - build/**
+    - android/**
+    - ios/**
+    - windows/**
+    - macos/**
+    - linux/**

@@ -1,6 +1,7 @@
 # Changelog
 
 # 12.0.0
+- Fixed check for update on iOS and desktop: the background task identifier still used the old `klit` name so iOS rejected it, the installed-version comparison crashed when the build number was empty, store installs never surfaced releases older than 7 days (the filter was inverted), and the Download button returned nothing on macOS/Windows/Linux; the remaining `klit` bundle/package identifiers were also renamed to `kilt` ([!91](https://gitlab.com/Openlyst/klit/-/merge_requests/91))
 - Added Markdown syntax support to DText rendering: `**bold**`/`__bold__`, `*italic*`/`_italic_`, `~~strikethrough~~`, `#`–`######` headers, `>` quotes, and `[name](url)` links now render in profiles, comments, descriptions, and everywhere else DText is shown ([!90](https://gitlab.com/Openlyst/klit/-/merge_requests/90))
 - Fixed dead space below the text inside the search box: the input is now vertically centered in the pill instead of being pinned to the top by its content padding ([!89](https://gitlab.com/Openlyst/klit/-/merge_requests/89))
 - Added browser-style UI zoom on desktop: Ctrl (Cmd on macOS) + `+`/`-` steps through zoom levels from 25% to 500%, Ctrl+0 resets to 100%, a badge shows the current percentage, and the factor persists across launches ([!88](https://gitlab.com/Openlyst/klit/-/merge_requests/88))

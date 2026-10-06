@@ -95,7 +95,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Klit'), findsOneWidget);
+      expect(find.text('Kilt'), findsOneWidget);
       expect(find.byType(ListView), findsOneWidget);
       expect(find.byIcon(Icons.settings), findsOneWidget);
     });
