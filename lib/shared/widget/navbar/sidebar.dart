@@ -246,6 +246,9 @@ class _SidebarCollapseButton extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               child: Row(
+                mainAxisAlignment: effectiveCollapsed
+                    ? MainAxisAlignment.center
+                    : MainAxisAlignment.start,
                 children: [
                   Icon(
                     effectiveCollapsed
@@ -317,6 +320,9 @@ class _SidebarTile extends StatelessWidget {
               onTap();
             },
             child: Row(
+              mainAxisAlignment: collapsed
+                  ? MainAxisAlignment.center
+                  : MainAxisAlignment.start,
               children: [
                 Icon(
                   item.icon,
