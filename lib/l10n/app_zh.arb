@@ -243,7 +243,7 @@
   "databaseRestartRequiredTitle": "需要重启",
   "databaseRestartRequiredBody": "应用需要重启以应用更改。",
   "databaseErrorLoading": "加载数据库错误",
-  "databaseBackupFileName": "klit_database_backup.db",
+  "databaseBackupFileName": "kilt_database_backup.db",
   "postUpdateSuccess": "已更新帖子 #{id}",
   "@postUpdateSuccess": {
     "placeholders": {

@@ -13,7 +13,10 @@ import 'package:kilt/identity/identity.dart';
 import 'package:kilt/logs/logs.dart';
 import 'package:kilt/traits/traits.dart';
 
-const String followsBackgroundTaskKey = 'gitlab.openlyst.klit.follows';
+const String followsBackgroundTaskKey = 'gitlab.openlyst.kilt.follows';
+
+/// Background task identifier used before the app was renamed to Kilt.
+const String legacyFollowsBackgroundTaskKey = 'gitlab.openlyst.klit.follows';
 
 Future<void> runFollowUpdates({
   required AppStorage storage,

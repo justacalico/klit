@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:deep_pick/deep_pick.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:kilt/logs/logs.dart';
 import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
@@ -13,7 +15,13 @@ const String _openlystBase = 'https://openlyst.ink/api/v1';
 const String _appSlug = 'kilt';
 
 class AppInfoClient {
-  AppInfoClient() {
+  AppInfoClient({@visibleForTesting Dio? dio}) {
+    _dio = dio ??
+        Dio(
+          BaseOptions(
+            headers: {HttpHeaders.userAgentHeader: info.userAgent},
+          ),
+        );
     _dio.interceptors.add(LoggingDioInterceptor());
     _dio.interceptors.add(
       ClientCacheInterceptor(options: ClientCacheConfig(store: cache)),
@@ -22,9 +30,7 @@ class AppInfoClient {
 
   final AppInfo info = AppInfo.instance;
   final CacheStore? cache = MemCacheStore();
-  late final Dio _dio = Dio(
-    BaseOptions(headers: {HttpHeaders.userAgentHeader: info.userAgent}),
-  );
+  late final Dio _dio;
 
   Future<List<AppVersion>> getVersions({bool force = false}) async {
     final response = await _dio.get(
@@ -63,7 +69,7 @@ class AppInfoClient {
         AppVersion(
           version: Version.parse(versionStr),
           name: versionStr,
-          description: '',
+          description: data('localizedDescription').asStringOrNull() ?? '',
           date: dateStr != null ? DateTime.tryParse(dateStr) : null,
           binaries: binaries.isEmpty ? null : binaries,
         ),
@@ -86,8 +92,12 @@ class AppInfoClient {
     bool beta = false,
   }) async {
     final versions = await getVersions(force: force);
+    // Build numbers are ignored by version comparisons anyway, and
+    // platform builds can report empty or non-semver values that would
+    // otherwise make this throw.
+    final versionName = info.version.split('+').first;
     final current = AppVersion(
-      version: Version.parse('${info.version}+${info.buildNumber}'),
+      version: Version.parse(versionName.isEmpty ? '0.0.0' : versionName),
     );
 
     versions.removeWhere(
@@ -109,7 +119,7 @@ class AppInfoClient {
     if (info.source.isFromStore) {
       versions.removeWhere(
         (e) =>
-            e.date?.isBefore(
+            e.date?.isAfter(
               DateTime.now().subtract(const Duration(days: 7)),
             ) ??
             false,
@@ -129,7 +139,9 @@ class AppInfoClient {
         ).toOptions(),
       );
       final root = pick(response.data);
-      final downloads = root('data')('downloads');
+      final data = root('data');
+      if (data('downloadsDisabled').asBoolOrNull() ?? false) return null;
+      final downloads = data('downloads');
       if (Platform.isAndroid) {
         final url = downloads('Android')('apk').asStringOrNull();
         if (url != null && url.isNotEmpty) return url;
@@ -138,9 +150,40 @@ class AppInfoClient {
         final url = downloads('iOS').asStringOrNull();
         if (url != null && url.isNotEmpty) return url;
       }
+      if (Platform.isMacOS) {
+        final macos = downloads('macOS');
+        final url =
+            macos(_arch).asStringOrNull() ?? macos('universal').asStringOrNull();
+        if (url != null && url.isNotEmpty) return url;
+      }
+      if (Platform.isWindows) {
+        final windows = downloads('Windows');
+        for (final kind in ['exe', 'msix', 'zip', 'portable']) {
+          final url = windows(kind)(_arch).asStringOrNull();
+          if (url != null && url.isNotEmpty) return url;
+        }
+      }
+      if (Platform.isLinux) {
+        final linux = downloads('Linux');
+        for (final kind in ['appimage', 'zip', 'deb', 'rpm']) {
+          final url = linux(kind)(_arch).asStringOrNull();
+          if (url != null && url.isNotEmpty) return url;
+        }
+      }
     } catch (_) {}
     return null;
   }
+
+  /// The CPU architecture key used by the Openlyst downloads API.
+  static String get _arch => switch (Abi.current()) {
+        Abi.macosArm64 ||
+        Abi.iosArm64 ||
+        Abi.windowsArm64 ||
+        Abi.linuxArm64 ||
+        Abi.androidArm64 =>
+          'arm64',
+        _ => 'x86_64',
+      };
 }
 
 class AppVersion {

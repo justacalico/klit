@@ -17,6 +17,7 @@ final Logger _logger = Logger('IsolateSetup');
 Future<void> initializeBackgroundTasks() async {
   if (!PlatformCapabilities.hasBackgroundWorker) return;
   await Workmanager().initialize(executeBackgroundTasks);
+  await Workmanager().cancelByUniqueName(legacyFollowsBackgroundTaskKey);
   _logger.fine('Initialized background tasks');
 }
 

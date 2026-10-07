@@ -124,7 +124,7 @@ class _SidebarState extends State<_Sidebar> {
                                   const SizedBox(width: 14),
                                   Expanded(
                                     child: Text(
-                                      'Klit',
+                                      'Kilt',
                                       style: theme.textTheme.bodyLarge
                                           ?.copyWith(
                                             fontWeight: FontWeight.w600,
