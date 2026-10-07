@@ -1,12 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0
 
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kilt/app/data/storage.dart';
 import 'package:kilt/app/routing/app_routes.dart';
+import 'package:kilt/identity/identity.dart';
 import 'package:kilt/l10n/gen/app_localizations.dart';
 import 'package:kilt/shared/shared.dart';
+import 'package:provider/provider.dart' as provider;
 
 void main() {
   Widget buildNavbar(
@@ -14,24 +18,29 @@ void main() {
     double? width,
     List<NavItem>? items,
   }) {
+    final identityClient = _TestIdentityClient();
+    addTearDown(identityClient.dispose);
     return ProviderScope(
       overrides: [
         if (items != null)
           navigationProvider.overrideWith(() => _TestNavigationNotifier(items)),
       ],
-      child: MaterialApp(
-        locale: const Locale('en'),
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: Scaffold(
-          body: ResponsiveNavbar(
-            placement: placement,
-            layoutWidth: width,
+      child: provider.ChangeNotifierProvider<IdentityClient>.value(
+        value: identityClient,
+        child: MaterialApp(
+          locale: const Locale('en'),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: ResponsiveNavbar(
+              placement: placement,
+              layoutWidth: width,
+            ),
           ),
         ),
       ),
@@ -99,12 +108,67 @@ void main() {
       expect(find.byType(ListView), findsOneWidget);
       expect(find.byIcon(Icons.settings), findsOneWidget);
     });
+
+    testWidgets('centers icons when sidebar is collapsed', (tester) async {
+      await setSize(tester, 700);
+      await tester.pumpWidget(
+        buildNavbar(NavbarPlacement.sidebar, width: 700),
+      );
+      await tester.pumpAndSettle();
+
+      const sidebarCenterX = 36.0;
+      for (final icon in [
+        Icons.home,
+        Icons.settings,
+        Icons.keyboard_double_arrow_right,
+      ]) {
+        expect(
+          tester.getCenter(find.byIcon(icon)).dx,
+          closeTo(sidebarCenterX, 0.01),
+        );
+      }
+    });
+
+    testWidgets('left-aligns icons when sidebar is expanded', (tester) async {
+      await setSize(tester, 1000);
+      await tester.pumpWidget(
+        buildNavbar(NavbarPlacement.sidebar, width: 1000),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.getCenter(find.byIcon(Icons.home)).dx,
+        lessThan(36.0),
+      );
+    });
   });
 }
 
 String _homeLabel(AppLocalizations l10n) => 'Home';
 String _searchLabel(AppLocalizations l10n) => 'Search';
 String _feedsLabel(AppLocalizations l10n) => 'Feeds';
+
+class _TestIdentityClient extends IdentityClient {
+  _TestIdentityClient()
+    : super(database: AppDatabase(NativeDatabase.memory()));
+
+  @override
+  Identity get identity => const Identity(
+    id: 1,
+    host: 'example.com',
+    username: null,
+    headers: null,
+  );
+
+  @override
+  Future<void> activate(int? id) async {}
+
+  @override
+  void dispose() {
+    attachedDatabase.close();
+    super.dispose();
+  }
+}
 
 class _TestNavigationNotifier extends NavigationNotifier {
   _TestNavigationNotifier(this._items);
