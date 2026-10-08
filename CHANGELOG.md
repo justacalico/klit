@@ -1,5 +1,8 @@
 # Changelog
 
+# 13.0.0
+- Bumped version to 13.0.0 ([!93](https://gitlab.com/Openlyst/klit/-/merge_requests/93))
+
 # 12.0.0
 - Fixed collapsed sidebar icons being left-aligned: navigation tiles and the collapse/expand button now center their icons horizontally, matching the project icon ([!92](https://gitlab.com/Openlyst/klit/-/merge_requests/92))
 - Fixed check for update on iOS and desktop: the background task identifier still used the old `klit` name so iOS rejected it, the installed-version comparison crashed when the build number was empty, store installs never surfaced releases older than 7 days (the filter was inverted), and the Download button returned nothing on macOS/Windows/Linux; the remaining `klit` bundle/package identifiers were also renamed to `kilt` ([!91](https://gitlab.com/Openlyst/klit/-/merge_requests/91))
