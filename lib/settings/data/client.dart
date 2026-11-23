@@ -11,7 +11,7 @@ import 'package:kilt/settings/settings.dart';
 import 'package:kilt/shared/shared.dart';
 import 'package:pub_semver/pub_semver.dart';
 
-const String _openlystBase = 'https://openlyst.ink/api/v1';
+const String _openlystBase = 'https://site--website--t5njkr9m5dx6.code.run/api/v1';
 const String _appSlug = 'kilt';
 
 class AppInfoClient {

@@ -161,5 +161,5 @@ dependency_overrides:
 
 cider:
   link_template:
-    tag: https://openlyst.ink/apps/kilt
-    diff: https://openlyst.ink
+    tag: https://site--website--t5njkr9m5dx6.code.run/apps/kilt
+    diff: https://site--website--t5njkr9m5dx6.code.run

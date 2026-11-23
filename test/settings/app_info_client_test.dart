@@ -82,7 +82,7 @@ Future<AppInfoClient> _client({
     developer: 'OpenLyst',
     github: null,
     discord: null,
-    website: 'openlyst.ink',
+    website: 'site--website--t5njkr9m5dx6.code.run',
     kofi: null,
     email: null,
     appName: 'Kilt',
