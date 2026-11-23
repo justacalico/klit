@@ -2,6 +2,7 @@
 
 # 13.0.0
 - Bumped version to 13.0.0 ([!93](https://gitlab.com/Openlyst/klit/-/merge_requests/93))
+- Replaced the retired openlyst.ink domain with the new site domain: app info website field, update-check API base URL, deb/rpm/exe packaging metadata and the cider link templates ([!94](https://gitlab.com/Openlyst/klit/-/merge_requests/94))
 
 # 12.0.0
 - Fixed collapsed sidebar icons being left-aligned: navigation tiles and the collapse/expand button now center their icons horizontally, matching the project icon ([!92](https://gitlab.com/Openlyst/klit/-/merge_requests/92))
